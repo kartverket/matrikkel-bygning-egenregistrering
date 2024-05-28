@@ -1,0 +1,43 @@
+openapi: "3.0.3"
+info:
+  title: "matrikkel_bygning_egenregistering API"
+  description: "matrikkel_bygning_egenregistering API"
+  version: "1.0.0"
+servers:
+- url: "http://localhost:8080"
+paths:
+  /metrics:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /v1/bygning:
+    get:
+      description: ""
+      responses:
+        "404":
+          description: "Not Found"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Nothing"
+    post:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Bueno"
