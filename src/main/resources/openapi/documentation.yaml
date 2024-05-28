@@ -4,7 +4,7 @@ info:
   description: "matrikkel_bygning_egenregistering API"
   version: "1.0.0"
 servers:
-- url: "http://localhost:8080"
+- url: "https://matrikkel_bygning_egenregistering"
 paths:
   /metrics:
     get:
@@ -20,24 +20,62 @@ paths:
     get:
       description: ""
       responses:
-        "404":
-          description: "Not Found"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Nothing"
-    post:
-      description: ""
-      responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Bygning"
+    post:
+      description: ""
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/Bygning"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
                 type: "string"
-              examples:
-                Example#1:
-                  value: "Bueno"
+        "500":
+          description: "Internal Server Error"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+components:
+  schemas:
+    Bygning:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        byggeaar:
+          type: "integer"
+          format: "int32"
+        areal:
+          type: "number"
+          format: "double"
+        energikilder:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+            - "NOE"
+            - "NOE_ANNET"
+        oppvarming:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+            - "VARMEPUMPE"
+        vann:
+          type: "boolean"
+        avlop:
+          type: "boolean"

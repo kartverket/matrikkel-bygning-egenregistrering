@@ -13,6 +13,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
+import no.kartverket.matrikkel.bygning.services.BygningService
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module).start(wait = true)
@@ -21,7 +22,7 @@ fun main() {
 fun Application.module() {
     install(ContentNegotiation) {
         json()
-
+        removeIgnoredType<String>()
     }
 
     install(CORS) {
@@ -41,5 +42,7 @@ fun Application.module() {
         }
     }
 
-    baseRoutesV1()
+    val bygningService = BygningService()
+
+    baseRoutesV1(bygningService)
 }
