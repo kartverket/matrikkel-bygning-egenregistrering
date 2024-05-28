@@ -31,7 +31,8 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.ktor:ktor-server-openapi:$ktor_version")
 
-    // Metrics
+    // Monitoring
+    implementation("io.ktor:ktor-server-call-logging:$ktor_version")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")
     implementation("io.micrometer:micrometer-registry-prometheus:$prometheus_version")
 
@@ -43,6 +44,9 @@ dependencies {
     // Serialization
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
+
+    // Persistence
+    implementation("com.h2database:h2:2.2.224")
 
     // Tests
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
