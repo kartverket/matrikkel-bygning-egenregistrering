@@ -12,7 +12,6 @@ fun Application.baseRoutesV1(
 ) {
     routing {
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
-        openAPI(path = "openapi", swaggerFile = "openapi/documentation.yaml")
 
         route("/v1") {
             bygningRouting(bygningService)
