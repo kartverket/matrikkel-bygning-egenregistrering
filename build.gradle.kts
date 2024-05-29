@@ -39,7 +39,7 @@ dependencies {
     // Logs
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
     implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
 
     // Serialization
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
