@@ -10,7 +10,7 @@ Prosjektet er satt opp med IntelliJ på MacOS. Dersom noe ikke fungerer, med and
 Prosjektet er bygd og kjørt med `temurin-21` JRE og IntelliJ default Kotlin SDK.
 
 For å kjøre prosjektet må du først sette opp database. Dette kan enkelt gjøres med docker compose:
-```
+```sh
 $ docker-compose -up
 ```
 
