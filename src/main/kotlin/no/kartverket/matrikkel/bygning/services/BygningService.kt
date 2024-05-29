@@ -24,10 +24,25 @@ class BygningService(private val bygningRepository: BygningRepository) {
     }
 
     fun getBygninger(): List<Bygning> {
-        return bygninger.toList()
+        val bygningerDTOs = bygningRepository.getBygninger()
+
+        return bygningerDTOs.map { it ->
+            val energikilderDTOs = bygningRepository.getEnergikilderForBygning(it.id)
+            val oppvarmingkilderDTOs = bygningRepository.getOppvarmingerForBygning(it.id)
+
+            Bygning(
+                id = it.id,
+                byggeaar = it.byggaar ?: 0,
+                areal = 0.0,
+                energikilder = emptyList(),
+                oppvarming = emptyList(),
+                avlop = it.avlop,
+                vann = it.vann
+            )
+        }
     }
 
     fun getBygningIds(): List<String> {
-        return bygningRepository.getBygningIds();
+        return bygningRepository.getBygningerIds();
     }
 }
