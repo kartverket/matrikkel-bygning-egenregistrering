@@ -47,7 +47,7 @@ dependencies {
 
     // Persistence
     implementation ("org.postgresql:postgresql:42.6.0")
-    implementation ("org.flywaydb:flyway-core:6.5.2")
+    implementation ("org.flywaydb:flyway-core:10.13.0")
 
     // Tests
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
