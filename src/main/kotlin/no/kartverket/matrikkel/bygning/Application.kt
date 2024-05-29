@@ -3,11 +3,9 @@ package no.kartverket.matrikkel.bygning
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.engine.*
 import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
-import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
@@ -16,12 +14,14 @@ import io.ktor.server.routing.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
+import no.kartverket.matrikkel.bygning.repositories.BygningRepository
+import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
 import no.kartverket.matrikkel.bygning.services.BygningService
+import org.flywaydb.core.Flyway
 import org.slf4j.event.Level
 
-fun main() {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module).start(wait = true)
-}
+fun main(args: Array<String>): Unit = EngineMain.main(args)
+
 
 fun Application.module() {
     install(ContentNegotiation) {
@@ -53,19 +53,21 @@ fun Application.module() {
 
     DatabaseSingleton.init()
 
-    val dbConnection = DatabaseSingleton.getConnection()
+    val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
 
-    dbConnection?.let {
-        val statement = it.createStatement()
-        val resultSet = statement.executeQuery("SELECT * FROM MyTable")
+    val url = environment.config.property("storage.jdbcURL").getString()
+    val username = environment.config.property("storage.username").getString()
+    val password = environment.config.property("storage.password").getString()
 
+    val flyway = Flyway.configure().validateMigrationNaming(true).dataSource(
+        url, username, password
+    ).load()
 
-        while (resultSet.next()) {
-            println(resultSet.getString("name"))
-        }
-    }
+    flyway.migrate()
 
-    val bygningService = BygningService()
+    val bygningRepository = BygningRepository(dbConnection)
+
+    val bygningService = BygningService(bygningRepository)
 
     baseRoutesV1(bygningService)
 }

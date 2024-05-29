@@ -1,9 +1,8 @@
 package no.kartverket.matrikkel.bygning.db
 
+import io.ktor.server.config.*
 import java.sql.Connection
 import java.sql.DriverManager
-import io.ktor.server.*
-import io.ktor.server.config.*
 
 object DatabaseSingleton {
     private var connection: Connection? = null
@@ -11,26 +10,13 @@ object DatabaseSingleton {
     fun init() {
         try {
             val jdbcURL = ApplicationConfig(null).property("storage.jdbcURL").getString()
+            val username = ApplicationConfig(null).property("storage.username").getString()
+            val password = ApplicationConfig(null).property("storage.password").getString()
 
-            connection = DriverManager.getConnection(jdbcURL)
-            connection?.let {
-                runSQLScript(it)
-            }
+            connection = DriverManager.getConnection(jdbcURL, username, password)
         } catch (e: Exception) {
             e.printStackTrace()
 
-        }
-    }
-
-    private fun runSQLScript(connection: Connection) {
-        val script = this::class.java.classLoader.getResource("init.sql")?.readText()
-        script?.let {
-            val statements = it.split(";")
-            statements.forEach { statement ->
-                if (statement.isNotBlank()) {
-                    connection.createStatement().execute(statement.trim())
-                }
-            }
         }
     }
 

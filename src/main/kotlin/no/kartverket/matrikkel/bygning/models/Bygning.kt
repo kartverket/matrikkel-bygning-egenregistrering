@@ -18,8 +18,7 @@ enum class Oppvarming {
 }
 
 enum class Energikilde {
-    NOE,
-    NOE_ANNET
+    GEOTERMISK,
 }
 
 

@@ -46,7 +46,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
 
     // Persistence
-    implementation("com.h2database:h2:2.2.224")
+    implementation ("org.postgresql:postgresql:42.6.0")
+    implementation ("org.flywaydb:flyway-core:6.5.2")
 
     // Tests
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")

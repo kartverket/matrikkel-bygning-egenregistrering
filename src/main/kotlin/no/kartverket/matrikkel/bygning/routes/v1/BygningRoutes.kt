@@ -11,7 +11,7 @@ import no.kartverket.matrikkel.bygning.services.BygningService
 fun Route.bygningRouting(bygningService: BygningService) {
     route("/bygning") {
         get {
-            val bygninger = bygningService.getBygninger()
+            val bygninger = bygningService.getBygningIds()
 
             call.respond(bygninger)
         }
