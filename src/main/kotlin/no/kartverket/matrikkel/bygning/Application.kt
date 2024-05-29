@@ -22,7 +22,6 @@ import org.slf4j.event.Level
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
-
 fun Application.module() {
     install(ContentNegotiation) {
         json()
