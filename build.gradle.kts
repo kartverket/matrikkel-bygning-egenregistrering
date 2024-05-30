@@ -7,6 +7,8 @@ plugins {
     kotlin("jvm") version "2.0.0"
     kotlin("plugin.serialization") version "2.0.0"
     id("io.ktor.plugin") version "2.3.11"
+
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "no.kartverket.matrikkel.bygning"
@@ -17,11 +19,14 @@ application {
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+
 }
 
 repositories {
     mavenCentral()
 }
+
+
 
 dependencies {
     // Ktor
@@ -46,8 +51,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
 
     // Persistence
-    implementation ("org.postgresql:postgresql:42.7.3")
-    implementation ("org.flywaydb:flyway-core:10.13.0")
+    implementation("org.postgresql:postgresql:42.7.3")
+    implementation("org.flywaydb:flyway-core:10.13.0")
     implementation("org.flywaydb:flyway-database-postgresql:10.13.0")
 
     // Tests
