@@ -1,5 +1,3 @@
-create schema if not exists bygning;
-
 create table if not exists oppvarming
 (
     id   serial primary key,
