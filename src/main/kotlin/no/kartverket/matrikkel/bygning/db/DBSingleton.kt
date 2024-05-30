@@ -13,6 +13,10 @@ object DatabaseSingleton {
     fun init() {
         try {
             connection = DriverManager.getConnection(jdbcURL, username, password)
+
+            val searchPathStatement = connection?.prepareStatement("set search_path = 'bygning'")
+
+            searchPathStatement?.execute()
         } catch (e: Exception) {
             e.printStackTrace()
         }
