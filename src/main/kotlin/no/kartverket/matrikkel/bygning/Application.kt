@@ -54,7 +54,7 @@ fun Application.module() {
 
     val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
 
-    val flyway = Flyway.configure().validateMigrationNaming(false).defaultSchema("public").dataSource(
+    val flyway = Flyway.configure().validateMigrationNaming(false).createSchemas(true).defaultSchema("bygning").dataSource(
         DatabaseSingleton.getJdbcURL(), DatabaseSingleton.getUsername(), DatabaseSingleton.getPassword()
     ).load()
 

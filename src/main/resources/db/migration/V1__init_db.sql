@@ -1,3 +1,7 @@
+create schema if not exists bygning;
+
+set search_path to bygning;
+
 create table if not exists oppvarming
 (
     id   serial primary key,
