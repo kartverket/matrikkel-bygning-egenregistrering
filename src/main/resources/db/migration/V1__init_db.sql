@@ -49,7 +49,3 @@ insert into bygning_oppvarminger (bygning_id, oppvarming_id)
 values ('1', 1);
 insert into bygning_energikilder (bygning_id, energikilde_id)
 VALUES ('2', 1);
-
-
-select *
-from bygning;
