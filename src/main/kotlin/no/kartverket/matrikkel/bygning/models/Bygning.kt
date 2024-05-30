@@ -20,5 +20,3 @@ enum class Oppvarming {
 enum class Energikilde {
     GEOTERMISK,
 }
-
-

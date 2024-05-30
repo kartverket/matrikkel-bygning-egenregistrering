@@ -54,12 +54,8 @@ fun Application.module() {
 
     val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
 
-    val url = environment.config.property("storage.jdbcURL").getString()
-    val username = environment.config.property("storage.username").getString()
-    val password = environment.config.property("storage.password").getString()
-
     val flyway = Flyway.configure().validateMigrationNaming(true).dataSource(
-        url, username, password
+        DatabaseSingleton.getJdbcURL(), DatabaseSingleton.getUsername(), DatabaseSingleton.getPassword()
     ).load()
 
     flyway.migrate()

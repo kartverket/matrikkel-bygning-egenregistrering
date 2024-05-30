@@ -6,21 +6,31 @@ import java.sql.DriverManager
 
 object DatabaseSingleton {
     private var connection: Connection? = null
+    private val jdbcURL = "jdbc:${ApplicationConfig(null).property("storage.jdbcURL").getString()}"
+    private val username = ApplicationConfig(null).property("storage.username").getString()
+    private val password = ApplicationConfig(null).property("storage.password").getString()
 
     fun init() {
         try {
-            val jdbcURL = ApplicationConfig(null).property("storage.jdbcURL").getString()
-            val username = ApplicationConfig(null).property("storage.username").getString()
-            val password = ApplicationConfig(null).property("storage.password").getString()
-
             connection = DriverManager.getConnection(jdbcURL, username, password)
         } catch (e: Exception) {
             e.printStackTrace()
-
         }
     }
 
     fun getConnection(): Connection? {
         return connection
+    }
+
+    fun getJdbcURL(): String {
+        return jdbcURL
+    }
+
+    fun getUsername(): String {
+        return username
+    }
+
+    fun getPassword(): String {
+        return password
     }
 }
