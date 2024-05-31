@@ -15,9 +15,10 @@ import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
+import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
 import no.kartverket.matrikkel.bygning.services.BygningService
-import org.slf4j.event.Level
+import no.kartverket.matrikkel.bygning.services.HealthService
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
@@ -25,6 +26,7 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
         removeIgnoredType<String>()
+        removeIgnoredType<HttpStatusCode>()
     }
 
     install(CORS) {
@@ -33,8 +35,9 @@ fun Application.module() {
     }
 
     install(CallLogging) {
-        level = Level.INFO
-        filter { call -> call.request.path().startsWith("/v1") }
+        filter { call ->
+            call.request.path().startsWith("/v1")
+        }
     }
 
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
@@ -54,8 +57,10 @@ fun Application.module() {
     val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
 
     val bygningRepository = BygningRepository(dbConnection)
+    val healthRepository = HealthRepository(dbConnection)
 
     val bygningService = BygningService(bygningRepository)
+    val healthService = HealthService(healthRepository)
 
-    baseRoutesV1(bygningService)
+    baseRoutesV1(bygningService, healthService)
 }
