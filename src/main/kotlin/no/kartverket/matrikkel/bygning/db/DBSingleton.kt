@@ -1,8 +1,12 @@
 package no.kartverket.matrikkel.bygning.db
 
 import io.ktor.server.config.*
+import io.ktor.util.logging.*
+import org.flywaydb.core.Flyway
 import java.sql.Connection
 import java.sql.DriverManager
+
+val LOGGER = KtorSimpleLogger("no.kartverket.matrikkel.bygning.db.DatabaseSingleton")
 
 object DatabaseSingleton {
     private var connection: Connection? = null
@@ -14,27 +18,22 @@ object DatabaseSingleton {
         try {
             connection = DriverManager.getConnection(jdbcURL, username, password)
 
-            val searchPathStatement = connection?.prepareStatement("set search_path = 'bygning'")
+            val flyway = Flyway.configure().validateMigrationNaming(true).createSchemas(true).defaultSchema("bygning")
+                .dataSource(
+                    jdbcURL, username, password
+                ).load()
 
+            flyway.migrate()
+
+            val searchPathStatement = connection?.prepareStatement("set search_path = 'bygning'")
             searchPathStatement?.execute()
+
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.error(e.stackTraceToString())
         }
     }
 
     fun getConnection(): Connection? {
         return connection
-    }
-
-    fun getJdbcURL(): String {
-        return jdbcURL
-    }
-
-    fun getUsername(): String {
-        return username
-    }
-
-    fun getPassword(): String {
-        return password
     }
 }

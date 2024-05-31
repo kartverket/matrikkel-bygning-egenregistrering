@@ -17,7 +17,6 @@ import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
 import no.kartverket.matrikkel.bygning.services.BygningService
-import org.flywaydb.core.Flyway
 import org.slf4j.event.Level
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
@@ -53,12 +52,6 @@ fun Application.module() {
     DatabaseSingleton.init()
 
     val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
-
-    val flyway = Flyway.configure().validateMigrationNaming(false).createSchemas(true).defaultSchema("bygning").dataSource(
-        DatabaseSingleton.getJdbcURL(), DatabaseSingleton.getUsername(), DatabaseSingleton.getPassword()
-    ).load()
-
-    flyway.migrate()
 
     val bygningRepository = BygningRepository(dbConnection)
 

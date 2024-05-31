@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -63,5 +65,13 @@ dependencies {
 ktor {
     fatJar {
         archiveFileName.set("matrikkel-bygning-egenregistering.jar")
+    }
+}
+
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        mergeServiceFiles()
+        archiveBaseName.set("${project.name}-all")
     }
 }
