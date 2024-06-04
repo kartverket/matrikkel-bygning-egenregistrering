@@ -4,6 +4,7 @@ val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
 val prometheus_version: String by project
+val flyway_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -54,8 +55,8 @@ dependencies {
 
     // Persistence
     implementation("org.postgresql:postgresql:42.7.3")
-    implementation("org.flywaydb:flyway-core:10.13.0")
-    implementation("org.flywaydb:flyway-database-postgresql:10.13.0")
+    implementation("org.flywaydb:flyway-core:$flyway_version")
+    implementation("org.flywaydb:flyway-database-postgresql:$flyway_version")
 
     // Tests
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
