@@ -33,7 +33,11 @@ object DatabaseSingleton {
         }
     }
 
-    fun getConnection(): Connection? {
-        return connection
+    fun getConnection(): Connection {
+        if (connection != null) {
+            return connection as Connection
+        }
+
+        throw RuntimeException("Kunne ikke koble til database")
     }
 }

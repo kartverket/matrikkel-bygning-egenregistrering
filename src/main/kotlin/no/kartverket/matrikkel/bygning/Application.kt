@@ -22,6 +22,8 @@ import no.kartverket.matrikkel.bygning.routes.v1.probeRouting
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.HealthService
 
+val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+
 fun main(args: Array<String>) {
     embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::internalModule).start(wait = false)
 
@@ -46,8 +48,12 @@ fun Application.module() {
         }
     }
 
+    install(MicrometerMetrics) {
+        registry = appMicrometerRegistry
+    }
+
     DatabaseSingleton.init()
-    val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
+    val dbConnection = DatabaseSingleton.getConnection()
     val bygningRepository = BygningRepository(dbConnection)
     val bygningService = BygningService(bygningRepository)
 
@@ -55,14 +61,12 @@ fun Application.module() {
 }
 
 fun Application.internalModule() {
-    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-
     install(MicrometerMetrics) {
         registry = appMicrometerRegistry
     }
 
     DatabaseSingleton.init()
-    val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
+    val dbConnection = DatabaseSingleton.getConnection()
     val healthRepository = HealthRepository(dbConnection)
     val healthService = HealthService(healthRepository)
 
