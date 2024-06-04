@@ -46,7 +46,7 @@ fun Application.module() {
     }
 
     routing {
-        localPort(8081) {
+        port(8081) {
             get("/metrics") {
                 call.respondText(appMicrometerRegistry.scrape())
             }
