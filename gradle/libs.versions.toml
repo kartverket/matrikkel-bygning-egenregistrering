@@ -1,0 +1,40 @@
+[versions]
+ktorVersion = "2.3.11"
+kotlinVersion = "2.0.0"
+logbackVersion = "1.4.14"
+logstashVersion = "7.4"
+prometheusVersion = "1.10.3"
+flywayVersion = "10.13.0"
+jacksonVersion = "2.17.1"
+postgresVersion = "42.7.3"
+shadowVersion = "8.1.1"
+
+[libraries]
+ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
+ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktorVersion" }
+ktor-server-swagger = { group = "io.ktor", name = "ktor-server-swagger", version.ref = "ktorVersion" }
+ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktorVersion" }
+ktor-server-openapi = { group = "io.ktor", name = "ktor-server-openapi", version.ref = "ktorVersion" }
+ktor-server-tests = { group = "io.ktor", name = "ktor-server-tests-jvm", version.ref = "ktorVersion" }
+ktor-server-call-logging = { group = "io.ktor", name = "ktor-server-call-logging", version.ref = "ktorVersion" }
+ktor-server-metrics-micrometer = { group = "io.ktor", name = "ktor-server-metrics-micrometer", version.ref = "ktorVersion" }
+ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version.ref = "ktorVersion" }
+ktor-serialization-kotlinx = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktorVersion" }
+
+flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flywayVersion" }
+flyway-database-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql", version.ref = "flywayVersion" }
+
+micrometer-prometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "prometheusVersion" }
+logstash-encoder = { group = "net.logstash.logback", name = "logstash-logback-encoder", version.ref = "logstashVersion" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jacksonVersion" }
+postgres = { group = "org.postgresql", name = "postgresql", version.ref = "postgresVersion" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlinVersion" }
+
+
+[plugins]
+kotlin-jvm = { id = "jvm", version.ref = "kotlinVersion" }
+kotlin-serialization = {id = "plugin.serialization", version.ref="kotlinVersion"}
+
+ktor = {id = "io.ktor.plugin", version.ref="ktorVersion" }
+shadow = {id = "com.github.johnrengelman.shadow", version.ref="shadowVersion"}

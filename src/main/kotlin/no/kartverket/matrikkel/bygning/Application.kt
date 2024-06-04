@@ -26,7 +26,6 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
         removeIgnoredType<String>()
-        removeIgnoredType<HttpStatusCode>()
     }
 
     install(CORS) {
