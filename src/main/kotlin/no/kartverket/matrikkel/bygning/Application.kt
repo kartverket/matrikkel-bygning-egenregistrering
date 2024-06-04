@@ -3,6 +3,7 @@ package no.kartverket.matrikkel.bygning
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.engine.*
 import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
@@ -17,10 +18,16 @@ import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
+import no.kartverket.matrikkel.bygning.routes.v1.probeRouting
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.HealthService
 
-fun main(args: Array<String>): Unit = EngineMain.main(args)
+fun main(args: Array<String>) {
+    embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::internalModule).start(wait = false)
+
+    EngineMain.main(args)
+}
+
 
 fun Application.module() {
     install(ContentNegotiation) {
@@ -39,29 +46,32 @@ fun Application.module() {
         }
     }
 
+    DatabaseSingleton.init()
+    val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
+    val bygningRepository = BygningRepository(dbConnection)
+    val bygningService = BygningService(bygningRepository)
+
+    baseRoutesV1(bygningService)
+}
+
+fun Application.internalModule() {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     install(MicrometerMetrics) {
         registry = appMicrometerRegistry
     }
 
-    routing {
-        port(8081) {
-            get("/metrics") {
-                call.respondText(appMicrometerRegistry.scrape())
-            }
-        }
-    }
-
     DatabaseSingleton.init()
-
     val dbConnection = DatabaseSingleton.getConnection() ?: throw RuntimeException("Kunne ikke koble til database")
-
-    val bygningRepository = BygningRepository(dbConnection)
     val healthRepository = HealthRepository(dbConnection)
-
-    val bygningService = BygningService(bygningRepository)
     val healthService = HealthService(healthRepository)
 
-    baseRoutesV1(bygningService, healthService)
+    routing {
+        get("/metrics") {
+            call.respondText(appMicrometerRegistry.scrape())
+        }
+
+        probeRouting(healthService)
+    }
+
 }
