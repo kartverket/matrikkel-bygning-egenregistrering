@@ -19,6 +19,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
@@ -36,12 +37,13 @@ fun main(args: Array<String>) {
 }
 
 
+@OptIn(ExperimentalSerializationApi::class)
 fun Application.module() {
     install(ContentNegotiation) {
         json(Json {
             serializersModule = KompendiumSerializersModule.module
             encodeDefaults = true
-
+            explicitNulls = false
         })
         removeIgnoredType<String>()
     }
