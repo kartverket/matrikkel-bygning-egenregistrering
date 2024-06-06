@@ -1,5 +1,10 @@
 package no.kartverket.matrikkel.bygning
 
+import io.bkbn.kompendium.core.plugin.NotarizedApplication
+import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
+import io.bkbn.kompendium.oas.OpenApiSpec
+import io.bkbn.kompendium.oas.info.Info
+import io.bkbn.kompendium.oas.serialization.KompendiumSerializersModule
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -14,12 +19,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
-import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
 import no.kartverket.matrikkel.bygning.routes.v1.probeRouting
-import no.kartverket.matrikkel.bygning.services.BygningService
+import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
 
 val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
@@ -33,7 +38,11 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     install(ContentNegotiation) {
-        json()
+        json(Json {
+            serializersModule = KompendiumSerializersModule.module
+            encodeDefaults = true
+
+        })
         removeIgnoredType<String>()
     }
 
@@ -52,12 +61,22 @@ fun Application.module() {
         registry = appMicrometerRegistry
     }
 
+    install(NotarizedApplication()) {
+        spec = OpenApiSpec(
+            info = Info(
+                title = "",
+                version = "",
+            )
+        )
+        schemaConfigurator = KotlinXSchemaConfigurator()
+    }
+
     DatabaseSingleton.init()
     val dbConnection = DatabaseSingleton.getConnection()
-    val bygningRepository = BygningRepository(dbConnection)
-    val bygningService = BygningService(bygningRepository)
 
-    baseRoutesV1(bygningService)
+    val egenregistreringsService = EgenregistreringsService()
+
+    baseRoutesV1(egenregistreringsService)
 }
 
 fun Application.internalModule() {

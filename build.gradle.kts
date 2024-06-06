@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
 
+    implementation(libs.kompendium.core)
+
     // Tests
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test)
@@ -57,7 +59,7 @@ dependencies {
 
 ktor {
     fatJar {
-        archiveFileName.set("matrikkel-bygning-egenregistering.jar")
+        archiveFileName.set("matrikkel-bygning-egenregistrering.jar")
     }
 }
 

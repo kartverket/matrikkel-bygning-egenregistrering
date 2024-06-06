@@ -1,22 +1,14 @@
 package no.kartverket.matrikkel.bygning.models
 
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class Bygning(
     val id: String,
-    val byggeaar: Int,
-    val areal: Double,
-    val energikilder: List<Energikilde>,
-    val oppvarming: List<Oppvarming>,
-    val vann: Boolean,
-    val avlop: Boolean,
+    val egenregistreringer: MutableList<BygningsRegistrering>
 )
 
-enum class Oppvarming {
-    VARMEPUMPE
-}
+data class Bruksenhet(
+    val id: String,
+    val bygningId: String,
+    val egenregistreringer: MutableList<BruksenhetRegistrering>
+)
 
-enum class Energikilde {
-    GEOTERMISK,
-}

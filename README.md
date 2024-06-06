@@ -1,7 +1,7 @@
 # API for Bygning
 
 Dette repoet har ansvar for ny bygningsdel som del av Eiendomsregister 2.0. I første omgang er det ønskelig at APIet
-skal kunne ta i mot egenregistrert data om bygninger og bruksenheter fra Team Egenregistering.
+skal kunne ta i mot egenregistrert data om bygninger og bruksenheter fra Team Egenregistrering.
 
 ## Lokalt oppsett
 

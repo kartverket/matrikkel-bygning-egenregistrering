@@ -1,1 +1,1 @@
-rootProject.name = "matrikkel-bygning-egenregistering"
+rootProject.name = "matrikkel-bygning-egenregistrering"
