@@ -55,17 +55,16 @@ data class AvlopRegistrering(
 
 @Serializable
 data class EnergikildeRegistrering(
-    val energikilde: EnergikildeKode, val registreringMetadata: RegistreringMetadata
+    val energikilder: List<EnergikildeKode>, val registreringMetadata: RegistreringMetadata
 )
 
 @Serializable
 data class OppvarmingRegistrering(
-    val oppvarming: OppvarmingsKode, val registreringMetadata: RegistreringMetadata
+    val oppvarminger: List<OppvarmingsKode>, val registreringMetadata: RegistreringMetadata
 )
 
 @Serializable
 data class BygningsRegistrering(
-    val bygningsId: String,
     val bruksarealRegistrering: BruksarealRegistrering,
     val byggeaarRegistrering: ByggeaarRegistrering,
     val vannforsyningsRegistrering: VannforsyningsRegistrering,
@@ -76,8 +75,8 @@ data class BygningsRegistrering(
 data class BruksenhetRegistrering(
     val bruksenhetId: String,
     val bruksarealRegistrering: BruksarealRegistrering,
-    val energikildeRegistreringer: List<EnergikildeRegistrering>,
-    val oppvarmingRegistreringer: List<OppvarmingRegistrering>
+    val energikildeRegistrering: EnergikildeRegistrering,
+    val oppvarmingRegistrering: OppvarmingRegistrering
 )
 
 @Serializable
