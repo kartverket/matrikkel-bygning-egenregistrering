@@ -13,7 +13,7 @@ Prosjektet er bygd og kjørt med `temurin-21` JRE og IntelliJ default Kotlin SDK
 For å kjøre prosjektet må du først sette opp database. Dette kan enkelt gjøres med docker compose:
 
 ```sh
-$ docker-compose -up db -d
+$ docker-compose up db -d
 ```
 
 Flagget `-d` gjør at loggene fra containeren ikke skrives til stdout. Dersom du ønsker det kan du droppe flagget.
@@ -23,7 +23,7 @@ Etter dette kan du kjøre opp applikasjonen enten lokalt, eller som en Docker co
 Hvis du vil kjøre appen som en Docker container kan du kjøre:
 
 ```sh
-$ docker-compose -up web -d
+$ docker-compose up web -d
 ```
 
 Ellers er det bare å kjøre opp applikasjonen som ønsket via IntelliJ eller kommandolinje. Ingen spesielle hensyn som er
