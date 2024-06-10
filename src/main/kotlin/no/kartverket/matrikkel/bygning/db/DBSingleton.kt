@@ -17,7 +17,13 @@ object DatabaseSingleton {
     fun init() {
         try {
             connection = DriverManager.getConnection(jdbcURL, username, password)
+        } catch (e: Exception) {
+            LOGGER.error(e.stackTraceToString())
+        }
+    }
 
+    fun migrate() {
+        try {
             val flyway = Flyway.configure().validateMigrationNaming(true).createSchemas(true).defaultSchema("bygning")
                 .dataSource(
                     jdbcURL, username, password
@@ -27,7 +33,6 @@ object DatabaseSingleton {
 
             val searchPathStatement = connection?.prepareStatement("set search_path = 'bygning'")
             searchPathStatement?.execute()
-
         } catch (e: Exception) {
             LOGGER.error(e.stackTraceToString())
         }
