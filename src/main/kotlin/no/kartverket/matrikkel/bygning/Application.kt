@@ -22,6 +22,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
+import no.kartverket.matrikkel.bygning.repositories.DemoRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
 import no.kartverket.matrikkel.bygning.routes.v1.probeRouting
@@ -65,8 +66,7 @@ fun Application.module() {
 
     install(NotarizedApplication()) {
         spec = OpenApiSpec(
-            jsonSchemaDialect = "https://spec.openapis.org/oas/3.1/dialect/base",
-            info = Info(
+            jsonSchemaDialect = "https://spec.openapis.org/oas/3.1/dialect/base", info = Info(
                 title = "API For Egenregistrering av Bygningsdata",
                 version = "0.1",
             )
@@ -80,7 +80,10 @@ fun Application.module() {
 
     val egenregistreringsService = EgenregistreringsService()
 
-    baseRoutesV1(egenregistreringsService)
+
+    val demoRepository = DemoRepository(dbConnection)
+
+    baseRoutesV1(egenregistreringsService, demoRepository)
 }
 
 fun Application.internalModule() {
