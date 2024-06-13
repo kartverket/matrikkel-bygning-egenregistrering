@@ -28,7 +28,7 @@ fun Application.baseRoutesV1(
             route("/demospokelser") {
                 demoDoc()
                 get {
-                    val spokelser = demoRepository.getDemospokelser();
+                    val spokelser = demoRepository.getDemospokelser().sortedBy { it.id };
 
                     call.respond(spokelser)
                 }
