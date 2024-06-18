@@ -44,6 +44,7 @@ dependencies {
     // Serialization
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx)
+    implementation(libs.kotlinx.datetime)
 
     // Persistence
     implementation(libs.postgres)

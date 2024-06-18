@@ -1,6 +1,5 @@
 package no.kartverket.matrikkel.bygning.routes.v1
 
-import io.bkbn.kompendium.core.metadata.GetInfo
 import io.bkbn.kompendium.core.metadata.PostInfo
 import io.bkbn.kompendium.core.plugin.NotarizedRoute
 import io.bkbn.kompendium.json.schema.definition.TypeDefinition
@@ -10,55 +9,38 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.kartverket.matrikkel.bygning.models.Bygning
-import no.kartverket.matrikkel.bygning.models.Egenregistrering
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import no.kartverket.matrikkel.bygning.models.EnergikildeKode
+import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
-    route("/egenregistrering") {
-        route("{bygningId}") {
-            egenregistreringBygningIdDoc()
-            get {
-                val gyldigFra = call.request.queryParameters["gyldigFra"]?.toLong() ?: 0L
-                val bygningId = call.parameters["bygningId"]
+    route("/egenregistreringer") {
+        egenregistreringBygningIdDoc()
+        post {
+            val egenregistrering = call.receive<EgenregistreringRequest>()
 
-                if (bygningId == null) {
-                    call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
-                    return@get
-                }
+            val bygningId = call.parameters["bygningId"]
 
-                val egenregistreringerForBygning =
-                    egenregistreringsService.getEgenregistreringerForBygning(bygningId, gyldigFra)
-
-                if (egenregistreringerForBygning != null) {
-                    call.respond(egenregistreringerForBygning)
-                } else {
-                    call.respondText("Fant ingen bygninger med id $bygningId", status = HttpStatusCode.NotFound)
-                }
-
+            if (bygningId == null) {
+                call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
+                return@post
             }
-            post {
-                val egenregistrering = call.receive<Egenregistrering>()
 
-                val bygningId = call.parameters["bygningId"]
+            val addedEgenregistrering =
+                egenregistreringsService.addEgenregistreringToBygning(bygningId, egenregistrering)
 
-                if (bygningId == null) {
-                    call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
-                    return@post
-                }
-
-                val addedEgenregistrering = egenregistreringsService.addEgenregistreringToBygning(bygningId, egenregistrering)
-
-                if (addedEgenregistrering) {
-                    call.respondText(
-                        "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.OK
-                    )
-                } else {
-                    call.respondText(
-                        "Det ble forsøkt registrert egenregistreringer på bruksenheter som ikke har tilknytning til bygningen",
-                        status = HttpStatusCode.BadRequest
-                    )
-                }
+            if (addedEgenregistrering) {
+                call.respondText(
+                    "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.OK
+                )
+            } else {
+                call.respondText(
+                    "Det ble forsøkt registrert egenregistreringer på bruksenheter som ikke har tilknytning til bygningen",
+                    status = HttpStatusCode.BadRequest
+                )
             }
         }
     }
@@ -75,9 +57,44 @@ private fun Route.egenregistreringBygningIdDoc() {
             summary("Legg til en egenregistrering på en bygning")
             description("Legger til en egenregistrering på en bygning og tilhørende bruksenheter, hvis noen")
             request {
-                requestType<Egenregistrering>()
+                requestType<EgenregistreringRequest>()
                 required(true)
                 description("Egeneregistrert data")
+                examples(
+                    "Bygning Id 1" to EgenregistreringRequest(
+                        bygningsRegistrering = BygningsRegistrering(
+                            bygningId = "1",
+                            bruksareal = BruksarealRegistrering(
+                                bruksareal = 125.0, metadata = RegistreringMetadataRequest(
+                                    registreringstidspunkt = Clock.System.now(),
+                                    gyldigFra = Clock.System.now()
+                                        .toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                                    gyldigTil = null,
+                                )
+                            ),
+                            null,
+                            null,
+                            null,
+                        ),
+                        bruksenhetRegistreringer = listOf(
+                            BruksenhetRegistrering(
+                                bruksenhetId = "a",
+                                null,
+                                energikilde = EnergikildeRegistrering(
+                                    energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
+                                    metadata = RegistreringMetadataRequest(
+                                        registreringstidspunkt = Clock.System.now(),
+                                        gyldigFra = Clock.System.now()
+                                            .toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                                        gyldigTil = null,
+                                    )
+                                ),
+                                null,
+                            )
+                        ),
+                    )
+                )
+
             }
             response {
                 responseCode(HttpStatusCode.OK)
@@ -89,29 +106,6 @@ private fun Route.egenregistreringBygningIdDoc() {
                 responseCode(HttpStatusCode.BadRequest)
                 responseType<String>()
                 description("Alle bruksenheter som kom i request tilhørte ikke bygningen")
-            }
-        }
-
-        get = GetInfo.builder {
-            summary("Hent egenregistreringer for en bygning")
-            description("Henter egenregistreringer på en bygning gitt en gyldighetsdato. Henter ikke tilhørende bruksenheter. Uten gyldighetsdato henter den alle registreringer")
-
-            parameters(
-                Parameter(
-                    name = "gyldigFra", `in` = Parameter.Location.query, schema = TypeDefinition.LONG, required = false
-                )
-            )
-
-            response {
-                responseCode(HttpStatusCode.OK)
-                responseType<Bygning>()
-                description("Bygning med tilhørende egenregistreringer")
-            }
-
-            canRespond {
-                responseCode(HttpStatusCode.NotFound)
-                responseType<String>()
-                description("Fant ikke bygning med gitt id")
             }
         }
     }

@@ -25,6 +25,7 @@ import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
 import no.kartverket.matrikkel.bygning.routes.v1.probeRouting
+import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
 
@@ -77,9 +78,11 @@ fun Application.module() {
     DatabaseSingleton.migrate()
     val dbConnection = DatabaseSingleton.getConnection()
 
-    val egenregistreringsService = EgenregistreringsService()
+    // Begge disse skal egentlig ha en "bygningRepository" på seg, men databasen finnes ikke ennå
+    val bygningService = BygningService()
+    val egenregistreringsService = EgenregistreringsService(bygningService)
 
-    baseRoutesV1(egenregistreringsService)
+    baseRoutesV1(bygningService, egenregistreringsService)
 }
 
 fun Application.internalModule() {

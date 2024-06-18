@@ -9,6 +9,7 @@ jacksonVersion = "2.17.1"
 postgresVersion = "42.7.3"
 shadowVersion = "8.1.1"
 kompendiumVersion = "3.14.4"
+kotlinxDatetimeVersion = "0.6.0"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -32,6 +33,7 @@ jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-datab
 postgres = { group = "org.postgresql", name = "postgresql", version.ref = "postgresVersion" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlinVersion" }
 kompendium-core = { group = "io.bkbn", name = "kompendium-core", version.ref = "kompendiumVersion" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 
 
 [plugins]
