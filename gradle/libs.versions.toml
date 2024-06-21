@@ -1,5 +1,5 @@
 [versions]
-ktorVersion = "2.3.11"
+ktorVersion = "2.3.12"
 kotlinVersion = "2.0.0"
 logbackVersion = "1.5.6"
 logstashVersion = "7.4"
