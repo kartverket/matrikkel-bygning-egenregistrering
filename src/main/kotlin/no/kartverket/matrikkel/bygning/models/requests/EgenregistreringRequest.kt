@@ -3,10 +3,10 @@ package no.kartverket.matrikkel.bygning.models.requests
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.models.AvlopKode
-import no.kartverket.matrikkel.bygning.models.EnergikildeKode
-import no.kartverket.matrikkel.bygning.models.OppvarmingsKode
-import no.kartverket.matrikkel.bygning.models.VannforsyningKode
+import no.kartverket.matrikkel.bygning.models.kodelister.AvlopsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningsKode
 
 @Serializable
 data class RegistreringMetadataRequest(
@@ -27,12 +27,12 @@ data class BruksarealRegistrering(
 
 @Serializable
 data class VannforsyningsRegistrering(
-    val vannforsyning: VannforsyningKode, val metadata: RegistreringMetadataRequest
+    val vannforsyning: VannforsyningsKode, val metadata: RegistreringMetadataRequest
 )
 
 @Serializable
 data class AvlopRegistrering(
-    val avlop: AvlopKode, val metadata: RegistreringMetadataRequest
+    val avlop: AvlopsKode, val metadata: RegistreringMetadataRequest
 )
 
 @Serializable
