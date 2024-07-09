@@ -92,15 +92,17 @@ fun Application.internalModule() {
 
     DatabaseSingleton.init()
     val dbConnection = DatabaseSingleton.getConnection()
-    val healthRepository = HealthRepository(dbConnection)
-    val healthService = HealthService(healthRepository)
 
-    routing {
-        get("/metrics") {
-            call.respondText(appMicrometerRegistry.scrape())
+    if (dbConnection != null) {
+        val healthRepository = HealthRepository(dbConnection)
+        val healthService = HealthService(healthRepository)
+
+        routing {
+            get("/metrics") {
+                call.respondText(appMicrometerRegistry.scrape())
+            }
+
+            probeRouting(healthService)
         }
-
-        probeRouting(healthService)
     }
-
 }
