@@ -38,18 +38,11 @@ object DatabaseSingleton {
         }
     }
 
-    fun getConnection(): Connection? {
-        try {
-            if (connection != null) {
-                return connection as Connection
-            }
-
-            throw RuntimeException("Kunne ikke koble til database")
-
-        } catch (e: Exception) {
-            LOGGER.error(e.stackTraceToString())
-
-            return null
+    fun getConnection(): Connection {
+        if (connection != null) {
+            return connection as Connection
         }
+
+        throw RuntimeException("Kunne ikke koble til database")
     }
 }
