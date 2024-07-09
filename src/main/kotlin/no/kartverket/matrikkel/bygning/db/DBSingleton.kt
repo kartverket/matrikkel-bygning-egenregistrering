@@ -24,7 +24,7 @@ object DatabaseSingleton {
 
     fun migrate() {
         try {
-            val flyway = Flyway.configure().validateMigrationNaming(true).createSchemas(true).defaultSchema("bygning")
+            val flyway = Flyway.configure().validateMigrationNaming(true).createSchemas(true).defaultSchema("bygning").outputQueryResults(true)
                 .dataSource(
                     jdbcURL, username, password
                 ).load()
