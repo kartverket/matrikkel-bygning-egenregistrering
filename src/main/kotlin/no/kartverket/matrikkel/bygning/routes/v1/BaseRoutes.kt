@@ -9,8 +9,7 @@ import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Application.baseRoutesV1(
-    bygningService: BygningService,
-    egenregistreringsService: EgenregistreringsService
+    bygningService: BygningService, egenregistreringsService: EgenregistreringsService
 ) {
     routing {
         swagger()
@@ -24,6 +23,7 @@ fun Application.baseRoutesV1(
 
         route("v1") {
             bygningRouting(bygningService, egenregistreringsService)
+            kodelisteRouting()
         }
 
     }

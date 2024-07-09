@@ -1,17 +1,29 @@
 package no.kartverket.matrikkel.bygning.models.kodelister
 
+import kotlinx.serialization.Serializable
+import kotlin.reflect.KClass
+
 // Kan det finnes flere presentasjonsnavn på én kode? For eksempel per ett på bokmål og ett på nynorsk?
-interface Kode {
+interface IKode {
     val kodenavn: String
     val presentasjonsnavn: String
     val beskrivelse: String
 }
 
+@Serializable
+data class Kode(
+    val kode: String,
+    val kodenavn: String,
+    val presentasjonsnavn: String,
+    val beskrivelse: String
+)
+
+@Serializable
 enum class VannforsyningsKode(
     override val kodenavn: String,
     override val presentasjonsnavn: String,
     override val beskrivelse: String
-) : Kode {
+) : IKode {
     OV("OffentligVannverk", "Offentlig vannverk", "Bygget er tilknyttet offentlig vannverk"),
     TPV(
         "TilknyttetPrivatVannverk",
@@ -30,21 +42,23 @@ enum class VannforsyningsKode(
     )
 }
 
+@Serializable
 enum class AvlopsKode(
     override val kodenavn: String,
     override val presentasjonsnavn: String,
     override val beskrivelse: String
-) : Kode {
+) : IKode {
     O("OffentligKloakk", "Offentlig kloakk", "Avløp er offentlig kloakk"),
     P("PrivatKloakk", "Privat kloakk", "Avløp er privat kloakk"),
     I("IngenKloakk", "Ingen kloakk", "Ingen tilknytning til kloakk")
 }
 
+@Serializable
 enum class EnergikildeKode(
     override val kodenavn: String,
     override val presentasjonsnavn: String,
     override val beskrivelse: String
-) : Kode {
+) : IKode {
     A(
         "AnnenEnergikilde",
         "Annen energikilde",
@@ -59,13 +73,36 @@ enum class EnergikildeKode(
     V("Varmepumpe", "Varmepumpe", "Energikildekode for varmepumpe"),
 }
 
+@Serializable
 enum class OppvarmingsKode(
     override val kodenavn: String,
     override val presentasjonsnavn: String,
     override val beskrivelse: String
-) : Kode {
+) : IKode {
     E("Elektrisk", "Elektrisk", "Elektrisk oppvarming"),
     S("Sentralvarme", "Sentralvarme", "Sentralvarme"),
     A("AnnenOppvarming", "Annen oppvarming", "Annen oppvarming")
 }
 
+@Serializable
+data class KodelisterResponse(
+    val vannforsyningsKoder: List<Kode>,
+    val avlopsKoder: List<Kode>,
+    val energikildeKoder: List<Kode>,
+    val oppvarmingsKoder: List<Kode>,
+)
+
+/*
+ * Enums i Kotlin returnerer kun name parameteret ved bruk av EnumClass.entries(). Denne extension functionen er til for å kunne returnere
+ * alle relevante parametere
+ */
+inline fun <reified T> KClass<T>.toKodeList(): List<Kode> where T : Enum<T>, T : IKode {
+    return enumValues<T>().map {
+        Kode(
+            kode = it.name,
+            kodenavn = it.kodenavn,
+            presentasjonsnavn = it.presentasjonsnavn,
+            beskrivelse = it.beskrivelse
+        )
+    }
+}
