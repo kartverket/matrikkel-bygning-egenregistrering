@@ -19,9 +19,9 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      new_tag:
-      new_digest:
-      image_name:
+      image_name: ${{ steps.set_outputs.outputs.image_name }}
+      new_tag: ${{ steps.set_outputs.outputs.new_tag }}
+      new_digest: ${{ steps.set_outputs.outputs.new_digest }}
 
     steps:
       - name: Checkout project sources
