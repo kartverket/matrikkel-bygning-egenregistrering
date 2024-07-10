@@ -74,7 +74,7 @@ jobs:
     name: Deploy to dev
     uses: kartverket/bygning-apps/.github/workflows/update-app-version.yaml@main
     with:
-      application_name: bygning_backend
+      application_name: bygning-backend
       image_name: ${{ needs.build.outputs.image_name }}
       image_tag: ${{ needs.build.outputs.new_tag }}
       image_digest: ${{ needs.build.outputs.new_digest }}
