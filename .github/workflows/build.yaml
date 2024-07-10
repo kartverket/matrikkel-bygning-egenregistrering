@@ -79,5 +79,6 @@ jobs:
       image_digest: ${{ needs.build.outputs.new_digest }}
       env: dev
       namespace: matrikkelbygning-main
+      cluster: atgcp1
     secrets:
       DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
