@@ -10,6 +10,7 @@ postgresVersion = "42.7.3"
 shadowVersion = "8.1.1"
 kompendiumVersion = "3.14.4"
 kotlinxDatetimeVersion = "0.6.0"
+jaxwsVersion = "4.0.2"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -34,6 +35,9 @@ postgres = { group = "org.postgresql", name = "postgresql", version.ref = "postg
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlinVersion" }
 kompendium-core = { group = "io.bkbn", name = "kompendium-core", version.ref = "kompendiumVersion" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
+
+jaxws-rt = { group = "com.sun.xml.ws", name = "jaxws-rt", version.ref = "jaxwsVersion" }
+jaxws-tools = { group = "com.sun.xml.ws", name = "jaxws-tools", version.ref = "jaxwsVersion" }
 
 
 [plugins]
