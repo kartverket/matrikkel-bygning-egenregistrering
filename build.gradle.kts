@@ -8,8 +8,10 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
+allprojects {
 group = "no.kartverket.matrikkel.bygning"
 version = "0.0.1"
+}
 
 application {
     mainClass.set("no.kartverket.matrikkel.bygning.ApplicationKt")
@@ -17,10 +19,6 @@ application {
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
