@@ -73,6 +73,8 @@ jobs:
     needs: [build]
     name: Deploy to dev
     uses: kartverket/bygning-apps/.github/workflows/update-app-version.yaml@main
+    permissions:
+      id-token: write
     with:
       application_name: bygning-backend
       image_name: ${{ needs.build.outputs.image_name }}
