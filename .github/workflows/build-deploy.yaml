@@ -81,5 +81,3 @@ jobs:
       env: dev
       namespace: matrikkelbygning-main
       cluster: atgcp1
-    secrets:
-      DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
