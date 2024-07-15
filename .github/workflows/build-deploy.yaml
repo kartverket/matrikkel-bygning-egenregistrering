@@ -64,7 +64,7 @@ jobs:
       - name: Add summary of build
         id: summary
         run: |
-          echo '### Image release'                                          >> $GITHUB_STEP_SUMMARY
+          echo '### Image release info'                                          >> $GITHUB_STEP_SUMMARY
           echo '- Image name: ${{ env.registry }}/${{ github.repository }}' >> $GITHUB_STEP_SUMMARY 
           echo '- Digest: ${{ steps.build.outputs.digest }}'                >> $GITHUB_STEP_SUMMARY
           echo '- Tag: ${{ steps.tag_version.outputs.new_tag }}'            >> $GITHUB_STEP_SUMMARY
