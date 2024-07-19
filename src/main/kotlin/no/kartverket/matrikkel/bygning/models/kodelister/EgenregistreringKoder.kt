@@ -5,7 +5,6 @@ import kotlin.reflect.KClass
 
 // Kan det finnes flere presentasjonsnavn på én kode? For eksempel per ett på bokmål og ett på nynorsk?
 interface IKode {
-    val kodenavn: String
     val presentasjonsnavn: String
     val beskrivelse: String
 }
@@ -13,30 +12,25 @@ interface IKode {
 @Serializable
 data class Kode(
     val kode: String,
-    val kodenavn: String,
     val presentasjonsnavn: String,
     val beskrivelse: String
 )
 
 @Serializable
 enum class VannforsyningsKode(
-    override val kodenavn: String,
     override val presentasjonsnavn: String,
     override val beskrivelse: String
 ) : IKode {
-    OV("OffentligVannverk", "Offentlig vannverk", "Bygget er tilknyttet offentlig vannverk"),
-    TPV(
-        "TilknyttetPrivatVannverk",
+    OffentligVannverk("Offentlig vannverk", "Bygget er tilknyttet offentlig vannverk"),
+    TilknyttetPrivatVannverk(
         "Tilknyttet privat vannverk",
         "Bygget er tilknyttet privat vannverk. Privat vannverk er nett som forsyner mer enn 100 personer eller 20 husstander."
     ),
-    API(
-        "AnnenPrivatInnlagtVann",
+    AnnenPrivatInnlagtVann(
         "Annen privat med innlagt vann",
         "Annen privat vannforsyning, bygget har innlagt vann"
     ),
-    AP(
-        "AnnenPrivatIkkeInnlagtVann",
+    AnnenPrivatIkkeInnlagtVann(
         "Annen privat men ikke innlagt vann",
         "Annen privat vannforsyning, bygget har ikke innlagt vann"
     )
@@ -44,44 +38,40 @@ enum class VannforsyningsKode(
 
 @Serializable
 enum class AvlopsKode(
-    override val kodenavn: String,
     override val presentasjonsnavn: String,
     override val beskrivelse: String
 ) : IKode {
-    O("OffentligKloakk", "Offentlig kloakk", "Avløp er offentlig kloakk"),
-    P("PrivatKloakk", "Privat kloakk", "Avløp er privat kloakk"),
-    I("IngenKloakk", "Ingen kloakk", "Ingen tilknytning til kloakk")
+    OffentligKloakk("Offentlig kloakk", "Avløp er offentlig kloakk"),
+    PrivatKloakk("Privat kloakk", "Avløp er privat kloakk"),
+    IngenKloakk("Ingen kloakk", "Ingen tilknytning til kloakk")
 }
 
 @Serializable
 enum class EnergikildeKode(
-    override val kodenavn: String,
     override val presentasjonsnavn: String,
     override val beskrivelse: String
 ) : IKode {
-    A(
-        "AnnenEnergikilde",
+    AnnenEnergikilde(
         "Annen energikilde",
         "Energikildekode for annen energikilde enn de som har ferdigdefinerte koder"
     ),
-    B("Biobrensel", "Biobrensel", "Energikildekode for biobrensel"),
-    E("Elektrisitet", "Elektrisitet", "Energikildekode for elektrisitet"),
-    F("Fjernvarme", "Fjernvarme", "Energikildekode for fjernvarme"),
-    G("Gass", "Gass", "Energikildekode for gass"),
-    O("OljeParafin", "Olje eller parafin", "Energikildekode for olje eller parafin"),
-    S("Solenergi", "Solenergi", "Energikildekode for solenergi"),
-    V("Varmepumpe", "Varmepumpe", "Energikildekode for varmepumpe"),
+    Biobrensel("Biobrensel", "Energikildekode for biobrensel"),
+    Elektrisitet("Elektrisitet", "Energikildekode for elektrisitet"),
+    Fjernvarme("Fjernvarme", "Energikildekode for fjernvarme"),
+    Gass("Gass", "Energikildekode for gass"),
+    OljeParafin("Olje eller parafin", "Energikildekode for olje eller parafin"),
+    Solenergi("Solenergi", "Energikildekode for solenergi"),
+    Varmepumpe("Varmepumpe", "Energikildekode for varmepumpe"),
 }
 
 @Serializable
 enum class OppvarmingsKode(
-    override val kodenavn: String,
     override val presentasjonsnavn: String,
     override val beskrivelse: String
 ) : IKode {
-    E("Elektrisk", "Elektrisk", "Elektrisk oppvarming"),
-    S("Sentralvarme", "Sentralvarme", "Sentralvarme"),
-    A("AnnenOppvarming", "Annen oppvarming", "Annen oppvarming")
+    Elektrisk("Elektrisk", "Elektrisk oppvarming"),
+    Sentralvarme("Sentralvarme", "Sentralvarme"),
+    AnnenOppvarming("Annen oppvarming", "Annen oppvarming")
 }
 
 @Serializable
@@ -100,7 +90,6 @@ inline fun <reified T> KClass<T>.toKodeList(): List<Kode> where T : Enum<T>, T :
     return enumValues<T>().map {
         Kode(
             kode = it.name,
-            kodenavn = it.kodenavn,
             presentasjonsnavn = it.presentasjonsnavn,
             beskrivelse = it.beskrivelse
         )

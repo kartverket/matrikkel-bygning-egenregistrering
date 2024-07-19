@@ -81,7 +81,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                                 bruksenhetId = "a",
                                 null,
                                 energikilde = EnergikildeRegistrering(
-                                    energikilder = listOf(EnergikildeKode.E, EnergikildeKode.G),
+                                    energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
                                     metadata = RegistreringMetadataRequest(
                                         registreringstidspunkt = Clock.System.now(),
                                         gyldigFra = Clock.System.now()
