@@ -12,7 +12,7 @@ import io.ktor.server.routing.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import no.kartverket.matrikkel.bygning.models.EnergikildeKode
+import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
@@ -59,7 +59,7 @@ private fun Route.egenregistreringBygningIdDoc() {
             request {
                 requestType<EgenregistreringRequest>()
                 required(true)
-                description("Egeneregistrert data")
+                description("Egenregistrert data")
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningsRegistrering = BygningsRegistrering(
