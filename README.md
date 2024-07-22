@@ -30,9 +30,3 @@ $ docker-compose up web -d
 
 Ellers er det bare å kjøre opp applikasjonen som ønsket via IntelliJ eller kommandolinje. Ingen spesielle hensyn som er
 nødvendig rundt miljøkonfigurasjon, det skal ha sane defaults.
-
-### Logging
-By default så kjører applikasjonen med JSON logging for at dette skal leses av Grafana Loki. Dette kan være vanskelig å lese lokalt, og det finnes dermed en lokal config for logback. For å bruke denne så må du sette opp en JVM option:
-```shell
-$ -Dlogback.configurationFile=logback-local.xml
-```
