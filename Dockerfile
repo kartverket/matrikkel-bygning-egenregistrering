@@ -7,4 +7,4 @@ FROM eclipse-temurin:21-jdk-alpine
 EXPOSE 8080:8080
 RUN mkdir /app
 COPY --from=build /home/gradle/src/build/libs/*.jar /app/matrikkel-bygning-egenregistrering.jar
-ENTRYPOINT ["java", "-Dlogback.configurationFile=logback-local.xml", "-jar","/app/matrikkel-bygning-egenregistrering.jar"]
+ENTRYPOINT ["java", "-Dlogback.configurationFile=logback-cloud.xml", "-jar","/app/matrikkel-bygning-egenregistrering.jar"]
