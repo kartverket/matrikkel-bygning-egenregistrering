@@ -15,19 +15,21 @@ import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
+import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
-import no.kartverket.matrikkel.bygning.routes.v1.baseRoutesV1
-import no.kartverket.matrikkel.bygning.routes.v1.probeRouting
+import no.kartverket.matrikkel.bygning.routes.installInternalRouting
+import no.kartverket.matrikkel.bygning.routes.v1.installBaseRouting
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
+import org.koin.dsl.module
+import org.koin.ktor.plugin.KoinIsolated
+import java.sql.Connection
 
 val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
@@ -35,6 +37,17 @@ fun main(args: Array<String>) {
     embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::internalModule).start(wait = false)
 
     EngineMain.main(args)
+}
+
+val appModule = module {
+    single { DatabaseSingleton.getConnection() }
+
+    // Repositories
+    single { BygningRepository(get()) }
+
+    // Services
+    single { BygningService(get()) }
+    single { EgenregistreringsService(get()) }
 }
 
 
@@ -74,15 +87,20 @@ fun Application.module() {
         schemaConfigurator = KotlinXSchemaConfigurator()
     }
 
+    install(KoinIsolated) {
+        modules(appModule)
+    }
+
     DatabaseSingleton.init()
     DatabaseSingleton.migrate()
-    val dbConnection = DatabaseSingleton.getConnection()
 
-    // Begge disse skal egentlig ha en "bygningRepository" på seg, men databasen finnes ikke ennå
-    val bygningService = BygningService()
-    val egenregistreringsService = EgenregistreringsService(bygningService)
+    installBaseRouting()
+}
 
-    baseRoutesV1(bygningService, egenregistreringsService)
+val internalModule = module {
+    single<Connection> { DatabaseSingleton.getConnection() }
+    single { HealthRepository(get()) }
+    single { HealthService(get()) }
 }
 
 fun Application.internalModule() {
@@ -90,17 +108,11 @@ fun Application.internalModule() {
         registry = appMicrometerRegistry
     }
 
-    DatabaseSingleton.init()
-    val dbConnection = DatabaseSingleton.getConnection()
-    val healthRepository = HealthRepository(dbConnection)
-    val healthService = HealthService(healthRepository)
-
-    routing {
-        get("/metrics") {
-            call.respondText(appMicrometerRegistry.scrape())
-        }
-
-        probeRouting(healthService)
+    install(KoinIsolated) {
+        modules(internalModule)
     }
 
+    DatabaseSingleton.init()
+
+    installInternalRouting()
 }

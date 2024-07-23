@@ -53,6 +53,11 @@ dependencies {
 
     implementation(libs.kompendium.core)
 
+    // Dependency injection
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.ktor)
+
     // Tests
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test)
