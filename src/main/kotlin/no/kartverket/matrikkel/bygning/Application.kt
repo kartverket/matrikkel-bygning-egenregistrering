@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning
 
+import DatabaseConfig
+import DatabaseFactory
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
 import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
@@ -8,6 +10,7 @@ import io.bkbn.kompendium.oas.serialization.KompendiumSerializersModule
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
@@ -19,7 +22,6 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import no.kartverket.matrikkel.bygning.db.DatabaseSingleton
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.installInternalRouting
@@ -28,8 +30,8 @@ import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
 import org.koin.dsl.module
+import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.KoinIsolated
-import java.sql.Connection
 
 val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
@@ -39,9 +41,21 @@ fun main(args: Array<String>) {
     EngineMain.main(args)
 }
 
-val appModule = module {
-    single { DatabaseSingleton.getConnection() }
+val databaseConfig = DatabaseConfig(
+    driverClassName = "org.postgresql.Driver",
+    jdbcUrl = "jdbc:${ApplicationConfig(null).property("storage.jdbcURL").getString()}",
+    username = ApplicationConfig(null).property("storage.username").getString(),
+    password = ApplicationConfig(null).property("storage.password").getString(),
+    maxPoolSize = 10
+)
 
+val databaseModule = module {
+    single { databaseConfig }
+    single { DatabaseFactory(get()) }
+    single { get<DatabaseFactory>().getDataSource() }
+}
+
+val appModule = module {
     // Repositories
     single { BygningRepository(get()) }
 
@@ -88,17 +102,17 @@ fun Application.module() {
     }
 
     install(KoinIsolated) {
-        modules(appModule)
+        modules(appModule, databaseModule)
     }
 
-    DatabaseSingleton.init()
-    DatabaseSingleton.migrate()
+    val dbFactory: DatabaseFactory by inject()
+    dbFactory.init()
+    dbFactory.runFlywayMigrations()
 
     installBaseRouting()
 }
 
 val internalModule = module {
-    single<Connection> { DatabaseSingleton.getConnection() }
     single { HealthRepository(get()) }
     single { HealthService(get()) }
 }
@@ -109,10 +123,11 @@ fun Application.internalModule() {
     }
 
     install(KoinIsolated) {
-        modules(internalModule)
+        modules(internalModule, databaseModule)
     }
 
-    DatabaseSingleton.init()
+    val dbFactory: DatabaseFactory by inject()
+    dbFactory.init()
 
     installInternalRouting()
 }

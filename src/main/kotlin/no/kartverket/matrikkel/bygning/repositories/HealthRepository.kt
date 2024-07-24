@@ -1,17 +1,15 @@
 package no.kartverket.matrikkel.bygning.repositories
 
-import java.sql.Connection
+import javax.sql.DataSource
 
-class HealthRepository(private val dbConnection: Connection) {
+class HealthRepository(private val dataSource: DataSource) {
     fun getHealthCheck(): Boolean {
-        val statement = dbConnection.createStatement()
+        val sql = "select 1;"
 
-        val resultSet = statement.executeQuery(
-            """
-            select 1;
-        """.trimIndent()
-        )
-
-        return resultSet.next()
+        dataSource.connection.use { connection ->
+            connection.createStatement().use { statement ->
+                return statement.executeQuery(sql).next()
+            }
+        }
     }
 }

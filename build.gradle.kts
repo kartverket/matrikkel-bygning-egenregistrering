@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.postgres)
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
+    implementation(libs.hikari)
 
     implementation(libs.kompendium.core)
 
