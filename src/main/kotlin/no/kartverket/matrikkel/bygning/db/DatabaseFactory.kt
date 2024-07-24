@@ -18,7 +18,6 @@ class DatabaseFactory(private val config: DatabaseConfig) {
             password = config.password
             maximumPoolSize = config.maxPoolSize
 
-            // Set the default schema
             config.defaultSchema?.let { schema ->
                 addDataSourceProperty("currentSchema", schema)
                 addDataSourceProperty("searchpath", schema)
