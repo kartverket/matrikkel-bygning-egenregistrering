@@ -27,7 +27,10 @@ class DatabaseFactory(private val config: DatabaseConfig) {
     }
 
     fun runFlywayMigrations() {
-        val flyway = Flyway.configure().validateMigrationNaming(true).createSchemas(true).defaultSchema("bygning")
+        val flyway = Flyway.configure()
+            .validateMigrationNaming(true)
+            .createSchemas(true)
+            .defaultSchema("bygning")
             .outputQueryResults(true)
             .dataSource(dataSource)
             .locations("classpath:db/migration")
