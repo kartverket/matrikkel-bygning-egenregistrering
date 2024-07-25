@@ -7,7 +7,6 @@ import javax.sql.DataSource
 class BygningRepository(private val dataSource: DataSource) {
     fun getBygninger(): List<BygningDTO> {
         val sql = "SELECT * FROM bygning;"
-
         dataSource.connection.use { connection ->
             connection.createStatement().use { statement ->
                 val resultSet = statement.executeQuery(sql)

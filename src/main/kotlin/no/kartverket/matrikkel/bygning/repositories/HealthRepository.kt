@@ -1,15 +1,19 @@
 package no.kartverket.matrikkel.bygning.repositories
 
+import no.kartverket.matrikkel.bygning.db.executeAndMapPreparedStatement
+import org.intellij.lang.annotations.Language
 import javax.sql.DataSource
 
 class HealthRepository(private val dataSource: DataSource) {
     fun getHealthCheck(): Boolean {
-        val sql = "select 1;"
+        @Language("PostgreSQL")
+        val sql = "SELECT 1 WHERE 1 = ?;"
 
-        dataSource.connection.use { connection ->
-            connection.createStatement().use { statement ->
-                return statement.executeQuery(sql).next()
-            }
-        }
+        val resultSet = dataSource.executeAndMapPreparedStatement(
+            sql,
+            { it.setInt(1, 1) }
+        ) { res -> res.getInt(1) }
+
+        return resultSet.isNotEmpty()
     }
 }
