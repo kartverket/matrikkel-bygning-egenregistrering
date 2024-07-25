@@ -106,7 +106,6 @@ fun Application.module() {
     }
 
     val dbFactory: DatabaseFactory by inject()
-    dbFactory.init()
     dbFactory.runFlywayMigrations()
 
     installBaseRouting()
@@ -125,9 +124,6 @@ fun Application.internalModule() {
     install(KoinIsolated) {
         modules(internalModule, databaseModule)
     }
-
-    val dbFactory: DatabaseFactory by inject()
-    dbFactory.init()
 
     installInternalRouting()
 }

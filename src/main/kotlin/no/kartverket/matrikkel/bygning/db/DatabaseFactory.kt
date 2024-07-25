@@ -4,9 +4,9 @@ import org.flywaydb.core.Flyway
 import javax.sql.DataSource
 
 class DatabaseFactory(private val config: DatabaseConfig) {
-    private lateinit var dataSource: DataSource
+    private var dataSource: DataSource
 
-    fun init() {
+    init {
         dataSource = createHikariDataSource()
     }
 
