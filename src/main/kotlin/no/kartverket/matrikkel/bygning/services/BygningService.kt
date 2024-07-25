@@ -5,8 +5,10 @@ import no.kartverket.matrikkel.bygning.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.models.BruksenhetStorage
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.BygningStorage
+import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 
-class BygningService {
+// BygningRepository er ubrukt, men brukes bare for å teste ut Koin
+class BygningService(val bygningRepository: BygningRepository) {
     val bruksenhetStorage: MutableList<BruksenhetStorage> = mutableListOf(
         BruksenhetStorage("a", "1", mutableListOf(), mutableListOf(), mutableListOf()),
         BruksenhetStorage("b", "1", mutableListOf(), mutableListOf(), mutableListOf()),
