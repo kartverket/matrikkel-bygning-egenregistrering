@@ -48,8 +48,14 @@ dependencies {
     implementation(libs.postgres)
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
+    implementation(libs.hikari)
 
     implementation(libs.kompendium.core)
+
+    // Dependency injection
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.ktor)
 
     // Tests
     testImplementation(libs.ktor.server.tests)

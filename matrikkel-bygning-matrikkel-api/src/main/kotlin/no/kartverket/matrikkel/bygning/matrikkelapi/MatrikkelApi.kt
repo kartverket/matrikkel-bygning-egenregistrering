@@ -17,7 +17,7 @@ class MatrikkelApi(private val baseUrl: URI) {
     private val kommuneServiceFactory = KommuneServiceWS()
     private val bygningServiceFactory = BygningServiceWS()
 
-    // TODO: Uheldig at denne er mutabel, for da kan noe ødelegge for andre. Kanskje er det ikke for dyrt å lage en nye hver gang.
+    // TODO: Uheldig at denne er mutabel, for da kan noe Ã¸delegge for andre. Kanskje er det ikke for dyrt Ã¥ lage en nye hver gang.
     val matrikkelContext = MatrikkelContext().apply {
         systemVersion = "4.18"
         locale = "no_NO_B" // TODO: Dette skal kanskje variere fra bruker til bruker

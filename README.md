@@ -5,6 +5,8 @@ skal kunne ta i mot egenregistrert data om bygninger og bruksenheter fra Team Eg
 
 ## Lokalt oppsett
 
+### Kjøring av applikasjon
+
 Prosjektet er satt opp med IntelliJ på MacOS. Dersom noe ikke fungerer, med andre IDEer eller operativsystemer, gjerne
 fyll ut README med informasjon om dette.
 
@@ -28,10 +30,3 @@ $ docker-compose up web -d
 
 Ellers er det bare å kjøre opp applikasjonen som ønsket via IntelliJ eller kommandolinje. Ingen spesielle hensyn som er
 nødvendig rundt miljøkonfigurasjon, det skal ha sane defaults.
-
-## TODOs
-
-* Utvide det faktiske APIet. Akkurat nå er det veldig, veldig enkelt, og er bare til for å lage en slags struktur med
-  Java-standard db -> repo -> service -> route
-* Sette opp menneske-vennlige logger for lokal utvikling, da disse er ganske kjipe å lese i JSON format
-* Error Boundaries på ruting og databasekall

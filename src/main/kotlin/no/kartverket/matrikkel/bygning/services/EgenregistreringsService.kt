@@ -5,7 +5,7 @@ import no.kartverket.matrikkel.bygning.models.BygningStorage
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import java.util.*
 
-class EgenregistreringsService(val bygningService: BygningService) {
+class EgenregistreringsService(private val bygningService: BygningService) {
 
     fun addEgenregistreringToBygning(bygningId: String, egenregistrering: EgenregistreringRequest): Boolean {
         val bygningIfExists = bygningService.bygningStorage.find { it.bygningId == bygningId }

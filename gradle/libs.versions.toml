@@ -1,16 +1,18 @@
 [versions]
-ktorVersion = "2.3.11"
+ktorVersion = "2.3.12"
 kotlinVersion = "2.0.0"
 logbackVersion = "1.5.6"
 logstashVersion = "7.4"
-prometheusVersion = "1.13.1"
-flywayVersion = "10.15.0"
-jacksonVersion = "2.17.1"
+prometheusVersion = "1.13.2"
+flywayVersion = "10.16.0"
+jacksonVersion = "2.17.2"
 postgresVersion = "42.7.3"
 shadowVersion = "8.1.1"
 kompendiumVersion = "3.14.4"
 kotlinxDatetimeVersion = "0.6.0"
 jaxwsVersion = "4.0.2"
+koinVersion = "3.5.6"
+hikariVersion = "5.1.0"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -24,6 +26,7 @@ ktor-server-metrics-micrometer = { group = "io.ktor", name = "ktor-server-metric
 ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version.ref = "ktorVersion" }
 ktor-serialization-kotlinx = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktorVersion" }
 
+hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikariVersion" }
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flywayVersion" }
 flyway-database-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql", version.ref = "flywayVersion" }
 
@@ -38,6 +41,10 @@ kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime",
 
 jaxws-rt = { group = "com.sun.xml.ws", name = "jaxws-rt", version.ref = "jaxwsVersion" }
 jaxws-tools = { group = "com.sun.xml.ws", name = "jaxws-tools", version.ref = "jaxwsVersion" }
+
+koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koinVersion" }
+koin-core = { group = "io.insert-koin", name = "koin-core" }
+koin-ktor = { group = "io.insert-koin", name = "koin-ktor" }
 
 
 [plugins]

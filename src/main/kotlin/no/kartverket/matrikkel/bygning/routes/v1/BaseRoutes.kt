@@ -7,11 +7,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import org.koin.ktor.ext.inject
 
-fun Application.baseRoutesV1(
-    bygningService: BygningService,
-    egenregistreringsService: EgenregistreringsService
-) {
+fun Application.installBaseRouting() {
     routing {
         swagger()
 
@@ -23,7 +21,11 @@ fun Application.baseRoutesV1(
         }
 
         route("v1") {
+            val bygningService by inject<BygningService>()
+            val egenregistreringsService by inject<EgenregistreringsService>()
+
             bygningRouting(bygningService, egenregistreringsService)
+            kodelisteRouting()
         }
 
     }

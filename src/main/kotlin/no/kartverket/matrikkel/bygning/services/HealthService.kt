@@ -6,5 +6,4 @@ class HealthService(private val healthRepository: HealthRepository) {
     fun getHealth(): Boolean {
         return healthRepository.getHealthCheck()
     }
-
 }
