@@ -35,8 +35,6 @@ import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.KoinIsolated
 import java.net.URI
 
-val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-
 fun main(args: Array<String>) {
     embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::internalModule).start(wait = false)
 
@@ -64,6 +62,10 @@ val appModule = module {
     // Services
     single { BygningService(get()) }
     single { EgenregistreringsService(get()) }
+}
+
+val metricsModule = module {
+    single { PrometheusMeterRegistry(PrometheusConfig.DEFAULT) }
 }
 
 val matrikkelModule = module {
@@ -99,10 +101,6 @@ fun Application.module() {
         }
     }
 
-    install(MicrometerMetrics) {
-        registry = appMicrometerRegistry
-    }
-
     install(NotarizedApplication()) {
         spec = OpenApiSpec(
             jsonSchemaDialect = "https://spec.openapis.org/oas/3.1/dialect/base", info = Info(
@@ -114,7 +112,12 @@ fun Application.module() {
     }
 
     install(KoinIsolated) {
-        modules(appModule, databaseModule, matrikkelModule)
+        modules(appModule, databaseModule, matrikkelModule, metricsModule)
+    }
+
+    val meterRegistry by inject<PrometheusMeterRegistry>()
+    install(MicrometerMetrics) {
+        registry = meterRegistry
     }
 
     val dbFactory: DatabaseFactory by inject()
@@ -129,12 +132,13 @@ val internalModule = module {
 }
 
 fun Application.internalModule() {
-    install(MicrometerMetrics) {
-        registry = appMicrometerRegistry
+    install(KoinIsolated) {
+        modules(internalModule, databaseModule, metricsModule)
     }
 
-    install(KoinIsolated) {
-        modules(internalModule, databaseModule)
+    val meterRegistry by inject<PrometheusMeterRegistry>()
+    install(MicrometerMetrics) {
+        registry = meterRegistry
     }
 
     installInternalRouting()
