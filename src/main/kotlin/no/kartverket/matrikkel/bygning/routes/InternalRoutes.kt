@@ -4,18 +4,18 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.kartverket.matrikkel.bygning.appMicrometerRegistry
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.services.HealthService
 import org.koin.ktor.ext.inject
 
 fun Application.installInternalRouting() {
     routing {
         route("/metrics") {
+            val meterRegistry by inject<PrometheusMeterRegistry>()
             get {
-                call.respondText(appMicrometerRegistry.scrape())
+                call.respondText(meterRegistry.scrape())
             }
         }
-
 
         route("/healthz") {
             val healthService: HealthService by inject()
