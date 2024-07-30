@@ -13,7 +13,7 @@ val jaxws: Configuration by configurations.creating {
 
 dependencies {
     implementation(libs.jaxws.rt) {
-        exclude(group = "org.eclipse.angus") // Hva i huleste skal vi med e-post?
+        exclude(group = "org.eclipse.angus") // Ekskluderer angus email
     }
     jaxws(libs.jaxws.tools)
 }
