@@ -21,7 +21,7 @@ class MatrikkelApi(private val baseUrl: URI) {
     val matrikkelContext = MatrikkelContext().apply {
         systemVersion = "4.18"
         locale = "no_NO_B" // TODO: Dette skal kanskje variere fra bruker til bruker
-        klientIdentifikasjon = "Matrikkel Egenregistrering"
+        klientIdentifikasjon = "matrikkel-bygning"
         koordinatsystemKodeId = KoordinatsystemKodeId().apply { value = 24 }
         isBrukOriginaleKoordinater = true
     }
