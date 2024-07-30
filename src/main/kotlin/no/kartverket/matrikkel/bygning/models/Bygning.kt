@@ -22,7 +22,6 @@ data class Bruksenhet(
     val oppvarmingRegistreringer: List<OppvarmingRegistrering>
 )
 
-
 // Disse er dummy klasser som brukes runtime mens vi ikke har en databasetilkobling
 data class BygningStorage(
     val bygningId: String,

@@ -41,16 +41,16 @@ fun main(args: Array<String>) {
     EngineMain.main(args)
 }
 
-val databaseConfig = DatabaseConfig(
-    driverClassName = "org.postgresql.Driver",
-    jdbcUrl = "jdbc:${ApplicationConfig(null).property("storage.jdbcURL").getString()}",
-    username = ApplicationConfig(null).property("storage.username").getString(),
-    password = ApplicationConfig(null).property("storage.password").getString(),
-    maxPoolSize = 10
-)
-
 val databaseModule = module {
-    single { databaseConfig }
+    single {
+        DatabaseConfig(
+            driverClassName = "org.postgresql.Driver",
+            jdbcUrl = "jdbc:${ApplicationConfig(null).property("storage.jdbcURL").getString()}",
+            username = ApplicationConfig(null).property("storage.username").getString(),
+            password = ApplicationConfig(null).property("storage.password").getString(),
+            maxPoolSize = 10
+        )
+    }
     single { DatabaseFactory(get()) }
     single { get<DatabaseFactory>().getDataSource() }
 }
