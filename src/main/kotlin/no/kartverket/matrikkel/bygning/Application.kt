@@ -2,8 +2,6 @@ package no.kartverket.matrikkel.bygning
 
 import DatabaseConfig
 import DatabaseFactory
-import MatrikkelConfig
-import MatrikkelFactory
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
 import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
@@ -24,6 +22,8 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import no.kartverket.matrikkel.bygning.matrikkel.MatrikkelConfig
+import no.kartverket.matrikkel.bygning.matrikkel.MatrikkelFactory
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.installInternalRouting
@@ -69,7 +69,6 @@ val metricsModule = module {
 }
 
 val matrikkelModule = module {
-    // TODO Dette skal ikke være definert i main module
     val matrikkelConfig = MatrikkelConfig(
         ApplicationConfig(null).property("matrikkel.baseUrl").getString(),
         ApplicationConfig(null).property("matrikkel.username").getString(),

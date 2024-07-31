@@ -9,8 +9,8 @@ plugins {
 }
 
 allprojects {
-group = "no.kartverket.matrikkel.bygning"
-version = "0.0.1"
+    group = "no.kartverket.matrikkel.bygning"
+    version = "0.0.1"
 }
 
 application {
@@ -61,8 +61,8 @@ dependencies {
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test)
 
-    implementation(project(":matrikkel-factory"))
     implementation(project(":matrikkel-shared"))
+    implementation(project(":matrikkel-api"))
 }
 
 ktor {

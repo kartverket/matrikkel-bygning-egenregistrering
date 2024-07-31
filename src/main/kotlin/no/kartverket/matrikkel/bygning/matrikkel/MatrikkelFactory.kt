@@ -1,4 +1,4 @@
-
+package no.kartverket.matrikkel.bygning.matrikkel
 import matrikkelclients.BygningClient
 import models.Bruksenhet
 import models.Bygning

@@ -16,6 +16,7 @@ import matrikkelclients.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import org.koin.ktor.ext.inject
 
 fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
@@ -32,6 +33,9 @@ fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsSer
                 call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
                 return@post
             }
+
+            // Buuuuuuu
+            val test = BygningId()
 
             val bygningFromMatrikkel = bygningClient.getBygningById(bygningId)
 

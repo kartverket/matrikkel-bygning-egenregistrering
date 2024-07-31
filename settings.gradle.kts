@@ -9,5 +9,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":matrikkel-api", ":matrikkel-shared", ":matrikkel-factory")
-include("")
+include(":matrikkel-api", ":matrikkel-shared")
