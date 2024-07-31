@@ -10,7 +10,7 @@ postgresVersion = "42.7.3"
 shadowVersion = "8.1.1"
 kompendiumVersion = "3.14.4"
 kotlinxDatetimeVersion = "0.6.0"
-jaxwsVersion = "4.0.2"
+jaxwsVersion = "4.0.3"
 koinVersion = "3.5.6"
 hikariVersion = "5.1.0"
 
