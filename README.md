@@ -5,22 +5,28 @@ skal kunne ta i mot egenregistrert data om bygninger og bruksenheter fra Team Eg
 
 ## Lokalt oppsett
 
-### Kjøring av applikasjon
-
 Prosjektet er satt opp med IntelliJ på MacOS. Dersom noe ikke fungerer, med andre IDEer eller operativsystemer, gjerne
 fyll ut README med informasjon om dette.
 
 Prosjektet er bygd og kjørt med `temurin-21` JRE og IntelliJ default Kotlin SDK.
 
-For å kjøre prosjektet må du først sette opp database. Dette kan enkelt gjøres med docker compose:
+### Kjøring av database
+
+For å kjøre applikasjonen må du først starte en database. For lokal kjøring er det definert en postgres-database i 
+[docker-compose.yaml](docker-compose.yaml). Her blir det definert et volume under `~/apps/postgres` slik at
+databasedata persisteres og overlever omstart av databaseserveren. Dersom man ønsker å fjerne lokale data kan man 
+fjerne denne katalogstrukturen.
+
+Databasen kan startes med docker compose:
 
 ```sh
 $ docker-compose up db -d
 ```
-
 Flagget `-d` gjør at loggene fra containeren ikke skrives til stdout. Dersom du ønsker det kan du droppe flagget.
 
-Etter dette kan du kjøre opp applikasjonen enten lokalt, eller som en Docker container.
+### Kjøring av applikasjon
+
+Når databasen kjører, kan du kjøre opp applikasjonen enten lokalt, eller som en Docker container.
 
 Hvis du vil kjøre appen som en Docker container kan du kjøre:
 
