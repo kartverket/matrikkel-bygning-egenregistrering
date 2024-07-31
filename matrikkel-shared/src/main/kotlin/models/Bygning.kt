@@ -1,7 +1,8 @@
-package no.kartverket.matrikkel.bygning.models
+package models
 
 data class Bygning(
     val bygningId: String,
+    val bygningNummer: String,
     val bruksenheter: List<Bruksenhet>,
 )
 

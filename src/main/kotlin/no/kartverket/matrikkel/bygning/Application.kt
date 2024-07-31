@@ -2,6 +2,8 @@ package no.kartverket.matrikkel.bygning
 
 import DatabaseConfig
 import DatabaseFactory
+import MatrikkelConfig
+import MatrikkelFactory
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
 import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
@@ -22,7 +24,6 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.installInternalRouting
@@ -33,7 +34,6 @@ import no.kartverket.matrikkel.bygning.services.HealthService
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.KoinIsolated
-import java.net.URI
 
 fun main(args: Array<String>) {
     embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::internalModule).start(wait = false)
@@ -69,15 +69,18 @@ val metricsModule = module {
 }
 
 val matrikkelModule = module {
+    // TODO Dette skal ikke være definert i main module
+    val matrikkelConfig = MatrikkelConfig(
+        ApplicationConfig(null).property("matrikkel.baseUrl").getString(),
+        ApplicationConfig(null).property("matrikkel.username").getString(),
+        ApplicationConfig(null).property("matrikkel.password").getString()
+    )
     single {
-        MatrikkelApi(URI(ApplicationConfig(null).property("matrikkel.baseUrl").getString()))
-            .withAuth(
-                ApplicationConfig(null).property("matrikkel.username").getString(),
-                ApplicationConfig(null).property("matrikkel.password").getString()
-            )
+        MatrikkelFactory(
+            matrikkelConfig
+        ).bygningClient
     }
 }
-
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.module() {
