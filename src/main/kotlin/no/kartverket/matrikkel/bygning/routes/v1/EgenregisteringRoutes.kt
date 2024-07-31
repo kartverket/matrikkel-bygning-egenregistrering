@@ -12,20 +12,36 @@ import io.ktor.server.routing.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
+import org.koin.ktor.ext.inject
 
 fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
     route("/egenregistreringer") {
         egenregistreringBygningIdDoc()
+        val matrikkelApi by inject<MatrikkelApi.WithAuth>()
+
         post {
+
             val egenregistrering = call.receive<EgenregistreringRequest>()
 
             val bygningId = call.parameters["bygningId"]
 
             if (bygningId == null) {
                 call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
+                return@post
+            }
+
+            // TODO Sikkert en bedre måte å sette opp dette på, men her er et eksempel på bruk av MatrikkelAPIet med injected matrikkel
+            try {
+                val matrikkelBygningId = BygningId().apply { value = bygningId.toLong() }
+                matrikkelApi.storeService().getObject(matrikkelBygningId, matrikkelApi.matrikkelContext)
+            } catch (exception: ServiceException) {
+                call.respondText("Bygningen finnes ikke i matrikkelen", status = HttpStatusCode.BadRequest)
                 return@post
             }
 
