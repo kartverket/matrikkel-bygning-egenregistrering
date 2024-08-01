@@ -35,10 +35,9 @@ import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.KoinIsolated
 import java.net.URI
 
-fun main(args: Array<String>) {
-    embeddedServer(Netty, port = 8081, host = "0.0.0.0", module = Application::internalModule).start(wait = false)
-
-    EngineMain.main(args)
+fun main() {
+    embeddedServer(factory = Netty, port = 8081, module = Application::internalModule).start(wait = false)
+    embeddedServer(factory = Netty, port = 8080, module = Application::mainModule).start(wait = true)
 }
 
 val databaseConfig = DatabaseConfig(
@@ -80,7 +79,7 @@ val matrikkelModule = module {
 
 
 @OptIn(ExperimentalSerializationApi::class)
-fun Application.module() {
+fun Application.mainModule() {
     install(ContentNegotiation) {
         json(Json {
             serializersModule = KompendiumSerializersModule.module
