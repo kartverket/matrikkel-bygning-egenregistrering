@@ -19,10 +19,11 @@ import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import org.koin.ktor.ext.inject
 
-fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
+fun Route.egenregistreringRouting() {
     route("/egenregistreringer") {
         egenregistreringBygningIdDoc()
         val bygningClient by inject<BygningClient>()
+        val egenregistreringsService by inject<EgenregistreringsService>()
 
         post {
             val egenregistrering = call.receive<EgenregistreringRequest>()
