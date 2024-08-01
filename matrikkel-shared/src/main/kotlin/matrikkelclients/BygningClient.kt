@@ -4,6 +4,6 @@ import models.Bygning
 
 
 interface BygningClient {
-    fun getBygningById(id: String): Bygning?
-    fun getBygningByBygningNummer(bygningNummer: String): Bygning?
+    fun getBygningById(id: Long): Bygning?
+    fun getBygningByBygningNummer(bygningNummer: Long): Bygning?
 }

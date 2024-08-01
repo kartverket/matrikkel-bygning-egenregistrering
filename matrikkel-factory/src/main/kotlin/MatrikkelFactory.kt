@@ -1,65 +1,28 @@
 
+import clients.LocalBygningClient
 import matrikkelclients.BygningClient
-import models.Bruksenhet
-import models.Bygning
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
 import no.kartverket.matrikkel.bygning.matrikkelapi.clients.MatrikkelBygningClient
 import java.net.URI
 
-data class MatrikkelConfig(
-    val baseUrl: String,
-    val username: String,
-    val password: String,
-)
+class MatrikkelFactory {
+    private val matrikkelUsername = System.getenv("MATRIKKEL_USERNAME")
+    private val matrikkelPassword = System.getenv("MATRIKKEL_PASSWORD")
+    private val matrikkelBaseUrl = System.getenv("MATRIKKEL_BASE_URL")
 
-// TODO Leve et annet sted den her sikkert
-class LocalBygningClient : BygningClient {
-    val bruksenheter: List<Bruksenhet> = listOf(
-        Bruksenhet(
-            "a", "1"
-        ), Bruksenhet(
-            "b", "1"
-        ), Bruksenhet(
-            "c", "2"
-        ), Bruksenhet(
-            "d", "2"
-        )
-    )
-    val bygninger: List<Bygning> = listOf(
-        Bygning(
-            "1", "100", bruksenheter = bruksenheter.subList(0, 2)
-        ), Bygning(
-            "2", "200", bruksenheter = bruksenheter.subList(2, 4)
-        )
-    )
-
-    override fun getBygningById(id: String): Bygning? {
-        return bygninger.find { it.bygningId == id }
-    }
-
-    override fun getBygningByBygningNummer(bygningNummer: String): Bygning? {
-        return bygninger.find { it.bygningNummer == bygningNummer }
-    }
-
-}
-
-class MatrikkelFactory(matrikkelConfig: MatrikkelConfig) {
     var bygningClient: BygningClient
 
     init {
-        // IsCloud? Idk hva vi skal kalle den
-        val localEnv = System.getenv("IS_LOCAL")
-        val isLocal = localEnv == null;
-
-        bygningClient = if (!isLocal) {
-            val matrikkelApi = MatrikkelApi(
-                URI(matrikkelConfig.baseUrl),
-            ).withAuth(matrikkelConfig.username, matrikkelConfig.password)
-
-            MatrikkelBygningClient(matrikkelApi)
+        // TODO Med denne løsningen så slipper man på en måte ekstra env vars for å vurdere miljø, men risikerer å feile ganske stille
+        // hvis noe ikke fungerer i prod, f. eks. Tenker denne gjerne kan diskuteres
+        if (matrikkelUsername == null || matrikkelPassword == null || matrikkelBaseUrl == null) {
+            bygningClient = LocalBygningClient()
         } else {
-            LocalBygningClient()
-        }
+            val matrikkelApi = MatrikkelApi(
+                URI(matrikkelBaseUrl),
+            ).withAuth(matrikkelUsername, matrikkelPassword)
 
+            bygningClient = MatrikkelBygningClient(matrikkelApi)
+        }
     }
 }

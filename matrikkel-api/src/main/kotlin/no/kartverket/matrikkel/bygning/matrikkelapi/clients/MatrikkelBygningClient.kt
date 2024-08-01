@@ -12,12 +12,12 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bruksenhet as 
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as MatrikkelBygning
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
-// TODO Skal man bare bruke Longs i stedet for å være innom strings hele tiden?
+// TODO Logging? Skal vi bruke sl4j for logging i klasser f. eks? Sikkert lurt å ta en runde på logging generelt
 class MatrikkelBygningClient(
     val matrikkelApi: MatrikkelApi.WithAuth
 ) : BygningClient {
-    override fun getBygningById(id: String): Bygning? {
-        val bygningId: BygningId = BygningId().apply { value = id.toLong() }
+    override fun getBygningById(id: Long): Bygning? {
+        val bygningId: BygningId = BygningId().apply { value = id }
 
         try {
             val bygning =
@@ -26,12 +26,11 @@ class MatrikkelBygningClient(
             val bruksenheter = matrikkelApi.storeService()
                 .getObjectsAs<MatrikkelBruksenhet>(bygning.bruksenhetIds.item, matrikkelApi.matrikkelContext)
 
-            return Bygning(
-                bygningId = bygning.id.toString(),
-                bygningNummer = bygning.bygningsnummer.toString(),
+            return Bygning(bygningId = bygning.id.value,
+                bygningNummer = bygning.bygningsnummer,
                 bruksenheter = bruksenheter.map {
                     Bruksenhet(
-                        bruksenhetId = it.id.toString(), bygningId = it.byggId.toString()
+                        bruksenhetId = it.id.value, bygningId = it.byggId.value
                     )
                 })
         } catch (exception: ServiceException) {
@@ -39,12 +38,11 @@ class MatrikkelBygningClient(
         }
     }
 
-    override fun getBygningByBygningNummer(bygningNummer: String): Bygning? {
+    override fun getBygningByBygningNummer(bygningNummer: Long): Bygning? {
         try {
-            val bygningId =
-                matrikkelApi.bygningService().findBygning(bygningNummer.toLong(), matrikkelApi.matrikkelContext)
+            val bygningId = matrikkelApi.bygningService().findBygning(bygningNummer, matrikkelApi.matrikkelContext)
 
-            return getBygningById(bygningId.toString())
+            return getBygningById(bygningId.value)
         } catch (exception: ServiceException) {
             return null
         }
