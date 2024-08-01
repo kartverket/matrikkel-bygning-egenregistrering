@@ -40,7 +40,7 @@ fun Route.bygningRouting() {
                     }
                 }
 
-                val bygning = bygningService.getBygning(bygningId, gyldigFraDate)
+                val bygning = bygningService.getBygning(bygningId.toLong(), gyldigFraDate)
 
                 if (bygning != null) {
                     call.respond(bygning)

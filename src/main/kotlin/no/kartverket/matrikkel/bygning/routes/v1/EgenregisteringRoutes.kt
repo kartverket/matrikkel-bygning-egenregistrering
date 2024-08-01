@@ -33,7 +33,7 @@ fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsSer
                 return@post
             }
 
-            val bygningFromMatrikkel = bygningClient.getBygningById(bygningId)
+            val bygningFromMatrikkel = bygningClient.getBygningById(bygningId.toLong())
 
             if (bygningFromMatrikkel == null) {
                 call.respondText("Bygningen finnes ikke i matrikkelen", status = HttpStatusCode.BadRequest)
@@ -41,7 +41,7 @@ fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsSer
             }
 
             val addedEgenregistrering =
-                egenregistreringsService.addEgenregistreringToBygning(bygningId, egenregistrering)
+                egenregistreringsService.addEgenregistreringToBygning(bygningId.toLong(), egenregistrering)
 
             if (addedEgenregistrering) {
                 call.respondText(
@@ -74,7 +74,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningsRegistrering = BygningsRegistrering(
-                            bygningId = "1",
+                            bygningId = 1L,
                             bruksareal = BruksarealRegistrering(
                                 bruksareal = 125.0, metadata = RegistreringMetadataRequest(
                                     registreringstidspunkt = Clock.System.now(),
@@ -89,7 +89,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                         ),
                         bruksenhetRegistreringer = listOf(
                             BruksenhetRegistrering(
-                                bruksenhetId = "a",
+                                bruksenhetId = 1L,
                                 null,
                                 energikilde = EnergikildeRegistrering(
                                     energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),

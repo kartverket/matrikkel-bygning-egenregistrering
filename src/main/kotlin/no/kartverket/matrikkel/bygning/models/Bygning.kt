@@ -5,7 +5,7 @@ import no.kartverket.matrikkel.bygning.models.requests.*
 
 @Serializable
 data class Bygning(
-    val bygningId: String,
+    val bygningId: Long,
     val bruksenheter: List<Bruksenhet>,
     val bruksarealRegistreringer: List<BruksarealRegistrering>,
     val byggeaarRegistreringer: List<ByggeaarRegistrering>,
@@ -15,8 +15,8 @@ data class Bygning(
 
 @Serializable
 data class Bruksenhet(
-    val bruksenhetId: String,
-    val bygningId: String,
+    val bruksenhetId: Long,
+    val bygningId: Long,
     val bruksarealRegistreringer: List<BruksarealRegistrering>,
     val energikildeRegistreringer: List<EnergikildeRegistrering>,
     val oppvarmingRegistreringer: List<OppvarmingRegistrering>
@@ -24,7 +24,7 @@ data class Bruksenhet(
 
 // Disse er dummy klasser som brukes runtime mens vi ikke har en databasetilkobling
 data class BygningStorage(
-    val bygningId: String,
+    val bygningId: Long,
     val bruksarealRegistreringer: MutableList<BruksarealRegistrering>,
     val byggeaarRegistreringer: MutableList<ByggeaarRegistrering>,
     val vannforsyningsRegistreringer: MutableList<VannforsyningsRegistrering>,
@@ -32,8 +32,8 @@ data class BygningStorage(
 )
 
 data class BruksenhetStorage(
-    val bruksenhetId: String,
-    val bygningId: String,
+    val bruksenhetId: Long,
+    val bygningId: Long,
     val bruksarealRegistreringer: MutableList<BruksarealRegistrering>,
     val energikildeRegistreringer: MutableList<EnergikildeRegistrering>,
     val oppvarmingRegistreringer: MutableList<OppvarmingRegistrering>

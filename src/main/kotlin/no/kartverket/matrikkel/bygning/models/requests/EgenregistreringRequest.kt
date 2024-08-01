@@ -47,7 +47,7 @@ data class OppvarmingRegistrering(
 
 @Serializable
 data class BygningsRegistrering(
-    val bygningId: String,
+    val bygningId: Long,
     val bruksareal: BruksarealRegistrering?,
     val byggeaar: ByggeaarRegistrering?,
     val vannforsyning: VannforsyningsRegistrering?,
@@ -56,7 +56,7 @@ data class BygningsRegistrering(
 
 @Serializable
 data class BruksenhetRegistrering(
-    val bruksenhetId: String,
+    val bruksenhetId: Long,
     val bruksareal: BruksarealRegistrering?,
     val energikilde: EnergikildeRegistrering?,
     val oppvarming: OppvarmingRegistrering?
