@@ -70,7 +70,7 @@ jobs:
           echo '- Tag: ${{ steps.tag_version.outputs.new_tag }}'            >> $GITHUB_STEP_SUMMARY
 
   deploy:
-    needs: [build]
+    needs: [ build ]
     name: Deploy to dev
     uses: kartverket/bygning-apps/.github/workflows/update-app-version.yaml@main
     permissions:
@@ -83,3 +83,18 @@ jobs:
       env: dev
       namespace: matrikkelbygning-main
       cluster: atgcp1
+
+  run-pharos:
+    needs: [ build ]
+    name: Run Pharos
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      packages: read
+      contents: read
+      security-events: write
+    steps:
+      - name: "Run Pharos"
+        uses: kartverket/pharos@v0.2.1
+        with:
+          image_url: ${{ needs.build.outputs.image_name }}:${{ needs.build.outputs.tag }}@${{ needs.build.outputs.digest }}
