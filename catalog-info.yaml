@@ -8,7 +8,7 @@ metadata:
 spec:
   type: "service"
   lifecycle: "production"
-  owner: "team-bygning"
+  owner: "bygning"
   system: "matrikkel"
   providesApis:
     - "matrikkel-bygning-egenregistrering-api"
@@ -48,5 +48,5 @@ metadata:
 spec:
   type: "openapi"
   lifecycle: "production"
-  owner: "team-bygning"
+  owner: "bygning"
   definition: |
