@@ -1,7 +1,5 @@
 package no.kartverket.matrikkel.bygning
 
-import DatabaseConfig
-import DatabaseFactory
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
 import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
@@ -22,6 +20,9 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import no.kartverket.matrikkel.bygning.db.DatabaseConfig
+import no.kartverket.matrikkel.bygning.db.createHikariDataSource
+import no.kartverket.matrikkel.bygning.db.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
@@ -31,30 +32,27 @@ import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
 import org.koin.dsl.module
-import org.koin.ktor.ext.inject
+import org.koin.ktor.ext.get
 import org.koin.ktor.plugin.KoinIsolated
 import java.net.URI
+import javax.sql.DataSource
 
 fun main() {
     embeddedServer(factory = Netty, port = 8081, module = Application::internalModule).start(wait = false)
     embeddedServer(factory = Netty, port = 8080, module = Application::mainModule).start(wait = true)
 }
 
-val databaseConfig = { config: ApplicationConfig ->
-    DatabaseConfig(
-        driverClassName = "org.postgresql.Driver",
-        jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
-        username = config.property("storage.username").getString(),
-        password = config.property("storage.password").getString(),
-        maxPoolSize = 10
-    )
-}
-
 val databaseModule = { config: ApplicationConfig ->
     module {
-        single { databaseConfig(config) }
-        single { DatabaseFactory(get()) }
-        single { get<DatabaseFactory>().getDataSource() }
+        single<DataSource> { createHikariDataSource(
+            DatabaseConfig(
+                driverClassName = "org.postgresql.Driver",
+                jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
+                username = config.property("storage.username").getString(),
+                password = config.property("storage.password").getString(),
+                maxPoolSize = 10
+            )
+        ) }
     }
 }
 
@@ -87,6 +85,10 @@ val matrikkelModule = { config: ApplicationConfig ->
 fun Application.mainModule() {
     val config = loadConfig()
 
+    install(KoinIsolated) {
+        modules(appModule, databaseModule(config), matrikkelModule(config), metricsModule)
+    }
+
     install(ContentNegotiation) {
         json(Json {
             serializersModule = KompendiumSerializersModule.module
@@ -117,19 +119,19 @@ fun Application.mainModule() {
         schemaConfigurator = KotlinXSchemaConfigurator()
     }
 
-    install(KoinIsolated) {
-        modules(appModule, databaseModule(config), matrikkelModule(config), metricsModule)
-    }
 
-    val meterRegistry by inject<PrometheusMeterRegistry>()
+    val meterRegistry = get<PrometheusMeterRegistry>()
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
 
-    val dbFactory: DatabaseFactory by inject()
-    dbFactory.runFlywayMigrations()
+    runFlywayMigrations(get())
 
-    installBaseRouting()
+    installBaseRouting(
+        matrikkelApi = get<MatrikkelApi.WithAuth>(),
+        bygningService = get<BygningService>(),
+        egenregistreringsService = get<EgenregistreringsService>()
+    )
 }
 
 val internalModule = module {
@@ -139,16 +141,20 @@ val internalModule = module {
 
 fun Application.internalModule() {
     val config = loadConfig()
+
     install(KoinIsolated) {
         modules(internalModule, databaseModule(config), metricsModule)
     }
 
-    val meterRegistry by inject<PrometheusMeterRegistry>()
+    val meterRegistry = get<PrometheusMeterRegistry>()
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
 
-    installInternalRouting()
+    installInternalRouting(
+        meterRegistry = meterRegistry,
+        healthService = get<HealthService>(),
+    )
 }
 
 private fun Application.loadConfig() =

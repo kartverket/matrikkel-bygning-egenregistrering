@@ -18,13 +18,12 @@ import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
-import org.koin.ktor.ext.inject
 
-fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
+fun Route.egenregistreringRouting(
+    matrikkelApi: MatrikkelApi.WithAuth,
+    egenregistreringsService: EgenregistreringsService) {
     route("/egenregistreringer") {
         egenregistreringBygningIdDoc()
-        val matrikkelApi by inject<MatrikkelApi.WithAuth>()
-
         post {
 
             val egenregistrering = call.receive<EgenregistreringRequest>()

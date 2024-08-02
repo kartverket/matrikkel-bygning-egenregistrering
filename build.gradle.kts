@@ -69,13 +69,6 @@ dependencies {
     testImplementation(libs.testcontainers.postgresql)
 }
 
-ktor {
-    fatJar {
-        archiveFileName.set("matrikkel-bygning-egenregistrering.jar")
-    }
-}
-
-
 tasks {
     named<ShadowJar>("shadowJar") {
         mergeServiceFiles()
