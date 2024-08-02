@@ -97,4 +97,4 @@ jobs:
       - name: "Run Pharos"
         uses: kartverket/pharos@v0.2.1
         with:
-          image_url: ${{ needs.build.outputs.image_name }}@${{ needs.build.outputs.digest }}
+          image_url: ${{ needs.build.outputs.image_name }}@${{ needs.build.outputs.new_digest }}
