@@ -22,6 +22,9 @@ application {
 }
 
 dependencies {
+    // Project
+    implementation(project(":matrikkel-bygning-matrikkel-api"))
+
     // Ktor
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
@@ -61,7 +64,9 @@ dependencies {
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test)
 
-    implementation(project(":matrikkel-bygning-matrikkel-api"))
+    testImplementation(libs.ktor.client.content.negotation)
+    testImplementation(libs.assertj)
+    testImplementation(libs.testcontainers.postgresql)
 }
 
 ktor {

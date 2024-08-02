@@ -12,7 +12,7 @@ class DatabaseFactory(private val config: DatabaseConfig) {
 
     private fun createHikariDataSource(): HikariDataSource {
         val hikariConfig = HikariConfig().apply {
-//            driverClassName = config.driverClassName
+            driverClassName = config.driverClassName
             jdbcUrl = config.jdbcUrl
             username = config.username
             password = config.password
