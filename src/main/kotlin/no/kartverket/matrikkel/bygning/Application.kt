@@ -1,5 +1,6 @@
 package no.kartverket.matrikkel.bygning
 
+import com.zaxxer.hikari.HikariDataSource
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
 import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
@@ -31,63 +32,18 @@ import no.kartverket.matrikkel.bygning.routes.v1.installBaseRouting
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
-import org.koin.dsl.module
-import org.koin.ktor.ext.get
-import org.koin.ktor.plugin.KoinIsolated
 import java.net.URI
-import javax.sql.DataSource
 
 fun main() {
     embeddedServer(factory = Netty, port = 8081, module = Application::internalModule).start(wait = false)
     embeddedServer(factory = Netty, port = 8080, module = Application::mainModule).start(wait = true)
 }
 
-val databaseModule = { config: ApplicationConfig ->
-    module {
-        single<DataSource> { createHikariDataSource(
-            DatabaseConfig(
-                driverClassName = "org.postgresql.Driver",
-                jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
-                username = config.property("storage.username").getString(),
-                password = config.property("storage.password").getString(),
-                maxPoolSize = 10
-            )
-        ) }
-    }
-}
-
-val appModule = module {
-    // Repositories
-    single { BygningRepository(get()) }
-
-    // Services
-    single { BygningService(get()) }
-    single { EgenregistreringsService(get()) }
-}
-
-val metricsModule = module {
-    single { PrometheusMeterRegistry(PrometheusConfig.DEFAULT) }
-}
-
-val matrikkelModule = { config: ApplicationConfig ->
-    module {
-        single {
-            MatrikkelApi(URI(config.property("matrikkel.baseUrl").getString()))
-                .withAuth(
-                    config.property("matrikkel.username").getString(),
-                    config.property("matrikkel.password").getString()
-                )
-        }
-    }
-}
+val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.mainModule() {
     val config = loadConfig()
-
-    install(KoinIsolated) {
-        modules(appModule, databaseModule(config), matrikkelModule(config), metricsModule)
-    }
 
     install(ContentNegotiation) {
         json(Json {
@@ -120,40 +76,61 @@ fun Application.mainModule() {
     }
 
 
-    val meterRegistry = get<PrometheusMeterRegistry>()
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
 
-    runFlywayMigrations(get())
+    val dataSource = getDataSource()
+
+    runFlywayMigrations(dataSource)
+
+    val bygningRepository = BygningRepository(dataSource)
+
+    val bygningService = BygningService(bygningRepository)
+    val egenregistreringsService = EgenregistreringsService(bygningService)
+
+    val matrikkelApi = MatrikkelApi(URI(config.property("matrikkel.baseUrl").getString()))
+        .withAuth(
+            config.property("matrikkel.username").getString(),
+            config.property("matrikkel.password").getString()
+        )
 
     installBaseRouting(
-        matrikkelApi = get<MatrikkelApi.WithAuth>(),
-        bygningService = get<BygningService>(),
-        egenregistreringsService = get<EgenregistreringsService>()
+        matrikkelApi = matrikkelApi,
+        bygningService = bygningService,
+        egenregistreringsService = egenregistreringsService
     )
 }
 
-val internalModule = module {
-    single { HealthRepository(get()) }
-    single { HealthService(get()) }
-}
 
 fun Application.internalModule() {
-    val config = loadConfig()
-
-    install(KoinIsolated) {
-        modules(internalModule, databaseModule(config), metricsModule)
-    }
-
-    val meterRegistry = get<PrometheusMeterRegistry>()
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
 
+    val dataSource = getDataSource()
+
+    val healthRepository = HealthRepository(dataSource)
+
+    val healthService = HealthService(healthRepository)
+
     installInternalRouting(
         meterRegistry = meterRegistry,
-        healthService = get<HealthService>(),
+        healthService = healthService,
+    )
+}
+
+private fun Application.getDataSource(): HikariDataSource {
+    val config = loadConfig()
+
+    return createHikariDataSource(
+        DatabaseConfig(
+            driverClassName = "org.postgresql.Driver",
+            jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
+            username = config.property("storage.username").getString(),
+            password = config.property("storage.password").getString(),
+            maxPoolSize = 10
+        )
     )
 }
 
