@@ -2,7 +2,6 @@ package no.kartverket.matrikkel.bygning
 
 import DatabaseConfig
 import DatabaseFactory
-import MatrikkelFactory
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
 import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
@@ -23,6 +22,7 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import no.kartverket.matrikkel.bygning.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.installInternalRouting
@@ -35,8 +35,18 @@ import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.KoinIsolated
 
 fun main() {
-    embeddedServer(factory = Netty, port = 8081, module = Application::internalModule).start(wait = false)
-    embeddedServer(factory = Netty, port = 8080, module = Application::mainModule).start(wait = true)
+    embeddedServer(
+        factory = Netty,
+        port = 8081,
+        module = Application::internalModule,
+    ).start(wait = false)
+
+    embeddedServer(
+        factory = Netty,
+        port = 8080,
+        module = Application::mainModule,
+        watchPaths = listOf("classes"),
+    ).start(wait = true)
 }
 
 val databaseConfig = { config: ApplicationConfig ->
@@ -70,9 +80,16 @@ val metricsModule = module {
     single { PrometheusMeterRegistry(PrometheusConfig.DEFAULT) }
 }
 
-val matrikkelModule = module {
-    single {
-        MatrikkelFactory().bygningClient
+val matrikkelModule = { config: ApplicationConfig ->
+    module {
+        single {
+            MatrikkelApiConfig.createBygningClient(
+                config.property("matrikkel.baseUrl").getString(),
+                config.property("matrikkel.username").getString(),
+                config.property("matrikkel.password").getString(),
+                config.property("ktor.development").getString().toBoolean(),
+            )
+        }
     }
 }
 
@@ -111,7 +128,7 @@ fun Application.mainModule() {
     }
 
     install(KoinIsolated) {
-        modules(appModule, databaseModule(config), matrikkelModule, metricsModule)
+        modules(appModule, databaseModule(config), matrikkelModule(config), metricsModule)
     }
 
     val meterRegistry by inject<PrometheusMeterRegistry>()

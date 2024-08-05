@@ -16,8 +16,6 @@ dependencies {
         exclude(group = "org.eclipse.angus") // Ekskluderer angus email
     }
 
-    implementation(project(":matrikkel-shared"))
-
     jaxws(libs.jaxws.tools)
 }
 

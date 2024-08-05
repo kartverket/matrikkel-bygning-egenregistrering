@@ -12,7 +12,7 @@ import io.ktor.server.routing.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import matrikkelclients.BygningClient
+import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService

@@ -1,6 +1,4 @@
-package matrikkelclients
-
-import models.Bygning
+package no.kartverket.matrikkel.bygning.matrikkel
 
 
 interface BygningClient {

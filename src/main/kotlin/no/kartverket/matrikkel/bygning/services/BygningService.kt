@@ -14,6 +14,7 @@ class BygningService(val bygningRepository: BygningRepository) {
         BruksenhetStorage(2L, 1L, mutableListOf(), mutableListOf(), mutableListOf()),
         BruksenhetStorage(3L, 2L, mutableListOf(), mutableListOf(), mutableListOf()),
         BruksenhetStorage(4L, 2L, mutableListOf(), mutableListOf(), mutableListOf()),
+        BruksenhetStorage(5L, 2L, mutableListOf(), mutableListOf(), mutableListOf()),
     )
 
     val bygningStorage: MutableList<BygningStorage> = mutableListOf(

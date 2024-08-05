@@ -9,16 +9,12 @@ plugins {
 }
 
 allprojects {
-group = "no.kartverket.matrikkel.bygning"
-version = "0.0.1"
+    group = "no.kartverket.matrikkel.bygning"
+    version = "0.0.1"
 }
 
 application {
     mainClass.set("no.kartverket.matrikkel.bygning.ApplicationKt")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-
 }
 
 dependencies {
@@ -61,8 +57,7 @@ dependencies {
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test)
 
-    implementation(project(":matrikkel-factory"))
-    implementation(project(":matrikkel-shared"))
+    implementation(project(":matrikkel-api"))
 
     testImplementation(libs.ktor.client.content.negotation)
     testImplementation(libs.assertj)

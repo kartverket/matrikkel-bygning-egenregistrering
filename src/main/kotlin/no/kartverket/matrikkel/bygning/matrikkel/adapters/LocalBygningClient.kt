@@ -1,11 +1,10 @@
-package clients
+package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
-import matrikkelclients.BygningClient
-import models.Bruksenhet
-import models.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.Bruksenhet
+import no.kartverket.matrikkel.bygning.matrikkel.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 
-// Burde denne leve i matrikkel-factory eller matrikkel-api?
-class LocalBygningClient : BygningClient {
+internal class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
             1L, 1L

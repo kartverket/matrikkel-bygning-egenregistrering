@@ -9,7 +9,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.LocalDate
-import models.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.Bygning
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import org.koin.ktor.ext.inject
