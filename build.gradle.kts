@@ -61,8 +61,9 @@ dependencies {
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test)
 
-    implementation(project(":matrikkel-factory"))
-    implementation(project(":matrikkel-shared"))
+//    implementation(project(":matrikkel-factory"))
+    implementation(project(":matrikkel-api"))
+//    implementation(project(":matrikkel-shared"))
 }
 
 ktor {

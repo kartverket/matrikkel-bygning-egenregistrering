@@ -1,4 +1,4 @@
-package models
+package no.kartverket.matrikkel.bygning.m22
 
 data class Bygning(
     val bygningId: Long,

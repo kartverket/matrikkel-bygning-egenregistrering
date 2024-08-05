@@ -1,8 +1,8 @@
-package no.kartverket.matrikkel.bygning.matrikkelapi.clients
+package no.kartverket.matrikkel.bygning.m22.adapter
 
-import matrikkelclients.BygningClient
-import models.Bruksenhet
-import models.Bygning
+import no.kartverket.matrikkel.bygning.m22.BygningClient
+import no.kartverket.matrikkel.bygning.m22.Bruksenhet
+import no.kartverket.matrikkel.bygning.m22.Bygning
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
 import no.kartverket.matrikkel.bygning.matrikkelapi.getObjectAs
 import no.kartverket.matrikkel.bygning.matrikkelapi.getObjectsAs
@@ -13,7 +13,7 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as Mat
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
 // TODO Logging? Skal vi bruke sl4j for logging i klasser f. eks? Sikkert lurt å ta en runde på logging generelt
-class MatrikkelBygningClient(
+internal class MatrikkelBygningClient(
     val matrikkelApi: MatrikkelApi.WithAuth
 ) : BygningClient {
     override fun getBygningById(id: Long): Bygning? {
