@@ -80,7 +80,7 @@ fun Application.mainModule() {
         registry = meterRegistry
     }
 
-    val dataSource = getDataSource(config)
+    val dataSource = createDataSource(loadConfig(environment))
 
     val bygningRepository = BygningRepository(dataSource)
 
@@ -108,7 +108,7 @@ fun Application.internalModule() {
         registry = meterRegistry
     }
 
-    val dataSource = getDataSource(loadConfig(environment))
+    val dataSource = createDataSource(loadConfig(environment))
 
     val healthRepository = HealthRepository(dataSource)
 
@@ -120,7 +120,7 @@ fun Application.internalModule() {
     )
 }
 
-private fun getDataSource(config: ApplicationConfig): HikariDataSource {
+private fun createDataSource(config: ApplicationConfig): HikariDataSource {
     return createHikariDataSource(
         DatabaseConfig(
             driverClassName = "org.postgresql.Driver",
