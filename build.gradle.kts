@@ -17,6 +17,17 @@ application {
     mainClass.set("no.kartverket.matrikkel.bygning.ApplicationKt")
 }
 
+sourceSets {
+    create("intTest") {
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
+    }
+}
+
+val intTestImplementation: Configuration by configurations.getting {
+    extendsFrom(configurations.implementation.get())
+}
+
 dependencies {
     implementation(project(":matrikkel-api"))
 
@@ -55,13 +66,13 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.ktor)
 
-    // Tests
-    testImplementation(libs.ktor.server.tests)
-    testImplementation(libs.kotlin.test)
+    // Integration tests
+    intTestImplementation(libs.kotlin.test)
+    intTestImplementation(libs.ktor.server.tests)
+    intTestImplementation(libs.ktor.client.content.negotation)
 
-    testImplementation(libs.ktor.client.content.negotation)
-    testImplementation(libs.assertj)
-    testImplementation(libs.testcontainers.postgresql)
+    intTestImplementation(libs.assertj)
+    intTestImplementation(libs.testcontainers.postgresql)
 }
 
 ktor {
@@ -77,3 +88,18 @@ tasks {
         archiveBaseName.set("${project.name}-all")
     }
 }
+
+val integrationTest = task<Test>("integrationTest") {
+    description = "Runs integration tests"
+    group = "verification"
+
+    testClassesDirs = sourceSets["intTest"].output.classesDirs
+    classpath = sourceSets["intTest"].runtimeClasspath
+    shouldRunAfter("test")
+
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
+tasks.check { dependsOn(integrationTest) }
