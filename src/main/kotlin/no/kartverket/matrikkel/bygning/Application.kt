@@ -43,7 +43,7 @@ val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.mainModule() {
-    val config = loadConfig()
+    val config = loadConfig(environment)
 
     install(ContentNegotiation) {
         json(Json {
@@ -80,7 +80,7 @@ fun Application.mainModule() {
         registry = meterRegistry
     }
 
-    val dataSource = getDataSource()
+    val dataSource = getDataSource(config)
 
     runFlywayMigrations(dataSource)
 
@@ -108,7 +108,7 @@ fun Application.internalModule() {
         registry = meterRegistry
     }
 
-    val dataSource = getDataSource()
+    val dataSource = getDataSource(loadConfig(environment))
 
     val healthRepository = HealthRepository(dataSource)
 
@@ -120,9 +120,7 @@ fun Application.internalModule() {
     )
 }
 
-private fun Application.getDataSource(): HikariDataSource {
-    val config = loadConfig()
-
+private fun getDataSource(config: ApplicationConfig): HikariDataSource {
     return createHikariDataSource(
         DatabaseConfig(
             driverClassName = "org.postgresql.Driver",
@@ -134,6 +132,6 @@ private fun Application.getDataSource(): HikariDataSource {
     )
 }
 
-private fun Application.loadConfig() =
+private fun loadConfig(environment: ApplicationEnvironment) =
     // Any properties set in tests or similar will be used first, then fall back to config from application.conf
     environment.config.withFallback(ApplicationConfig("application.conf"))
