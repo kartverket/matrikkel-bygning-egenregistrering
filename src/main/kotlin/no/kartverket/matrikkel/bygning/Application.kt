@@ -82,8 +82,6 @@ fun Application.mainModule() {
 
     val dataSource = getDataSource(config)
 
-    runFlywayMigrations(dataSource)
-
     val bygningRepository = BygningRepository(dataSource)
 
     val bygningService = BygningService(bygningRepository)
@@ -100,6 +98,8 @@ fun Application.mainModule() {
         bygningService = bygningService,
         egenregistreringsService = egenregistreringsService
     )
+
+    runFlywayMigrations(dataSource)
 }
 
 
