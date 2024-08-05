@@ -39,18 +39,22 @@ fun main() {
     embeddedServer(factory = Netty, port = 8080, module = Application::mainModule).start(wait = true)
 }
 
-val databaseModule = module {
-    single {
-        DatabaseConfig(
-            driverClassName = "org.postgresql.Driver",
-            jdbcUrl = "jdbc:${ApplicationConfig(null).property("storage.jdbcURL").getString()}",
-            username = ApplicationConfig(null).property("storage.username").getString(),
-            password = ApplicationConfig(null).property("storage.password").getString(),
-            maxPoolSize = 10
-        )
+val databaseConfig = { config: ApplicationConfig ->
+    DatabaseConfig(
+        driverClassName = "org.postgresql.Driver",
+        jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
+        username = config.property("storage.username").getString(),
+        password = config.property("storage.password").getString(),
+        maxPoolSize = 10
+    )
+}
+
+val databaseModule = { config: ApplicationConfig ->
+    module {
+        single { databaseConfig(config) }
+        single { DatabaseFactory(get()) }
+        single { get<DatabaseFactory>().getDataSource() }
     }
-    single { DatabaseFactory(get()) }
-    single { get<DatabaseFactory>().getDataSource() }
 }
 
 val appModule = module {
@@ -74,6 +78,8 @@ val matrikkelModule = module {
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.mainModule() {
+    val config = loadConfig()
+
     install(ContentNegotiation) {
         json(Json {
             serializersModule = KompendiumSerializersModule.module
@@ -105,7 +111,7 @@ fun Application.mainModule() {
     }
 
     install(KoinIsolated) {
-        modules(appModule, databaseModule, matrikkelModule, metricsModule)
+        modules(appModule, databaseModule(config), matrikkelModule, metricsModule)
     }
 
     val meterRegistry by inject<PrometheusMeterRegistry>()
@@ -125,8 +131,9 @@ val internalModule = module {
 }
 
 fun Application.internalModule() {
+    val config = loadConfig()
     install(KoinIsolated) {
-        modules(internalModule, databaseModule, metricsModule)
+        modules(internalModule, databaseModule(config), metricsModule)
     }
 
     val meterRegistry by inject<PrometheusMeterRegistry>()
@@ -136,3 +143,7 @@ fun Application.internalModule() {
 
     installInternalRouting()
 }
+
+private fun Application.loadConfig() =
+    // Any properties set in tests or similar will be used first, then fall back to config from application.conf
+    environment.config.withFallback(ApplicationConfig("application.conf"))

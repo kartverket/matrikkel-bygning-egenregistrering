@@ -63,6 +63,10 @@ dependencies {
 
     implementation(project(":matrikkel-factory"))
     implementation(project(":matrikkel-shared"))
+
+    testImplementation(libs.ktor.client.content.negotation)
+    testImplementation(libs.assertj)
+    testImplementation(libs.testcontainers.postgresql)
 }
 
 ktor {

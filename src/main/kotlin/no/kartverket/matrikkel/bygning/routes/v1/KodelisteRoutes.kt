@@ -27,7 +27,6 @@ fun Route.kodelisteRouting() {
         kodelisteRoute("oppvarming", OppvarmingsKode::class)
         kodelisteRoute("energikilde", EnergikildeKode::class)
         kodelisteRoute("vannforsyning", VannforsyningsKode::class)
-
     }
 }
 
