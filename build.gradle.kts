@@ -18,6 +18,8 @@ application {
 }
 
 dependencies {
+    implementation(project(":matrikkel-api"))
+
     // Ktor
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
@@ -56,8 +58,6 @@ dependencies {
     // Tests
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test)
-
-    implementation(project(":matrikkel-api"))
 
     testImplementation(libs.ktor.client.content.negotation)
     testImplementation(libs.assertj)

@@ -22,7 +22,7 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import no.kartverket.matrikkel.bygning.matrikkel.MatrikkelApiConfig
+import no.kartverket.matrikkel.bygning.matrikkel.createBygningClient
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.installInternalRouting
@@ -83,7 +83,7 @@ val metricsModule = module {
 val matrikkelModule = { config: ApplicationConfig ->
     module {
         single {
-            MatrikkelApiConfig.createBygningClient(
+            createBygningClient(
                 config.property("matrikkel.baseUrl").getString(),
                 config.property("matrikkel.username").getString(),
                 config.property("matrikkel.password").getString(),
