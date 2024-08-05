@@ -17,6 +17,10 @@ class MatrikkelApiConfig {
                 return LocalBygningClient()
             }
 
+            if (matrikkelUsername.isEmpty() || matrikkelPassword.isEmpty() || matrikkelBaseUrl.isEmpty()) {
+                throw RuntimeException("MatrikkelConfig mangler brukernavn, passord eller base url. Dersom applikasjonen kjører i sky er disse miljøvariablene påkrevd")
+            }
+
             return MatrikkelBygningClient(
                 MatrikkelApi(
                     URI(matrikkelBaseUrl),
