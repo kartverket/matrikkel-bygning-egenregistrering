@@ -1,5 +1,6 @@
 package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
+import io.ktor.util.logging.*
 import no.kartverket.matrikkel.bygning.matrikkel.Bruksenhet
 import no.kartverket.matrikkel.bygning.matrikkel.Bygning
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
@@ -16,6 +17,8 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as Mat
 internal class MatrikkelBygningClient(
     val matrikkelApi: MatrikkelApi.WithAuth
 ) : BygningClient {
+    private val LOGGER = KtorSimpleLogger("MatrikkelBygningClient")
+
     override fun getBygningById(id: Long): Bygning? {
         val bygningId: BygningId = BygningId().apply { value = id }
 
@@ -34,6 +37,7 @@ internal class MatrikkelBygningClient(
                     )
                 })
         } catch (exception: ServiceException) {
+            LOGGER.warn("Noe gikk galt under henting av bygning med id $bygningId: ${exception.message}")
             return null
         }
     }
@@ -44,6 +48,7 @@ internal class MatrikkelBygningClient(
 
             return getBygningById(bygningId.value)
         } catch (exception: ServiceException) {
+            LOGGER.warn("Noe gikk galt under henting av bygning med nummer $bygningNummer: ${exception.message}")
             return null
         }
     }
