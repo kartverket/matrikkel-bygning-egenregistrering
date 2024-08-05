@@ -36,3 +36,20 @@ $ docker-compose up web -d
 
 Ellers er det bare å kjøre opp applikasjonen som ønsket via IntelliJ eller kommandolinje. Ingen spesielle hensyn som er
 nødvendig rundt miljøkonfigurasjon, det skal ha sane defaults.
+
+### Integrasjonstester
+
+Prosjektet inneholder noen integrasjonstester som ligger under [src/intTest](src/intTest). Testene bruker blant annet testcontainers for å kjøre opp en database som bruke under testene. 
+
+Testene er definert med en egen task som kan kjøres slik:
+
+```./gradlew integrationTest```
+
+I tillegg blir task-en kjørt ved standard `./gradlew build`
+
+#### Oppsett med Colima
+
+Integrasjonstestene krever at man har Docker kjørende på maskinen, men skal i utgangspunktet fungere uten noe annet oppsett, spesielt hvis man benytter Docker Desktop.
+
+Men hvis man benytter Colima som container runtime er det nødvendig å sette opp noen ekstra miljøvariabler for å få testene til å kjøre.  
+Se testcontainers sin egen dokumentasjon [her](https://java.testcontainers.org/supported_docker_environment/)
