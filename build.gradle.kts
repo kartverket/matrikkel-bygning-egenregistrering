@@ -39,9 +39,7 @@ dependencies {
     // Ktor
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.server.swagger)
     implementation(libs.ktor.server.cors)
-    implementation(libs.ktor.server.openapi)
 
     // Monitoring
     implementation(libs.ktor.server.call.logging)
