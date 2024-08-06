@@ -9,16 +9,12 @@ plugins {
 }
 
 allprojects {
-group = "no.kartverket.matrikkel.bygning"
-version = "0.0.1"
+    group = "no.kartverket.matrikkel.bygning"
+    version = "0.0.1"
 }
 
 application {
     mainClass.set("no.kartverket.matrikkel.bygning.ApplicationKt")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-
 }
 
 sourceSets {
@@ -33,8 +29,7 @@ val intTestImplementation: Configuration by configurations.getting {
 }
 
 dependencies {
-    // Project
-    implementation(project(":matrikkel-bygning-matrikkel-api"))
+    implementation(project(":matrikkel-api"))
 
     // Ktor
     implementation(libs.ktor.server.core)

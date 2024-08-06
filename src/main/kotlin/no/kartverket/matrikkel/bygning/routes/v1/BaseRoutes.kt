@@ -5,9 +5,6 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.kartverket.matrikkel.bygning.services.BygningService
-import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
-import org.koin.ktor.ext.inject
 
 fun Application.installBaseRouting() {
     routing {
@@ -21,10 +18,9 @@ fun Application.installBaseRouting() {
         }
 
         route("v1") {
-            val bygningService by inject<BygningService>()
-            val egenregistreringsService by inject<EgenregistreringsService>()
 
-            bygningRouting(bygningService, egenregistreringsService)
+
+            bygningRouting()
             kodelisteRouting()
         }
 

@@ -18,7 +18,7 @@ class BygningRouteTest : TestWithDb() {
         val response = client.get("/v1/bygninger/1")
 
         assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(response.body<Bygning>().bygningId).isEqualTo("1")
+        assertThat(response.body<Bygning>().bygningId).isEqualTo(1L)
         assertThat(response.body<Bygning>().bruksenheter).hasSize(2)
     }
 

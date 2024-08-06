@@ -2,6 +2,9 @@ package no.kartverket.matrikkel.bygning.matrikkelapi
 
 import jakarta.xml.ws.BindingProvider
 import jakarta.xml.ws.handler.MessageContext
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.MatrikkelBubbleId
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.MatrikkelBubbleIdList
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.MatrikkelBubbleObject
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.MatrikkelContext
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.geometri.koder.KoordinatsystemKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.bygning.BygningService
@@ -91,4 +94,21 @@ class MatrikkelApi(private val baseUrl: URI) {
             )
         }
     }
+}
+
+// TODO Kanskje finne et eget sted for disse
+inline fun <reified T : MatrikkelBubbleObject?> StoreService.getObjectAs(
+    id: MatrikkelBubbleId?,
+    matrikkelContext: MatrikkelContext,
+): T {
+    val obj = this.getObject(id, matrikkelContext)
+    return T::class.java.cast(obj)
+}
+
+inline fun <reified T : MatrikkelBubbleObject?> StoreService.getObjectsAs(
+    ids: List<MatrikkelBubbleId>,
+    matrikkelContext: MatrikkelContext,
+): List<T> {
+    val objects = this.getObjects(MatrikkelBubbleIdList().apply { item.addAll(ids) }, matrikkelContext)
+    return objects.item.filterIsInstance<T>().map { T::class.java.cast(it) }
 }

@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.jaxws.rt) {
         exclude(group = "org.eclipse.angus") // Ekskluderer angus email
     }
+
     jaxws(libs.jaxws.tools)
 }
 

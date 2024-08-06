@@ -22,7 +22,7 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
+import no.kartverket.matrikkel.bygning.matrikkel.createBygningClient
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.installInternalRouting
@@ -33,11 +33,20 @@ import no.kartverket.matrikkel.bygning.services.HealthService
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.KoinIsolated
-import java.net.URI
 
 fun main() {
-    embeddedServer(factory = Netty, port = 8081, module = Application::internalModule).start(wait = false)
-    embeddedServer(factory = Netty, port = 8080, module = Application::mainModule).start(wait = true)
+    embeddedServer(
+        factory = Netty,
+        port = 8081,
+        module = Application::internalModule,
+    ).start(wait = false)
+
+    embeddedServer(
+        factory = Netty,
+        port = 8080,
+        module = Application::mainModule,
+        watchPaths = listOf("classes"),
+    ).start(wait = true)
 }
 
 val databaseConfig = { config: ApplicationConfig ->
@@ -74,11 +83,12 @@ val metricsModule = module {
 val matrikkelModule = { config: ApplicationConfig ->
     module {
         single {
-            MatrikkelApi(URI(config.property("matrikkel.baseUrl").getString()))
-                .withAuth(
-                    config.property("matrikkel.username").getString(),
-                    config.property("matrikkel.password").getString()
-                )
+            createBygningClient(
+                config.property("matrikkel.baseUrl").getString(),
+                config.property("matrikkel.username").getString(),
+                config.property("matrikkel.password").getString(),
+                config.property("ktor.development").getString().toBoolean(),
+            )
         }
     }
 }

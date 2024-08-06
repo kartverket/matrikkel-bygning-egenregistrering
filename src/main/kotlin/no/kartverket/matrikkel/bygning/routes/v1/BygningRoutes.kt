@@ -9,13 +9,17 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.LocalDate
-import no.kartverket.matrikkel.bygning.models.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.Bygning
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import org.koin.ktor.ext.inject
 
-fun Route.bygningRouting(bygningService: BygningService, egenregistreringsService: EgenregistreringsService) {
+fun Route.bygningRouting() {
     route("bygninger") {
         route("{bygningId}") {
+            val bygningService by inject<BygningService>()
+            val egenregistreringsService by inject<EgenregistreringsService>()
+
             egenregistreringRouting(egenregistreringsService)
 
             bygningDoc()
@@ -36,7 +40,7 @@ fun Route.bygningRouting(bygningService: BygningService, egenregistreringsServic
                     }
                 }
 
-                val bygning = bygningService.getBygning(bygningId, gyldigFraDate)
+                val bygning = bygningService.getBygning(bygningId.toLong(), gyldigFraDate)
 
                 if (bygning != null) {
                     call.respond(bygning)

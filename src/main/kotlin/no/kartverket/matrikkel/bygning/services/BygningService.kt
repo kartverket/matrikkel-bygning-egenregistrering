@@ -10,18 +10,19 @@ import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 // BygningRepository er ubrukt, men brukes bare for å teste ut Koin
 class BygningService(val bygningRepository: BygningRepository) {
     val bruksenhetStorage: MutableList<BruksenhetStorage> = mutableListOf(
-        BruksenhetStorage("a", "1", mutableListOf(), mutableListOf(), mutableListOf()),
-        BruksenhetStorage("b", "1", mutableListOf(), mutableListOf(), mutableListOf()),
-        BruksenhetStorage("c", "2", mutableListOf(), mutableListOf(), mutableListOf()),
-        BruksenhetStorage("d", "2", mutableListOf(), mutableListOf(), mutableListOf()),
+        BruksenhetStorage(1L, 1L, mutableListOf(), mutableListOf(), mutableListOf()),
+        BruksenhetStorage(2L, 1L, mutableListOf(), mutableListOf(), mutableListOf()),
+        BruksenhetStorage(3L, 2L, mutableListOf(), mutableListOf(), mutableListOf()),
+        BruksenhetStorage(4L, 2L, mutableListOf(), mutableListOf(), mutableListOf()),
+        BruksenhetStorage(5L, 2L, mutableListOf(), mutableListOf(), mutableListOf()),
     )
 
     val bygningStorage: MutableList<BygningStorage> = mutableListOf(
-        BygningStorage("1", mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
-        BygningStorage("2", mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
+        BygningStorage(1L, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
+        BygningStorage(2L, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
     )
 
-    fun getBygning(bygningId: String, gyldigFra: LocalDate?): Bygning? {
+    fun getBygning(bygningId: Long, gyldigFra: LocalDate?): Bygning? {
         // TODO Filtrer ut egenregistreringer uten en gitt gyldighetsdato
 
         val bygning = bygningStorage.find { bygningId == it.bygningId } ?: return null
