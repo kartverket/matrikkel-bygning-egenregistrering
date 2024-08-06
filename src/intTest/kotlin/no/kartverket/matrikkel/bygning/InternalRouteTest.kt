@@ -10,9 +10,7 @@ class InternalRouteTest : TestWithDb() {
 
     @Test
     fun `metrics endepunkt svarer ok`() = testApplication {
-        application {
-            internalModule()
-        }
+        internalModuleWithDatabaseEnvironment()
 
         val response = client.get("/metrics")
 

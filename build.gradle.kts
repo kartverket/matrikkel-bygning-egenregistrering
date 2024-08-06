@@ -73,6 +73,10 @@ tasks {
         mergeServiceFiles()
         archiveBaseName.set("${project.name}-all")
     }
+
+    check {
+        dependsOn(integrationTest)
+    }
 }
 
 val integrationTest = task<Test>("integrationTest") {
@@ -87,5 +91,3 @@ val integrationTest = task<Test>("integrationTest") {
         events("passed", "skipped", "failed")
     }
 }
-
-tasks.check { dependsOn(integrationTest) }
