@@ -12,20 +12,17 @@ import io.ktor.server.routing.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
+import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
-import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
-import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 
 fun Route.egenregistreringRouting(
-    matrikkelApi: MatrikkelApi.WithAuth,
+    bygningClient: BygningClient,
     egenregistreringsService: EgenregistreringsService) {
     route("/egenregistreringer") {
         egenregistreringBygningIdDoc()
         post {
-
             val egenregistrering = call.receive<EgenregistreringRequest>()
 
             val bygningId = call.parameters["bygningId"]
@@ -35,17 +32,15 @@ fun Route.egenregistreringRouting(
                 return@post
             }
 
-            // TODO Sikkert en bedre måte å sette opp dette på, men her er et eksempel på bruk av MatrikkelAPIet med injected matrikkel
-            try {
-                val matrikkelBygningId = BygningId().apply { value = bygningId.toLong() }
-                matrikkelApi.storeService().getObject(matrikkelBygningId, matrikkelApi.matrikkelContext)
-            } catch (exception: ServiceException) {
+            val bygningFromMatrikkel = bygningClient.getBygningById(bygningId.toLong())
+
+            if (bygningFromMatrikkel == null) {
                 call.respondText("Bygningen finnes ikke i matrikkelen", status = HttpStatusCode.BadRequest)
                 return@post
             }
 
             val addedEgenregistrering =
-                egenregistreringsService.addEgenregistreringToBygning(bygningId, egenregistrering)
+                egenregistreringsService.addEgenregistreringToBygning(bygningId.toLong(), egenregistrering)
 
             if (addedEgenregistrering) {
                 call.respondText(
@@ -78,7 +73,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningsRegistrering = BygningsRegistrering(
-                            bygningId = "1",
+                            bygningId = 1L,
                             bruksareal = BruksarealRegistrering(
                                 bruksareal = 125.0, metadata = RegistreringMetadataRequest(
                                     registreringstidspunkt = Clock.System.now(),
@@ -93,7 +88,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                         ),
                         bruksenhetRegistreringer = listOf(
                             BruksenhetRegistrering(
-                                bruksenhetId = "a",
+                                bruksenhetId = 1L,
                                 null,
                                 energikilde = EnergikildeRegistrering(
                                     energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),

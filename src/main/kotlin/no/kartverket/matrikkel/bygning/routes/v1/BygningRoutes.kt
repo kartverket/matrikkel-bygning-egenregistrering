@@ -9,19 +9,19 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.LocalDate
-import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
+import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Route.bygningRouting(
-    matrikkelApi: MatrikkelApi.WithAuth,
+    bygningClient: BygningClient,
     bygningService: BygningService,
     egenregistreringsService: EgenregistreringsService
 ) {
     route("bygninger") {
         route("{bygningId}") {
-            egenregistreringRouting(matrikkelApi, egenregistreringsService)
+            egenregistreringRouting(bygningClient, egenregistreringsService)
 
             bygningDoc()
             get {
@@ -41,7 +41,7 @@ fun Route.bygningRouting(
                     }
                 }
 
-                val bygning = bygningService.getBygning(bygningId, gyldigFraDate)
+                val bygning = bygningService.getBygning(bygningId.toLong(), gyldigFraDate)
 
                 if (bygning != null) {
                     call.respond(bygning)

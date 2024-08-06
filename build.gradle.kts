@@ -15,22 +15,26 @@ allprojects {
 
 application {
     mainClass.set("no.kartverket.matrikkel.bygning.ApplicationKt")
+}
 
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+sourceSets {
+    create("intTest") {
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
+    }
+}
 
+val intTestImplementation: Configuration by configurations.getting {
+    extendsFrom(configurations.implementation.get())
 }
 
 dependencies {
-    // Project
-    implementation(project(":matrikkel-bygning-matrikkel-api"))
+    implementation(project(":matrikkel-api"))
 
     // Ktor
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.server.swagger)
     implementation(libs.ktor.server.cors)
-    implementation(libs.ktor.server.openapi)
 
     // Monitoring
     implementation(libs.ktor.server.call.logging)
@@ -55,13 +59,13 @@ dependencies {
 
     implementation(libs.kompendium.core)
 
-    // Tests
-    testImplementation(libs.ktor.server.tests)
-    testImplementation(libs.kotlin.test)
+    // Integration tests
+    intTestImplementation(libs.kotlin.test)
+    intTestImplementation(libs.ktor.server.tests)
+    intTestImplementation(libs.ktor.client.content.negotation)
 
-    testImplementation(libs.ktor.client.content.negotation)
-    testImplementation(libs.assertj)
-    testImplementation(libs.testcontainers.postgresql)
+    intTestImplementation(libs.assertj)
+    intTestImplementation(libs.testcontainers.postgresql)
 }
 
 tasks {
@@ -70,3 +74,18 @@ tasks {
         archiveBaseName.set("${project.name}-all")
     }
 }
+
+val integrationTest = task<Test>("integrationTest") {
+    description = "Runs integration tests"
+    group = "verification"
+
+    testClassesDirs = sourceSets["intTest"].output.classesDirs
+    classpath = sourceSets["intTest"].runtimeClasspath
+    shouldRunAfter("test")
+
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
+tasks.check { dependsOn(integrationTest) }

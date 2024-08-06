@@ -7,7 +7,7 @@ import java.util.*
 
 class EgenregistreringsService(private val bygningService: BygningService) {
 
-    fun addEgenregistreringToBygning(bygningId: String, egenregistrering: EgenregistreringRequest): Boolean {
+    fun addEgenregistreringToBygning(bygningId: Long, egenregistrering: EgenregistreringRequest): Boolean {
         val bygningIfExists = bygningService.bygningStorage.find { it.bygningId == bygningId }
 
         val isAllBruksenheterRegisteredOnCorrectBygning =

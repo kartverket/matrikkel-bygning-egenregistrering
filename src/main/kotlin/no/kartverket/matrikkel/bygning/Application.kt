@@ -24,7 +24,7 @@ import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.db.DatabaseConfig
 import no.kartverket.matrikkel.bygning.db.createHikariDataSource
 import no.kartverket.matrikkel.bygning.db.runFlywayMigrations
-import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
+import no.kartverket.matrikkel.bygning.matrikkel.createBygningClient
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.installInternalRouting
@@ -32,11 +32,20 @@ import no.kartverket.matrikkel.bygning.routes.v1.installBaseRouting
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
-import java.net.URI
 
 fun main() {
-    embeddedServer(factory = Netty, port = 8081, module = Application::internalModule).start(wait = false)
-    embeddedServer(factory = Netty, port = 8080, module = Application::mainModule).start(wait = true)
+    embeddedServer(
+        factory = Netty,
+        port = 8081,
+        module = Application::internalModule,
+    ).start(wait = false)
+
+    embeddedServer(
+        factory = Netty,
+        port = 8080,
+        module = Application::mainModule,
+        watchPaths = listOf("classes"),
+    ).start(wait = true)
 }
 
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
@@ -87,14 +96,15 @@ fun Application.mainModule() {
     val bygningService = BygningService(bygningRepository)
     val egenregistreringsService = EgenregistreringsService(bygningService)
 
-    val matrikkelApi = MatrikkelApi(URI(config.property("matrikkel.baseUrl").getString()))
-        .withAuth(
-            config.property("matrikkel.username").getString(),
-            config.property("matrikkel.password").getString()
-        )
+    val bygningClient = createBygningClient(
+        config.propertyOrNull("matrikkel.baseUrl")?.getString() ?: "",
+        config.propertyOrNull("matrikkel.username")?.getString() ?: "",
+        config.propertyOrNull("matrikkel.password")?.getString() ?: "",
+        config.property("ktor.development").getString().toBoolean(),
+    )
 
     installBaseRouting(
-        matrikkelApi = matrikkelApi,
+        bygningClient = bygningClient,
         bygningService = bygningService,
         egenregistreringsService = egenregistreringsService
     )
