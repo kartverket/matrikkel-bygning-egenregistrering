@@ -40,7 +40,7 @@ fun Route.egenregistreringRouting(
             }
 
             val addedEgenregistrering =
-                egenregistreringsService.addEgenregistreringToBygning(bygningId.toLong(), egenregistrering)
+                egenregistreringsService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
 
             if (addedEgenregistrering) {
                 call.respondText(
