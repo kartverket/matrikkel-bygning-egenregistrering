@@ -1,21 +1,21 @@
 package no.kartverket.matrikkel.bygning.services
 
-import no.kartverket.matrikkel.bygning.models.BruksenhetStorage
-import no.kartverket.matrikkel.bygning.models.BygningStorage
+import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
+import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import java.util.*
 
-class EgenregistreringsService(private val bygningService: BygningService) {
+class EgenregistreringsService(private val bygningClient: BygningClient) {
+    private val bygningRegistreringer: MutableList<BygningsRegistrering> = mutableListOf()
+    private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
     fun addEgenregistreringToBygning(bygningId: Long, egenregistrering: EgenregistreringRequest): Boolean {
-        val bygningIfExists = bygningService.bygningStorage.find { it.bygningId == bygningId }
+        val bygningIfExists = bygningClient.getBygningById(bygningId) ?: return false
 
         val isAllBruksenheterRegisteredOnCorrectBygning =
             egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
-                val bruksenhetIfExists =
-                    bygningService.bruksenhetStorage.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
-
-                bruksenhetIfExists?.bygningId == bygningId
+                bygningIfExists.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
             }
 
         if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
@@ -23,52 +23,24 @@ class EgenregistreringsService(private val bygningService: BygningService) {
         // TODO Bør kunne skille alle registreringer med en ID, skal denne settes på metadataen til hver enkelt registrering?
         val egenregistreringsId = UUID.randomUUID().toString()
 
-        if (bygningIfExists == null) {
-            bygningService.bygningStorage.add(BygningStorage(
-                bygningId = bygningId,
-                bruksarealRegistreringer = egenregistrering.bygningsRegistrering.bruksareal?.let { mutableListOf(it) }
-                    ?: mutableListOf(),
-                byggeaarRegistreringer = egenregistrering.bygningsRegistrering.byggeaar?.let { mutableListOf(it) }
-                    ?: mutableListOf(),
-                vannforsyningsRegistreringer = egenregistrering.bygningsRegistrering.vannforsyning?.let {
-                    mutableListOf(
-                        it
-                    )
-                } ?: mutableListOf(),
-                avlopRegistreringer = egenregistrering.bygningsRegistrering.avlop?.let { mutableListOf(it) }
-                    ?: mutableListOf(),
-            ))
-        } else {
-            egenregistrering.bygningsRegistrering.bruksareal?.let { bygningIfExists.bruksarealRegistreringer.add(it) }
-            egenregistrering.bygningsRegistrering.byggeaar?.let { bygningIfExists.byggeaarRegistreringer.add(it) }
-            egenregistrering.bygningsRegistrering.vannforsyning?.let {
-                bygningIfExists.vannforsyningsRegistreringer.add(
-                    it
-                )
-            }
-            egenregistrering.bygningsRegistrering.avlop?.let { bygningIfExists.avlopRegistreringer.add(it) }
-        }
+        bygningRegistreringer.add(
+            BygningsRegistrering(
+                bruksareal = egenregistrering.bygningsRegistrering.bruksareal,
+                byggeaar = egenregistrering.bygningsRegistrering.byggeaar,
+                vannforsyning = egenregistrering.bygningsRegistrering.vannforsyning,
+                avlop = egenregistrering.bygningsRegistrering.avlop,
+            )
+        )
 
         egenregistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
-            val bruksenhetId = bruksenhetRegistrering.bruksenhetId
-            val bruksenhetIfExists = bygningService.bruksenhetStorage.find { it.bruksenhetId == bruksenhetId }
-
-            if (bruksenhetIfExists == null) {
-                bygningService.bruksenhetStorage.add(BruksenhetStorage(
-                    bruksenhetId = bruksenhetId,
-                    bygningId = bygningId,
-                    bruksarealRegistreringer = bruksenhetRegistrering.bruksareal?.let { mutableListOf(it) }
-                        ?: mutableListOf(),
-                    energikildeRegistreringer = bruksenhetRegistrering.energikilde?.let { mutableListOf(it) }
-                        ?: mutableListOf(),
-                    oppvarmingRegistreringer = bruksenhetRegistrering.oppvarming?.let { mutableListOf(it) }
-                        ?: mutableListOf(),
-                ))
-            } else {
-                bruksenhetRegistrering.bruksareal?.let { bruksenhetIfExists.bruksarealRegistreringer.add(it) }
-                bruksenhetRegistrering.energikilde?.let { bruksenhetIfExists.energikildeRegistreringer.add(it) }
-                bruksenhetRegistrering.oppvarming?.let { bruksenhetIfExists.oppvarmingRegistreringer.add(it) }
-            }
+            bruksenhetRegistreringer.add(
+                BruksenhetRegistrering(
+                    bruksenhetId = bruksenhetRegistrering.bruksenhetId,
+                    bruksareal = bruksenhetRegistrering.bruksareal,
+                    energikilde = bruksenhetRegistrering.energikilde,
+                    oppvarming = bruksenhetRegistrering.oppvarming,
+                )
+            )
         }
 
         return true

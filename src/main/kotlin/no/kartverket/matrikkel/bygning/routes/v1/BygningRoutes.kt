@@ -8,15 +8,12 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.datetime.LocalDate
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.Bygning
-import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Route.bygningRouting(
     bygningClient: BygningClient,
-    bygningService: BygningService,
     egenregistreringsService: EgenregistreringsService
 ) {
     route("bygninger") {
@@ -25,7 +22,6 @@ fun Route.bygningRouting(
 
             bygningDoc()
             get {
-                val gyldigFra = call.request.queryParameters["gyldigFra"]
                 val bygningId = call.parameters["bygningId"]
 
                 if (bygningId == null) {
@@ -33,15 +29,8 @@ fun Route.bygningRouting(
                     return@get
                 }
 
-                val gyldigFraDate = gyldigFra?.let {
-                    try {
-                        LocalDate.parse(it)
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
 
-                val bygning = bygningService.getBygning(bygningId.toLong(), gyldigFraDate)
+                val bygning = bygningClient.getBygningById(bygningId.toLong())
 
                 if (bygning != null) {
                     call.respond(bygning)
@@ -64,21 +53,12 @@ private fun Route.bygningDoc() {
 
         get = GetInfo.builder {
             summary("Hent en bygning")
-            description("Henter en bygning med gitte egenregistreringer. Kan også være med en gitt gyldigFra dato.")
-
-            parameters(
-                Parameter(
-                    name = "gyldigFra",
-                    `in` = Parameter.Location.query,
-                    schema = TypeDefinition.STRING,
-                    required = false
-                )
-            )
+            description("Henter en bygning med tilhørende bruksenheter.")
 
             response {
                 responseCode(HttpStatusCode.OK)
                 responseType<Bygning>()
-                description("Bygning med tilhørende egenregistreringer")
+                description("Bygning med tilhørende bruksenheter")
             }
 
             canRespond {

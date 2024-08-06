@@ -6,12 +6,10 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
-import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Application.installBaseRouting(
     bygningClient: BygningClient,
-    bygningService: BygningService,
     egenregistreringsService: EgenregistreringsService
 ) {
     routing {
@@ -25,7 +23,7 @@ fun Application.installBaseRouting(
         }
 
         route("v1") {
-            bygningRouting(bygningClient, bygningService, egenregistreringsService)
+            bygningRouting(bygningClient, egenregistreringsService)
             kodelisteRouting()
         }
 
