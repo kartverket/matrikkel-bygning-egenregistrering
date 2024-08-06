@@ -16,13 +16,12 @@ import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
-import org.koin.ktor.ext.inject
 
-fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
+fun Route.egenregistreringRouting(
+    bygningClient: BygningClient,
+    egenregistreringsService: EgenregistreringsService) {
     route("/egenregistreringer") {
         egenregistreringBygningIdDoc()
-        val bygningClient by inject<BygningClient>()
-
         post {
             val egenregistrering = call.receive<EgenregistreringRequest>()
 

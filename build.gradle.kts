@@ -59,11 +59,6 @@ dependencies {
 
     implementation(libs.kompendium.core)
 
-    // Dependency injection
-    implementation(platform(libs.koin.bom))
-    implementation(libs.koin.core)
-    implementation(libs.koin.ktor)
-
     // Integration tests
     intTestImplementation(libs.kotlin.test)
     intTestImplementation(libs.ktor.server.tests)
@@ -73,17 +68,14 @@ dependencies {
     intTestImplementation(libs.testcontainers.postgresql)
 }
 
-ktor {
-    fatJar {
-        archiveFileName.set("matrikkel-bygning-egenregistrering.jar")
-    }
-}
-
-
 tasks {
     named<ShadowJar>("shadowJar") {
         mergeServiceFiles()
         archiveBaseName.set("${project.name}-all")
+    }
+
+    check {
+        dependsOn(integrationTest)
     }
 }
 
@@ -99,5 +91,3 @@ val integrationTest = task<Test>("integrationTest") {
         events("passed", "skipped", "failed")
     }
 }
-
-tasks.check { dependsOn(integrationTest) }

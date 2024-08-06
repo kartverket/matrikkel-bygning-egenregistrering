@@ -7,7 +7,6 @@ import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.BygningStorage
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 
-// BygningRepository er ubrukt, men brukes bare for å teste ut Koin
 class BygningService(val bygningRepository: BygningRepository) {
     val bruksenhetStorage: MutableList<BruksenhetStorage> = mutableListOf(
         BruksenhetStorage(1L, 1L, mutableListOf(), mutableListOf(), mutableListOf()),

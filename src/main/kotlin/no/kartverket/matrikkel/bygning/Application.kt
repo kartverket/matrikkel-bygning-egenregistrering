@@ -1,7 +1,6 @@
 package no.kartverket.matrikkel.bygning
 
-import DatabaseConfig
-import DatabaseFactory
+import com.zaxxer.hikari.HikariDataSource
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
 import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
@@ -22,6 +21,9 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import no.kartverket.matrikkel.bygning.db.DatabaseConfig
+import no.kartverket.matrikkel.bygning.db.createHikariDataSource
+import no.kartverket.matrikkel.bygning.db.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.matrikkel.createBygningClient
 import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
@@ -30,9 +32,6 @@ import no.kartverket.matrikkel.bygning.routes.v1.installBaseRouting
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
-import org.koin.dsl.module
-import org.koin.ktor.ext.inject
-import org.koin.ktor.plugin.KoinIsolated
 
 fun main() {
     embeddedServer(
@@ -49,53 +48,11 @@ fun main() {
     ).start(wait = true)
 }
 
-val databaseConfig = { config: ApplicationConfig ->
-    DatabaseConfig(
-        driverClassName = "org.postgresql.Driver",
-        jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
-        username = config.property("storage.username").getString(),
-        password = config.property("storage.password").getString(),
-        maxPoolSize = 10
-    )
-}
-
-val databaseModule = { config: ApplicationConfig ->
-    module {
-        single { databaseConfig(config) }
-        single { DatabaseFactory(get()) }
-        single { get<DatabaseFactory>().getDataSource() }
-    }
-}
-
-val appModule = module {
-    // Repositories
-    single { BygningRepository(get()) }
-
-    // Services
-    single { BygningService(get()) }
-    single { EgenregistreringsService(get()) }
-}
-
-val metricsModule = module {
-    single { PrometheusMeterRegistry(PrometheusConfig.DEFAULT) }
-}
-
-val matrikkelModule = { config: ApplicationConfig ->
-    module {
-        single {
-            createBygningClient(
-                config.property("matrikkel.baseUrl").getString(),
-                config.property("matrikkel.username").getString(),
-                config.property("matrikkel.password").getString(),
-                config.property("ktor.development").getString().toBoolean(),
-            )
-        }
-    }
-}
+val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.mainModule() {
-    val config = loadConfig()
+    val config = loadConfig(environment)
 
     install(ContentNegotiation) {
         json(Json {
@@ -127,40 +84,64 @@ fun Application.mainModule() {
         schemaConfigurator = KotlinXSchemaConfigurator()
     }
 
-    install(KoinIsolated) {
-        modules(appModule, databaseModule(config), matrikkelModule(config), metricsModule)
-    }
 
-    val meterRegistry by inject<PrometheusMeterRegistry>()
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
 
-    val dbFactory: DatabaseFactory by inject()
-    dbFactory.runFlywayMigrations()
+    val dataSource = createDataSource(loadConfig(environment))
 
-    installBaseRouting()
+    val bygningRepository = BygningRepository(dataSource)
+
+    val bygningService = BygningService(bygningRepository)
+    val egenregistreringsService = EgenregistreringsService(bygningService)
+
+    val bygningClient = createBygningClient(
+        config.propertyOrNull("matrikkel.baseUrl")?.getString() ?: "",
+        config.propertyOrNull("matrikkel.username")?.getString() ?: "",
+        config.propertyOrNull("matrikkel.password")?.getString() ?: "",
+        config.property("ktor.development").getString().toBoolean(),
+    )
+
+    installBaseRouting(
+        bygningClient = bygningClient,
+        bygningService = bygningService,
+        egenregistreringsService = egenregistreringsService
+    )
+
+    runFlywayMigrations(dataSource)
 }
 
-val internalModule = module {
-    single { HealthRepository(get()) }
-    single { HealthService(get()) }
-}
 
 fun Application.internalModule() {
-    val config = loadConfig()
-    install(KoinIsolated) {
-        modules(internalModule, databaseModule(config), metricsModule)
-    }
-
-    val meterRegistry by inject<PrometheusMeterRegistry>()
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
 
-    installInternalRouting()
+    val dataSource = createDataSource(loadConfig(environment))
+
+    val healthRepository = HealthRepository(dataSource)
+
+    val healthService = HealthService(healthRepository)
+
+    installInternalRouting(
+        meterRegistry = meterRegistry,
+        healthService = healthService,
+    )
 }
 
-private fun Application.loadConfig() =
+private fun createDataSource(config: ApplicationConfig): HikariDataSource {
+    return createHikariDataSource(
+        DatabaseConfig(
+            driverClassName = "org.postgresql.Driver",
+            jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
+            username = config.property("storage.username").getString(),
+            password = config.property("storage.password").getString(),
+            maxPoolSize = 10
+        )
+    )
+}
+
+private fun loadConfig(environment: ApplicationEnvironment) =
     // Any properties set in tests or similar will be used first, then fall back to config from application.conf
     environment.config.withFallback(ApplicationConfig("application.conf"))

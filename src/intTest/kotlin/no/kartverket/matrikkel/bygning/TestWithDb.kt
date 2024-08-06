@@ -12,7 +12,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 abstract class TestWithDb {
 
     companion object {
-        val postgresSQLContainer = PostgreSQLContainer("postgres:15-alpine")
+        private val postgresSQLContainer = PostgreSQLContainer("postgres:15-alpine")
 
         @BeforeClass
         @JvmStatic

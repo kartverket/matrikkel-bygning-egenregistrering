@@ -1,44 +1,36 @@
+package no.kartverket.matrikkel.bygning.db
+
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import javax.sql.DataSource
 
-class DatabaseFactory(private val config: DatabaseConfig) {
-    private var dataSource: DataSource
+fun runFlywayMigrations(dataSource: DataSource) {
+    val flyway = Flyway.configure()
+        .validateMigrationNaming(true)
+        .createSchemas(true)
+        .defaultSchema("bygning")
+        .outputQueryResults(true)
+        .dataSource(dataSource)
+        .locations("classpath:db/migration")
+        .load()
 
-    init {
-        dataSource = createHikariDataSource()
-    }
+    flyway.migrate()
+}
 
-    private fun createHikariDataSource(): HikariDataSource {
-        val hikariConfig = HikariConfig().apply {
-            driverClassName = config.driverClassName
-            jdbcUrl = config.jdbcUrl
-            username = config.username
-            password = config.password
-            maximumPoolSize = config.maxPoolSize
+fun createHikariDataSource(config: DatabaseConfig): HikariDataSource {
+    val hikariConfig = HikariConfig().apply {
+        jdbcUrl = config.jdbcUrl
+        username = config.username
+        password = config.password
+        maximumPoolSize = config.maxPoolSize
 
-            config.defaultSchema?.let { schema ->
-                addDataSourceProperty("currentSchema", schema)
-                addDataSourceProperty("searchpath", schema)
-            }
+        config.defaultSchema?.let { schema ->
+            addDataSourceProperty("currentSchema", schema)
+            addDataSourceProperty("searchpath", schema)
         }
-        return HikariDataSource(hikariConfig)
     }
-
-    fun runFlywayMigrations() {
-        val flyway = Flyway.configure()
-            .validateMigrationNaming(true)
-            .createSchemas(true)
-            .defaultSchema("bygning")
-            .outputQueryResults(true)
-            .dataSource(dataSource)
-            .locations("classpath:db/migration")
-            .load()
-        flyway.migrate()
-    }
-
-    fun getDataSource(): DataSource = dataSource
+    return HikariDataSource(hikariConfig)
 }
 
 data class DatabaseConfig(
