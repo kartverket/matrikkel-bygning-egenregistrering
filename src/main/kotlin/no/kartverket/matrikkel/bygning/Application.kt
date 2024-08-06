@@ -25,11 +25,9 @@ import no.kartverket.matrikkel.bygning.db.DatabaseConfig
 import no.kartverket.matrikkel.bygning.db.createHikariDataSource
 import no.kartverket.matrikkel.bygning.db.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.matrikkel.createBygningClient
-import no.kartverket.matrikkel.bygning.repositories.BygningRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.installInternalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.installBaseRouting
-import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
 
@@ -91,11 +89,6 @@ fun Application.mainModule() {
 
     val dataSource = createDataSource(loadConfig(environment))
 
-    val bygningRepository = BygningRepository(dataSource)
-
-    val bygningService = BygningService(bygningRepository)
-    val egenregistreringsService = EgenregistreringsService(bygningService)
-
     val bygningClient = createBygningClient(
         config.propertyOrNull("matrikkel.baseUrl")?.getString() ?: "",
         config.propertyOrNull("matrikkel.username")?.getString() ?: "",
@@ -103,9 +96,11 @@ fun Application.mainModule() {
         config.property("ktor.development").getString().toBoolean(),
     )
 
+    // Kanskje litt snålt at EgenregService får bygningClient, men vi sender den også med til BaseRouting
+    val egenregistreringsService = EgenregistreringsService(bygningClient)
+
     installBaseRouting(
         bygningClient = bygningClient,
-        bygningService = bygningService,
         egenregistreringsService = egenregistreringsService
     )
 

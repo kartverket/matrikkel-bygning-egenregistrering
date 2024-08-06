@@ -1,12 +1,12 @@
 package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
 import io.ktor.util.logging.*
-import no.kartverket.matrikkel.bygning.matrikkel.Bruksenhet
-import no.kartverket.matrikkel.bygning.matrikkel.Bygning
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
 import no.kartverket.matrikkel.bygning.matrikkelapi.getObjectAs
 import no.kartverket.matrikkel.bygning.matrikkelapi.getObjectsAs
+import no.kartverket.matrikkel.bygning.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.models.Bygning
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bruksenhet as MatrikkelBruksenhet

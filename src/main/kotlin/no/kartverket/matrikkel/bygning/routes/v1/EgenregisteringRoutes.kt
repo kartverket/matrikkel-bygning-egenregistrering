@@ -73,7 +73,6 @@ private fun Route.egenregistreringBygningIdDoc() {
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningsRegistrering = BygningsRegistrering(
-                            bygningId = 1L,
                             bruksareal = BruksarealRegistrering(
                                 bruksareal = 125.0, metadata = RegistreringMetadataRequest(
                                     registreringstidspunkt = Clock.System.now(),
