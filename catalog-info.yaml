@@ -4,14 +4,14 @@ kind: "Component"
 metadata:
   name: "matrikkel-bygning-egenregistrering"
   tags:
-    - "public"
+  - "public"
 spec:
   type: "service"
   lifecycle: "production"
   owner: "bygning"
   system: "matrikkel"
   providesApis:
-    - "matrikkel-bygning-egenregistrering-api"
+  - "matrikkel-bygning-egenregistrering-api"
 ---
 apiVersion: "backstage.io/v1alpha1"
 kind: "Group"
@@ -22,31 +22,35 @@ spec:
   type: "security_champion"
   parent: "eiendom_security_champions"
   members:
-    - "ljooys"
+  - "ljooys"
   children:
-    - "resource:matrikkel-bygning-egenregistrering"
+  - "resource:matrikkel-bygning-egenregistrering"
 ---
 apiVersion: "backstage.io/v1alpha1"
 kind: "Resource"
 metadata:
   name: "matrikkel-bygning-egenregistrering"
   links:
-    - url: "https://github.com/kartverket/matrikkel-bygning-egenregistrering"
-      title: "matrikkel-bygning-egenregistrering på GitHub"
+  - url: "https://github.com/kartverket/matrikkel-bygning-egenregistrering"
+    title: "matrikkel-bygning-egenregistrering på GitHub"
 spec:
   type: "repo"
   owner: "security_champion_matrikkel-bygning-egenregistrering"
   dependencyOf:
-    - "component:matrikkel-bygning-egenregistrering"
+  - "component:matrikkel-bygning-egenregistrering"
 ---
 apiVersion: "backstage.io/v1alpha1"
 kind: "API"
 metadata:
   name: "matrikkel-bygning-egenregistrering-api"
   tags:
-    - "public"
+  - "public"
 spec:
   type: "openapi"
   lifecycle: "production"
   owner: "bygning"
   definition: |
+    openapi: "3.0.0"
+    info:
+        title: matrikkel-bygning-egenregistrering API
+    paths:
