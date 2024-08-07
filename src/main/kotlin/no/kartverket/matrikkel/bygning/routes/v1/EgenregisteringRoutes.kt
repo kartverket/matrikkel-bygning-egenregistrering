@@ -19,7 +19,8 @@ import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Route.egenregistreringRouting(
     bygningClient: BygningClient,
-    egenregistreringsService: EgenregistreringsService) {
+    egenregistreringsService: EgenregistreringsService
+) {
     route("/egenregistreringer") {
         egenregistreringBygningIdDoc()
         post {
@@ -32,37 +33,46 @@ fun Route.egenregistreringRouting(
                 return@post
             }
 
+            val validationErrors = mutableListOf<EgenregistreringValidationErrorResponse>()
+
             val bygningFromMatrikkel = bygningClient.getBygningById(bygningId.toLong())
 
             if (bygningFromMatrikkel == null) {
-                call.respondText("Bygning med id $bygningId finnes ikke i matrikkelen", status = HttpStatusCode.BadRequest)
-                return@post
+                validationErrors.add(EgenregistreringValidationError.BygningDoesNotExist.toErrorResponse(null))
             }
 
-            val isEgenregistreringValid = egenregistreringsService.validateEgenregistrering(egenregistrering)
+            val egenregistreringValidationErrors = egenregistreringsService.validateEgenregistrering(egenregistrering)
 
-            if (!isEgenregistreringValid) {
-                // TODO teksten her bør nok komme fra noen variabler i egenregService i stedet, men lar det ligge til vi er helt enig om hva det skal være
-                call.respondText(
-                    "Egenregistreringen er ikke gyldig. Gyldighetsdato kan tidligst settes til år 1700, og kan ikke fremtidsføres for lenger enn 6 måneder frem i tid.",
-                    status = HttpStatusCode.BadRequest
+            if (egenregistreringValidationErrors.isNotEmpty()) {
+                validationErrors.addAll(egenregistreringValidationErrors.map { error ->
+                    error.second.toErrorResponse(error.first)
+                })
+            }
+
+            if (validationErrors.isNotEmpty()) {
+                call.respond(
+                    status = HttpStatusCode.BadRequest,
+                    validationErrors
                 )
                 return@post
             }
 
-            val addedEgenregistrering =
-                egenregistreringsService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
+            if (bygningFromMatrikkel != null) {
+                val addedEgenregistrering =
+                    egenregistreringsService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
 
-            if (addedEgenregistrering) {
-                call.respondText(
-                    "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.OK
-                )
-            } else {
-                call.respondText(
-                    "Det ble forsøkt registrert egenregistreringer på bruksenheter som ikke har tilknytning til bygningen",
-                    status = HttpStatusCode.BadRequest
-                )
+                if (addedEgenregistrering) {
+                    call.respondText(
+                        "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.OK
+                    )
+                } else {
+                    call.respond(
+                        status = HttpStatusCode.BadRequest,
+                        EgenregistreringValidationError.BruksenhetIsNotConnectedToBygning.toErrorResponse(null)
+                    )
+                }
             }
+
         }
     }
 }
@@ -124,8 +134,8 @@ private fun Route.egenregistreringBygningIdDoc() {
 
             canRespond {
                 responseCode(HttpStatusCode.BadRequest)
-                responseType<String>()
-                description("Alle bruksenheter som kom i request tilhørte ikke bygningen")
+                responseType<List<EgenregistreringValidationErrorResponse>>()
+                description("Validering av egenregistreringsdata har gått feil")
             }
         }
     }

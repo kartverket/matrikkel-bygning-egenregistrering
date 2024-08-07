@@ -65,3 +65,26 @@ data class BruksenhetRegistrering(
 data class EgenregistreringRequest(
     val bygningsRegistrering: BygningsRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>
 )
+
+@Serializable
+enum class EgenregistreringValidationError(val errorMessage: String) {
+    DateTooEarly("Gyldighetsdato er satt til å være for langt bak i tid"),
+    DateTooLate("Gyldighetsdato er satt til å være for langt frem i tid"),
+    BygningDoesNotExist("Bygningen finnes ikke i matrikkelen"),
+    BruksenhetIsNotConnectedToBygning("Bruksenheten finnes ikke i bygningen")
+}
+
+fun EgenregistreringValidationError.toErrorResponse(field: String?): EgenregistreringValidationErrorResponse {
+    return EgenregistreringValidationErrorResponse(
+        this.name,
+        this.errorMessage,
+        field = field
+    )
+}
+
+@Serializable
+data class EgenregistreringValidationErrorResponse(
+    val code: String,
+    val description: String,
+    val field: String?,
+)

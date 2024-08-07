@@ -5,6 +5,7 @@ import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringValidationError
 
 class EgenregistreringsService {
     private val bygningRegistreringer: MutableList<BygningsRegistrering> = mutableListOf()
@@ -41,33 +42,43 @@ class EgenregistreringsService {
         return true
     }
 
-    fun validateEgenregistrering(egenregistrering: EgenregistreringRequest): Boolean {
-        val bygningRegistreringDates = listOfNotNull(
-            egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
-            egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
-            egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
-            egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra
-        )
-
-        val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map {
-            listOfNotNull(
-                it.bruksareal?.metadata?.gyldigFra,
-                it.oppvarming?.metadata?.gyldigFra,
-                it.energikilde?.metadata?.gyldigFra
-            )
-        }.flatten()
-
-        val isAnyRegistreringsDateInvalid = (bygningRegistreringDates + bruksenhetRegistreringDates).any {
-            val earliestPossibleValidYear = 1700
-            // Er vi bænkers på system tidssone på SKIP?
-            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-            // TODO Jeg har bare gjetta på et tall her, godt mulig det bør være tillatt å fremtidsføre lenger frem i tid enn dette?
-            val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
-
-            return (it.year <= earliestPossibleValidYear || it > inSixMonths)
+    fun validateEgenregistrering(egenregistrering: EgenregistreringRequest): List<Pair<String, EgenregistreringValidationError>> {
+        val bygningRegistreringDates = listOf(
+            "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
+            "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
+            "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
+            "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra
+        ).mapNotNull { (name, date) ->
+            date?.let { name to it}
         }
 
-        return isAnyRegistreringsDateInvalid
+        val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
+            listOf(
+                "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
+                "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
+                "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra
+            ).mapNotNull { (name, date) ->
+                date?.let { name to it}
+            }
+        }.flatten()
+
+        val earliestPossibleValidYear = 1700
+        // Er vi bænkers på system tidssone på SKIP?
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        // TODO Jeg har bare gjetta på et tall her, godt mulig det bør være tillatt å fremtidsføre lenger frem i tid enn dette?
+        val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
+
+        return (bygningRegistreringDates + bruksenhetRegistreringDates).mapNotNull {
+            if (it.second.year <= earliestPossibleValidYear) {
+                return@mapNotNull it.first to EgenregistreringValidationError.DateTooLate
+            }
+
+            if (it.second > inSixMonths) {
+                return@mapNotNull it.first to EgenregistreringValidationError.DateTooEarly
+            }
+
+            return@mapNotNull null
+        }
+
     }
 }
