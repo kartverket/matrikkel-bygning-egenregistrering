@@ -35,7 +35,17 @@ fun Route.egenregistreringRouting(
             val bygningFromMatrikkel = bygningClient.getBygningById(bygningId.toLong())
 
             if (bygningFromMatrikkel == null) {
-                call.respondText("Bygningen finnes ikke i matrikkelen", status = HttpStatusCode.BadRequest)
+                call.respondText("Bygning med id $bygningId finnes ikke i matrikkelen", status = HttpStatusCode.BadRequest)
+                return@post
+            }
+
+            val isEgenregistreringValid = egenregistreringsService.validateEgenregistrering(egenregistrering)
+
+            if (!isEgenregistreringValid) {
+                call.respondText(
+                    "Egenregistreringen er ikke gyldig. Gyldighetsdato kan tidligst settes til år 1700, og kan ikke fremtidsføres for lenger enn 6 måneder frem i tid.",
+                    status = HttpStatusCode.BadRequest
+                )
                 return@post
             }
 

@@ -1,10 +1,10 @@
 package no.kartverket.matrikkel.bygning.services
 
+import kotlinx.datetime.*
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
-import java.util.*
 
 class EgenregistreringsService(private val bygningClient: BygningClient) {
     private val bygningRegistreringer: MutableList<BygningsRegistrering> = mutableListOf()
@@ -19,9 +19,6 @@ class EgenregistreringsService(private val bygningClient: BygningClient) {
             }
 
         if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
-
-        // TODO Bør kunne skille alle registreringer med en ID, skal denne settes på metadataen til hver enkelt registrering?
-        val egenregistreringsId = UUID.randomUUID().toString()
 
         bygningRegistreringer.add(
             BygningsRegistrering(
@@ -44,5 +41,35 @@ class EgenregistreringsService(private val bygningClient: BygningClient) {
         }
 
         return true
+    }
+
+    fun validateEgenregistrering(egenregistrering: EgenregistreringRequest): Boolean {
+        val bygningRegistreringDates = listOfNotNull(
+            egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
+            egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
+            egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
+            egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra
+        )
+
+        val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map {
+            listOfNotNull(
+                it.bruksareal?.metadata?.gyldigFra,
+                it.oppvarming?.metadata?.gyldigFra,
+                it.energikilde?.metadata?.gyldigFra
+            )
+        }.flatten()
+
+        val isAnyRegistreringsDateInvalid = (bygningRegistreringDates + bruksenhetRegistreringDates).any {
+            val earliestPossibleValidYear = 1700
+            // Er vi bænkers på system tidssone på SKIP?
+            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+            // TODO Jeg har bare gjetta på et tall her, godt mulig det bør være tillatt å fremtidsføre lenger frem i tid enn dette?
+            val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
+
+            return (it.year <= earliestPossibleValidYear || it > inSixMonths)
+        }
+
+        return isAnyRegistreringsDateInvalid
     }
 }
