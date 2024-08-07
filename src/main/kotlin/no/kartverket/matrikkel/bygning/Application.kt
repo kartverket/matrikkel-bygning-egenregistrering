@@ -96,8 +96,7 @@ fun Application.mainModule() {
         config.property("ktor.development").getString().toBoolean(),
     )
 
-    // Kanskje litt snålt at EgenregService får bygningClient, men vi sender den også med til BaseRouting
-    val egenregistreringsService = EgenregistreringsService(bygningClient)
+    val egenregistreringsService = EgenregistreringsService()
 
     installBaseRouting(
         bygningClient = bygningClient,
