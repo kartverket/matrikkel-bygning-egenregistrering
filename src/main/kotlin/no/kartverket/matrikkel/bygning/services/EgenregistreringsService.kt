@@ -1,21 +1,19 @@
 package no.kartverket.matrikkel.bygning.services
 
 import kotlinx.datetime.*
-import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
+import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 
-class EgenregistreringsService(private val bygningClient: BygningClient) {
+class EgenregistreringsService {
     private val bygningRegistreringer: MutableList<BygningsRegistrering> = mutableListOf()
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
-    fun addEgenregistreringToBygning(bygningId: Long, egenregistrering: EgenregistreringRequest): Boolean {
-        val bygningIfExists = bygningClient.getBygningById(bygningId) ?: return false
-
+    fun addEgenregistreringToBygning(bygning: Bygning, egenregistrering: EgenregistreringRequest): Boolean {
         val isAllBruksenheterRegisteredOnCorrectBygning =
             egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
-                bygningIfExists.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
+                bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
             }
 
         if (!isAllBruksenheterRegisteredOnCorrectBygning) return false

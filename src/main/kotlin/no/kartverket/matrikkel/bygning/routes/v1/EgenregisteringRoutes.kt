@@ -42,6 +42,7 @@ fun Route.egenregistreringRouting(
             val isEgenregistreringValid = egenregistreringsService.validateEgenregistrering(egenregistrering)
 
             if (!isEgenregistreringValid) {
+                // TODO teksten her bør nok komme fra noen variabler i egenregService i stedet, men lar det ligge til vi er helt enig om hva det skal være
                 call.respondText(
                     "Egenregistreringen er ikke gyldig. Gyldighetsdato kan tidligst settes til år 1700, og kan ikke fremtidsføres for lenger enn 6 måneder frem i tid.",
                     status = HttpStatusCode.BadRequest
@@ -50,7 +51,7 @@ fun Route.egenregistreringRouting(
             }
 
             val addedEgenregistrering =
-                egenregistreringsService.addEgenregistreringToBygning(bygningId.toLong(), egenregistrering)
+                egenregistreringsService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
 
             if (addedEgenregistrering) {
                 call.respondText(
