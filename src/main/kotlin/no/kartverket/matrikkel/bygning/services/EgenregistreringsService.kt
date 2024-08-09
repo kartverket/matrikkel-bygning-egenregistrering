@@ -63,8 +63,7 @@ class EgenregistreringsService {
         }.flatten()
 
         val earliestPossibleValidYear = 1700
-        // Er vi bænkers på system tidssone på SKIP?
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
         // TODO Jeg har bare gjetta på et tall her, godt mulig det bør være tillatt å fremtidsføre lenger frem i tid enn dette?
         val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
 
