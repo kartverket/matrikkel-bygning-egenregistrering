@@ -1,5 +1,6 @@
 package no.kartverket.matrikkel.bygning.services
 
+import io.ktor.server.plugins.requestvalidation.*
 import kotlinx.datetime.*
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
@@ -13,6 +14,47 @@ class EgenregistreringsService {
 
     companion object Validator {
         const val EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR = 1700
+
+        fun validateEgenregistreringRequest(today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): suspend (EgenregistreringRequest) -> ValidationResult {
+            return { egenregistrering ->
+                val bygningRegistreringDates = listOf(
+                    "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
+                    "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
+                    "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
+                    "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra
+                ).mapNotNull { (name, date) ->
+                    date?.let { name to it }
+                }
+
+                val bruksenhetRegistreringDates =
+                    egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
+                        listOf(
+                            "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
+                            "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
+                            "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra
+                        ).mapNotNull { (name, date) ->
+                            date?.let { name to it }
+                        }
+                    }.flatten()
+
+                val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
+
+                if ((bygningRegistreringDates + bruksenhetRegistreringDates).any {
+                        if (it.second.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
+                            return@any true
+                        }
+
+                        if (it.second > inSixMonths) {
+                            return@any true
+                        }
+                        return@any false
+                    }) {
+                    ValidationResult.Invalid("noe")
+                } else {
+                    ValidationResult.Valid
+                }
+            }
+        }
 
         fun validateEgenregistrering(
             egenregistrering: EgenregistreringRequest,
