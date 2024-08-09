@@ -16,6 +16,7 @@ import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import no.kartverket.matrikkel.bygning.services.EgenregistreringsService.Validator.validateEgenregistrering
 
 fun Route.egenregistreringRouting(
     bygningClient: BygningClient,
@@ -41,7 +42,7 @@ fun Route.egenregistreringRouting(
                 validationErrors.add(EgenregistreringValidationError.BygningDoesNotExist.toErrorResponse(null))
             }
 
-            val egenregistreringValidationErrors = egenregistreringsService.validateEgenregistrering(egenregistrering)
+            val egenregistreringValidationErrors = validateEgenregistrering(egenregistrering)
 
             if (egenregistreringValidationErrors.isNotEmpty()) {
                 validationErrors.addAll(egenregistreringValidationErrors.map { error ->
@@ -63,7 +64,7 @@ fun Route.egenregistreringRouting(
 
                 if (addedEgenregistrering) {
                     call.respondText(
-                        "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.OK
+                        "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.Created
                     )
                 } else {
                     call.respond(

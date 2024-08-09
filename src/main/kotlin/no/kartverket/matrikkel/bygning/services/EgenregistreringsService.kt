@@ -11,6 +11,47 @@ class EgenregistreringsService {
     private val bygningRegistreringer: MutableList<BygningsRegistrering> = mutableListOf()
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
+    companion object Validator {
+        const val EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR = 1700
+
+        fun validateEgenregistrering(egenregistrering: EgenregistreringRequest): List<Pair<String, EgenregistreringValidationError>> {
+            val bygningRegistreringDates = listOf(
+                "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
+                "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
+                "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
+                "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra
+            ).mapNotNull { (name, date) ->
+                date?.let { name to it }
+            }
+
+            val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
+                listOf(
+                    "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
+                    "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
+                    "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra
+                ).mapNotNull { (name, date) ->
+                    date?.let { name to it }
+                }
+            }.flatten()
+
+            val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+            // TODO Jeg har bare gjetta på et tall her, godt mulig det bør være tillatt å fremtidsføre lenger frem i tid enn dette?
+            val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
+
+            return (bygningRegistreringDates + bruksenhetRegistreringDates).mapNotNull {
+                if (it.second.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
+                    return@mapNotNull it.first to EgenregistreringValidationError.DateTooLate
+                }
+
+                if (it.second > inSixMonths) {
+                    return@mapNotNull it.first to EgenregistreringValidationError.DateTooEarly
+                }
+
+                return@mapNotNull null
+            }
+        }
+    }
+
     fun addEgenregistreringToBygning(bygning: Bygning, egenregistrering: EgenregistreringRequest): Boolean {
         val isAllBruksenheterRegisteredOnCorrectBygning =
             egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
@@ -42,42 +83,4 @@ class EgenregistreringsService {
         return true
     }
 
-    fun validateEgenregistrering(egenregistrering: EgenregistreringRequest): List<Pair<String, EgenregistreringValidationError>> {
-        val bygningRegistreringDates = listOf(
-            "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
-            "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
-            "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
-            "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra
-        ).mapNotNull { (name, date) ->
-            date?.let { name to it}
-        }
-
-        val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
-            listOf(
-                "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
-                "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
-                "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra
-            ).mapNotNull { (name, date) ->
-                date?.let { name to it}
-            }
-        }.flatten()
-
-        val earliestPossibleValidYear = 1700
-        val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        // TODO Jeg har bare gjetta på et tall her, godt mulig det bør være tillatt å fremtidsføre lenger frem i tid enn dette?
-        val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
-
-        return (bygningRegistreringDates + bruksenhetRegistreringDates).mapNotNull {
-            if (it.second.year <= earliestPossibleValidYear) {
-                return@mapNotNull it.first to EgenregistreringValidationError.DateTooLate
-            }
-
-            if (it.second > inSixMonths) {
-                return@mapNotNull it.first to EgenregistreringValidationError.DateTooEarly
-            }
-
-            return@mapNotNull null
-        }
-
-    }
 }
