@@ -66,7 +66,6 @@ data class EgenregistreringRequest(
     val bygningsRegistrering: BygningsRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>
 )
 
-@Serializable
 enum class EgenregistreringValidationError(val errorMessage: String) {
     DateTooEarly("Gyldighetsdato er satt til å være for langt bak i tid"),
     DateTooLate("Gyldighetsdato er satt til å være for langt frem i tid"),
