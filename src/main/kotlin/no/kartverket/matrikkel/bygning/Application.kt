@@ -16,6 +16,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.request.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
@@ -46,6 +47,13 @@ fun main() {
     ).start(wait = true)
 }
 
+// Generic extension function
+inline fun <reified T : Any> RequestValidationConfig.addValidator(
+    noinline validator: suspend (T) -> ValidationResult
+) {
+    validate<T>(validator)
+}
+
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -59,6 +67,12 @@ fun Application.mainModule() {
             explicitNulls = false
         })
         removeIgnoredType<String>()
+    }
+
+
+
+    install(RequestValidation) {
+        addValidator(EgenregistreringsService.validateEgenregistreringRequest())
     }
 
     install(CORS) {
