@@ -7,7 +7,7 @@ import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.services.HealthService
 
-fun Application.installInternalRouting(
+fun Application.internalRouting(
     meterRegistry: PrometheusMeterRegistry,
     healthService: HealthService
 ) {

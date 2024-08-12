@@ -25,8 +25,10 @@ import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 fun Route.egenregistreringRouting(
     bygningClient: BygningClient, egenregistreringsService: EgenregistreringsService
 ) {
-    route("/egenregistreringer") {
+
+    route("{bygningId}/egenregistreringer") {
         egenregistreringBygningIdDoc()
+
         post {
             val egenregistrering = call.receive<EgenregistreringRequest>()
 
@@ -62,6 +64,7 @@ fun Route.egenregistreringRouting(
 
 private fun Route.egenregistreringBygningIdDoc() {
     install(NotarizedRoute()) {
+        tags = setOf("Egenregistrering")
         parameters = listOf(
             Parameter(
                 name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
@@ -94,10 +97,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                                 bruksenhetId = 1L,
                                 null,
                                 energikilde = EnergikildeRegistrering(
-                                    energikilder = listOf(
-                                        EnergikildeKode.Elektrisitet,
-                                        EnergikildeKode.Gass,
-                                    ),
+                                    energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
                                     metadata = RegistreringMetadataRequest(
                                         registreringstidspunkt = Clock.System.now(),
                                         gyldigFra = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
