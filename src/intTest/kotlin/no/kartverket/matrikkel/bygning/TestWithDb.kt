@@ -54,7 +54,10 @@ abstract class TestWithDb {
                 config = MapApplicationConfig(
                     "storage.jdbcURL" to postgresSQLContainer.jdbcUrl.removePrefix("jdbc:"),
                     "storage.username" to postgresSQLContainer.username,
-                    "storage.password" to postgresSQLContainer.password
+                    "storage.password" to postgresSQLContainer.password,
+                    "matrikkel.baseUrl" to "",
+                    "matrikkel.username" to "",
+                    "matrikkel.password" to "",
                 )
             }
         }
