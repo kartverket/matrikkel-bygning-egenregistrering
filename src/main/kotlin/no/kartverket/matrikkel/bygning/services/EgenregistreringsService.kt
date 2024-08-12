@@ -15,7 +15,9 @@ class EgenregistreringsService {
     companion object Validator {
         const val EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR = 1700
 
-        fun validateEgenregistreringRequest(today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): suspend (EgenregistreringRequest) -> ValidationResult {
+        fun validateEgenregistreringRequest(
+            today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
+        ): suspend (EgenregistreringRequest) -> ValidationResult {
             return { egenregistrering ->
                 val bygningRegistreringDates = listOf(
                     "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
@@ -39,59 +41,23 @@ class EgenregistreringsService {
 
                 val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
 
-                if ((bygningRegistreringDates + bruksenhetRegistreringDates).any {
-                        if (it.second.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
-                            return@any true
-                        }
+                val errors = (bygningRegistreringDates + bruksenhetRegistreringDates).mapNotNull { (field, date) ->
+                    // TODO Look into how to format this string to give best status page formatting
+                    if (date.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
+                        return@mapNotNull "$field: ${EgenregistreringValidationError.DateTooEarly.errorMessage}"
+                    }
 
-                        if (it.second > inSixMonths) {
-                            return@any true
-                        }
-                        return@any false
-                    }) {
-                    ValidationResult.Invalid("noe")
+                    if (date > inSixMonths) {
+                        return@mapNotNull "$field: ${EgenregistreringValidationError.DateTooLate.errorMessage}"
+                    }
+                    return@mapNotNull null
+                }
+
+                if (errors.isNotEmpty()) {
+                    ValidationResult.Invalid(errors)
                 } else {
                     ValidationResult.Valid
                 }
-            }
-        }
-
-        fun validateEgenregistrering(
-            egenregistrering: EgenregistreringRequest,
-            today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        ): List<Pair<String, EgenregistreringValidationError>> {
-            val bygningRegistreringDates = listOf(
-                "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
-                "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
-                "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
-                "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra
-            ).mapNotNull { (name, date) ->
-                date?.let { name to it }
-            }
-
-            val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
-                listOf(
-                    "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
-                    "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
-                    "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra
-                ).mapNotNull { (name, date) ->
-                    date?.let { name to it }
-                }
-            }.flatten()
-
-            // TODO Jeg har bare gjetta på et tall her, godt mulig det bør være tillatt å fremtidsføre lenger frem i tid enn dette?
-            val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
-
-            return (bygningRegistreringDates + bruksenhetRegistreringDates).mapNotNull {
-                if (it.second.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
-                    return@mapNotNull it.first to EgenregistreringValidationError.DateTooLate
-                }
-
-                if (it.second > inSixMonths) {
-                    return@mapNotNull it.first to EgenregistreringValidationError.DateTooEarly
-                }
-
-                return@mapNotNull null
             }
         }
     }

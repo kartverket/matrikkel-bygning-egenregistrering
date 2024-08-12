@@ -17,7 +17,9 @@ import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.requestvalidation.*
+import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -47,7 +49,6 @@ fun main() {
     ).start(wait = true)
 }
 
-// Generic extension function
 inline fun <reified T : Any> RequestValidationConfig.addValidator(
     noinline validator: suspend (T) -> ValidationResult
 ) {
@@ -69,10 +70,14 @@ fun Application.mainModule() {
         removeIgnoredType<String>()
     }
 
-
-
     install(RequestValidation) {
         addValidator(EgenregistreringsService.validateEgenregistreringRequest())
+    }
+
+    install(StatusPages) {
+        exception<RequestValidationException> { call, cause ->
+            call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
+        }
     }
 
     install(CORS) {

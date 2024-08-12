@@ -16,7 +16,6 @@ import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.*
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
-import no.kartverket.matrikkel.bygning.services.EgenregistreringsService.Validator.validateEgenregistrering
 
 fun Route.egenregistreringRouting(
     bygningClient: BygningClient,
@@ -40,14 +39,6 @@ fun Route.egenregistreringRouting(
 
             if (bygningFromMatrikkel == null) {
                 validationErrors.add(EgenregistreringValidationError.BygningDoesNotExist.toErrorResponse(null))
-            }
-
-            val egenregistreringValidationErrors = validateEgenregistrering(egenregistrering)
-
-            if (egenregistreringValidationErrors.isNotEmpty()) {
-                validationErrors.addAll(egenregistreringValidationErrors.map { error ->
-                    error.second.toErrorResponse(error.first)
-                })
             }
 
             if (validationErrors.isNotEmpty()) {
