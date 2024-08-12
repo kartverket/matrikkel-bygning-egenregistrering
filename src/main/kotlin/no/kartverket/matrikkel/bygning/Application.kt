@@ -2,15 +2,13 @@ package no.kartverket.matrikkel.bygning
 
 import io.bkbn.kompendium.core.routes.swagger
 import io.ktor.server.application.*
-import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
-import no.kartverket.matrikkel.bygning.db.DatabaseConfig
-import no.kartverket.matrikkel.bygning.db.createHikariDataSource
+import no.kartverket.matrikkel.bygning.db.createDataSource
 import no.kartverket.matrikkel.bygning.db.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.matrikkel.createBygningClient
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
@@ -24,7 +22,6 @@ import no.kartverket.matrikkel.bygning.routes.v1.egenregistreringRouting
 import no.kartverket.matrikkel.bygning.routes.v1.kodelisteRouting
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
-import javax.sql.DataSource
 
 fun main() {
     embeddedServer(
@@ -83,16 +80,4 @@ fun Application.internalModule() {
     val healthService = HealthService(healthRepository)
 
     internalRouting(meterRegistry, healthService)
-}
-
-private fun createDataSource(config: ApplicationConfig): DataSource {
-    return createHikariDataSource(
-        DatabaseConfig(
-            driverClassName = "org.postgresql.Driver",
-            jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
-            username = config.property("storage.username").getString(),
-            password = config.property("storage.password").getString(),
-            maxPoolSize = 10
-        )
-    )
 }
