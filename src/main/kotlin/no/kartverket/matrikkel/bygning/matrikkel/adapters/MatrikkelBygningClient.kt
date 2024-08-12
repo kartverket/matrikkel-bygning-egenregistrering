@@ -1,6 +1,5 @@
 package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
-import io.ktor.util.logging.*
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
 import no.kartverket.matrikkel.bygning.matrikkelapi.getObjectAs
@@ -9,6 +8,8 @@ import no.kartverket.matrikkel.bygning.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bruksenhet as MatrikkelBruksenhet
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as MatrikkelBygning
 
@@ -17,7 +18,7 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as Mat
 internal class MatrikkelBygningClient(
     val matrikkelApi: MatrikkelApi.WithAuth
 ) : BygningClient {
-    private val LOGGER = KtorSimpleLogger("MatrikkelBygningClient")
+    private val LOG: Logger = LoggerFactory.getLogger(MatrikkelBygningClient::class.java)
 
     override fun getBygningById(id: Long): Bygning? {
         val bygningId: BygningId = BygningId().apply { value = id }
@@ -37,7 +38,7 @@ internal class MatrikkelBygningClient(
                     )
                 })
         } catch (exception: ServiceException) {
-            LOGGER.warn("Noe gikk galt under henting av bygning med id $bygningId: ${exception.message}")
+            LOG.warn("Noe gikk galt under henting av bygning med id {}", bygningId, exception)
             return null
         }
     }
@@ -48,7 +49,7 @@ internal class MatrikkelBygningClient(
 
             return getBygningById(bygningId.value)
         } catch (exception: ServiceException) {
-            LOGGER.warn("Noe gikk galt under henting av bygning med nummer $bygningNummer: ${exception.message}")
+            LOG.warn("Noe gikk galt under henting av bygning med nummer {}", bygningNummer, exception)
             return null
         }
     }
