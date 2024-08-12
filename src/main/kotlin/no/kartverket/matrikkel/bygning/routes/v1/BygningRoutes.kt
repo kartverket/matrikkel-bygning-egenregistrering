@@ -14,33 +14,32 @@ import no.kartverket.matrikkel.bygning.models.Bygning
 fun Route.bygningRouting(
     bygningClient: BygningClient,
 ) {
-    route("bygninger") {
-        route("{bygningId}") {
-            bygningDoc()
+    route("{bygningId}") {
+        bygningDoc()
 
-            get {
-                val bygningId = call.parameters["bygningId"]
+        get {
+            val bygningId = call.parameters["bygningId"]
 
-                if (bygningId == null) {
-                    call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
-                    return@get
-                }
-
-                val bygning = bygningClient.getBygningById(bygningId.toLong())
-
-                if (bygning != null) {
-                    call.respond(bygning)
-                } else {
-                    call.respondText("Fant ingen bygninger med id $bygningId", status = HttpStatusCode.NotFound)
-                }
-
+            if (bygningId == null) {
+                call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
+                return@get
             }
+
+            val bygning = bygningClient.getBygningById(bygningId.toLong())
+
+            if (bygning != null) {
+                call.respond(bygning)
+            } else {
+                call.respondText("Fant ingen bygninger med id $bygningId", status = HttpStatusCode.NotFound)
+            }
+
         }
     }
 }
 
 private fun Route.bygningDoc() {
     install(NotarizedRoute()) {
+        tags = setOf("Bygninger")
         parameters = listOf(
             Parameter(
                 name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING
