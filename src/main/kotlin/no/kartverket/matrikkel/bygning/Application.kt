@@ -1,6 +1,5 @@
 package no.kartverket.matrikkel.bygning
 
-import com.zaxxer.hikari.HikariDataSource
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
 import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
@@ -24,6 +23,7 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.db.DatabaseConfig
 import no.kartverket.matrikkel.bygning.db.createHikariDataSource
 import no.kartverket.matrikkel.bygning.db.runFlywayMigrations
@@ -33,6 +33,7 @@ import no.kartverket.matrikkel.bygning.routes.installInternalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.installBaseRouting
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
+import javax.sql.DataSource
 
 fun main() {
     embeddedServer(
@@ -59,7 +60,7 @@ val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.mainModule() {
-    val config = loadConfig(environment)
+    val config = loadConfiguration(environment)
 
     install(ContentNegotiation) {
         json(Json {
@@ -106,13 +107,12 @@ fun Application.mainModule() {
         registry = meterRegistry
     }
 
-    val dataSource = createDataSource(loadConfig(environment))
+    val dataSource = createDataSource(config)
 
     val bygningClient = createBygningClient(
-        config.propertyOrNull("matrikkel.baseUrl")?.getString() ?: "",
-        config.propertyOrNull("matrikkel.username")?.getString() ?: "",
-        config.propertyOrNull("matrikkel.password")?.getString() ?: "",
-        config.property("ktor.development").getString().toBoolean(),
+        config.property("matrikkel.baseUrl").getString(),
+        config.property("matrikkel.username").getString(),
+        config.property("matrikkel.password").getString(),
     )
 
     val egenregistreringsService = EgenregistreringsService()
@@ -127,14 +127,14 @@ fun Application.mainModule() {
 
 
 fun Application.internalModule() {
+    val config = loadConfiguration(environment)
+
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
 
-    val dataSource = createDataSource(loadConfig(environment))
-
+    val dataSource = createDataSource(config)
     val healthRepository = HealthRepository(dataSource)
-
     val healthService = HealthService(healthRepository)
 
     installInternalRouting(
@@ -143,7 +143,7 @@ fun Application.internalModule() {
     )
 }
 
-private fun createDataSource(config: ApplicationConfig): HikariDataSource {
+private fun createDataSource(config: ApplicationConfig): DataSource {
     return createHikariDataSource(
         DatabaseConfig(
             driverClassName = "org.postgresql.Driver",
@@ -154,7 +154,3 @@ private fun createDataSource(config: ApplicationConfig): HikariDataSource {
         )
     )
 }
-
-private fun loadConfig(environment: ApplicationEnvironment) =
-    // Any properties set in tests or similar will be used first, then fall back to config from application.conf
-    environment.config.withFallback(ApplicationConfig("application.conf"))

@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.flyway.database.postgresql)
     implementation(libs.hikari)
 
+    // OpenAPI
     implementation(libs.kompendium.core)
 
     // Integration tests
