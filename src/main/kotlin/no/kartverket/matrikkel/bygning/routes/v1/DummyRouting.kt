@@ -6,7 +6,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Route.dummyRouting() {
-    // TODO Remove after checking connection between Egenreg and Bygning
     route("dummy") {
         get {
             call.respondText("Hei Egenregistrering!", status = HttpStatusCode.OK)

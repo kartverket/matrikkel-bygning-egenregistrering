@@ -52,21 +52,21 @@ fun Application.mainModule() {
 
     val dataSource = createDataSource(config)
 
-    val bygningClient = createBygningClient(
-        config.property("matrikkel.baseUrl").getString(),
-        config.property("matrikkel.username").getString(),
-        config.property("matrikkel.password").getString(),
-    )
+    val bygningClient = createBygningClient(config)
 
     val egenregistreringsService = EgenregistreringsService()
 
     routing {
         swagger()
+
+        // TODO Remove after checking connection between Egenreg and Bygning
+        dummyRouting()
         route("v1") {
-            dummyRouting()
-            bygningRouting(bygningClient)
-            egenregistreringRouting(bygningClient, egenregistreringsService)
             kodelisteRouting()
+            route("bygninger") {
+                bygningRouting(bygningClient)
+                egenregistreringRouting(bygningClient, egenregistreringsService)
+            }
         }
     }
 

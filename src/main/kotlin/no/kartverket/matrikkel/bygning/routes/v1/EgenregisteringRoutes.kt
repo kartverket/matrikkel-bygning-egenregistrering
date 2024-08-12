@@ -19,9 +19,10 @@ import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Route.egenregistreringRouting(
     bygningClient: BygningClient,
-    egenregistreringsService: EgenregistreringsService) {
+    egenregistreringsService: EgenregistreringsService
+) {
 
-    route("/bygninger/{bygningId}/egenregistreringer") {
+    route("{bygningId}/egenregistreringer") {
         egenregistreringBygningIdDoc()
 
         post {
@@ -60,6 +61,7 @@ fun Route.egenregistreringRouting(
 
 private fun Route.egenregistreringBygningIdDoc() {
     install(NotarizedRoute()) {
+        tags = setOf("Egenregistrering")
         parameters = listOf(
             Parameter(
                 name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING
