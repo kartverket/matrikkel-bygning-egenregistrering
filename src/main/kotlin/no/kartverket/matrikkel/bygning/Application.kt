@@ -54,11 +54,13 @@ fun Application.mainModule() {
     val config = loadConfiguration(environment)
 
     install(ContentNegotiation) {
-        json(Json {
-            serializersModule = KompendiumSerializersModule.module
-            encodeDefaults = true
-            explicitNulls = false
-        })
+        json(
+            Json {
+                serializersModule = KompendiumSerializersModule.module
+                encodeDefaults = true
+                explicitNulls = false
+            },
+        )
         removeIgnoredType<String>()
     }
 
@@ -75,10 +77,11 @@ fun Application.mainModule() {
 
     install(NotarizedApplication()) {
         spec = OpenApiSpec(
-            jsonSchemaDialect = "https://spec.openapis.org/oas/3.1/dialect/base", info = Info(
+            jsonSchemaDialect = "https://spec.openapis.org/oas/3.1/dialect/base",
+            info = Info(
                 title = "API For Egenregistrering av Bygningsdata",
                 version = "0.1",
-            )
+            ),
         )
         schemaConfigurator = KotlinXSchemaConfigurator()
     }
@@ -100,7 +103,7 @@ fun Application.mainModule() {
 
     installBaseRouting(
         bygningClient = bygningClient,
-        egenregistreringsService = egenregistreringsService
+        egenregistreringsService = egenregistreringsService,
     )
 
     runFlywayMigrations(dataSource)
@@ -131,7 +134,7 @@ private fun createDataSource(config: ApplicationConfig): DataSource {
             jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
             username = config.property("storage.username").getString(),
             password = config.property("storage.password").getString(),
-            maxPoolSize = 10
-        )
+            maxPoolSize = 10,
+        ),
     )
 }

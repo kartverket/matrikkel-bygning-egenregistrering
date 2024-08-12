@@ -14,12 +14,17 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.models.requests.*
+import no.kartverket.matrikkel.bygning.models.requests.BruksarealRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.models.requests.EnergikildeRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataRequest
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Route.egenregistreringRouting(
-    bygningClient: BygningClient,
-    egenregistreringsService: EgenregistreringsService) {
+    bygningClient: BygningClient, egenregistreringsService: EgenregistreringsService
+) {
     route("/egenregistreringer") {
         egenregistreringBygningIdDoc()
         post {
@@ -39,17 +44,16 @@ fun Route.egenregistreringRouting(
                 return@post
             }
 
-            val addedEgenregistrering =
-                egenregistreringsService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
+            val addedEgenregistrering = egenregistreringsService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
 
             if (addedEgenregistrering) {
                 call.respondText(
-                    "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.OK
+                    "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.OK,
                 )
             } else {
                 call.respondText(
                     "Det ble forsøkt registrert egenregistreringer på bruksenheter som ikke har tilknytning til bygningen",
-                    status = HttpStatusCode.BadRequest
+                    status = HttpStatusCode.BadRequest,
                 )
             }
         }
@@ -60,8 +64,8 @@ private fun Route.egenregistreringBygningIdDoc() {
     install(NotarizedRoute()) {
         parameters = listOf(
             Parameter(
-                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING
-            )
+                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
         )
         post = PostInfo.builder {
             summary("Legg til en egenregistrering på en bygning")
@@ -74,12 +78,12 @@ private fun Route.egenregistreringBygningIdDoc() {
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningsRegistrering = BygningsRegistrering(
                             bruksareal = BruksarealRegistrering(
-                                bruksareal = 125.0, metadata = RegistreringMetadataRequest(
+                                bruksareal = 125.0,
+                                metadata = RegistreringMetadataRequest(
                                     registreringstidspunkt = Clock.System.now(),
-                                    gyldigFra = Clock.System.now()
-                                        .toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                                    gyldigFra = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
                                     gyldigTil = null,
-                                )
+                                ),
                             ),
                             null,
                             null,
@@ -90,18 +94,20 @@ private fun Route.egenregistreringBygningIdDoc() {
                                 bruksenhetId = 1L,
                                 null,
                                 energikilde = EnergikildeRegistrering(
-                                    energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
+                                    energikilder = listOf(
+                                        EnergikildeKode.Elektrisitet,
+                                        EnergikildeKode.Gass,
+                                    ),
                                     metadata = RegistreringMetadataRequest(
                                         registreringstidspunkt = Clock.System.now(),
-                                        gyldigFra = Clock.System.now()
-                                            .toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                                        gyldigFra = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
                                         gyldigTil = null,
-                                    )
+                                    ),
                                 ),
                                 null,
-                            )
+                            ),
                         ),
-                    )
+                    ),
                 )
 
             }

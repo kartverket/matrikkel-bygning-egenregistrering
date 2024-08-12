@@ -47,8 +47,8 @@ private fun Route.bygningDoc() {
     install(NotarizedRoute()) {
         parameters = listOf(
             Parameter(
-                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING
-            )
+                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
         )
 
         get = GetInfo.builder {

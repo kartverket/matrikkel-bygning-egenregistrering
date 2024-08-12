@@ -11,7 +11,7 @@ class HealthRepository(private val dataSource: DataSource) {
 
         val resultSet = dataSource.executeAndMapPreparedStatement(
             sql,
-            { it.setInt(1, 1) }
+            { it.setInt(1, 1) },
         ) { res -> res.getInt(1) }
 
         return resultSet.isNotEmpty()

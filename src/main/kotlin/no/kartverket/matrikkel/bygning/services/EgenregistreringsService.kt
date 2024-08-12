@@ -11,10 +11,9 @@ class EgenregistreringsService {
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
     fun addEgenregistreringToBygning(bygning: Bygning, egenregistrering: EgenregistreringRequest): Boolean {
-        val isAllBruksenheterRegisteredOnCorrectBygning =
-            egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
-                bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
-            }
+        val isAllBruksenheterRegisteredOnCorrectBygning = egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
+            bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
+        }
 
         if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
 
@@ -27,7 +26,7 @@ class EgenregistreringsService {
                 byggeaar = egenregistrering.bygningsRegistrering.byggeaar,
                 vannforsyning = egenregistrering.bygningsRegistrering.vannforsyning,
                 avlop = egenregistrering.bygningsRegistrering.avlop,
-            )
+            ),
         )
 
         egenregistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
@@ -37,7 +36,7 @@ class EgenregistreringsService {
                     bruksareal = bruksenhetRegistrering.bruksareal,
                     energikilde = bruksenhetRegistrering.energikilde,
                     oppvarming = bruksenhetRegistrering.oppvarming,
-                )
+                ),
             )
         }
 

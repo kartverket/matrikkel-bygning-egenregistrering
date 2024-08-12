@@ -24,8 +24,7 @@ ktor-server-call-logging = { group = "io.ktor", name = "ktor-server-call-logging
 ktor-server-metrics-micrometer = { group = "io.ktor", name = "ktor-server-metrics-micrometer", version.ref = "ktorVersion" }
 ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version.ref = "ktorVersion" }
 ktor-serialization-kotlinx = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktorVersion" }
-
-ktor-client-content-negotation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorVersion"}
+ktor-client-content-negotation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorVersion" }
 
 hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikariVersion" }
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flywayVersion" }

@@ -6,7 +6,14 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.kartverket.matrikkel.bygning.models.kodelister.*
+import no.kartverket.matrikkel.bygning.models.kodelister.AvlopsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.models.kodelister.IKode
+import no.kartverket.matrikkel.bygning.models.kodelister.Kode
+import no.kartverket.matrikkel.bygning.models.kodelister.KodelisterResponse
+import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.toKodeList
 import kotlin.reflect.KClass
 
 fun Route.kodelisteRouting() {
@@ -19,7 +26,7 @@ fun Route.kodelisteRouting() {
                     vannforsyningsKoder = VannforsyningsKode::class.toKodeList(),
                     avlopsKoder = AvlopsKode::class.toKodeList(),
                     oppvarmingsKoder = OppvarmingsKode::class.toKodeList(),
-                )
+                ),
             )
         }
 

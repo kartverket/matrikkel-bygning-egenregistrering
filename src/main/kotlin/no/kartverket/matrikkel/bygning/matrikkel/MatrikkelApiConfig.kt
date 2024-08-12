@@ -15,10 +15,11 @@ fun createBygningClient(
         Env.isLocal() -> {
             LocalBygningClient()
         }
+
         else -> MatrikkelBygningClient(
             MatrikkelApi(
                 URI(matrikkelBaseUrl),
-            ).withAuth(matrikkelUsername, matrikkelPassword)
+            ).withAuth(matrikkelUsername, matrikkelPassword),
         )
     }
 }
