@@ -35,7 +35,7 @@ logstash-encoder = { group = "net.logstash.logback", name = "logstash-logback-en
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jacksonVersion" }
 postgres = { group = "org.postgresql", name = "postgresql", version.ref = "postgresVersion" }
-kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlinVersion" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlinVersion" }
 kompendium-core = { group = "io.bkbn", name = "kompendium-core", version.ref = "kompendiumVersion" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 
