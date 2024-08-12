@@ -10,17 +10,14 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.Bygning
-import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 
 fun Route.bygningRouting(
     bygningClient: BygningClient,
-    egenregistreringsService: EgenregistreringsService
 ) {
     route("bygninger") {
         route("{bygningId}") {
-            egenregistreringRouting(bygningClient, egenregistreringsService)
-
             bygningDoc()
+
             get {
                 val bygningId = call.parameters["bygningId"]
 
@@ -28,7 +25,6 @@ fun Route.bygningRouting(
                     call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
                     return@get
                 }
-
 
                 val bygning = bygningClient.getBygningById(bygningId.toLong())
 

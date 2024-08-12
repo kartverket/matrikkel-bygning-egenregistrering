@@ -20,8 +20,10 @@ import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 fun Route.egenregistreringRouting(
     bygningClient: BygningClient,
     egenregistreringsService: EgenregistreringsService) {
-    route("/egenregistreringer") {
+
+    route("/bygninger/{bygningId}/egenregistreringer") {
         egenregistreringBygningIdDoc()
+
         post {
             val egenregistrering = call.receive<EgenregistreringRequest>()
 
