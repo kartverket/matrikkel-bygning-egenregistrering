@@ -14,11 +14,13 @@ import kotlinx.serialization.json.Json
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.configureHTTP() {
     install(ContentNegotiation) {
-        json(Json {
-            serializersModule = KompendiumSerializersModule.module
-            encodeDefaults = true
-            explicitNulls = false
-        })
+        json(
+            Json {
+                serializersModule = KompendiumSerializersModule.module
+                encodeDefaults = true
+                explicitNulls = false
+            },
+        )
         removeIgnoredType<String>()
     }
     install(CORS) {

@@ -30,13 +30,15 @@ internal class MatrikkelBygningClient(
             val bruksenheter = matrikkelApi.storeService()
                 .getObjectsAs<MatrikkelBruksenhet>(bygning.bruksenhetIds.item, matrikkelApi.matrikkelContext)
 
-            return Bygning(bygningId = bygning.id.value,
+            return Bygning(
+                bygningId = bygning.id.value,
                 bygningNummer = bygning.bygningsnummer,
                 bruksenheter = bruksenheter.map {
                     Bruksenhet(
-                        bruksenhetId = it.id.value, bygningId = it.byggId.value
+                        bruksenhetId = it.id.value, bygningId = it.byggId.value,
                     )
-                })
+                },
+            )
         } catch (exception: ServiceException) {
             LOG.warn("Noe gikk galt under henting av bygning med id {}", bygningId, exception)
             return null
