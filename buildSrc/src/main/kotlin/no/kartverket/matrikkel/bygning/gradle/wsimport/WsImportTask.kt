@@ -2,7 +2,6 @@ package no.kartverket.matrikkel.bygning.gradle.wsimport
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.OutputDirectory

@@ -42,8 +42,8 @@ private fun Route.bygningDoc() {
         tags = setOf("Bygninger")
         parameters = listOf(
             Parameter(
-                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING
-            )
+                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
         )
 
         get = GetInfo.builder {

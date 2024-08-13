@@ -20,8 +20,8 @@ fun createBygningClient(
                 URI(config.property("matrikkel.baseUrl").getString()),
             ).withAuth(
                 config.property("matrikkel.username").getString(),
-                config.property("matrikkel.password").getString()
-            )
+                config.property("matrikkel.password").getString(),
+            ),
         )
     }
 }

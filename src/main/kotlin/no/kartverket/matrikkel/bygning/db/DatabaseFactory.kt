@@ -7,12 +7,13 @@ import org.flywaydb.core.Flyway
 import javax.sql.DataSource
 
 fun createDataSource(config: ApplicationConfig): DataSource {
-    val hikariConfig = HikariConfig().apply {
-        jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}"
-        username = config.property("storage.username").getString()
-        password = config.property("storage.password").getString()
-        maximumPoolSize = 10
-    }
+    val hikariConfig = HikariConfig()
+        .apply {
+            jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}"
+            username = config.property("storage.username").getString()
+            password = config.property("storage.password").getString()
+            maximumPoolSize = 10
+        }
     return HikariDataSource(hikariConfig)
 }
 

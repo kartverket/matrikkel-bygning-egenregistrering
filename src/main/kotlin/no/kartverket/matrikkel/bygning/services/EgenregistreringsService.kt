@@ -1,7 +1,12 @@
 package no.kartverket.matrikkel.bygning.services
 
 import io.ktor.server.plugins.requestvalidation.*
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
@@ -23,21 +28,20 @@ class EgenregistreringsService {
                     "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
                     "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
                     "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
-                    "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra
+                    "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra,
                 ).mapNotNull { (name, date) ->
                     date?.let { name to it }
                 }
 
-                val bruksenhetRegistreringDates =
-                    egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
-                        listOf(
-                            "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
-                            "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
-                            "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra
-                        ).mapNotNull { (name, date) ->
-                            date?.let { name to it }
-                        }
-                    }.flatten()
+                val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
+                    listOf(
+                        "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
+                        "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
+                        "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra,
+                    ).mapNotNull { (name, date) ->
+                        date?.let { name to it }
+                    }
+                }.flatten()
 
                 val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
 
@@ -63,10 +67,9 @@ class EgenregistreringsService {
     }
 
     fun addEgenregistreringToBygning(bygning: Bygning, egenregistrering: EgenregistreringRequest): Boolean {
-        val isAllBruksenheterRegisteredOnCorrectBygning =
-            egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
-                bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
-            }
+        val isAllBruksenheterRegisteredOnCorrectBygning = egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
+            bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
+        }
 
         if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
 
@@ -76,7 +79,7 @@ class EgenregistreringsService {
                 byggeaar = egenregistrering.bygningsRegistrering.byggeaar,
                 vannforsyning = egenregistrering.bygningsRegistrering.vannforsyning,
                 avlop = egenregistrering.bygningsRegistrering.avlop,
-            )
+            ),
         )
 
         egenregistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
@@ -86,7 +89,7 @@ class EgenregistreringsService {
                     bruksareal = bruksenhetRegistrering.bruksareal,
                     energikilde = bruksenhetRegistrering.energikilde,
                     oppvarming = bruksenhetRegistrering.oppvarming,
-                )
+                ),
             )
         }
 

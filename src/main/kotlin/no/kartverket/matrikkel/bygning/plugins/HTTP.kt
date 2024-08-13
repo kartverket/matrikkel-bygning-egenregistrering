@@ -24,11 +24,13 @@ inline fun <reified T : Any> RequestValidationConfig.addValidator(
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.configureHTTP() {
     install(ContentNegotiation) {
-        json(Json {
-            serializersModule = KompendiumSerializersModule.module
-            encodeDefaults = true
-            explicitNulls = false
-        })
+        json(
+            Json {
+                serializersModule = KompendiumSerializersModule.module
+                encodeDefaults = true
+                explicitNulls = false
+            },
+        )
         removeIgnoredType<String>()
     }
 

@@ -90,7 +90,7 @@ class MatrikkelApi(private val baseUrl: URI) {
     private class BearerTokenAuthenticator(private val bearerToken: String) : Authenticator {
         override fun invoke(requestContext: MutableMap<String, Any?>) {
             requestContext[MessageContext.HTTP_REQUEST_HEADERS] = mapOf(
-                "Authorization" to listOf("Bearer $bearerToken")
+                "Authorization" to listOf("Bearer $bearerToken"),
             )
         }
     }

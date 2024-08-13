@@ -24,15 +24,15 @@ enum class VannforsyningsKode(
     OffentligVannverk("Offentlig vannverk", "Bygget er tilknyttet offentlig vannverk"),
     TilknyttetPrivatVannverk(
         "Tilknyttet privat vannverk",
-        "Bygget er tilknyttet privat vannverk. Privat vannverk er nett som forsyner mer enn 100 personer eller 20 husstander."
+        "Bygget er tilknyttet privat vannverk. Privat vannverk er nett som forsyner mer enn 100 personer eller 20 husstander.",
     ),
     AnnenPrivatInnlagtVann(
         "Annen privat med innlagt vann",
-        "Annen privat vannforsyning, bygget har innlagt vann"
+        "Annen privat vannforsyning, bygget har innlagt vann",
     ),
     AnnenPrivatIkkeInnlagtVann(
         "Annen privat men ikke innlagt vann",
-        "Annen privat vannforsyning, bygget har ikke innlagt vann"
+        "Annen privat vannforsyning, bygget har ikke innlagt vann",
     )
 }
 
@@ -53,7 +53,7 @@ enum class EnergikildeKode(
 ) : IKode {
     AnnenEnergikilde(
         "Annen energikilde",
-        "Energikildekode for annen energikilde enn de som har ferdigdefinerte koder"
+        "Energikildekode for annen energikilde enn de som har ferdigdefinerte koder",
     ),
     Biobrensel("Biobrensel", "Energikildekode for biobrensel"),
     Elektrisitet("Elektrisitet", "Energikildekode for elektrisitet"),
@@ -91,7 +91,7 @@ inline fun <reified T> KClass<T>.toKodeList(): List<Kode> where T : Enum<T>, T :
         Kode(
             kode = it.name,
             presentasjonsnavn = it.presentasjonsnavn,
-            beskrivelse = it.beskrivelse
+            beskrivelse = it.beskrivelse,
         )
     }
 }
