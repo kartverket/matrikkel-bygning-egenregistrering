@@ -14,7 +14,15 @@ data class RegistreringMetadataRequest(
     val registreringstidspunkt: Instant,
     val gyldigFra: LocalDate?,
     val gyldigTil: LocalDate?,
-)
+) {
+    init {
+        if (gyldigFra != null && gyldigTil != null) {
+            require(gyldigTil >= gyldigFra) {
+                "Gyldig til dato kan ikke være satt til før/samtidig som gyldig fra dato"
+            }
+        }
+    }
+}
 
 @Serializable
 data class ByggeaarRegistrering(
@@ -73,18 +81,3 @@ enum class EgenregistreringValidationError(val errorMessage: String) {
     BygningDoesNotExist("Bygningen finnes ikke i matrikkelen"),
     BruksenhetIsNotConnectedToBygning("Bruksenheten finnes ikke i bygningen")
 }
-
-fun EgenregistreringValidationError.toErrorResponse(field: String?): EgenregistreringValidationErrorResponse {
-    return EgenregistreringValidationErrorResponse(
-        this.name,
-        this.errorMessage,
-        field = field
-    )
-}
-
-@Serializable
-data class EgenregistreringValidationErrorResponse(
-    val code: String,
-    val description: String,
-    val field: String?,
-)

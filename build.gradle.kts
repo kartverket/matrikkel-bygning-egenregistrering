@@ -39,6 +39,7 @@ dependencies {
 
     // Monitoring
     implementation(libs.ktor.server.call.logging)
+    implementation(libs.ktor.server.call.id)
     implementation(libs.ktor.server.metrics.micrometer)
     implementation(libs.micrometer.prometheus)
 
@@ -49,7 +50,6 @@ dependencies {
 
     // Serialization
     implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.ktor.server.request.validation)
     implementation(libs.ktor.serialization.kotlinx)
     implementation(libs.kotlinx.datetime)
 

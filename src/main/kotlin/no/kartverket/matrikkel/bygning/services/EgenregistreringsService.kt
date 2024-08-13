@@ -1,6 +1,5 @@
 package no.kartverket.matrikkel.bygning.services
 
-import io.ktor.server.plugins.requestvalidation.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -12,6 +11,7 @@ import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringValidationError
+import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 
 class EgenregistreringsService {
     private val bygningRegistreringer: MutableList<BygningsRegistrering> = mutableListOf()
@@ -21,48 +21,74 @@ class EgenregistreringsService {
         const val EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR = 1700
 
         fun validateEgenregistreringRequest(
+            egenregistrering: EgenregistreringRequest,
             today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        ): suspend (EgenregistreringRequest) -> ValidationResult {
-            return { egenregistrering ->
-                val bygningRegistreringDates = listOf(
-                    "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
-                    "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
-                    "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
-                    "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra,
+        ): List<ErrorDetail> {
+
+            val bygningRegistreringDates = listOf(
+                "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
+                "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
+                "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
+                "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra,
+            ).mapNotNull { (name, date) ->
+                date?.let { name to it }
+            }
+
+            val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
+                listOf(
+                    "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
+                    "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
+                    "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra,
                 ).mapNotNull { (name, date) ->
                     date?.let { name to it }
                 }
+            }.flatten()
 
-                val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
-                    listOf(
-                        "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
-                        "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
-                        "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra,
-                    ).mapNotNull { (name, date) ->
-                        date?.let { name to it }
-                    }
-                }.flatten()
+            val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
 
-                val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
+            val errorDetails = mutableListOf<ErrorDetail>()
 
-                val errors = (bygningRegistreringDates + bruksenhetRegistreringDates).mapNotNull { (field, date) ->
-                    // TODO Look into how to format this string to give best status page formatting
-                    if (date.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
-                        return@mapNotNull "$field: ${EgenregistreringValidationError.DateTooEarly.errorMessage}"
-                    }
-
-                    if (date > inSixMonths) {
-                        return@mapNotNull "$field: ${EgenregistreringValidationError.DateTooLate.errorMessage}"
-                    }
-                    return@mapNotNull null
+            bygningRegistreringDates.forEach { (field, date) ->
+                if (date.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
+                    errorDetails.add(
+                        ErrorDetail(
+                            pointer = "bygningRegistreringer.$field.metadata",
+                            detail = EgenregistreringValidationError.DateTooEarly.errorMessage,
+                        ),
+                    )
                 }
 
-                if (errors.isNotEmpty()) {
-                    ValidationResult.Invalid(errors)
-                } else {
-                    ValidationResult.Valid
+                if (date > inSixMonths) {
+                    errorDetails.add(
+                        ErrorDetail(
+                            pointer = "bygningRegistreringer.$field.metadata",
+                            detail = EgenregistreringValidationError.DateTooLate.errorMessage,
+                        ),
+                    )
                 }
             }
+
+            bruksenhetRegistreringDates.forEachIndexed { index, (field, date) ->
+                if (date.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
+                    errorDetails.add(
+                        ErrorDetail(
+                            pointer = "bruksenhetRegistreringer[$index].$field.metadata",
+                            detail = EgenregistreringValidationError.DateTooEarly.errorMessage,
+                        ),
+                    )
+                }
+
+                if (date > inSixMonths) {
+                    errorDetails.add(
+                        ErrorDetail(
+                            pointer = "bruksenhetRegistreringer[$index].$field.metadata",
+                            detail = EgenregistreringValidationError.DateTooLate.errorMessage,
+                        ),
+                    )
+                }
+            }
+
+            return errorDetails.toList()
         }
     }
 
