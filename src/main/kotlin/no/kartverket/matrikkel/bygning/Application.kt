@@ -1,13 +1,9 @@
 package no.kartverket.matrikkel.bygning
 
 import io.bkbn.kompendium.core.routes.swagger
-import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
@@ -42,26 +38,10 @@ fun main() {
     ).start(wait = true)
 }
 
-inline fun <reified T : Any> RequestValidationConfig.addValidator(
-    noinline validator: suspend (T) -> ValidationResult
-) {
-    validate<T>(validator)
-}
-
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
 fun Application.mainModule() {
     val config = loadConfiguration(environment)
-
-    install(RequestValidation) {
-        addValidator(EgenregistreringsService.validateEgenregistreringRequest())
-    }
-
-    install(StatusPages) {
-        exception<RequestValidationException> { call, cause ->
-            call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
-        }
-    }
 
     configureHTTP()
     configureMonitoring()

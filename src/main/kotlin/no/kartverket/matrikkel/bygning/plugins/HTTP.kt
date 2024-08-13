@@ -7,9 +7,19 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.requestvalidation.*
+import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+
+inline fun <reified T : Any> RequestValidationConfig.addValidator(
+    noinline validator: suspend (T) -> ValidationResult
+) {
+    validate<T>(validator)
+}
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.configureHTTP() {
@@ -21,6 +31,17 @@ fun Application.configureHTTP() {
         })
         removeIgnoredType<String>()
     }
+
+    install(RequestValidation) {
+        addValidator(EgenregistreringsService.validateEgenregistreringRequest())
+    }
+
+    install(StatusPages) {
+        exception<RequestValidationException> { call, cause ->
+            call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
+        }
+    }
+
     install(CORS) {
         anyHost()
         allowHeader(HttpHeaders.ContentType)
