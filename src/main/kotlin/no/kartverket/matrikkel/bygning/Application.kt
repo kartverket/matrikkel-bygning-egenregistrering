@@ -1,39 +1,31 @@
 package no.kartverket.matrikkel.bygning
 
-import io.bkbn.kompendium.core.plugin.NotarizedApplication
-import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
-import io.bkbn.kompendium.oas.OpenApiSpec
-import io.bkbn.kompendium.oas.info.Info
-import io.bkbn.kompendium.oas.serialization.KompendiumSerializersModule
+import io.bkbn.kompendium.core.routes.swagger
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.config.*
 import io.ktor.server.engine.*
-import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
-import io.ktor.server.plugins.callloging.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
-import no.kartverket.matrikkel.bygning.db.DatabaseConfig
-import no.kartverket.matrikkel.bygning.db.createHikariDataSource
+import no.kartverket.matrikkel.bygning.db.createDataSource
 import no.kartverket.matrikkel.bygning.db.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.matrikkel.createBygningClient
+import no.kartverket.matrikkel.bygning.plugins.configureHTTP
+import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
+import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
-import no.kartverket.matrikkel.bygning.routes.installInternalRouting
-import no.kartverket.matrikkel.bygning.routes.v1.installBaseRouting
+import no.kartverket.matrikkel.bygning.routes.internalRouting
+import no.kartverket.matrikkel.bygning.routes.v1.bygningRouting
+import no.kartverket.matrikkel.bygning.routes.v1.dummyRouting
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistreringRouting
+import no.kartverket.matrikkel.bygning.routes.v1.kodelisteRouting
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
 import no.kartverket.matrikkel.bygning.services.HealthService
-import javax.sql.DataSource
 
 fun main() {
     embeddedServer(
@@ -58,18 +50,8 @@ inline fun <reified T : Any> RequestValidationConfig.addValidator(
 
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
-@OptIn(ExperimentalSerializationApi::class)
 fun Application.mainModule() {
     val config = loadConfiguration(environment)
-
-    install(ContentNegotiation) {
-        json(Json {
-            serializersModule = KompendiumSerializersModule.module
-            encodeDefaults = true
-            explicitNulls = false
-        })
-        removeIgnoredType<String>()
-    }
 
     install(RequestValidation) {
         addValidator(EgenregistreringsService.validateEgenregistreringRequest())
@@ -81,76 +63,41 @@ fun Application.mainModule() {
         }
     }
 
-    install(CORS) {
-        anyHost()
-        allowHeader(HttpHeaders.ContentType)
-    }
-
-    install(CallLogging) {
-        filter { call ->
-            call.request.path().startsWith("/v1")
-        }
-    }
-
-    install(NotarizedApplication()) {
-        spec = OpenApiSpec(
-            jsonSchemaDialect = "https://spec.openapis.org/oas/3.1/dialect/base", info = Info(
-                title = "API For Egenregistrering av Bygningsdata",
-                version = "0.1",
-            )
-        )
-        schemaConfigurator = KotlinXSchemaConfigurator()
-    }
-
-
-    install(MicrometerMetrics) {
-        registry = meterRegistry
-    }
+    configureHTTP()
+    configureMonitoring()
+    configureOpenAPI()
 
     val dataSource = createDataSource(config)
 
-    val bygningClient = createBygningClient(
-        config.property("matrikkel.baseUrl").getString(),
-        config.property("matrikkel.username").getString(),
-        config.property("matrikkel.password").getString(),
-    )
+    val bygningClient = createBygningClient(config)
 
     val egenregistreringsService = EgenregistreringsService()
 
-    installBaseRouting(
-        bygningClient = bygningClient,
-        egenregistreringsService = egenregistreringsService
-    )
+    routing {
+        swagger()
+
+        // TODO Remove after checking connection between Egenreg and Bygning
+        dummyRouting()
+        route("v1") {
+            kodelisteRouting()
+            route("bygninger") {
+                bygningRouting(bygningClient)
+                egenregistreringRouting(bygningClient, egenregistreringsService)
+            }
+        }
+    }
 
     runFlywayMigrations(dataSource)
 }
 
-
 fun Application.internalModule() {
     val config = loadConfiguration(environment)
 
-    install(MicrometerMetrics) {
-        registry = meterRegistry
-    }
+    configureMonitoring()
 
     val dataSource = createDataSource(config)
     val healthRepository = HealthRepository(dataSource)
     val healthService = HealthService(healthRepository)
 
-    installInternalRouting(
-        meterRegistry = meterRegistry,
-        healthService = healthService,
-    )
-}
-
-private fun createDataSource(config: ApplicationConfig): DataSource {
-    return createHikariDataSource(
-        DatabaseConfig(
-            driverClassName = "org.postgresql.Driver",
-            jdbcUrl = "jdbc:${config.property("storage.jdbcURL").getString()}",
-            username = config.property("storage.username").getString(),
-            password = config.property("storage.password").getString(),
-            maxPoolSize = 10
-        )
-    )
+    internalRouting(meterRegistry, healthService)
 }

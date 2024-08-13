@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
 fun loadConfiguration(environment: ApplicationEnvironment): ApplicationConfig =
-    // Any properties set in tests or similar will be used first, then fall back to config from application.conf
     configLocation()
         .let {
             log.info("Loading configuration using file: {}", it)
+            // Any properties set in tests or similar will be used first, then fall back to config from configLocation
             environment.config.withFallback(ApplicationConfig(it))
         }
 
