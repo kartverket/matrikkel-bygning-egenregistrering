@@ -10,83 +10,42 @@ import io.ktor.server.plugins.callid.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.util.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringValidationError
 import no.kartverket.matrikkel.bygning.models.requests.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataRequest
-import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import no.kartverket.matrikkel.bygning.models.Result.ErrorResult
+import no.kartverket.matrikkel.bygning.models.Result.Success
 
-fun Route.egenregistreringRouting(
-    bygningClient: BygningClient, egenregistreringsService: EgenregistreringsService
-) {
+fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
     route("{bygningId}/egenregistreringer") {
         egenregistreringBygningIdDoc()
 
         post {
             val egenregistrering = call.receive<EgenregistreringRequest>()
+            val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-            val bygningId = call.parameters["bygningId"]
-
-            if (bygningId == null) {
-                call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
-                return@post
-            }
-
-            val validationErrors = EgenregistreringsService.validateEgenregistreringRequest(egenregistrering).toMutableList()
-
-            val bygningFromMatrikkel = bygningClient.getBygningById(bygningId.toLong())
-
-            if (bygningFromMatrikkel == null) {
-                validationErrors.add(
-                    ErrorDetail(
-                        detail = EgenregistreringValidationError.BygningDoesNotExist.errorMessage,
-                    ),
+            when (val result = egenregistreringsService.addEgenregistreringToBygning(bygningId, egenregistrering)) {
+                is Success -> call.respondText(
+                    "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.Created,
                 )
-            }
-
-            if (validationErrors.isNotEmpty()) {
-                call.respond(
+                is ErrorResult -> call.respond(
                     status = HttpStatusCode.BadRequest,
                     ErrorResponse.ValidationError(
                         correlationId = call.callId,
-                        errorDetails = validationErrors,
+                        errorDetails = result.errors,
                     ),
                 )
-                return@post
             }
-
-            if (bygningFromMatrikkel != null) {
-                val addedEgenregistrering = egenregistreringsService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
-
-                if (addedEgenregistrering) {
-                    call.respondText(
-                        "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.Created,
-                    )
-                } else {
-                    call.respond(
-                        status = HttpStatusCode.BadRequest,
-                        ErrorResponse.ValidationError(
-                            correlationId = call.callId,
-                            errorDetails = listOf(
-                                ErrorDetail(
-                                    detail = EgenregistreringValidationError.BruksenhetIsNotConnectedToBygning.errorMessage,
-                                ),
-                            ),
-                        ),
-                    )
-                }
-            }
-
         }
     }
 }

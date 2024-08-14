@@ -8,8 +8,9 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.util.*
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
-import no.kartverket.matrikkel.bygning.models.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.Bygning
 
 fun Route.bygningRouting(
     bygningClient: BygningClient,
@@ -18,21 +19,12 @@ fun Route.bygningRouting(
         bygningDoc()
 
         get {
-            val bygningId = call.parameters["bygningId"]
+            val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-            if (bygningId == null) {
-                call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
-                return@get
-            }
+            val bygning = bygningClient.getBygningById(bygningId)
+                ?: call.respondText("Fant ingen bygninger med id $bygningId", status = HttpStatusCode.NotFound)
 
-            val bygning = bygningClient.getBygningById(bygningId.toLong())
-
-            if (bygning != null) {
-                call.respond(bygning)
-            } else {
-                call.respondText("Fant ingen bygninger med id $bygningId", status = HttpStatusCode.NotFound)
-            }
-
+            call.respond(bygning)
         }
     }
 }

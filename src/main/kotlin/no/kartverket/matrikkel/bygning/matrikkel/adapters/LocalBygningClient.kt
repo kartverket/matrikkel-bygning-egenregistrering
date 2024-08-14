@@ -1,8 +1,8 @@
 package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
-import no.kartverket.matrikkel.bygning.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.models.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.Bruksenhet
+import no.kartverket.matrikkel.bygning.matrikkel.Bygning
 
 internal class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(

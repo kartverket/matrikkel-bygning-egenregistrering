@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.models
+package no.kartverket.matrikkel.bygning.matrikkel
 
 import kotlinx.serialization.Serializable
 

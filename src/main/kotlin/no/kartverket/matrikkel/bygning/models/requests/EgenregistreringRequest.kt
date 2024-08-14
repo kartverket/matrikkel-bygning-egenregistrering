@@ -7,7 +7,6 @@ import no.kartverket.matrikkel.bygning.models.kodelister.AvlopsKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingsKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningsKode
-import no.kartverket.matrikkel.bygning.services.EgenregistreringsService.Validator.EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR
 
 @Serializable
 data class RegistreringMetadataRequest(
@@ -74,10 +73,3 @@ data class BruksenhetRegistrering(
 data class EgenregistreringRequest(
     val bygningsRegistrering: BygningsRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>
 )
-
-enum class EgenregistreringValidationError(val errorMessage: String) {
-    DateTooEarly("Gyldighetsdato er satt til å være for langt bak i tid, tidligste mulige registrering er $EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR"),
-    DateTooLate("Gyldighetsdato er satt til å være for langt frem i tid"),
-    BygningDoesNotExist("Bygningen finnes ikke i matrikkelen"),
-    BruksenhetIsNotConnectedToBygning("Bruksenheten finnes ikke i bygningen")
-}

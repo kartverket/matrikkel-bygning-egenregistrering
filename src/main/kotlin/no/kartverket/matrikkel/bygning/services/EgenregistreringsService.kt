@@ -1,104 +1,55 @@
 package no.kartverket.matrikkel.bygning.services
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.plus
-import kotlinx.datetime.todayIn
-import no.kartverket.matrikkel.bygning.models.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
+import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringValidationError
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 
-class EgenregistreringsService {
+class EgenregistreringsService(private val bygningClient: BygningClient) {
     private val bygningRegistreringer: MutableList<BygningsRegistrering> = mutableListOf()
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
-    companion object Validator {
-        const val EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR = 1700
+    fun addEgenregistreringToBygning(bygningId: Long, egenregistrering: EgenregistreringRequest): Result<Unit> {
+        val validationErrors = EgenregistreringValidationService.validateEgenregistreringRequest(egenregistrering)
 
-        fun validateEgenregistreringRequest(
-            egenregistrering: EgenregistreringRequest,
-            today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        ): List<ErrorDetail> {
+        if (validationErrors.isNotEmpty()) {
+            return Result.ErrorResult(validationErrors)
+        }
 
-            val bygningRegistreringDates = listOf(
-                "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
-                "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
-                "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
-                "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra,
-            ).mapNotNull { (name, date) ->
-                date?.let { name to it }
+        val bygning = bygningClient.getBygningById(bygningId)
+            ?: return Result.ErrorResult(
+                ErrorDetail(
+                    detail = "Bygningen finnes ikke i matrikkelen",
+                ),
+            )
+
+        return when (alleBruksenheterErRegistrertPaaKorrektBygning(egenregistrering, bygning)) {
+            true -> {
+                addEgenregistreringToBygning(egenregistrering)
+                addEgenregistreringToBruksenhet(egenregistrering)
+                Result.Success(Unit)
             }
-
-            val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
-                listOf(
-                    "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
-                    "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
-                    "energikilde" to bruksenhetRegistrering.energikilde?.metadata?.gyldigFra,
-                ).mapNotNull { (name, date) ->
-                    date?.let { name to it }
-                }
-            }.flatten()
-
-            val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
-
-            val errorDetails = mutableListOf<ErrorDetail>()
-
-            bygningRegistreringDates.forEach { (field, date) ->
-                if (date.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
-                    errorDetails.add(
-                        ErrorDetail(
-                            pointer = "bygningRegistreringer.$field.metadata",
-                            detail = EgenregistreringValidationError.DateTooEarly.errorMessage,
-                        ),
-                    )
-                }
-
-                if (date > inSixMonths) {
-                    errorDetails.add(
-                        ErrorDetail(
-                            pointer = "bygningRegistreringer.$field.metadata",
-                            detail = EgenregistreringValidationError.DateTooLate.errorMessage,
-                        ),
-                    )
-                }
+            false -> {
+                Result.ErrorResult(
+                    ErrorDetail(
+                        detail = "Bruksenheten finnes ikke i bygningen",
+                    ),
+                )
             }
-
-            bruksenhetRegistreringDates.forEachIndexed { index, (field, date) ->
-                if (date.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
-                    errorDetails.add(
-                        ErrorDetail(
-                            pointer = "bruksenhetRegistreringer[$index].$field.metadata",
-                            detail = EgenregistreringValidationError.DateTooEarly.errorMessage,
-                        ),
-                    )
-                }
-
-                if (date > inSixMonths) {
-                    errorDetails.add(
-                        ErrorDetail(
-                            pointer = "bruksenhetRegistreringer[$index].$field.metadata",
-                            detail = EgenregistreringValidationError.DateTooLate.errorMessage,
-                        ),
-                    )
-                }
-            }
-
-            return errorDetails.toList()
         }
     }
 
-    fun addEgenregistreringToBygning(bygning: Bygning, egenregistrering: EgenregistreringRequest): Boolean {
-        val isAllBruksenheterRegisteredOnCorrectBygning = egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
-            bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
-        }
+    private fun alleBruksenheterErRegistrertPaaKorrektBygning(
+        egenregistrering: EgenregistreringRequest,
+        bygning: Bygning
+    ) = egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
+        bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
+    }
 
-        if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
-
+    private fun addEgenregistreringToBygning(egenregistrering: EgenregistreringRequest) {
         bygningRegistreringer.add(
             BygningsRegistrering(
                 bruksareal = egenregistrering.bygningsRegistrering.bruksareal,
@@ -107,7 +58,9 @@ class EgenregistreringsService {
                 avlop = egenregistrering.bygningsRegistrering.avlop,
             ),
         )
+    }
 
+    private fun addEgenregistreringToBruksenhet(egenregistrering: EgenregistreringRequest) {
         egenregistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
             bruksenhetRegistreringer.add(
                 BruksenhetRegistrering(
@@ -118,8 +71,5 @@ class EgenregistreringsService {
                 ),
             )
         }
-
-        return true
     }
-
 }
