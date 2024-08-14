@@ -12,7 +12,7 @@ import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 class EgenregistreringValidationService {
 
     companion object Validator {
-        const val EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR = 1700
+        private const val EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR = 1700
 
         fun validateEgenregistreringRequest(
             egenregistrering: EgenregistreringRequest,

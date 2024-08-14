@@ -62,6 +62,9 @@ dependencies {
     // OpenAPI
     implementation(libs.kompendium.core)
 
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.assertj)
+
     // Integration tests
     intTestImplementation(libs.kotlin.test)
     intTestImplementation(libs.ktor.server.tests)
