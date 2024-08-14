@@ -26,23 +26,20 @@ class EgenregistreringsService(private val bygningClient: BygningClient) {
                 ),
             )
 
-        return when (alleBruksenheterErRegistrertPaaKorrektBygning(egenregistrering, bygning)) {
-            true -> {
-                addEgenregistreringToBygning(egenregistrering)
-                addEgenregistreringToBruksenhet(egenregistrering)
-                Result.Success(Unit)
-            }
-            false -> {
-                Result.ErrorResult(
-                    ErrorDetail(
-                        detail = "Bruksenheten finnes ikke i bygningen",
-                    ),
-                )
-            }
+        if (!isAllBruksenheterRegisteredOnCorrectBygning(egenregistrering, bygning)) {
+            return Result.ErrorResult(
+                ErrorDetail(
+                    detail = "Bruksenheten finnes ikke i bygningen",
+                ),
+            )
         }
+
+        addEgenregistreringToBygning(egenregistrering)
+        addEgenregistreringToBruksenhet(egenregistrering)
+        return Result.Success(Unit)
     }
 
-    private fun alleBruksenheterErRegistrertPaaKorrektBygning(
+    private fun isAllBruksenheterRegisteredOnCorrectBygning(
         egenregistrering: EgenregistreringRequest,
         bygning: Bygning
     ) = egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
