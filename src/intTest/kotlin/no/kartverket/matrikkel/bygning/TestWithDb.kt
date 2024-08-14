@@ -55,9 +55,7 @@ abstract class TestWithDb {
                     "storage.jdbcURL" to postgresSQLContainer.jdbcUrl.removePrefix("jdbc:"),
                     "storage.username" to postgresSQLContainer.username,
                     "storage.password" to postgresSQLContainer.password,
-                    "matrikkel.baseUrl" to "",
-                    "matrikkel.username" to "",
-                    "matrikkel.password" to "",
+                    "matrikkel.useStub" to "true",
                 )
             }
         }

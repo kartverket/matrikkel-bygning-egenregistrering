@@ -18,7 +18,7 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as Mat
 internal class MatrikkelBygningClient(
     val matrikkelApi: MatrikkelApi.WithAuth
 ) : BygningClient {
-    private val LOG: Logger = LoggerFactory.getLogger(MatrikkelBygningClient::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     override fun getBygningById(id: Long): Bygning? {
         val bygningId: BygningId = BygningId().apply { value = id }
@@ -40,7 +40,7 @@ internal class MatrikkelBygningClient(
                 },
             )
         } catch (exception: ServiceException) {
-            LOG.warn("Noe gikk galt under henting av bygning med id {}", bygningId, exception)
+            log.warn("Noe gikk galt under henting av bygning med id {}", bygningId, exception)
             return null
         }
     }
@@ -51,7 +51,7 @@ internal class MatrikkelBygningClient(
 
             return getBygningById(bygningId.value)
         } catch (exception: ServiceException) {
-            LOG.warn("Noe gikk galt under henting av bygning med nummer {}", bygningNummer, exception)
+            log.warn("Noe gikk galt under henting av bygning med nummer {}", bygningNummer, exception)
             return null
         }
     }

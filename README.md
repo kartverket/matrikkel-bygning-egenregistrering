@@ -25,6 +25,20 @@ $ docker-compose up db -d
 
 Flagget `-d` gjør at loggene fra containeren ikke skrives til stdout. Dersom du ønsker det kan du droppe flagget.
 
+### Integrasjon mot matrikkel APIet
+
+Som standard brukes det en stub/mock mot matrikkel APIet når applikasjonen kjører lokalt. 
+For å endre til å gå mot et faktisk kjørende matrikkel, må propertien `matrikkel.useStub` settes til `false`
+i [application-local.conf](./src/main/resources/application-local.conf)
+
+I tillegg må følgende miljøvariabler være satt (f.eks. i Run Configurations i IntelliJ)
+
+```
+MATRIKKEL_BASE_URL // Kan settes for å overstyre default miljø
+MATRIKKEL_USERNAME
+MATRIKKEL_PASSWORD
+```
+
 ### Kjøring av applikasjon
 
 Når databasen kjører, kan du kjøre opp applikasjonen enten lokalt, eller som en Docker container.
