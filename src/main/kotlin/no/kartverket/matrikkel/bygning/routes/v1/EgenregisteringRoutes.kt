@@ -14,6 +14,8 @@ import io.ktor.server.util.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import no.kartverket.matrikkel.bygning.models.Result.ErrorResult
+import no.kartverket.matrikkel.bygning.models.Result.Success
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
@@ -23,8 +25,6 @@ import no.kartverket.matrikkel.bygning.models.requests.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataRequest
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
-import no.kartverket.matrikkel.bygning.models.Result.ErrorResult
-import no.kartverket.matrikkel.bygning.models.Result.Success
 
 fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
     route("{bygningId}/egenregistreringer") {

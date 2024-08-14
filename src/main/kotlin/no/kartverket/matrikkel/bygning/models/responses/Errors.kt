@@ -38,4 +38,13 @@ sealed class ErrorResponse(
         title = "Formateringsfeil",
         detail = "Requesten din inneholdt én eller flere felter som ikke var formatert riktig. Se listen over feil for flere detaljer",
     )
+
+    @Serializable
+    class InternalServerError(
+        override val correlationId: String?, override val errorDetails: List<ErrorDetail>
+    ) : ErrorResponse(
+        status = HttpStatusCode.InternalServerError.value,
+        title = "Serverfeil",
+        detail = "Noe har gått galt på serveren. Ta kontakt med Kartverket hvis feilen vedvarer",
+    )
 }
