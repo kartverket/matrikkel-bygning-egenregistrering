@@ -51,7 +51,7 @@ fun Application.mainModule() {
 
     val bygningClient = createBygningClient(config)
 
-    val egenregistreringsService = EgenregistreringsService()
+    val egenregistreringsService = EgenregistreringsService(bygningClient)
 
     routing {
         swagger()
@@ -62,7 +62,7 @@ fun Application.mainModule() {
             kodelisteRouting()
             route("bygninger") {
                 bygningRouting(bygningClient)
-                egenregistreringRouting(bygningClient, egenregistreringsService)
+                egenregistreringRouting(egenregistreringsService)
             }
         }
     }
