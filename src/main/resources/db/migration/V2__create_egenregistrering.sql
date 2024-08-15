@@ -1,84 +1,46 @@
-create table bygning (
-
+CREATE TABLE bygning
+(
+    id BIGINT PRIMARY KEY
 );
 
-create table bruksenhet (
-
+CREATE TABLE bruksenhet
+(
+    id         BIGINT PRIMARY KEY,
+    bygning_id BIGINT NOT NULL REFERENCES bygning (id)
 );
 
-create table egenregistrering (
-    id,
-    metadata her?
+CREATE TABLE egenregistrering
+(
+    id          BIGSERIAL    PRIMARY KEY,
+    registrerer VARCHAR(255) NOT NULL
 );
 
-create table registrering (
-    id,
-    egenregistrering_id,
-    registreringsTidspunkt,
-    gyldigFra?,
-    gyldigTil?
+-- Er dette noe nice måte å gjøre det på? Da slipper man at alle de forskjellige feltene man kan registrere
+-- må definere registreringsmetadata
+CREATE TABLE registrering
+(
+    id                     BIGSERIAL                PRIMARY KEY,
+    egenregistrering_id    BIGINT                   NOT NULL REFERENCES egenregistrering (id),
+    registrering_objekt_id BIGINT                   NOT NULL,
+    registrering_tidspunkt TIMESTAMP WITH TIME ZONE NOT NULL,
+    gyldig_fra             DATE,
+    gyldig_til             DATE
 );
 
-create table byggeaarregistrering (
-    id = registering_id (slipper at alle de forskjellige registreringstabellene må inneholde de samme feltene?),
-    byggeaar,
-);
+--- Dette er ikke mulig, da den forventer å referere til noe som finnes i både bygninger og bruksenheter
+--- Hvordan kan vi gjøre noe liknende på en god måte?
+-- ALTER TABLE registrering
+--     ADD CONSTRAINT fk_registrering_objekt_bygning
+--         FOREIGN KEY (registrering_objekt_id)
+--             REFERENCES bygning (id);
+--
+-- ALTER TABLE registrering
+--     ADD CONSTRAINT fk_registrering_objekt_bruksenhet
+--         FOREIGN KEY (registrering_objekt_id)
+--             REFERENCES bruksenhet (id);
 
---
--- @Serializable
--- data class RegistreringMetadataRequest(
---     val registreringstidspunkt: Instant,
---     val gyldigFra: LocalDate?,
---     val gyldigTil: LocalDate?,
--- )
---
--- @Serializable
--- data class ByggeaarRegistrering(
---     val byggeaar: Int, val metadata: RegistreringMetadataRequest
--- )
---
--- @Serializable
--- data class BruksarealRegistrering(
---     val bruksareal: Double, val metadata: RegistreringMetadataRequest
--- )
---
--- @Serializable
--- data class VannforsyningsRegistrering(
---     val vannforsyning: VannforsyningsKode, val metadata: RegistreringMetadataRequest
--- )
---
--- @Serializable
--- data class AvlopRegistrering(
---     val avlop: AvlopsKode, val metadata: RegistreringMetadataRequest
--- )
---
--- @Serializable
--- data class EnergikildeRegistrering(
---     val energikilder: List<EnergikildeKode>, val metadata: RegistreringMetadataRequest
--- )
---
--- @Serializable
--- data class OppvarmingRegistrering(
---     val oppvarminger: List<OppvarmingsKode>, val metadata: RegistreringMetadataRequest
--- )
---
--- @Serializable
--- data class BygningsRegistrering(
---     val bruksareal: BruksarealRegistrering?,
---     val byggeaar: ByggeaarRegistrering?,
---     val vannforsyning: VannforsyningsRegistrering?,
---     val avlop: AvlopRegistrering?
--- )
---
--- @Serializable
--- data class BruksenhetRegistrering(
---     val bruksenhetId: Long,
---     val bruksareal: BruksarealRegistrering?,
---     val energikilde: EnergikildeRegistrering?,
---     val oppvarming: OppvarmingRegistrering?
--- )
---
--- @Serializable
--- data class EgenregistreringRequest(
---     val bygningsRegistrering: BygningsRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>
--- )
+CREATE TABLE byggeaar_registrering
+(
+    id       BIGINT PRIMARY KEY REFERENCES registrering (id),
+    byggeaar INTEGER            NOT NULL
+);
