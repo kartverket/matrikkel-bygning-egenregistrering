@@ -54,7 +54,7 @@ nødvendig rundt miljøkonfigurasjon, det skal ha sane defaults.
 
 ### Integrasjonstester
 
-Prosjektet inneholder noen integrasjonstester som ligger under [src/intTest](src/intTest). Testene bruker blant annet
+Prosjektet inneholder noen integrasjonstester som ligger under [src/intTest](src/integrationTest). Testene bruker blant annet
 testcontainers for å kjøre opp en database som bruke under testene.
 
 Testene er definert med en egen task som kan kjøres slik:
