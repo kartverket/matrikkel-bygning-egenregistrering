@@ -7,7 +7,7 @@ import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestWithDb
 import no.kartverket.matrikkel.bygning.models.Bygning
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class BygningRouteTest : TestWithDb() {
 
