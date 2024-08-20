@@ -11,13 +11,11 @@ class EgenregistreringsService {
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
     fun addEgenregistreringToBygning(bygning: Bygning, egenregistrering: EgenregistreringRequest): Boolean {
-        if (egenregistrering.bruksenhetRegistreringer?.isNotEmpty() == true) {
-            val isAllBruksenheterRegisteredOnCorrectBygning = egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
-                bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
-            }
+        val isAllBruksenheterRegisteredOnCorrectBygning = egenregistrering.bruksenhetRegistreringer?.any { bruksenhetRegistering ->
+            bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
+        } ?: true
 
-            if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
-        }
+        if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
 
         // TODO Bør kunne skille alle registreringer med en ID, skal denne settes på metadataen til hver enkelt registrering?
         val egenregistreringsId = UUID.randomUUID().toString()
