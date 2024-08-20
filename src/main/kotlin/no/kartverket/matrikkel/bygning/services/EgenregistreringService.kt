@@ -4,12 +4,12 @@ import no.kartverket.matrikkel.bygning.matrikkel.Bygning
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 
-class EgenregistreringsService(private val bygningClient: BygningClient) {
-    private val bygningRegistreringer: MutableList<BygningsRegistrering> = mutableListOf()
+class EgenregistreringService(private val bygningClient: BygningClient) {
+    private val bygningRegistreringer: MutableList<BygningRegistrering> = mutableListOf()
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
     fun addEgenregistreringToBygning(bygningId: Long, egenregistrering: EgenregistreringRequest): Result<Unit> {
@@ -52,11 +52,11 @@ class EgenregistreringsService(private val bygningClient: BygningClient) {
 
     private fun addEgenregistreringToBygning(egenregistrering: EgenregistreringRequest) {
         bygningRegistreringer.add(
-            BygningsRegistrering(
-                bruksareal = egenregistrering.bygningsRegistrering.bruksareal,
-                byggeaar = egenregistrering.bygningsRegistrering.byggeaar,
-                vannforsyning = egenregistrering.bygningsRegistrering.vannforsyning,
-                avlop = egenregistrering.bygningsRegistrering.avlop,
+            BygningRegistrering(
+                bruksareal = egenregistrering.bygningRegistrering.bruksareal,
+                byggeaar = egenregistrering.bygningRegistrering.byggeaar,
+                vannforsyning = egenregistrering.bygningRegistrering.vannforsyning,
+                avlop = egenregistrering.bygningRegistrering.avlop,
             ),
         )
     }

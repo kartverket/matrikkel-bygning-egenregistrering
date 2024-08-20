@@ -20,7 +20,7 @@ import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.bygningRouting
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistreringRouting
 import no.kartverket.matrikkel.bygning.routes.v1.kodelisteRouting
-import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 import no.kartverket.matrikkel.bygning.services.HealthService
 
 fun main() {
@@ -52,7 +52,7 @@ fun Application.mainModule() {
 
     val bygningClient = createBygningClient(config)
 
-    val egenregistreringsService = EgenregistreringsService(bygningClient)
+    val egenregistreringService = EgenregistreringService(bygningClient)
 
     routing {
         swagger()
@@ -61,7 +61,7 @@ fun Application.mainModule() {
             kodelisteRouting()
             route("bygninger") {
                 bygningRouting(bygningClient)
-                egenregistreringRouting(egenregistreringsService)
+                egenregistreringRouting(egenregistreringService)
             }
         }
     }

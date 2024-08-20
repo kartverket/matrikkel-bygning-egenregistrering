@@ -19,14 +19,14 @@ import no.kartverket.matrikkel.bygning.models.Result.Success
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.models.requests.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataRequest
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
-import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 
-fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsService) {
+fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
     route("{bygningId}/egenregistreringer") {
         egenregistreringBygningIdDoc()
 
@@ -34,7 +34,7 @@ fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsSer
             val egenregistrering = call.receive<EgenregistreringRequest>()
             val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-            when (val result = egenregistreringsService.addEgenregistreringToBygning(bygningId, egenregistrering)) {
+            when (val result = egenregistreringService.addEgenregistreringToBygning(bygningId, egenregistrering)) {
                 is Success -> call.respondText(
                     "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.Created,
                 )
@@ -68,7 +68,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                 description("Egenregistrert data")
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
-                        bygningsRegistrering = BygningsRegistrering(
+                        bygningRegistrering = BygningRegistrering(
                             bruksareal = BruksarealRegistrering(
                                 bruksareal = 125.0,
                                 metadata = RegistreringMetadataRequest(
