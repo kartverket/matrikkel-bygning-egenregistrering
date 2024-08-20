@@ -1,7 +1,6 @@
 package no.kartverket.matrikkel.bygning.plugins
 
 import io.bkbn.kompendium.core.plugin.NotarizedApplication
-import io.bkbn.kompendium.json.schema.KotlinXSchemaConfigurator
 import io.bkbn.kompendium.oas.OpenApiSpec
 import io.bkbn.kompendium.oas.info.Info
 import io.ktor.server.application.*
@@ -15,6 +14,5 @@ fun Application.configureOpenAPI() {
                 version = "0.1",
             ),
         )
-        schemaConfigurator = KotlinXSchemaConfigurator()
     }
 }

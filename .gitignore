@@ -37,3 +37,5 @@ out/
 
 ### Jenv ###
 .java-version
+
+.env
