@@ -16,14 +16,14 @@ import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.models.requests.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataRequest
-import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 
 fun Route.egenregistreringRouting(
-    bygningClient: BygningClient, egenregistreringsService: EgenregistreringsService
+    bygningClient: BygningClient, egenregistreringService: EgenregistreringService
 ) {
 
     route("{bygningId}/egenregistreringer") {
@@ -46,7 +46,7 @@ fun Route.egenregistreringRouting(
                 return@post
             }
 
-            val addedEgenregistrering = egenregistreringsService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
+            val addedEgenregistrering = egenregistreringService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
 
             if (addedEgenregistrering) {
                 call.respondText(
@@ -79,7 +79,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                 description("Egenregistrert data")
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
-                        bygningsRegistrering = BygningsRegistrering(
+                        bygningRegistrering = BygningRegistrering(
                             bruksareal = BruksarealRegistrering(
                                 bruksareal = 125.0,
                                 metadata = RegistreringMetadataRequest(

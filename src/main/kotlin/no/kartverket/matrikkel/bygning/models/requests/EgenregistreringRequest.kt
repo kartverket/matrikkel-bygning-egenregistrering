@@ -3,10 +3,10 @@ package no.kartverket.matrikkel.bygning.models.requests
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.models.kodelister.AvlopsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingsKode
-import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
 
 @Serializable
 data class RegistreringMetadataRequest(
@@ -26,13 +26,13 @@ data class BruksarealRegistrering(
 )
 
 @Serializable
-data class VannforsyningsRegistrering(
-    val vannforsyning: VannforsyningsKode, val metadata: RegistreringMetadataRequest
+data class VannforsyningRegistrering(
+    val vannforsyning: VannforsyningKode, val metadata: RegistreringMetadataRequest
 )
 
 @Serializable
 data class AvlopRegistrering(
-    val avlop: AvlopsKode, val metadata: RegistreringMetadataRequest
+    val avlop: AvlopKode, val metadata: RegistreringMetadataRequest
 )
 
 @Serializable
@@ -42,14 +42,14 @@ data class EnergikildeRegistrering(
 
 @Serializable
 data class OppvarmingRegistrering(
-    val oppvarminger: List<OppvarmingsKode>, val metadata: RegistreringMetadataRequest
+    val oppvarminger: List<OppvarmingKode>, val metadata: RegistreringMetadataRequest
 )
 
 @Serializable
-data class BygningsRegistrering(
+data class BygningRegistrering(
     val bruksareal: BruksarealRegistrering?,
     val byggeaar: ByggeaarRegistrering?,
-    val vannforsyning: VannforsyningsRegistrering?,
+    val vannforsyning: VannforsyningRegistrering?,
     val avlop: AvlopRegistrering?
 )
 
@@ -63,5 +63,5 @@ data class BruksenhetRegistrering(
 
 @Serializable
 data class EgenregistreringRequest(
-    val bygningsRegistrering: BygningsRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>?
+    val bygningRegistrering: BygningRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>?
 )
