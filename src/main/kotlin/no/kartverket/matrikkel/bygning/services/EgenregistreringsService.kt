@@ -11,9 +11,9 @@ class EgenregistreringsService {
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
     fun addEgenregistreringToBygning(bygning: Bygning, egenregistrering: EgenregistreringRequest): Boolean {
-        val isAllBruksenheterRegisteredOnCorrectBygning = egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
+        val isAllBruksenheterRegisteredOnCorrectBygning = egenregistrering.bruksenhetRegistreringer?.any { bruksenhetRegistering ->
             bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
-        }
+        } ?: true
 
         if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
 
@@ -29,7 +29,7 @@ class EgenregistreringsService {
             ),
         )
 
-        egenregistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
+        egenregistrering.bruksenhetRegistreringer?.forEach { bruksenhetRegistrering ->
             bruksenhetRegistreringer.add(
                 BruksenhetRegistrering(
                     bruksenhetId = bruksenhetRegistrering.bruksenhetId,
