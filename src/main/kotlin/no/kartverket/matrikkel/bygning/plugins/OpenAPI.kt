@@ -15,8 +15,6 @@ fun Application.configureOpenAPI() {
                 version = "0.1",
             ),
         )
-        schemaConfigurator = KotlinXSchemaConfigurator(
-
-        )
+        schemaConfigurator = KotlinXSchemaConfigurator()
     }
 }

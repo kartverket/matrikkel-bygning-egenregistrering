@@ -5,14 +5,13 @@ import io.ktor.serialization.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
 
 fun Application.configureStatusPages() {
     fun ApplicationCall.getCallId(): String? {
-        return this.request.header(HttpHeaders.XRequestId)
+        return this.response.headers[HttpHeaders.XRequestId]
     }
 
     install(StatusPages) {

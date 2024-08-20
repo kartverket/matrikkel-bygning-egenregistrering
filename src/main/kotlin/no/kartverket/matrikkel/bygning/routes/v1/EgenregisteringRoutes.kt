@@ -38,11 +38,12 @@ fun Route.egenregistreringRouting(egenregistreringsService: EgenregistreringsSer
                 is Success -> call.respondText(
                     "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.Created,
                 )
+
                 is ErrorResult -> call.respond(
                     status = HttpStatusCode.BadRequest,
                     ErrorResponse.ValidationError(
                         correlationId = call.callId,
-                        errorDetails = result.errors,
+                        details = result.errors,
                     ),
                 )
             }

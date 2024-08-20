@@ -11,6 +11,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import java.util.*
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.configureHTTP() {
@@ -26,7 +27,11 @@ fun Application.configureHTTP() {
     }
 
     install(CallId) {
-        retrieveFromHeader(HttpHeaders.XRequestId)
+        generate {
+            UUID.randomUUID().toString()
+        }
+
+        header(HttpHeaders.XRequestId)
     }
 
     install(CORS) {
