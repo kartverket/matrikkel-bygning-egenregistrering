@@ -28,7 +28,7 @@ class EgenregistreringValidationService {
                 date?.let { name to it }
             }
 
-            val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
+            val bruksenhetRegistreringDates = egenregistrering.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
                 listOf(
                     "bruksareal" to bruksenhetRegistrering.bruksareal?.metadata?.gyldigFra,
                     "oppvarming" to bruksenhetRegistrering.oppvarming?.metadata?.gyldigFra,
@@ -36,7 +36,7 @@ class EgenregistreringValidationService {
                 ).mapNotNull { (name, date) ->
                     date?.let { name to it }
                 }
-            }.flatten()
+            }?.flatten()
 
             val inSixMonths = today.plus(6, DateTimeUnit.MONTH)
 
@@ -62,7 +62,7 @@ class EgenregistreringValidationService {
                 }
             }
 
-            bruksenhetRegistreringDates.forEachIndexed { index, (field, date) ->
+            bruksenhetRegistreringDates?.forEachIndexed { index, (field, date) ->
                 if (date.year <= EARLIEST_POSSIBLE_EGENREGISTRERING_YEAR) {
                     errorDetails.add(
                         ErrorDetail(

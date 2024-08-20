@@ -42,8 +42,12 @@ class EgenregistreringsService(private val bygningClient: BygningClient) {
     private fun isAllBruksenheterRegisteredOnCorrectBygning(
         egenregistrering: EgenregistreringRequest,
         bygning: Bygning
-    ) = egenregistrering.bruksenhetRegistreringer.any { bruksenhetRegistering ->
-        bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
+    ): Boolean {
+        if (egenregistrering.bruksenhetRegistreringer?.isEmpty() == true) return true
+
+        return egenregistrering.bruksenhetRegistreringer?.any { bruksenhetRegistering ->
+            bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
+        } ?: true
     }
 
     private fun addEgenregistreringToBygning(egenregistrering: EgenregistreringRequest) {
@@ -58,7 +62,7 @@ class EgenregistreringsService(private val bygningClient: BygningClient) {
     }
 
     private fun addEgenregistreringToBruksenhet(egenregistrering: EgenregistreringRequest) {
-        egenregistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
+        egenregistrering.bruksenhetRegistreringer?.forEach { bruksenhetRegistrering ->
             bruksenhetRegistreringer.add(
                 BruksenhetRegistrering(
                     bruksenhetId = bruksenhetRegistrering.bruksenhetId,

@@ -18,7 +18,6 @@ import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.bygningRouting
-import no.kartverket.matrikkel.bygning.routes.v1.dummyRouting
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistreringRouting
 import no.kartverket.matrikkel.bygning.routes.v1.kodelisteRouting
 import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
@@ -58,8 +57,6 @@ fun Application.mainModule() {
     routing {
         swagger()
 
-        // TODO Remove after checking connection between Egenreg and Bygning
-        dummyRouting()
         route("v1") {
             kodelisteRouting()
             route("bygninger") {

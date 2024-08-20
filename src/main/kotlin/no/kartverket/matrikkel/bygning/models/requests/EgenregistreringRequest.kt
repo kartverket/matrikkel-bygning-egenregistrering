@@ -71,5 +71,5 @@ data class BruksenhetRegistrering(
 
 @Serializable
 data class EgenregistreringRequest(
-    val bygningsRegistrering: BygningsRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>
+    val bygningsRegistrering: BygningsRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>?
 )
