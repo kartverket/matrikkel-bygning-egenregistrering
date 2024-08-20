@@ -15,7 +15,7 @@ import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataReque
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import no.kartverket.matrikkel.bygning.services.EgenregistreringValidationService.Validator.validateEgenregistreringRequest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import kotlin.test.Test
 
 class EgenregistreringValidationServiceTest {
     private val defaultInstant = Instant.DISTANT_PAST

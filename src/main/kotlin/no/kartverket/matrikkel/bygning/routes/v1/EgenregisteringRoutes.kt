@@ -100,7 +100,7 @@ private fun Route.egenregistreringBygningIdDoc() {
 
             }
             response {
-                responseCode(HttpStatusCode.OK)
+                responseCode(HttpStatusCode.Created)
                 responseType<String>()
                 description("Bygninger og eventuelle bruksenheter registrert")
             }

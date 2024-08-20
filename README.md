@@ -25,6 +25,20 @@ $ docker-compose up db -d
 
 Flagget `-d` gjør at loggene fra containeren ikke skrives til stdout. Dersom du ønsker det kan du droppe flagget.
 
+### Integrasjon mot matrikkel APIet
+
+Som standard brukes det en stub/mock mot matrikkel APIet når applikasjonen kjører lokalt. 
+For å endre til å gå mot et faktisk kjørende matrikkel, må propertien `matrikkel.useStub` settes til `false`
+i [application-local.conf](./src/main/resources/application-local.conf)
+
+I tillegg må følgende miljøvariabler være satt (f.eks. i Run Configurations i IntelliJ)
+
+```
+MATRIKKEL_BASE_URL // Kan settes for å overstyre default miljø
+MATRIKKEL_USERNAME
+MATRIKKEL_PASSWORD
+```
+
 ### Kjøring av applikasjon
 
 Når databasen kjører, kan du kjøre opp applikasjonen enten lokalt, eller som en Docker container.
@@ -40,7 +54,7 @@ nødvendig rundt miljøkonfigurasjon, det skal ha sane defaults.
 
 ### Integrasjonstester
 
-Prosjektet inneholder noen integrasjonstester som ligger under [src/intTest](src/intTest). Testene bruker blant annet
+Prosjektet inneholder noen integrasjonstester som ligger under [src/integrationTest](src/integrationTest). Testene bruker blant annet
 testcontainers for å kjøre opp en database som bruke under testene.
 
 Testene er definert med en egen task som kan kjøres slik:

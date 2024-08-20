@@ -1,4 +1,9 @@
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 
 plugins {
     kotlin("jvm").version(libs.versions.kotlinVersion)
@@ -6,6 +11,8 @@ plugins {
 
     alias(libs.plugins.ktor)
     alias(libs.plugins.shadow)
+
+    `jvm-test-suite`
 }
 
 allprojects {
@@ -15,17 +22,6 @@ allprojects {
 
 application {
     mainClass.set("no.kartverket.matrikkel.bygning.ApplicationKt")
-}
-
-sourceSets {
-    create("intTest") {
-        compileClasspath += sourceSets.main.get().output
-        runtimeClasspath += sourceSets.main.get().output
-    }
-}
-
-val intTestImplementation: Configuration by configurations.getting {
-    extendsFrom(configurations.implementation.get())
 }
 
 dependencies {
@@ -64,14 +60,6 @@ dependencies {
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.assertj)
-
-    // Integration tests
-    intTestImplementation(libs.kotlin.test)
-    intTestImplementation(libs.ktor.server.tests)
-    intTestImplementation(libs.ktor.client.content.negotation)
-
-    intTestImplementation(libs.assertj)
-    intTestImplementation(libs.testcontainers.postgresql)
 }
 
 tasks {
@@ -79,21 +67,37 @@ tasks {
         mergeServiceFiles()
         archiveBaseName.set("${project.name}-all")
     }
+}
 
-    check {
-        dependsOn(integrationTest)
+tasks.withType<Test> {
+    testLogging {
+        showCauses = true
+        showExceptions = true
+        exceptionFormat = TestExceptionFormat.FULL
+        events(PASSED, SKIPPED, FAILED)
     }
 }
 
-val integrationTest = task<Test>("integrationTest") {
-    description = "Runs integration tests"
-    group = "verification"
+@Suppress("UnstableApiUsage")
+testing {
+    suites {
+        withType<JvmTestSuite> {
+            useJUnitJupiter()
+        }
 
-    testClassesDirs = sourceSets["intTest"].output.classesDirs
-    classpath = sourceSets["intTest"].runtimeClasspath
-    shouldRunAfter("test")
+        register<JvmTestSuite>("integrationTest") {
+            dependencies {
+                implementation(project())
 
-    testLogging {
-        events("passed", "skipped", "failed")
+                implementation(libs.ktor.serialization.kotlinx)
+
+                implementation(libs.kotlin.test)
+                implementation(libs.ktor.server.tests)
+                implementation(libs.ktor.client.content.negotation)
+
+                implementation(libs.assertj)
+                implementation(libs.testcontainers.postgresql)
+            }
+        }
     }
 }
