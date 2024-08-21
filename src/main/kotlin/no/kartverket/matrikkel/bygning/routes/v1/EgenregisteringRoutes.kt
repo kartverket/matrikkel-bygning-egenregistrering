@@ -35,8 +35,8 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
 
             when (val result = egenregistreringService.addEgenregistreringToBygning(bygningId, egenregistrering)) {
                 is Success -> {
-                    call.respondText(
-                        "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.Created,
+                    call.respond(
+                        HttpStatusCode.Created,
                     )
                 }
 
@@ -102,8 +102,8 @@ private fun Route.egenregistreringBygningIdDoc() {
             }
             response {
                 responseCode(HttpStatusCode.Created)
-                responseType<String>()
-                description("Bygninger og eventuelle bruksenheter registrert")
+                responseType<Unit>()
+                description("Egenregistrering ble registrert")
             }
 
             canRespond {
