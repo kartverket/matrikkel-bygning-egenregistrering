@@ -10,9 +10,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import no.kartverket.matrikkel.bygning.models.Result.ErrorResult
 import no.kartverket.matrikkel.bygning.models.Result.Success
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
@@ -21,7 +18,6 @@ import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.models.requests.EnergikildeRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataRequest
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
 import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 
@@ -71,11 +67,6 @@ private fun Route.egenregistreringBygningIdDoc() {
                         bygningRegistrering = BygningRegistrering(
                             bruksareal = BruksarealRegistrering(
                                 bruksareal = 125.0,
-                                metadata = RegistreringMetadataRequest(
-                                    registreringstidspunkt = Clock.System.now(),
-                                    gyldigFra = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-                                    gyldigTil = null,
-                                ),
                             ),
                             null,
                             null,
@@ -87,11 +78,6 @@ private fun Route.egenregistreringBygningIdDoc() {
                                 null,
                                 energikilde = EnergikildeRegistrering(
                                     energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
-                                    metadata = RegistreringMetadataRequest(
-                                        registreringstidspunkt = Clock.System.now(),
-                                        gyldigFra = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-                                        gyldigTil = null,
-                                    ),
                                 ),
                                 null,
                             ),

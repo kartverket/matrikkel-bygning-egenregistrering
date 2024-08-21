@@ -13,12 +13,6 @@ class EgenregistreringService(private val bygningClient: BygningClient) {
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
     fun addEgenregistreringToBygning(bygningId: Long, egenregistrering: EgenregistreringRequest): Result<Unit> {
-        val validationErrors = EgenregistreringValidationService.validateEgenregistreringRequest(egenregistrering)
-
-        if (validationErrors.isNotEmpty()) {
-            return Result.ErrorResult(validationErrors)
-        }
-
         val bygning = bygningClient.getBygningById(bygningId)
             ?: return Result.ErrorResult(
                 ErrorDetail(
