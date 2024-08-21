@@ -20,10 +20,10 @@ class EgenregistreringValidationService {
         ): List<ErrorDetail> {
 
             val bygningRegistreringDates = listOf(
-                "avlop" to egenregistrering.bygningsRegistrering.avlop?.metadata?.gyldigFra,
-                "bruksareal" to egenregistrering.bygningsRegistrering.bruksareal?.metadata?.gyldigFra,
-                "byggeaar" to egenregistrering.bygningsRegistrering.byggeaar?.metadata?.gyldigFra,
-                "vannforsyning" to egenregistrering.bygningsRegistrering.vannforsyning?.metadata?.gyldigFra,
+                "avlop" to egenregistrering.bygningRegistrering.avlop?.metadata?.gyldigFra,
+                "bruksareal" to egenregistrering.bygningRegistrering.bruksareal?.metadata?.gyldigFra,
+                "byggeaar" to egenregistrering.bygningRegistrering.byggeaar?.metadata?.gyldigFra,
+                "vannforsyning" to egenregistrering.bygningRegistrering.vannforsyning?.metadata?.gyldigFra,
             ).mapNotNull { (name, date) ->
                 date?.let { name to it }
             }

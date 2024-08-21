@@ -9,7 +9,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import no.kartverket.matrikkel.bygning.models.requests.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.ByggeaarRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.BygningsRegistrering
+import no.kartverket.matrikkel.bygning.models.requests.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataRequest
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
@@ -23,7 +23,7 @@ class EgenregistreringValidationServiceTest {
     @Test
     fun `egenregistrering fra aar 1000 skal feile validering`() {
         val tooEarlyRegisteredEgenregistrering = EgenregistreringRequest(
-            bygningsRegistrering = BygningsRegistrering(
+            bygningRegistrering = BygningRegistrering(
                 bruksareal = BruksarealRegistrering(
                     100.0,
                     metadata = RegistreringMetadataRequest(
@@ -56,7 +56,7 @@ class EgenregistreringValidationServiceTest {
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
         val tooLateRegisteredEgenregistrering = EgenregistreringRequest(
-            bygningsRegistrering = BygningsRegistrering(
+            bygningRegistrering = BygningRegistrering(
                 bruksareal = BruksarealRegistrering(
                     100.0,
                     metadata = RegistreringMetadataRequest(
@@ -87,7 +87,7 @@ class EgenregistreringValidationServiceTest {
     @Test
     fun `egenregistrering med flere feil skal gi flere feil`() {
         val tooEarlyRegisteredEgenregistrering = EgenregistreringRequest(
-            bygningsRegistrering = BygningsRegistrering(
+            bygningRegistrering = BygningRegistrering(
                 bruksareal = BruksarealRegistrering(
                     100.0,
                     metadata = RegistreringMetadataRequest(
@@ -119,7 +119,7 @@ class EgenregistreringValidationServiceTest {
     @Test
     fun `egenregistrering med riktig formaterte datoer skal ikke gi feilmelding`() {
         val correctlyFormattedEgenregistrering = EgenregistreringRequest(
-            bygningsRegistrering = BygningsRegistrering(
+            bygningRegistrering = BygningRegistrering(
                 bruksareal = BruksarealRegistrering(
                     100.0,
                     metadata = RegistreringMetadataRequest(
