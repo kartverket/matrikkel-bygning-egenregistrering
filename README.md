@@ -10,6 +10,16 @@ fyll ut README med informasjon om dette.
 
 Prosjektet er bygd og kjørt med `temurin-21` JRE og IntelliJ default Kotlin SDK.
 
+
+### TLDR
+Vil du kjøre alt av applikasjon og database med Docker, gjør følgende:
+```shell
+$ export PORT=<PORT_NUMMER>          # Optional
+$ export INTERNAL_PORT=<PORT_NUMMER> # Optional
+$ ./gradlew build
+$ docker-compose up
+```
+
 ### Kjøring av database
 
 For å kjøre applikasjonen må du først starte en database. For lokal kjøring er det definert en postgres-database i
