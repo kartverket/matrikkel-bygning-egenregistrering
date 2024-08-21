@@ -8,23 +8,32 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+private val logger: Logger = LoggerFactory.getLogger(object {}::class.java)
 
 fun Application.configureStatusPages() {
-    fun ApplicationCall.getCallId(): String? {
-        return this.response.headers[HttpHeaders.XRequestId]
-    }
-
     install(StatusPages) {
+        exception<Throwable> { call, exception ->
+            logger.error("Noe gikk galt", exception)
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                ErrorResponse.InternalServerError(),
+            )
+        }
+
         exception<BadRequestException> { call, exception ->
-            when (exception) {
-                is MissingRequestParameterException -> {
+            logger.warn("Bad request exception", exception)
+
+            when (val cause = exception.cause) {
+                is JsonConvertException -> {
                     call.respond(
-                        HttpStatusCode.InternalServerError,
-                        ErrorResponse.InternalServerError(
-                            call.getCallId(),
-                            listOf(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse.BadRequestError(
+                            details = listOf(
                                 ErrorDetail(
-                                    detail = "Request URLen kunne ikke hente et parameter. Dette tyder på en utviklingsfeil",
+                                    detail = cause.message ?: "Ukjent feil etter serialisering av request objekt",
                                 ),
                             ),
                         ),
@@ -32,45 +41,29 @@ fun Application.configureStatusPages() {
                 }
 
                 else -> {
-                    when (val cause = exception.cause) {
-                        is JsonConvertException -> {
-                            call.respond(
-                                HttpStatusCode.BadRequest,
-                                ErrorResponse.BadRequestError(
-                                    call.getCallId(),
-                                    listOf(
-                                        // TODO Prøve å hente ut informasjon om felt og sånt via feilmelding?
-                                        ErrorDetail(
-                                            detail = cause.message ?: "Ukjent feil etter serialisering av request objekt",
-                                        ),
-                                    ),
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse.BadRequestError(
+                            details = listOf(
+                                ErrorDetail(
+                                    detail = exception.message
+                                        ?: "Ukjent feil med request gjør at server ikke kan håndtere forespørselen",
                                 ),
-                            )
-                        }
-                    }
+                            ),
+                        ),
+                    )
                 }
             }
-
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse.BadRequestError(
-                    call.getCallId(),
-                    listOf(
-                        ErrorDetail(
-                            detail = exception.message ?: "Ukjent feil med request gjør at server ikke kan håndtere forespørselen",
-                        ),
-                    ),
-                ),
-            )
         }
 
         exception<IllegalArgumentException> { call, exception ->
+            logger.warn("Illegal argument exception", exception)
+
             when (exception) {
                 is NumberFormatException -> call.respond(
                     HttpStatusCode.BadRequest,
                     ErrorResponse.BadRequestError(
-                        call.getCallId(),
-                        listOf(
+                        details = listOf(
                             ErrorDetail(
                                 detail = "Et parameter/argument i requesten din kunne ikke formateres. Sjekk at alle IDer har riktig type.",
                             ),

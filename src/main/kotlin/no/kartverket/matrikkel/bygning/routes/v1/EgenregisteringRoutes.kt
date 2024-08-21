@@ -6,7 +6,6 @@ import io.bkbn.kompendium.json.schema.definition.TypeDefinition
 import io.bkbn.kompendium.oas.payload.Parameter
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.plugins.callid.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -35,14 +34,15 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
             val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
             when (val result = egenregistreringService.addEgenregistreringToBygning(bygningId, egenregistrering)) {
-                is Success -> call.respondText(
-                    "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.Created,
-                )
+                is Success -> {
+                    call.respondText(
+                        "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.Created,
+                    )
+                }
 
                 is ErrorResult -> call.respond(
                     status = HttpStatusCode.BadRequest,
                     ErrorResponse.ValidationError(
-                        correlationId = call.callId,
                         details = result.errors,
                     ),
                 )
@@ -106,16 +106,17 @@ private fun Route.egenregistreringBygningIdDoc() {
                 description("Bygninger og eventuelle bruksenheter registrert")
             }
 
-            // Kompendium støtter ikke sealed classes per nå på grunn av en bug som egentlig er løst, men han får ikke publisha til Maven
-            // Se GitHub Issue for mer info: https://github.com/bkbnio/kompendium/issues/625
-            // Eventuell workaround er å gjøre ErrorResponse til interface
-            /*
             canRespond {
                 responseCode(HttpStatusCode.BadRequest)
                 responseType<ErrorResponse.ValidationError>()
                 description("Validering av egenregistreringsdata har gått feil")
             }
-            */
+
+            canRespond {
+                responseCode(HttpStatusCode.InternalServerError)
+                responseType<ErrorResponse.InternalServerError>()
+                description("Noe gikk galt på server")
+            }
         }
     }
 }

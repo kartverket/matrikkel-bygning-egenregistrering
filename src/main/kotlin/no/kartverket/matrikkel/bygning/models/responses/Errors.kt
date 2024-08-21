@@ -2,6 +2,7 @@ package no.kartverket.matrikkel.bygning.models.responses
 
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
+import org.slf4j.MDC
 
 @Serializable
 data class ErrorDetail(
@@ -9,42 +10,42 @@ data class ErrorDetail(
     val detail: String,
 )
 
-@Serializable
-sealed class ErrorResponse(
-    val status: Int,
-    val title: String,
-    val description: String,
-) {
-    // Disse kan ikke settes som vanlige properties, på grunn av en pågående bug i forbindelse med @Serializable annotasjonen, se:
-    // https://youtrack.jetbrains.com/issue/KT-38958 og
-    // https://stackoverflow.com/questions/63173082/how-to-serialize-kotlin-sealed-class-with-open-val-using-kotlinx-serialization/63539183#63539183
-    abstract val correlationId: String?
-    abstract val details: List<ErrorDetail>?
+sealed interface ErrorResponse {
+    val status: Int
+    val title: String
+    val description: String
+    val correlationId: String
+    val details: List<ErrorDetail>
 
     @Serializable
     class ValidationError(
-        override val correlationId: String?, override val details: List<ErrorDetail>
-    ) : ErrorResponse(
-        status = HttpStatusCode.BadRequest.value,
-        title = "Valideringsfeil",
-        description = "Requesten din inneholdt én eller flere felter som ikke kunne valideres. Se listen over feil for flere detaljer",
-    )
+        override val status: Int = HttpStatusCode.BadRequest.value,
+        override val title: String = "Valideringsfeil",
+        override val description: String = "Requesten din inneholdt én eller flere felter som ikke kunne valideres. Se listen over feil for flere detaljer",
+        override val correlationId: String = resolveCallID(),
+        override val details: List<ErrorDetail> = emptyList(),
+    ) : ErrorResponse
 
     @Serializable
     class BadRequestError(
-        override val correlationId: String?, override val details: List<ErrorDetail>
-    ) : ErrorResponse(
-        status = HttpStatusCode.BadRequest.value,
-        title = "Formateringsfeil",
-        description = "Requesten din inneholdt én eller flere felter som ikke var formatert riktig. Se listen over feil for flere detaljer",
-    )
+        override val status: Int = HttpStatusCode.BadRequest.value,
+        override val title: String = "Formateringsfeil",
+        override val description: String = "Requesten din inneholdt én eller flere felter som ikke var formatert riktig. Se listen over feil for flere detaljer",
+        override val correlationId: String = resolveCallID(),
+        override val details: List<ErrorDetail> = emptyList(),
+    ) : ErrorResponse
+
 
     @Serializable
     class InternalServerError(
-        override val correlationId: String?, override val details: List<ErrorDetail>?
-    ) : ErrorResponse(
-        status = HttpStatusCode.InternalServerError.value,
-        title = "Serverfeil",
-        description = "Noe har gått galt på serveren. Ta kontakt med Kartverket hvis feilen vedvarer",
-    )
+        override val status: Int = HttpStatusCode.InternalServerError.value,
+        override val title: String = "Serverfeil",
+        override val description: String = "Noe har gått galt på serveren. Ta kontakt med Kartverket hvis feilen vedvarer",
+        override val correlationId: String = resolveCallID(),
+        override val details: List<ErrorDetail> = emptyList(),
+    ) : ErrorResponse
+}
+
+fun resolveCallID(): String {
+    return MDC.get("call-id") ?: ""
 }
