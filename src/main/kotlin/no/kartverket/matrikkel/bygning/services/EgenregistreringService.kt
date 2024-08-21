@@ -1,25 +1,50 @@
 package no.kartverket.matrikkel.bygning.services
 
-import no.kartverket.matrikkel.bygning.models.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
+import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
-import java.util.*
+import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 
-class EgenregistreringService {
+class EgenregistreringService(private val bygningClient: BygningClient) {
     private val bygningRegistreringer: MutableList<BygningRegistrering> = mutableListOf()
     private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
 
-    fun addEgenregistreringToBygning(bygning: Bygning, egenregistrering: EgenregistreringRequest): Boolean {
-        val isAllBruksenheterRegisteredOnCorrectBygning = egenregistrering.bruksenhetRegistreringer?.any { bruksenhetRegistering ->
+    fun addEgenregistreringToBygning(bygningId: Long, egenregistrering: EgenregistreringRequest): Result<Unit> {
+        val bygning = bygningClient.getBygningById(bygningId)
+            ?: return Result.ErrorResult(
+                ErrorDetail(
+                    detail = "Bygningen finnes ikke i matrikkelen",
+                ),
+            )
+
+        if (!isAllBruksenheterRegisteredOnCorrectBygning(egenregistrering, bygning)) {
+            return Result.ErrorResult(
+                ErrorDetail(
+                    detail = "Bruksenheten finnes ikke i bygningen",
+                ),
+            )
+        }
+
+        addEgenregistreringToBygning(egenregistrering)
+        addEgenregistreringToBruksenhet(egenregistrering)
+        return Result.Success(Unit)
+    }
+
+    private fun isAllBruksenheterRegisteredOnCorrectBygning(
+        egenregistrering: EgenregistreringRequest,
+        bygning: Bygning
+    ): Boolean {
+        if (egenregistrering.bruksenhetRegistreringer?.isEmpty() == true) return true
+
+        return egenregistrering.bruksenhetRegistreringer?.any { bruksenhetRegistering ->
             bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
         } ?: true
+    }
 
-        if (!isAllBruksenheterRegisteredOnCorrectBygning) return false
-
-        // TODO Bør kunne skille alle registreringer med en ID, skal denne settes på metadataen til hver enkelt registrering?
-        val egenregistreringsId = UUID.randomUUID().toString()
-
+    private fun addEgenregistreringToBygning(egenregistrering: EgenregistreringRequest) {
         bygningRegistreringer.add(
             BygningRegistrering(
                 bruksareal = egenregistrering.bygningRegistrering.bruksareal,
@@ -28,7 +53,9 @@ class EgenregistreringService {
                 avlop = egenregistrering.bygningRegistrering.avlop,
             ),
         )
+    }
 
+    private fun addEgenregistreringToBruksenhet(egenregistrering: EgenregistreringRequest) {
         egenregistrering.bruksenhetRegistreringer?.forEach { bruksenhetRegistrering ->
             bruksenhetRegistreringer.add(
                 BruksenhetRegistrering(
@@ -39,7 +66,5 @@ class EgenregistreringService {
                 ),
             )
         }
-
-        return true
     }
 }

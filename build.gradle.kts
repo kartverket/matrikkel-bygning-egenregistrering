@@ -1,6 +1,9 @@
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent.*
+import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 
 plugins {
     kotlin("jvm").version(libs.versions.kotlinVersion)
@@ -28,9 +31,11 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.cors)
+    implementation(libs.ktor.server.status.pages)
 
     // Monitoring
     implementation(libs.ktor.server.call.logging)
+    implementation(libs.ktor.server.call.id)
     implementation(libs.ktor.server.metrics.micrometer)
     implementation(libs.micrometer.prometheus)
 
@@ -52,6 +57,9 @@ dependencies {
 
     // OpenAPI
     implementation(libs.kompendium.core)
+
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.assertj)
 }
 
 tasks {

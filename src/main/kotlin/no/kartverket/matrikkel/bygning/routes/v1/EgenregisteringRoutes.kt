@@ -9,53 +9,38 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
+import io.ktor.server.util.*
+import no.kartverket.matrikkel.bygning.models.Result.ErrorResult
+import no.kartverket.matrikkel.bygning.models.Result.Success
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.requests.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.models.requests.EnergikildeRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.RegistreringMetadataRequest
+import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
 import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 
-fun Route.egenregistreringRouting(
-    bygningClient: BygningClient, egenregistreringService: EgenregistreringService
-) {
-
+fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
     route("{bygningId}/egenregistreringer") {
         egenregistreringBygningIdDoc()
 
         post {
             val egenregistrering = call.receive<EgenregistreringRequest>()
+            val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-            val bygningId = call.parameters["bygningId"]
+            when (val result = egenregistreringService.addEgenregistreringToBygning(bygningId, egenregistrering)) {
+                is Success -> {
+                    call.respond(
+                        HttpStatusCode.Created,
+                    )
+                }
 
-            if (bygningId == null) {
-                call.respondText("Du må sende med bygningId som parameter", status = HttpStatusCode.BadRequest)
-                return@post
-            }
-
-            val bygningFromMatrikkel = bygningClient.getBygningById(bygningId.toLong())
-
-            if (bygningFromMatrikkel == null) {
-                call.respondText("Bygningen finnes ikke i matrikkelen", status = HttpStatusCode.BadRequest)
-                return@post
-            }
-
-            val addedEgenregistrering = egenregistreringService.addEgenregistreringToBygning(bygningFromMatrikkel, egenregistrering)
-
-            if (addedEgenregistrering) {
-                call.respondText(
-                    "Egenregistrering registrert på bygning $bygningId", status = HttpStatusCode.OK,
-                )
-            } else {
-                call.respondText(
-                    "Det ble forsøkt registrert egenregistreringer på bruksenheter som ikke har tilknytning til bygningen",
+                is ErrorResult -> call.respond(
                     status = HttpStatusCode.BadRequest,
+                    ErrorResponse.ValidationError(
+                        details = result.errors,
+                    ),
                 )
             }
         }
@@ -82,11 +67,6 @@ private fun Route.egenregistreringBygningIdDoc() {
                         bygningRegistrering = BygningRegistrering(
                             bruksareal = BruksarealRegistrering(
                                 bruksareal = 125.0,
-                                metadata = RegistreringMetadataRequest(
-                                    registreringstidspunkt = Clock.System.now(),
-                                    gyldigFra = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-                                    gyldigTil = null,
-                                ),
                             ),
                             null,
                             null,
@@ -98,11 +78,6 @@ private fun Route.egenregistreringBygningIdDoc() {
                                 null,
                                 energikilde = EnergikildeRegistrering(
                                     energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
-                                    metadata = RegistreringMetadataRequest(
-                                        registreringstidspunkt = Clock.System.now(),
-                                        gyldigFra = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-                                        gyldigTil = null,
-                                    ),
                                 ),
                                 null,
                             ),
@@ -112,15 +87,21 @@ private fun Route.egenregistreringBygningIdDoc() {
 
             }
             response {
-                responseCode(HttpStatusCode.OK)
-                responseType<String>()
-                description("Bygninger og eventuelle bruksenheter registrert")
+                responseCode(HttpStatusCode.Created)
+                responseType<Unit>()
+                description("Egenregistrering ble registrert")
             }
 
             canRespond {
                 responseCode(HttpStatusCode.BadRequest)
-                responseType<String>()
-                description("Alle bruksenheter som kom i request tilhørte ikke bygningen")
+                responseType<ErrorResponse.ValidationError>()
+                description("Validering av egenregistreringsdata har gått feil")
+            }
+
+            canRespond {
+                responseCode(HttpStatusCode.InternalServerError)
+                responseType<ErrorResponse.InternalServerError>()
+                description("Noe gikk galt på server")
             }
         }
     }
