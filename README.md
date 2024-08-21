@@ -58,6 +58,9 @@ INTERNAL_PORT=<PORT_NUMMER>
 `PORT` brukes for selve applikasjonen, mens `INTERNAL_PORT` brukes for interne endepunkter som metrikker og
 helsesjekker.
 
+**NB**: `.env` for å sette disse variablene fungerer kun dersom du bruker Docker for å kjøre applikasjonen. Dersom du
+ønsker å kjøre via IntelliJ eller liknende må du sette disse i runtime configurationen din.
+
 ### Integrasjon mot matrikkel APIet
 
 Som standard brukes det en stub/mock mot matrikkel APIet når applikasjonen kjører lokalt.
