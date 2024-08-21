@@ -23,15 +23,18 @@ import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 import no.kartverket.matrikkel.bygning.services.HealthService
 
 fun main() {
+    val internalPort = System.getenv("INTERNAL_PORT")?.toIntOrNull() ?: 8081
+    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
+
     embeddedServer(
         factory = Netty,
-        port = 8081,
+        port = internalPort,
         module = Application::internalModule,
     ).start(wait = false)
 
     embeddedServer(
         factory = Netty,
-        port = 8080,
+        port = port,
         module = Application::mainModule,
         watchPaths = listOf("classes"),
     ).start(wait = true)
