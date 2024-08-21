@@ -3,10 +3,11 @@ services:
     build: .
     ports:
       - "${PORT:-8080}:${PORT:-8080}"
+    env_file:
+      - path: .env
+        required: false
     environment:
       DB_URL: postgresql://db:5432/postgres
-      PORT: "${PORT:-8080}"
-      INTERNAL_PORT: "${INTERNAL_PORT:-8081}"
     depends_on:
       db:
         condition: service_healthy

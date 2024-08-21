@@ -17,7 +17,8 @@ Vil du kjøre alt av applikasjon og database med Docker, gjør følgende:
 $ export PORT=<PORT_NUMMER>          # Optional
 $ export INTERNAL_PORT=<PORT_NUMMER> # Optional
 $ ./gradlew build
-$ docker-compose up
+$ docker compose build
+$ docker compose up
 ```
 
 ### Kjøring av database
@@ -30,7 +31,7 @@ fjerne denne katalogstrukturen.
 Databasen kan startes med docker compose:
 
 ```sh
-$ docker-compose up db -d
+$ docker compose up db -d
 ```
 
 Flagget `-d` gjør at containeren kjøres i detached modus og loggene fra containeren ikke skrives til stdout. Dersom du
@@ -48,7 +49,8 @@ $ ./gradlew build
 Hvis du vil kjøre appen som en Docker container kan du kjøre:
 
 ```sh
-$ docker-compose up web -d
+$ docker compose build
+$ docker compose up web -d
 ```
 
 Ellers er det bare å kjøre opp applikasjonen som ønsket via IntelliJ eller kommandolinje. Ingen spesielle hensyn som er
@@ -80,7 +82,8 @@ i [application-local.conf](./src/main/resources/application-local.conf)
 I tillegg må følgende miljøvariabler være satt (f.eks. i Run Configurations i IntelliJ)
 
 ```
-MATRIKKEL_BASE_URL // Kan settes for å overstyre default miljø
+MATRIKKEL_USE_STUB=false    # Deaktiverer stub av matrikkel APIet lokalt
+MATRIKKEL_BASE_URL          # Kan settes for å overstyre default miljø
 MATRIKKEL_USERNAME
 MATRIKKEL_PASSWORD
 ```
