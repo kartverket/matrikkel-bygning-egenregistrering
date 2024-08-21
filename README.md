@@ -10,6 +10,16 @@ fyll ut README med informasjon om dette.
 
 Prosjektet er bygd og kjørt med `temurin-21` JRE og IntelliJ default Kotlin SDK.
 
+
+### TLDR
+Vil du kjøre alt av applikasjon og database med Docker, gjør følgende:
+```shell
+$ export PORT=<PORT_NUMMER>          # Optional
+$ export INTERNAL_PORT=<PORT_NUMMER> # Optional
+$ ./gradlew build
+$ docker-compose up
+```
+
 ### Kjøring av database
 
 For å kjøre applikasjonen må du først starte en database. For lokal kjøring er det definert en postgres-database i
@@ -23,11 +33,47 @@ Databasen kan startes med docker compose:
 $ docker-compose up db -d
 ```
 
-Flagget `-d` gjør at loggene fra containeren ikke skrives til stdout. Dersom du ønsker det kan du droppe flagget.
+Flagget `-d` gjør at containeren kjøres i detached modus og loggene fra containeren ikke skrives til stdout. Dersom du
+ønsker det kan du droppe flagget.
+
+### Kjøring av applikasjon
+
+Når databasen kjører, kan du kjøre opp applikasjonen enten lokalt, eller som en Docker container. Før du gjør dette må
+du bygge applikasjonen, dette kan gjøres med gradle:
+
+```sh
+$ ./gradlew build
+```
+
+Hvis du vil kjøre appen som en Docker container kan du kjøre:
+
+```sh
+$ docker-compose up web -d
+```
+
+Ellers er det bare å kjøre opp applikasjonen som ønsket via IntelliJ eller kommandolinje. Ingen spesielle hensyn som er
+nødvendig rundt miljøkonfigurasjon, det skal ha sane defaults.
+
+#### Håndtering av portkonflikter
+
+Applikasjonen er satt opp til å håndtere bruk av andre porter enn default 8080 og 8081. Hvis du ønsker å bruke dette kan
+du opprette en fil ved navn `.env` på rot i prosjektet. Denne filen blir ignorert av git og sjekkes ikke inn. Sett så
+følgende variabler:
+
+```
+PORT=<PORT_NUMMER>
+INTERNAL_PORT=<PORT_NUMMER>
+```
+
+`PORT` brukes for selve applikasjonen, mens `INTERNAL_PORT` brukes for interne endepunkter som metrikker og
+helsesjekker.
+
+**NB**: `.env` for å sette disse variablene fungerer kun dersom du bruker Docker for å kjøre applikasjonen. Dersom du
+ønsker å kjøre via IntelliJ eller liknende må du sette disse i runtime configurationen din.
 
 ### Integrasjon mot matrikkel APIet
 
-Som standard brukes det en stub/mock mot matrikkel APIet når applikasjonen kjører lokalt. 
+Som standard brukes det en stub/mock mot matrikkel APIet når applikasjonen kjører lokalt.
 For å endre til å gå mot et faktisk kjørende matrikkel, må propertien `matrikkel.useStub` settes til `false`
 i [application-local.conf](./src/main/resources/application-local.conf)
 
@@ -39,22 +85,10 @@ MATRIKKEL_USERNAME
 MATRIKKEL_PASSWORD
 ```
 
-### Kjøring av applikasjon
-
-Når databasen kjører, kan du kjøre opp applikasjonen enten lokalt, eller som en Docker container.
-
-Hvis du vil kjøre appen som en Docker container kan du kjøre:
-
-```sh
-$ docker-compose up web -d
-```
-
-Ellers er det bare å kjøre opp applikasjonen som ønsket via IntelliJ eller kommandolinje. Ingen spesielle hensyn som er
-nødvendig rundt miljøkonfigurasjon, det skal ha sane defaults.
-
 ### Integrasjonstester
 
-Prosjektet inneholder noen integrasjonstester som ligger under [src/integrationTest](src/integrationTest). Testene bruker blant annet
+Prosjektet inneholder noen integrasjonstester som ligger under [src/integrationTest](src/integrationTest). Testene
+bruker blant annet
 testcontainers for å kjøre opp en database som bruke under testene.
 
 Testene er definert med en egen task som kan kjøres slik:
