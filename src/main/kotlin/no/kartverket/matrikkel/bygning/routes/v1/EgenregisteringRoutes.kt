@@ -65,7 +65,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningRegistrering = BygningRegistrering(
-                            bruksareal = BruksarealRegistrering(
+                            bruksarealRegistrering = BruksarealRegistrering(
                                 bruksareal = 125.0,
                             ),
                             null,
@@ -76,7 +76,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                             BruksenhetRegistrering(
                                 bruksenhetId = 1L,
                                 null,
-                                energikilde = EnergikildeRegistrering(
+                                energikildeRegistrering = EnergikildeRegistrering(
                                     energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
                                 ),
                                 null,

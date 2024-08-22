@@ -47,10 +47,10 @@ class EgenregistreringService(private val bygningClient: BygningClient) {
     private fun addEgenregistreringToBygning(egenregistrering: EgenregistreringRequest) {
         bygningRegistreringer.add(
             BygningRegistrering(
-                bruksareal = egenregistrering.bygningRegistrering.bruksareal,
-                byggeaar = egenregistrering.bygningRegistrering.byggeaar,
-                vannforsyning = egenregistrering.bygningRegistrering.vannforsyning,
-                avlop = egenregistrering.bygningRegistrering.avlop,
+                bruksarealRegistrering = egenregistrering.bygningRegistrering.bruksarealRegistrering,
+                byggeaarRegistrering = egenregistrering.bygningRegistrering.byggeaarRegistrering,
+                vannforsyningRegistrering = egenregistrering.bygningRegistrering.vannforsyningRegistrering,
+                avlopRegistrering = egenregistrering.bygningRegistrering.avlopRegistrering,
             ),
         )
     }
@@ -60,9 +60,9 @@ class EgenregistreringService(private val bygningClient: BygningClient) {
             bruksenhetRegistreringer.add(
                 BruksenhetRegistrering(
                     bruksenhetId = bruksenhetRegistrering.bruksenhetId,
-                    bruksareal = bruksenhetRegistrering.bruksareal,
-                    energikilde = bruksenhetRegistrering.energikilde,
-                    oppvarming = bruksenhetRegistrering.oppvarming,
+                    bruksarealRegistrering = bruksenhetRegistrering.bruksarealRegistrering,
+                    energikildeRegistrering = bruksenhetRegistrering.energikildeRegistrering,
+                    oppvarmingRegistrering = bruksenhetRegistrering.oppvarmingRegistrering,
                 ),
             )
         }
