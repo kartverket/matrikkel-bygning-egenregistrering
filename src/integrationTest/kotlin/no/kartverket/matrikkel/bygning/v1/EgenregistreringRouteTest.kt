@@ -23,17 +23,17 @@ class EgenregistreringRouteTest : TestWithDb() {
             setBody(
                 EgenregistreringRequest(
                     bygningRegistrering = BygningRegistrering(
-                        bruksareal = BruksarealRegistrering(bruksareal = 125.0),
-                        byggeaar = ByggeaarRegistrering(byggeaar = 2010),
-                        vannforsyning = null,
-                        avlop = null,
+                        bruksarealRegistrering = BruksarealRegistrering(bruksareal = 125.0),
+                        byggeaarRegistrering = ByggeaarRegistrering(byggeaar = 2010),
+                        vannforsyningRegistrering = null,
+                        avlopRegistrering = null,
                     ),
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
                             bruksenhetId = 1L,
-                            bruksareal = BruksarealRegistrering(bruksareal = 50.0),
-                            energikilde = null,
-                            oppvarming = null,
+                            bruksarealRegistrering = BruksarealRegistrering(bruksareal = 50.0),
+                            energikildeRegistrering = null,
+                            oppvarmingRegistrering = null,
                         ),
                     ),
                 ),
@@ -52,17 +52,17 @@ class EgenregistreringRouteTest : TestWithDb() {
             setBody(
                 EgenregistreringRequest(
                     bygningRegistrering = BygningRegistrering(
-                        bruksareal = BruksarealRegistrering(bruksareal = 125.0),
-                        byggeaar = ByggeaarRegistrering(byggeaar = 2010),
-                        vannforsyning = null,
-                        avlop = null,
+                        bruksarealRegistrering = BruksarealRegistrering(bruksareal = 125.0),
+                        byggeaarRegistrering = ByggeaarRegistrering(byggeaar = 2010),
+                        vannforsyningRegistrering = null,
+                        avlopRegistrering = null,
                     ),
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
                             bruksenhetId = 3L,
-                            bruksareal = BruksarealRegistrering(bruksareal = 50.0),
-                            energikilde = null,
-                            oppvarming = null,
+                            bruksarealRegistrering = BruksarealRegistrering(bruksareal = 50.0),
+                            energikildeRegistrering = null,
+                            oppvarmingRegistrering = null,
                         ),
                     ),
                 ),

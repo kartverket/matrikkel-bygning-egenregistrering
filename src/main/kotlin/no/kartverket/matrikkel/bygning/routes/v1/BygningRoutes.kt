@@ -9,8 +9,8 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.matrikkel.Bygning
+import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 
 fun Route.bygningRouting(
     bygningClient: BygningClient,
