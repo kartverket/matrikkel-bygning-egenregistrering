@@ -9,7 +9,6 @@ jacksonVersion = "2.17.2"
 postgresVersion = "42.7.3"
 shadowVersion = "8.1.1"
 kompendiumVersion = "3.14.4"
-kotlinxDatetimeVersion = "0.6.0"
 jaxwsVersion = "4.0.3"
 hikariVersion = "5.1.0"
 assertjVersion = "3.26.3"
@@ -40,7 +39,6 @@ jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-datab
 postgres = { group = "org.postgresql", name = "postgresql", version.ref = "postgresVersion" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlinVersion" }
 kompendium-core = { group = "io.bkbn", name = "kompendium-core", version.ref = "kompendiumVersion" }
-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 
 jaxws-rt = { group = "com.sun.xml.ws", name = "jaxws-rt", version.ref = "jaxwsVersion" }
 jaxws-tools = { group = "com.sun.xml.ws", name = "jaxws-tools", version.ref = "jaxwsVersion" }
