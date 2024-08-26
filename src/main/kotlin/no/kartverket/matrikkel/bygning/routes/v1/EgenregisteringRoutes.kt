@@ -2,59 +2,43 @@ package no.kartverket.matrikkel.bygning.routes.v1
 
 import io.bkbn.kompendium.core.metadata.PostInfo
 import io.bkbn.kompendium.core.plugin.NotarizedRoute
-import io.bkbn.kompendium.json.schema.definition.TypeDefinition
-import io.bkbn.kompendium.oas.payload.Parameter
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.util.*
+import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
+import no.kartverket.matrikkel.bygning.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.Result.ErrorResult
 import no.kartverket.matrikkel.bygning.models.Result.Success
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.models.requests.BruksarealRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.BruksenhetRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.BygningRegistrering
-import no.kartverket.matrikkel.bygning.models.requests.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.models.requests.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
+import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BruksenhetRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BygningRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.dto.request.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 
 fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
-    route("{bygningId}/egenregistreringer") {
-        egenregistreringBygningIdDoc()
+    egenregistreringDoc()
 
-        post {
-            val egenregistrering = call.receive<EgenregistreringRequest>()
-            val bygningId = call.parameters.getOrFail("bygningId").toLong()
+    post {
+        val egenregistrering = call.receive<EgenregistreringRequest>()
 
-            when (val result = egenregistreringService.addEgenregistreringToBygning(bygningId, egenregistrering)) {
-                is Success -> {
-                    call.respond(
-                        HttpStatusCode.Created,
-                    )
-                }
-
-                is ErrorResult -> call.respond(
-                    status = HttpStatusCode.BadRequest,
-                    ErrorResponse.ValidationError(
-                        details = result.errors,
-                    ),
-                )
-            }
+        when (val result = egenregistreringService.addEgenregistreringToBygning(egenregistrering)) {
+            is Success -> call.respond(HttpStatusCode.Created)
+            is ErrorResult -> call.respond(
+                status = HttpStatusCode.BadRequest,
+                ErrorResponse.ValidationError(
+                    details = result.errors,
+                ),
+            )
         }
     }
 }
 
-private fun Route.egenregistreringBygningIdDoc() {
+private fun Route.egenregistreringDoc() {
     install(NotarizedRoute()) {
         tags = setOf("Egenregistrering")
-        parameters = listOf(
-            Parameter(
-                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
-            ),
-        )
         post = PostInfo.builder {
             summary("Legg til en egenregistrering på en bygning")
             description("Legger til en egenregistrering på en bygning og tilhørende bruksenheter, hvis noen")
@@ -64,7 +48,8 @@ private fun Route.egenregistreringBygningIdDoc() {
                 description("Egenregistrert data")
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
-                        bygningRegistrering = BygningRegistrering(
+                        bygningId = 1,
+                        bygningRegistrering = BygningRegistreringRequest(
                             bruksarealRegistrering = BruksarealRegistrering(
                                 bruksareal = 125.0,
                             ),
@@ -73,7 +58,7 @@ private fun Route.egenregistreringBygningIdDoc() {
                             null,
                         ),
                         bruksenhetRegistreringer = listOf(
-                            BruksenhetRegistrering(
+                            BruksenhetRegistreringRequest(
                                 bruksenhetId = 1L,
                                 null,
                                 energikildeRegistrering = EnergikildeRegistrering(

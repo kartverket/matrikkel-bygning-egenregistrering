@@ -1,10 +1,12 @@
-package no.kartverket.matrikkel.bygning.models.requests
+package no.kartverket.matrikkel.bygning.models
 
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
+import java.time.Instant
+import java.util.*
 
 @Serializable
 data class ByggeaarRegistrering(
@@ -36,23 +38,27 @@ data class OppvarmingRegistrering(
     val oppvarminger: List<OppvarmingKode>,
 )
 
-@Serializable
-data class BygningRegistrering(
-    val bruksarealRegistrering: BruksarealRegistrering?,
-    val byggeaarRegistrering: ByggeaarRegistrering?,
-    val vannforsyningRegistrering: VannforsyningRegistrering?,
-    val avlopRegistrering: AvlopRegistrering?
-)
 
-@Serializable
+interface Registrering {
+    val registreringId: UUID
+    val registreringTidspunkt: Instant
+}
+
+data class BygningRegistrering(
+    val bygningId: Long,
+    val byggeaarRegistrering: ByggeaarRegistrering?,
+    val bruksarealRegistrering: BruksarealRegistrering?,
+    val vannforsyningRegistrering: VannforsyningRegistrering?,
+    val avlopRegistrering: AvlopRegistrering?,
+    override val registreringId: UUID,
+    override val registreringTidspunkt: Instant,
+) : Registrering
+
 data class BruksenhetRegistrering(
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistrering?,
     val energikildeRegistrering: EnergikildeRegistrering?,
-    val oppvarmingRegistrering: OppvarmingRegistrering?
-)
-
-@Serializable
-data class EgenregistreringRequest(
-    val bygningRegistrering: BygningRegistrering, val bruksenhetRegistreringer: List<BruksenhetRegistrering>?
-)
+    val oppvarmingRegistrering: OppvarmingRegistrering?,
+    override val registreringId: UUID,
+    override val registreringTidspunkt: Instant,
+) : Registrering
