@@ -17,24 +17,22 @@ import no.kartverket.matrikkel.bygning.models.kodelister.toKodeList
 import kotlin.reflect.KClass
 
 fun Route.kodelisteRouting() {
-    route("/kodelister") {
-        kodelisterDoc()
-        get {
-            call.respond(
-                KodelisterResponse(
-                    energikildeKoder = EnergikildeKode::class.toKodeList(),
-                    vannforsyningKoder = VannforsyningKode::class.toKodeList(),
-                    avlopKoder = AvlopKode::class.toKodeList(),
-                    oppvarmingKoder = OppvarmingKode::class.toKodeList(),
-                ),
-            )
-        }
-
-        kodelisteRoute("avlop", AvlopKode::class)
-        kodelisteRoute("oppvarming", OppvarmingKode::class)
-        kodelisteRoute("energikilde", EnergikildeKode::class)
-        kodelisteRoute("vannforsyning", VannforsyningKode::class)
+    kodelisterDoc()
+    get {
+        call.respond(
+            KodelisterResponse(
+                energikildeKoder = EnergikildeKode::class.toKodeList(),
+                vannforsyningKoder = VannforsyningKode::class.toKodeList(),
+                avlopKoder = AvlopKode::class.toKodeList(),
+                oppvarmingKoder = OppvarmingKode::class.toKodeList(),
+            ),
+        )
     }
+
+    kodelisteRoute("avlop", AvlopKode::class)
+    kodelisteRoute("oppvarming", OppvarmingKode::class)
+    kodelisteRoute("energikilde", EnergikildeKode::class)
+    kodelisteRoute("vannforsyning", VannforsyningKode::class)
 }
 
 private inline fun <reified T> Route.kodelisteRoute(

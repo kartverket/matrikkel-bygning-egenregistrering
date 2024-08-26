@@ -44,6 +44,15 @@ sealed interface ErrorResponse {
         override val correlationId: String = resolveCallID(),
         override val details: List<ErrorDetail> = emptyList(),
     ) : ErrorResponse
+
+    @Serializable
+    class NotFoundError(
+        override val status: Int = HttpStatusCode.NotFound.value,
+        override val title: String = "Ikke funnet",
+        override val description: String = "Ressursen du etterspurte kunne ikke bli funnet",
+        override val correlationId: String = resolveCallID(),
+        override val details: List<ErrorDetail> = emptyList(),
+    ) : ErrorResponse
 }
 
 fun resolveCallID(): String {

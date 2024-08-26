@@ -4,8 +4,8 @@ import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
 import no.kartverket.matrikkel.bygning.matrikkelapi.getObjectAs
 import no.kartverket.matrikkel.bygning.matrikkelapi.getObjectsAs
-import no.kartverket.matrikkel.bygning.matrikkel.Bruksenhet
-import no.kartverket.matrikkel.bygning.matrikkel.Bygning
+import no.kartverket.matrikkel.bygning.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.models.Bygning
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import org.slf4j.Logger
@@ -14,7 +14,6 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bruksenhet as 
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as MatrikkelBygning
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
-// TODO Logging? Skal vi bruke sl4j for logging i klasser f. eks? Sikkert lurt å ta en runde på logging generelt
 internal class MatrikkelBygningClient(
     val matrikkelApi: MatrikkelApi.WithAuth
 ) : BygningClient {
@@ -24,23 +23,23 @@ internal class MatrikkelBygningClient(
         val bygningId: BygningId = BygningId().apply { value = id }
 
         try {
-            val bygning =
-                matrikkelApi.storeService().getObjectAs<MatrikkelBygning>(bygningId, matrikkelApi.matrikkelContext)
+            val bygning = matrikkelApi.storeService().getObjectAs<MatrikkelBygning>(bygningId, matrikkelApi.matrikkelContext)
 
-            val bruksenheter = matrikkelApi.storeService()
-                .getObjectsAs<MatrikkelBruksenhet>(bygning.bruksenhetIds.item, matrikkelApi.matrikkelContext)
+            val bruksenheter =
+                matrikkelApi.storeService().getObjectsAs<MatrikkelBruksenhet>(bygning.bruksenhetIds.item, matrikkelApi.matrikkelContext)
 
             return Bygning(
                 bygningId = bygning.id.value,
                 bygningNummer = bygning.bygningsnummer,
                 bruksenheter = bruksenheter.map {
                     Bruksenhet(
-                        bruksenhetId = it.id.value, bygningId = it.byggId.value,
+                        bruksenhetId = it.id.value,
+                        bygningId = it.byggId.value,
                     )
                 },
             )
         } catch (exception: ServiceException) {
-            log.warn("Noe gikk galt under henting av bygning med id {}", bygningId, exception)
+            log.warn("Noe gikk galt under henting av bygning med id {}", bygningId.value, exception)
             return null
         }
     }
