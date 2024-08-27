@@ -24,10 +24,7 @@ jobs:
       - name: Checkout project sources
         uses: actions/checkout@v4
       - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
+        uses: ./.github/actions/setup-java
       - name: Run build and integration tests
         run: ./gradlew build integrationTest
       - name: Build and push docker
