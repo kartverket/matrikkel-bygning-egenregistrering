@@ -46,6 +46,8 @@ jaxws-tools = { group = "com.sun.xml.ws", name = "jaxws-tools", version.ref = "j
 assertj = { group = "org.assertj", name = "assertj-core", version.ref = "assertjVersion" }
 testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainersVersion" }
 
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime-jvm", version = "0.6.1"}
+
 [plugins]
 kotlin-jvm = { id = "jvm", version.ref = "kotlinVersion" }
 kotlin-serialization = { id = "plugin.serialization", version.ref = "kotlinVersion" }
