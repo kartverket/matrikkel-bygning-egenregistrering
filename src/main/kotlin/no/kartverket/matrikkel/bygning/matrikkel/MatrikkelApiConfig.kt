@@ -1,7 +1,6 @@
 package no.kartverket.matrikkel.bygning.matrikkel
 
 import io.ktor.server.config.*
-import no.kartverket.matrikkel.bygning.config.Env
 import no.kartverket.matrikkel.bygning.matrikkel.adapters.LocalBygningClient
 import no.kartverket.matrikkel.bygning.matrikkel.adapters.MatrikkelBygningClient
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
@@ -14,8 +13,8 @@ private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 fun createBygningClient(
     config: ApplicationConfig
 ): BygningClient {
-    if (Env.isLocal() && config.propertyOrNull("matrikkel.useStub")?.getString().toBoolean()) {
-        log.warn("Bruker stub for matrikkel APIet. Skal kun brukes lokalt!")
+    if (config.propertyOrNull("matrikkel.useStub")?.getString().toBoolean()) {
+        log.warn("Bruker stub for matrikkel APIet. Bør kun brukes lokalt!")
         return LocalBygningClient()
     }
 
