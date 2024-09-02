@@ -14,25 +14,29 @@ import no.kartverket.matrikkel.bygning.matrikkel.createBygningClient
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
+import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.bygningRouting
-import no.kartverket.matrikkel.bygning.routes.v1.dummyRouting
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistreringRouting
 import no.kartverket.matrikkel.bygning.routes.v1.kodelisteRouting
-import no.kartverket.matrikkel.bygning.services.EgenregistreringsService
+import no.kartverket.matrikkel.bygning.services.BygningService
+import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 import no.kartverket.matrikkel.bygning.services.HealthService
 
 fun main() {
+    val internalPort = System.getenv("INTERNAL_PORT")?.toIntOrNull() ?: 8081
+    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
+
     embeddedServer(
         factory = Netty,
-        port = 8081,
+        port = internalPort,
         module = Application::internalModule,
     ).start(wait = false)
 
     embeddedServer(
         factory = Netty,
-        port = 8080,
+        port = port,
         module = Application::mainModule,
         watchPaths = listOf("classes"),
     ).start(wait = true)
@@ -46,23 +50,28 @@ fun Application.mainModule() {
     configureHTTP()
     configureMonitoring()
     configureOpenAPI()
+    configureStatusPages()
 
     val dataSource = createDataSource(config)
 
     val bygningClient = createBygningClient(config)
 
-    val egenregistreringsService = EgenregistreringsService()
+
+    val egenregistreringService = EgenregistreringService(bygningClient)
+    val bygningService = BygningService(bygningClient, egenregistreringService)
 
     routing {
         swagger()
 
-        // TODO Remove after checking connection between Egenreg and Bygning
-        dummyRouting()
         route("v1") {
-            kodelisteRouting()
+            route("kodelister") {
+                kodelisteRouting()
+            }
+            route("egenregistreringer") {
+                egenregistreringRouting(egenregistreringService)
+            }
             route("bygninger") {
-                bygningRouting(bygningClient)
-                egenregistreringRouting(bygningClient, egenregistreringsService)
+                bygningRouting(bygningService)
             }
         }
     }

@@ -2,7 +2,10 @@ services:
   web:
     build: .
     ports:
-      - "8080:8080"
+      - "${PORT:-8080}:${PORT:-8080}"
+    env_file:
+      - path: .env
+        required: false
     environment:
       DB_URL: postgresql://db:5432/postgres
     depends_on:

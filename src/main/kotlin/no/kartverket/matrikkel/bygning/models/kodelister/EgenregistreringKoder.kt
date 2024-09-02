@@ -17,7 +17,7 @@ data class Kode(
 )
 
 @Serializable
-enum class VannforsyningsKode(
+enum class VannforsyningKode(
     override val presentasjonsnavn: String,
     override val beskrivelse: String
 ) : IKode {
@@ -37,7 +37,7 @@ enum class VannforsyningsKode(
 }
 
 @Serializable
-enum class AvlopsKode(
+enum class AvlopKode(
     override val presentasjonsnavn: String,
     override val beskrivelse: String
 ) : IKode {
@@ -65,7 +65,7 @@ enum class EnergikildeKode(
 }
 
 @Serializable
-enum class OppvarmingsKode(
+enum class OppvarmingKode(
     override val presentasjonsnavn: String,
     override val beskrivelse: String
 ) : IKode {
@@ -76,10 +76,10 @@ enum class OppvarmingsKode(
 
 @Serializable
 data class KodelisterResponse(
-    val vannforsyningsKoder: List<Kode>,
-    val avlopsKoder: List<Kode>,
+    val vannforsyningKoder: List<Kode>,
+    val avlopKoder: List<Kode>,
     val energikildeKoder: List<Kode>,
-    val oppvarmingsKoder: List<Kode>,
+    val oppvarmingKoder: List<Kode>,
 )
 
 /*

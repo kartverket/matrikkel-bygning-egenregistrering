@@ -7,25 +7,33 @@ import no.kartverket.matrikkel.bygning.models.Bygning
 internal class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
-            1L, 1L,
+            bruksenhetId = 1L,
+            bygningId = 1L,
         ),
         Bruksenhet(
-            2L, 1L,
+            bruksenhetId = 2L,
+            bygningId = 1L,
         ),
         Bruksenhet(
-            3L, 2L,
+            bruksenhetId = 3L,
+            bygningId = 2L,
         ),
         Bruksenhet(
-            4L, 2L,
+            bruksenhetId = 4L,
+            bygningId = 2L,
         ),
     )
 
     private val bygninger: List<Bygning> = listOf(
         Bygning(
-            1L, 100L, bruksenheter = bruksenheter.subList(0, 2),
+            bygningId = 1L,
+            bygningNummer = 100L,
+            bruksenheter = bruksenheter.subList(0, 2),
         ),
         Bygning(
-            2L, 200L, bruksenheter = bruksenheter.subList(2, 4),
+            bygningId = 2L,
+            bygningNummer = 200L,
+            bruksenheter = bruksenheter.subList(2, 4),
         ),
     )
 

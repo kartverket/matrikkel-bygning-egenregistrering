@@ -5,8 +5,8 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import io.ktor.server.testing.*
-import org.junit.AfterClass
-import org.junit.BeforeClass
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.testcontainers.containers.PostgreSQLContainer
 
 abstract class TestWithDb {
@@ -14,14 +14,14 @@ abstract class TestWithDb {
     companion object {
         private val postgresSQLContainer = PostgreSQLContainer("postgres:15-alpine")
 
-        @BeforeClass
+        @BeforeAll
         @JvmStatic
         fun setUp() {
             postgresSQLContainer.withDatabaseName("bygning")
             postgresSQLContainer.start()
         }
 
-        @AfterClass
+        @AfterAll
         @JvmStatic
         fun tearDown() {
             postgresSQLContainer.stop()
@@ -55,9 +55,7 @@ abstract class TestWithDb {
                     "storage.jdbcURL" to postgresSQLContainer.jdbcUrl.removePrefix("jdbc:"),
                     "storage.username" to postgresSQLContainer.username,
                     "storage.password" to postgresSQLContainer.password,
-                    "matrikkel.baseUrl" to "",
-                    "matrikkel.username" to "",
-                    "matrikkel.password" to "",
+                    "matrikkel.useStub" to "true",
                 )
             }
         }

@@ -14,33 +14,32 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bruksenhet as 
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as MatrikkelBygning
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
-// TODO Logging? Skal vi bruke sl4j for logging i klasser f. eks? Sikkert lurt å ta en runde på logging generelt
 internal class MatrikkelBygningClient(
     val matrikkelApi: MatrikkelApi.WithAuth
 ) : BygningClient {
-    private val LOG: Logger = LoggerFactory.getLogger(MatrikkelBygningClient::class.java)
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     override fun getBygningById(id: Long): Bygning? {
         val bygningId: BygningId = BygningId().apply { value = id }
 
         try {
-            val bygning =
-                matrikkelApi.storeService().getObjectAs<MatrikkelBygning>(bygningId, matrikkelApi.matrikkelContext)
+            val bygning = matrikkelApi.storeService().getObjectAs<MatrikkelBygning>(bygningId, matrikkelApi.matrikkelContext)
 
-            val bruksenheter = matrikkelApi.storeService()
-                .getObjectsAs<MatrikkelBruksenhet>(bygning.bruksenhetIds.item, matrikkelApi.matrikkelContext)
+            val bruksenheter =
+                matrikkelApi.storeService().getObjectsAs<MatrikkelBruksenhet>(bygning.bruksenhetIds.item, matrikkelApi.matrikkelContext)
 
             return Bygning(
                 bygningId = bygning.id.value,
                 bygningNummer = bygning.bygningsnummer,
                 bruksenheter = bruksenheter.map {
                     Bruksenhet(
-                        bruksenhetId = it.id.value, bygningId = it.byggId.value,
+                        bruksenhetId = it.id.value,
+                        bygningId = it.byggId.value,
                     )
                 },
             )
         } catch (exception: ServiceException) {
-            LOG.warn("Noe gikk galt under henting av bygning med id {}", bygningId, exception)
+            log.warn("Noe gikk galt under henting av bygning med id {}", bygningId.value, exception)
             return null
         }
     }
@@ -51,7 +50,7 @@ internal class MatrikkelBygningClient(
 
             return getBygningById(bygningId.value)
         } catch (exception: ServiceException) {
-            LOG.warn("Noe gikk galt under henting av bygning med nummer {}", bygningNummer, exception)
+            log.warn("Noe gikk galt under henting av bygning med nummer {}", bygningNummer, exception)
             return null
         }
     }

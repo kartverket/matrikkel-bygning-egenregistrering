@@ -6,35 +6,33 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.kartverket.matrikkel.bygning.models.kodelister.AvlopsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.IKode
 import no.kartverket.matrikkel.bygning.models.kodelister.Kode
 import no.kartverket.matrikkel.bygning.models.kodelister.KodelisterResponse
-import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingsKode
-import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningsKode
+import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.models.kodelister.toKodeList
 import kotlin.reflect.KClass
 
 fun Route.kodelisteRouting() {
-    route("/kodelister") {
-        kodelisterDoc()
-        get {
-            call.respond(
-                KodelisterResponse(
-                    energikildeKoder = EnergikildeKode::class.toKodeList(),
-                    vannforsyningsKoder = VannforsyningsKode::class.toKodeList(),
-                    avlopsKoder = AvlopsKode::class.toKodeList(),
-                    oppvarmingsKoder = OppvarmingsKode::class.toKodeList(),
-                ),
-            )
-        }
-
-        kodelisteRoute("avlop", AvlopsKode::class)
-        kodelisteRoute("oppvarming", OppvarmingsKode::class)
-        kodelisteRoute("energikilde", EnergikildeKode::class)
-        kodelisteRoute("vannforsyning", VannforsyningsKode::class)
+    kodelisterDoc()
+    get {
+        call.respond(
+            KodelisterResponse(
+                energikildeKoder = EnergikildeKode::class.toKodeList(),
+                vannforsyningKoder = VannforsyningKode::class.toKodeList(),
+                avlopKoder = AvlopKode::class.toKodeList(),
+                oppvarmingKoder = OppvarmingKode::class.toKodeList(),
+            ),
+        )
     }
+
+    kodelisteRoute("avlop", AvlopKode::class)
+    kodelisteRoute("oppvarming", OppvarmingKode::class)
+    kodelisteRoute("energikilde", EnergikildeKode::class)
+    kodelisteRoute("vannforsyning", VannforsyningKode::class)
 }
 
 private inline fun <reified T> Route.kodelisteRoute(

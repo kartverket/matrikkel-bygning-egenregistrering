@@ -5,9 +5,9 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestWithDb
-import no.kartverket.matrikkel.bygning.models.Bygning
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BygningResponse
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class BygningRouteTest : TestWithDb() {
 
@@ -18,8 +18,8 @@ class BygningRouteTest : TestWithDb() {
         val response = client.get("/v1/bygninger/1")
 
         assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(response.body<Bygning>().bygningId).isEqualTo(1L)
-        assertThat(response.body<Bygning>().bruksenheter).hasSize(2)
+        assertThat(response.body<BygningResponse>().bygningId).isEqualTo(1L)
+        assertThat(response.body<BygningResponse>().bruksenheter).hasSize(2)
     }
 
     @Test
