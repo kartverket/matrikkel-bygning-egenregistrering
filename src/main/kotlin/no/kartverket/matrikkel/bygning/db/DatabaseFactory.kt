@@ -13,6 +13,7 @@ fun createDataSource(config: ApplicationConfig): DataSource {
             username = config.property("storage.username").getString()
             password = config.property("storage.password").getString()
             maximumPoolSize = 10
+            isAutoCommit = false
         }
     return HikariDataSource(hikariConfig)
 }

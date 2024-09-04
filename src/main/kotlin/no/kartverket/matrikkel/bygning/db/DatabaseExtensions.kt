@@ -14,21 +14,7 @@ inline fun <T> Statement.executeQuery(sql: String, block: (ResultSet) -> T) = ex
 inline fun <T> Connection.prepareStatement(sql: String, block: (PreparedStatement) -> T) = prepareStatement(sql).use(block)
 inline fun <T> PreparedStatement.executeQuery(block: (ResultSet) -> T) = executeQuery().use(block)
 
-fun <T> DataSource.executeAndMapStatement(
-    sql: String, resultMapper: (ResultSet) -> T
-): List<T> {
-    return this.connection { connection ->
-        connection.createStatement { statement ->
-            statement.executeQuery(sql) { resultSet ->
-                generateSequence {
-                    if (resultSet.next()) resultMapper(resultSet) else null
-                }.toList()
-            }
-        }
-    }
-}
-
-fun <T> DataSource.executeAndMapPreparedStatement(
+fun <T> DataSource.executeQueryAndMapPreparedStatement(
     sql: String, vararg setters: (PreparedStatement) -> Unit, resultMapper: (ResultSet) -> T
 ): List<T> {
     return this.connection { connection ->

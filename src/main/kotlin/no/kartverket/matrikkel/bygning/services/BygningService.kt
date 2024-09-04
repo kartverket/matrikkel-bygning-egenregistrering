@@ -5,10 +5,11 @@ import no.kartverket.matrikkel.bygning.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
+import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 
 class BygningService(
     private val bygningClient: BygningClient,
-    private val egenregistreringService: EgenregistreringService
+    private val egenregistreringRepository: EgenregistreringRepository,
 ) {
     fun getBygningWithEgenregistrertData(bygningId: Long): Result<Bygning> {
         val bygning = bygningClient.getBygningById(bygningId)
@@ -18,7 +19,7 @@ class BygningService(
                 ),
             )
 
-        val bygningWithEgenregistrertData = egenregistreringService.findNewestEgenregistreringForBygning(bygningId)
+        val bygningWithEgenregistrertData = egenregistreringRepository.findNewestBygningRegistrering(bygningId)
             ?.let { bygning.withEgenregistrertData(it) }
             ?: bygning
 
@@ -26,6 +27,7 @@ class BygningService(
             .map(::addEgenregistrerteDataForBruksenhet)
 
         return Result.Success(bygningWithEgenregistrertData.withBruksenheter(bruksenheterWithEgenregistrertData))
+
     }
 
     fun getBruksenhetWithEgenregistrertData(bygningId: Long, bruksenhetId: Long): Result<Bruksenhet> {
@@ -49,7 +51,7 @@ class BygningService(
     }
 
     private fun addEgenregistrerteDataForBruksenhet(bruksenhet: Bruksenhet): Bruksenhet {
-        return egenregistreringService.findNewestEgenregistreringForBruksenhet(bruksenhet.bruksenhetId)
+        return egenregistreringRepository.findNewestBruksenhetRegistrering(bruksenhet.bruksenhetId)
             ?.let { bruksenhet.withEgenregistrertData(it) }
             ?: bruksenhet
     }

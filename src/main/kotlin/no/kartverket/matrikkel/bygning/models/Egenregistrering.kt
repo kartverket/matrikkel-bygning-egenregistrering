@@ -5,6 +5,7 @@ import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.serializers.UUIDSerializer
 import java.time.Instant
 import java.util.*
 
@@ -38,27 +39,32 @@ data class OppvarmingRegistrering(
     val oppvarminger: List<OppvarmingKode>,
 )
 
-
-interface Registrering {
-    val registreringId: UUID
-    val registreringTidspunkt: Instant
-}
-
+@Serializable
 data class BygningRegistrering(
+    @Serializable(with = UUIDSerializer::class)
+    val registreringId: UUID,
     val bygningId: Long,
     val byggeaarRegistrering: ByggeaarRegistrering?,
     val bruksarealRegistrering: BruksarealRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,
     val avlopRegistrering: AvlopRegistrering?,
-    override val registreringId: UUID,
-    override val registreringTidspunkt: Instant,
-) : Registrering
+)
 
+@Serializable
 data class BruksenhetRegistrering(
+    @Serializable(with = UUIDSerializer::class)
+    val registreringId: UUID,
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistrering?,
     val energikildeRegistrering: EnergikildeRegistrering?,
     val oppvarmingRegistrering: OppvarmingRegistrering?,
-    override val registreringId: UUID,
-    override val registreringTidspunkt: Instant,
-) : Registrering
+)
+
+data class Egenregistrering(
+    val id: UUID,
+    val registrerer: String,
+    val registreringTidspunkt: Instant,
+    val bygningId: Long,
+    val bygningRegistrering: BygningRegistrering?,
+    val bruksenhetRegistreringer: List<BruksenhetRegistrering>?
+)

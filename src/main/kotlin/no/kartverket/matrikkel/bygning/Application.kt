@@ -15,6 +15,7 @@ import no.kartverket.matrikkel.bygning.plugins.configureHTTP
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
+import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.bygningRouting
@@ -54,11 +55,13 @@ fun Application.mainModule() {
 
     val dataSource = createDataSource(config)
 
+    val egenregistreringRepository = EgenregistreringRepository(dataSource)
+
     val bygningClient = createBygningClient(config)
 
 
-    val egenregistreringService = EgenregistreringService(bygningClient)
-    val bygningService = BygningService(bygningClient, egenregistreringService)
+    val egenregistreringService = EgenregistreringService(bygningClient, egenregistreringRepository)
+    val bygningService = BygningService(bygningClient, egenregistreringRepository)
 
     routing {
         swagger()

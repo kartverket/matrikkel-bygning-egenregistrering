@@ -16,15 +16,18 @@ import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BygningRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.dto.request.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.dto.request.toEgenregistrering
 import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 
 fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
     egenregistreringDoc()
 
     post {
-        val egenregistrering = call.receive<EgenregistreringRequest>()
+        val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
-        when (val result = egenregistreringService.addEgenregistreringToBygning(egenregistrering)) {
+        val egenregistrering = egenregistreringRequest.toEgenregistrering("Egenregistrering")
+
+        when (val result = egenregistreringService.addEgenregistrering(egenregistrering)) {
             is Success -> call.respond(HttpStatusCode.Created)
             is ErrorResult -> call.respond(
                 status = HttpStatusCode.BadRequest,
