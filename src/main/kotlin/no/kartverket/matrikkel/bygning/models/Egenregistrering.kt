@@ -39,26 +39,31 @@ data class OppvarmingRegistrering(
     val oppvarminger: List<OppvarmingKode>,
 )
 
+sealed interface Registrering {
+    val registreringId: UUID
+    val bruksarealRegistrering: BruksarealRegistrering?
+}
+
 @Serializable
 data class BygningRegistrering(
     @Serializable(with = UUIDSerializer::class)
-    val registreringId: UUID,
+    override val registreringId: UUID,
     val bygningId: Long,
+    override val bruksarealRegistrering: BruksarealRegistrering?,
     val byggeaarRegistrering: ByggeaarRegistrering?,
-    val bruksarealRegistrering: BruksarealRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,
     val avlopRegistrering: AvlopRegistrering?,
-)
+) : Registrering
 
 @Serializable
 data class BruksenhetRegistrering(
     @Serializable(with = UUIDSerializer::class)
-    val registreringId: UUID,
+    override val registreringId: UUID,
     val bruksenhetId: Long,
-    val bruksarealRegistrering: BruksarealRegistrering?,
+    override val bruksarealRegistrering: BruksarealRegistrering?,
     val energikildeRegistrering: EnergikildeRegistrering?,
     val oppvarmingRegistrering: OppvarmingRegistrering?,
-)
+) : Registrering
 
 data class Egenregistrering(
     val id: UUID,

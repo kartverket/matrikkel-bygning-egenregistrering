@@ -8,9 +8,12 @@ import no.kartverket.matrikkel.bygning.db.prepareStatement
 import no.kartverket.matrikkel.bygning.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.models.Registrering
 import org.intellij.lang.annotations.Language
 import org.postgresql.util.PGobject
+import java.sql.Connection
 import java.sql.Timestamp
+import java.util.*
 import javax.sql.DataSource
 
 class EgenregistreringRepository(private val dataSource: DataSource) {
@@ -19,14 +22,9 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
             BygningRegistrering::class -> "bygningId"
             BruksenhetRegistrering::class -> "bruksenhetId"
             else -> null
-        }
+        } ?: return null
 
-        if (idName == null) {
-            return null
-        }
-
-        @Language("PostgreSQL")
-        val getRegistrering = """
+        @Language("PostgreSQL") val getRegistrering = """
                 select r.registrering, e.registrering_tidspunkt
                 from bygning.registrering r
                     left join bygning.egenregistrering e on e.id = r.egenregistrering_id
@@ -54,6 +52,26 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         return findNewestRegistrering<BygningRegistrering>(bygningId)
     }
 
+    private inline fun <reified T : Registrering> saveRegistrering(
+        connection: Connection, registrering: T, registreringId: UUID, egenregistreringId: UUID
+    ): Boolean {
+        @Language("PostgreSQL") val createRegistreringSQL = "INSERT INTO bygning.registrering values (?, ?, ?)"
+
+        return connection.prepareStatement(createRegistreringSQL) { preparedStatement ->
+            preparedStatement.setObject(1, registreringId)
+            preparedStatement.setObject(2, egenregistreringId)
+            preparedStatement.setObject(
+                3,
+                PGobject().apply {
+                    this.type = "jsonb"
+                    this.value = Json.encodeToString(registrering)
+                },
+            )
+
+            return@prepareStatement preparedStatement.executeUpdate() > 0
+        }
+    }
+
     fun saveEgenregistrering(egenregistrering: Egenregistrering): Boolean {
         // Try catch noe sted ??
         dataSource.connection { connection ->
@@ -70,43 +88,31 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
                 return@prepareStatement preparedStatement.executeUpdate() > 0
             }
 
-            // TODO Bør sikkert skille ut disse to
-            @Language("PostgreSQL") val createRegistreringSQL = "INSERT INTO bygning.registrering values (?, ?, ?)"
 
             val didSaveBygningRegistrering = egenregistrering.bygningRegistrering?.let { bygningRegistrering ->
-                connection.prepareStatement(createRegistreringSQL) { preparedStatement ->
-                    preparedStatement.setObject(1, bygningRegistrering.registreringId)
-                    preparedStatement.setObject(2, egenregistrering.id)
-                    preparedStatement.setObject(
-                        3,
-                        PGobject().apply {
-                            this.type = "jsonb"
-                            this.value = Json.encodeToString(bygningRegistrering)
-                        },
-                    )
-
-                    return@prepareStatement preparedStatement.executeUpdate() > 0
-                }
+                saveRegistrering(
+                    connection,
+                    bygningRegistrering,
+                    bygningRegistrering.registreringId,
+                    egenregistrering.id,
+                )
             }
 
             val didSaveBruksenhetRegistreringer = egenregistrering.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
-                connection.prepareStatement(createRegistreringSQL) { preparedStatement ->
-                    preparedStatement.setObject(1, bruksenhetRegistrering.registreringId)
-                    preparedStatement.setObject(2, egenregistrering.id)
-                    preparedStatement.setObject(
-                        3,
-                        PGobject().apply {
-                            this.type = "jsonb"
-                            this.value = Json.encodeToString(bruksenhetRegistrering)
-                        },
-                    )
-
-                    return@prepareStatement preparedStatement.executeUpdate() > 0
-                }
+                saveRegistrering(
+                    connection,
+                    bruksenhetRegistrering,
+                    bruksenhetRegistrering.registreringId,
+                    egenregistrering.id,
+                )
             }
 
             // Lol
-            if (didSaveEgenregistrering && (didSaveBygningRegistrering != null && didSaveBygningRegistrering) && (didSaveBruksenhetRegistreringer != null && didSaveBruksenhetRegistreringer.all { it })) {
+            if (
+                didSaveEgenregistrering &&
+                (didSaveBygningRegistrering != null && didSaveBygningRegistrering) &&
+                (didSaveBruksenhetRegistreringer != null && didSaveBruksenhetRegistreringer.all { it })
+            ) {
                 connection.commit()
                 return true
             }
