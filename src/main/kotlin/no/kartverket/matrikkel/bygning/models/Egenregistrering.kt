@@ -65,6 +65,9 @@ data class BruksenhetRegistrering(
     val oppvarmingRegistrering: OppvarmingRegistrering?,
 ) : Registrering
 
+// Ikke så fan av at egenregistrering har bygningID på toppnivå, og en bygning også har bygningId
+// Per nå trenger man det for at bygningRegistreringer kan hentes opp på bygningId, samt at man må hente riktig bygning og bruksenheter
+// når man egenregistrerer bruksenheter
 data class Egenregistrering(
     val id: UUID,
     val registrerer: String,
