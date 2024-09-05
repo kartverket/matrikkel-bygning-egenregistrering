@@ -19,6 +19,7 @@ class BygningService(
                 ),
             )
 
+        // Burde disse heller komme fra egenregistreringService, i stedet for å sende inn egenregistreringRepository her?
         val bygningWithEgenregistrertData = egenregistreringRepository.findNewestBygningRegistrering(bygningId)
             ?.let { bygning.withEgenregistrertData(it) }
             ?: bygning

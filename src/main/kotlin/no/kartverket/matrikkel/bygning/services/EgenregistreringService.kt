@@ -7,19 +7,22 @@ import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 
-class EgenregistreringService(private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository) {
+class EgenregistreringService(
+    private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository
+) {
     fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
 
         val bygning = bygningClient.getBygningById(egenregistrering.bygningId) ?: return Result.ErrorResult(
             ErrorDetail(
-                detail = "Bygningen finnes ikke i matrikkelen",
+                detail = "Bygning med ID ${egenregistrering.bygningId} finnes ikke i matrikkelen",
             ),
         )
 
-        if (!isAllBruksenheterRegisteredOnCorrectBygning(egenregistrering, bygning)) {
+        val invalidBruksenheter = findBruksenheterNotRegisteredOnCorrectBygning(egenregistrering, bygning)
+        if (invalidBruksenheter.isNotEmpty()) {
             return Result.ErrorResult(
                 ErrorDetail(
-                    detail = "Bruksenheten finnes ikke i bygningen",
+                    detail = "Bruksenhet${if (invalidBruksenheter.size > 1) "er" else ""} med ID ${invalidBruksenheter.joinToString()} finnes ikke i bygning med ID ${bygning.bygningId}",
                 ),
             )
         }
@@ -33,19 +36,25 @@ class EgenregistreringService(private val bygningClient: BygningClient, private 
             // Skal vi ha en måte å sende ut "internal server error" fra services?
             Result.ErrorResult(
                 ErrorDetail(
-                    detail = "Noe gikk galt under lagring av egenregistrering"
-                )
+                    detail = "Noe gikk galt under lagring av egenregistrering",
+                ),
             )
         }
     }
 
-    private fun isAllBruksenheterRegisteredOnCorrectBygning(
+    private fun findBruksenheterNotRegisteredOnCorrectBygning(
         egenregistrering: Egenregistrering, bygning: Bygning
-    ): Boolean {
-        if (egenregistrering.bruksenhetRegistreringer?.isEmpty() == true) return true
+    ): List<Long> {
+        if (egenregistrering.bruksenhetRegistreringer?.isEmpty() == true) return emptyList()
 
-        return egenregistrering.bruksenhetRegistreringer?.any { bruksenhetRegistering ->
-            bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
-        } ?: true
+        return egenregistrering.bruksenhetRegistreringer?.mapNotNull { bruksenhetRegistering ->
+            val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
+
+            if (bruksenhet == null) {
+                return@mapNotNull bruksenhetRegistering.bruksenhetId
+            } else {
+                return@mapNotNull null
+            }
+        } ?: emptyList()
     }
 }
