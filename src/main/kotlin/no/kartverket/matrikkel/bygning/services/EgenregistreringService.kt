@@ -10,7 +10,7 @@ import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 class EgenregistreringService(
     private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository
 ) {
-    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
+    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Int> {
 
         val bygning = bygningClient.getBygningById(egenregistrering.bygningId) ?: return Result.ErrorResult(
             ErrorDetail(
@@ -27,19 +27,9 @@ class EgenregistreringService(
             )
         }
 
-        val egenregistreringWasSaved = egenregistreringRepository.saveEgenregistrering(egenregistrering);
+        val egenregistreringSaveResult = egenregistreringRepository.saveEgenregistrering(egenregistrering);
 
-        return if (egenregistreringWasSaved) {
-            Result.Success(Unit)
-        } else {
-            // TODO Dette er egentlig en 500 error, for noe har gått galt men vi vet ikke hva.
-            // Skal vi ha en måte å sende ut "internal server error" fra services?
-            Result.ErrorResult(
-                ErrorDetail(
-                    detail = "Noe gikk galt under lagring av egenregistrering",
-                ),
-            )
-        }
+        return egenregistreringSaveResult
     }
 
     private fun findBruksenheterNotRegisteredOnCorrectBygning(

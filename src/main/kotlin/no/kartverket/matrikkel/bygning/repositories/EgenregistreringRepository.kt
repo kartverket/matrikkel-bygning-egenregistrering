@@ -71,7 +71,7 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
     fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Int> {
         return dataSource.withTransaction<Int> { connection ->
             @Language("PostgreSQL") val createEgenregistreringSQL = "INSERT INTO bygning.egenregistrering values (?, ?, ?)"
-            val egenregistreringSavedCount = connection.prepareAndExecuteUpdate(
+            connection.prepareAndExecuteUpdate(
                 createEgenregistreringSQL,
                 { it.setObject(1, egenregistrering.id) },
                 { it.setString(2, egenregistrering.registrerer) },
@@ -92,7 +92,7 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
                 },
             )
 
-            return@withTransaction Result.Success(egenregistreringSavedCount + bygningAndBruksenheterRegistreringSavedCounts.sum())
+            return@withTransaction Result.Success(bygningAndBruksenheterRegistreringSavedCounts.sum())
         }
     }
 }
