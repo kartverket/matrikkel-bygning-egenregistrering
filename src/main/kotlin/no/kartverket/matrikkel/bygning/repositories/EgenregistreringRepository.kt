@@ -2,18 +2,20 @@ package no.kartverket.matrikkel.bygning.repositories
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import no.kartverket.matrikkel.bygning.db.connection
 import no.kartverket.matrikkel.bygning.db.executeQueryAndMapPreparedStatement
-import no.kartverket.matrikkel.bygning.db.prepareStatement
+import no.kartverket.matrikkel.bygning.db.prepareAndExecuteUpdate
+import no.kartverket.matrikkel.bygning.db.prepareBatchAndExecuteUpdate
+import no.kartverket.matrikkel.bygning.db.withTransaction
 import no.kartverket.matrikkel.bygning.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.Registrering
+import no.kartverket.matrikkel.bygning.models.Result
 import org.intellij.lang.annotations.Language
 import org.postgresql.util.PGobject
-import java.sql.Connection
+import java.sql.PreparedStatement
 import java.sql.Timestamp
-import java.util.*
+import java.util.UUID
 import javax.sql.DataSource
 
 class EgenregistreringRepository(private val dataSource: DataSource) {
@@ -52,72 +54,45 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         return findNewestRegistrering<BygningRegistrering>(bygningId)
     }
 
-    private inline fun <reified T : Registrering> saveRegistrering(
-        connection: Connection, registrering: T, registreringId: UUID, egenregistreringId: UUID
-    ): Boolean {
-        @Language("PostgreSQL") val createRegistreringSQL = "INSERT INTO bygning.registrering values (?, ?, ?)"
+    inline fun <reified T : Registrering> createRegistreringBatchSetter(
+        egenregistreringId: UUID, registrering: T
+    ): (PreparedStatement) -> Unit = { preparedStatement ->
+        preparedStatement.setObject(1, registrering.registreringId)
+        preparedStatement.setObject(2, egenregistreringId)
+        preparedStatement.setObject(
+            3,
+            PGobject().apply {
+                this.type = "jsonb"
+                this.value = Json.encodeToString(registrering)
+            },
+        )
+    }
 
-        return connection.prepareStatement(createRegistreringSQL) { preparedStatement ->
-            preparedStatement.setObject(1, registreringId)
-            preparedStatement.setObject(2, egenregistreringId)
-            preparedStatement.setObject(
-                3,
-                PGobject().apply {
-                    this.type = "jsonb"
-                    this.value = Json.encodeToString(registrering)
+    fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Int> {
+        return dataSource.withTransaction<Int> { connection ->
+            @Language("PostgreSQL") val createEgenregistreringSQL = "INSERT INTO bygning.egenregistrering values (?, ?, ?)"
+            val egenregistreringSavedCount = connection.prepareAndExecuteUpdate(
+                createEgenregistreringSQL,
+                { it.setObject(1, egenregistrering.id) },
+                { it.setString(2, egenregistrering.registrerer) },
+                { it.setTimestamp(3, Timestamp.from(egenregistrering.registreringTidspunkt)) },
+            )
+
+            @Language("PostgreSQL") val createRegistreringSQL = "INSERT INTO bygning.registrering values (?, ?, ?)"
+            val bygningAndBruksenheterRegistreringSavedCounts = connection.prepareBatchAndExecuteUpdate(
+                createRegistreringSQL,
+                buildList {
+                    egenregistrering.bygningRegistrering?.let { bygningRegistrering ->
+                        add(createRegistreringBatchSetter(egenregistrering.id, bygningRegistrering))
+                    }
+
+                    egenregistrering.bruksenhetRegistreringer?.forEach { bruksenhetRegistrering ->
+                        add(createRegistreringBatchSetter(egenregistrering.id, bruksenhetRegistrering))
+                    }
                 },
             )
 
-            return@prepareStatement preparedStatement.executeUpdate() > 0
-        }
-    }
-
-    fun saveEgenregistrering(egenregistrering: Egenregistrering): Boolean {
-        // Try catch noe sted ??
-        dataSource.connection { connection ->
-            connection.autoCommit = false
-
-            @Language("PostgreSQL") val createEgenregistreringSQL = "INSERT INTO bygning.egenregistrering values (?, ?, ?)"
-
-            val didSaveEgenregistrering = connection.prepareStatement(createEgenregistreringSQL) { preparedStatement ->
-                preparedStatement.setObject(1, egenregistrering.id)
-                preparedStatement.setString(2, egenregistrering.registrerer)
-                // TODO Hvordan sette timestamp riktig mellom java typer?
-                preparedStatement.setTimestamp(3, Timestamp.from(egenregistrering.registreringTidspunkt))
-
-                return@prepareStatement preparedStatement.executeUpdate() > 0
-            }
-
-
-            val didSaveBygningRegistrering = egenregistrering.bygningRegistrering?.let { bygningRegistrering ->
-                saveRegistrering(
-                    connection,
-                    bygningRegistrering,
-                    bygningRegistrering.registreringId,
-                    egenregistrering.id,
-                )
-            }
-
-            val didSaveBruksenhetRegistreringer = egenregistrering.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
-                saveRegistrering(
-                    connection,
-                    bruksenhetRegistrering,
-                    bruksenhetRegistrering.registreringId,
-                    egenregistrering.id,
-                )
-            }
-
-            // Lol
-            if (
-                didSaveEgenregistrering &&
-                (didSaveBygningRegistrering != null && didSaveBygningRegistrering) &&
-                (didSaveBruksenhetRegistreringer != null && didSaveBruksenhetRegistreringer.all { it })
-            ) {
-                connection.commit()
-                return true
-            }
-
-            return false
+            return@withTransaction Result.Success(egenregistreringSavedCount + bygningAndBruksenheterRegistreringSavedCounts.sum())
         }
     }
 }
