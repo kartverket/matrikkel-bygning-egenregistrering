@@ -49,8 +49,8 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         }.firstOrNull()
     }
 
-    fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Int> {
-        return dataSource.withTransaction<Int> { connection ->
+    fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
+        return dataSource.withTransaction<Unit> { connection ->
             connection.prepareAndExecuteUpdate(
                 "INSERT INTO bygning.egenregistrering values (?, ?, ?)",
                 { it.setObject(1, egenregistrering.id) },
@@ -58,7 +58,7 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
                 { it.setTimestamp(3, Timestamp.from(egenregistrering.registreringTidspunkt)) },
             )
 
-            val bygningAndBruksenheterRegistreringSavedCounts = connection.prepareBatchAndExecuteUpdate(
+            connection.prepareBatchAndExecuteUpdate(
                 "INSERT INTO bygning.registrering values (?, ?, ?)",
                 buildList {
                     egenregistrering.bygningRegistrering?.let { bygningRegistrering ->
@@ -70,8 +70,6 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
                     }
                 },
             )
-
-            bygningAndBruksenheterRegistreringSavedCounts.sum()
         }
     }
 

@@ -36,20 +36,20 @@ fun <T> DataSource.executeQueryAndMapPreparedStatement(
     }
 }
 
-fun Connection.prepareAndExecuteUpdate(sql: String, vararg setters: (PreparedStatement) -> Unit): Int {
+fun Connection.prepareAndExecuteUpdate(sql: String, vararg setters: (PreparedStatement) -> Unit) {
     return this.prepareStatement(sql) { preparedStatement ->
         setters.forEach { it(preparedStatement) }
         preparedStatement.executeUpdate()
     }
 }
 
-fun Connection.prepareBatchAndExecuteUpdate(sql: String, batchSetters: List<(PreparedStatement) -> Unit>): List<Int> {
+fun Connection.prepareBatchAndExecuteUpdate(sql: String, batchSetters: List<(PreparedStatement) -> Unit>) {
     return this.prepareStatement(sql) { preparedStatement ->
         batchSetters.forEach { setter ->
             setter(preparedStatement)
             preparedStatement.addBatch()
         }
-        preparedStatement.executeBatch().toList()
+        preparedStatement.executeBatch()
     }
 }
 
