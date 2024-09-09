@@ -11,7 +11,6 @@ import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.Registrering
 import no.kartverket.matrikkel.bygning.models.Result
-import org.intellij.lang.annotations.Language
 import org.postgresql.util.PGobject
 import java.sql.PreparedStatement
 import java.sql.Timestamp
@@ -26,17 +25,15 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
             else -> null
         } ?: return null
 
-        @Language("PostgreSQL") val getRegistrering = """
+        val newestRegistrering = dataSource.executeQueryAndMapPreparedStatement(
+            """
                 select r.registrering, e.registrering_tidspunkt
                 from bygning.registrering r
                     left join bygning.egenregistrering e on e.id = r.egenregistrering_id
                 where r.registrering ->> ? = ?
                 order by e.registrering_tidspunkt DESC
                 limit 1;
-            """.trimIndent()
-
-        val newestRegistrering = dataSource.executeQueryAndMapPreparedStatement(
-            getRegistrering,
+            """.trimIndent(),
             { it.setString(1, idName) },
             { it.setString(2, id.toString()) },
         ) {
@@ -70,17 +67,15 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
 
     fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Int> {
         return dataSource.withTransaction<Int> { connection ->
-            @Language("PostgreSQL") val createEgenregistreringSQL = "INSERT INTO bygning.egenregistrering values (?, ?, ?)"
             connection.prepareAndExecuteUpdate(
-                createEgenregistreringSQL,
+                "INSERT INTO bygning.egenregistrering values (?, ?, ?)",
                 { it.setObject(1, egenregistrering.id) },
                 { it.setString(2, egenregistrering.registrerer) },
                 { it.setTimestamp(3, Timestamp.from(egenregistrering.registreringTidspunkt)) },
             )
 
-            @Language("PostgreSQL") val createRegistreringSQL = "INSERT INTO bygning.registrering values (?, ?, ?)"
             val bygningAndBruksenheterRegistreringSavedCounts = connection.prepareBatchAndExecuteUpdate(
-                createRegistreringSQL,
+                "INSERT INTO bygning.registrering values (?, ?, ?)",
                 buildList {
                     egenregistrering.bygningRegistrering?.let { bygningRegistrering ->
                         add(createRegistreringBatchSetter(egenregistrering.id, bygningRegistrering))
@@ -92,7 +87,7 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
                 },
             )
 
-            return@withTransaction Result.Success(bygningAndBruksenheterRegistreringSavedCounts.sum())
+            bygningAndBruksenheterRegistreringSavedCounts.sum()
         }
     }
 }

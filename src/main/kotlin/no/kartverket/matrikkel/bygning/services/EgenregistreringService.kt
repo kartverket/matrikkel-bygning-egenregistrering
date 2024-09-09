@@ -41,9 +41,9 @@ class EgenregistreringService(
             val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
 
             if (bruksenhet == null) {
-                return@mapNotNull bruksenhetRegistering.bruksenhetId
+                bruksenhetRegistering.bruksenhetId
             } else {
-                return@mapNotNull null
+                null
             }
         } ?: emptyList()
     }
