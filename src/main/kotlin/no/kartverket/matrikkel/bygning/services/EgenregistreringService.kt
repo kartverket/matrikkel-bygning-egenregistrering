@@ -10,7 +10,7 @@ import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 class EgenregistreringService(
     private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository
 ) {
-    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Int> {
+    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
 
         val bygning = bygningClient.getBygningById(egenregistrering.bygningId) ?: return Result.ErrorResult(
             ErrorDetail(
