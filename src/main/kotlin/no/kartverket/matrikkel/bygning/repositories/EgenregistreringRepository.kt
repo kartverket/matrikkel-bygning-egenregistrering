@@ -18,14 +18,22 @@ import java.util.UUID
 import javax.sql.DataSource
 
 class EgenregistreringRepository(private val dataSource: DataSource) {
-    private inline fun <reified T> findNewestRegistrering(id: Long): T? {
+    fun findNewestBruksenhetRegistrering(bruksenhetId: Long): BruksenhetRegistrering? {
+        return findNewestRegistrering<BruksenhetRegistrering>(bruksenhetId)
+    }
+
+    fun findNewestBygningRegistrering(bygningId: Long): BygningRegistrering? {
+        return findNewestRegistrering<BygningRegistrering>(bygningId)
+    }
+
+    private inline fun <reified T: Registrering> findNewestRegistrering(id: Long): T? {
         val idName = when (T::class) {
             BygningRegistrering::class -> "bygningId"
             BruksenhetRegistrering::class -> "bruksenhetId"
             else -> null
-        } ?: return null
+        } ?: throw RuntimeException("Det ble forsøkt å hente registrering med feil type, ${T::class}")
 
-        val newestRegistrering = dataSource.executeQueryAndMapPreparedStatement(
+        return dataSource.executeQueryAndMapPreparedStatement(
             """
                 select r.registrering, e.registrering_tidspunkt
                 from bygning.registrering r
@@ -39,30 +47,6 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         ) {
             Json.decodeFromString<T>(it.getString("registrering"))
         }.firstOrNull()
-
-        return newestRegistrering
-    }
-
-    fun findNewestBruksenhetRegistrering(bruksenhetId: Long): BruksenhetRegistrering? {
-        return findNewestRegistrering<BruksenhetRegistrering>(bruksenhetId)
-    }
-
-    fun findNewestBygningRegistrering(bygningId: Long): BygningRegistrering? {
-        return findNewestRegistrering<BygningRegistrering>(bygningId)
-    }
-
-    inline fun <reified T : Registrering> createRegistreringBatchSetter(
-        egenregistreringId: UUID, registrering: T
-    ): (PreparedStatement) -> Unit = { preparedStatement ->
-        preparedStatement.setObject(1, registrering.registreringId)
-        preparedStatement.setObject(2, egenregistreringId)
-        preparedStatement.setObject(
-            3,
-            PGobject().apply {
-                this.type = "jsonb"
-                this.value = Json.encodeToString(registrering)
-            },
-        )
     }
 
     fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Int> {
@@ -89,5 +73,19 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
 
             bygningAndBruksenheterRegistreringSavedCounts.sum()
         }
+    }
+
+    private inline fun <reified T : Registrering> createRegistreringBatchSetter(
+        egenregistreringId: UUID, registrering: T
+    ): (PreparedStatement) -> Unit = { preparedStatement ->
+        preparedStatement.setObject(1, registrering.registreringId)
+        preparedStatement.setObject(2, egenregistreringId)
+        preparedStatement.setObject(
+            3,
+            PGobject().apply {
+                this.type = "jsonb"
+                this.value = Json.encodeToString(registrering)
+            },
+        )
     }
 }

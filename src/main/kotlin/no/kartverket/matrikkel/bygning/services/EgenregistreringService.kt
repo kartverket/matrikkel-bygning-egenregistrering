@@ -27,9 +27,7 @@ class EgenregistreringService(
             )
         }
 
-        val egenregistreringSaveResult = egenregistreringRepository.saveEgenregistrering(egenregistrering);
-
-        return egenregistreringSaveResult
+        return egenregistreringRepository.saveEgenregistrering(egenregistrering);
     }
 
     private fun findBruksenheterNotRegisteredOnCorrectBygning(
