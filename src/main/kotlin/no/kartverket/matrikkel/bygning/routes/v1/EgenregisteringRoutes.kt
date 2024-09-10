@@ -25,7 +25,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
     post {
         val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
-        val egenregistrering = egenregistreringRequest.toEgenregistrering("Egenregistrering")
+        val egenregistrering = egenregistreringRequest.toEgenregistrering()
 
         when (val result = egenregistreringService.addEgenregistrering(egenregistrering)) {
             is Success -> call.respond(HttpStatusCode.Created, "${result.data} registreringer ble lagret")

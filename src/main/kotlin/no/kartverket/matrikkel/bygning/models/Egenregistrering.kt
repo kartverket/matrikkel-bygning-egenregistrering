@@ -70,7 +70,6 @@ data class BruksenhetRegistrering(
 // når man egenregistrerer bruksenheter
 data class Egenregistrering(
     val id: UUID,
-    val registrerer: String,
     val registreringTidspunkt: Instant,
     val bygningId: Long,
     val bygningRegistrering: BygningRegistrering?,

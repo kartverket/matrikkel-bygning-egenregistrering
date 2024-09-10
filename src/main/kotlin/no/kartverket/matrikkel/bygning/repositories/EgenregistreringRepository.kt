@@ -54,11 +54,10 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
     fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
         return dataSource.withTransaction<Unit> { connection ->
             connection.prepareAndExecuteUpdate(
-                "INSERT INTO bygning.egenregistrering values (?, ?, ?)",
+                "INSERT INTO bygning.egenregistrering values (?, ?)",
             ) {
                 it.setObject(1, egenregistrering.id)
-                it.setString(2, egenregistrering.registrerer)
-                it.setTimestamp(3, Timestamp.from(egenregistrering.registreringTidspunkt))
+                it.setTimestamp(2, Timestamp.from(egenregistrering.registreringTidspunkt))
             }
 
             connection.prepareBatchAndExecuteUpdate(

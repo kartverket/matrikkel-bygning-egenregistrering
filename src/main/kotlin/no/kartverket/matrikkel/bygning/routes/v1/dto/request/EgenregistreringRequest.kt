@@ -37,10 +37,9 @@ data class EgenregistreringRequest(
     val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
 
-fun EgenregistreringRequest.toEgenregistrering(registrerer: String): Egenregistrering {
+fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     return Egenregistrering(
         id = UUID.randomUUID(),
-        registrerer = registrerer,
         registreringTidspunkt = Instant.now(),
         bygningId = this.bygningId,
         bygningRegistrering = BygningRegistrering(
