@@ -33,8 +33,6 @@ class EgenregistreringService(
     private fun findBruksenheterNotRegisteredOnCorrectBygning(
         egenregistrering: Egenregistrering, bygning: Bygning
     ): List<Long> {
-        if (egenregistrering.bruksenhetRegistreringer?.isEmpty() == true) return emptyList()
-
         return egenregistrering.bruksenhetRegistreringer?.mapNotNull { bruksenhetRegistering ->
             val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
 
