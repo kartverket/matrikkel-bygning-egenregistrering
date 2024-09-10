@@ -27,12 +27,12 @@ internal class LocalBygningClient : BygningClient {
     private val bygninger: List<Bygning> = listOf(
         Bygning(
             bygningId = 1L,
-            bygningNummer = 100L,
+            bygningsnummer = 100L,
             bruksenheter = bruksenheter.subList(0, 2),
         ),
         Bygning(
             bygningId = 2L,
-            bygningNummer = 200L,
+            bygningsnummer = 200L,
             bruksenheter = bruksenheter.subList(2, 4),
         ),
     )
@@ -42,6 +42,6 @@ internal class LocalBygningClient : BygningClient {
     }
 
     override fun getBygningByBygningNummer(bygningNummer: Long): Bygning? {
-        return bygninger.find { it.bygningNummer == bygningNummer }
+        return bygninger.find { it.bygningsnummer == bygningNummer }
     }
 }

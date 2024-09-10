@@ -11,7 +11,7 @@ import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
 @Serializable
 data class BygningResponse(
     val bygningId: Long,
-    val bygningNummer: Long,
+    val bygningsnummer: Long,
     val byggeaar: Int? = null,
     val bruksareal: Double? = null,
     val vannforsyning: VannforsyningKode? = null,
@@ -21,7 +21,7 @@ data class BygningResponse(
 
 fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
     bygningId = this.bygningId,
-    bygningNummer = this.bygningNummer,
+    bygningsnummer = this.bygningsnummer,
     bruksareal = this.bruksareal,
     byggeaar = this.byggeaar,
     bruksenheter = this.bruksenheter.map { it.toBruksenhetResponse() },
