@@ -4,12 +4,12 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import no.kartverket.matrikkel.bygning.TestWithDb
+import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BygningResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class BygningRouteTest : TestWithDb() {
+class BygningRouteTest : TestApplicationWithDb() {
 
     @Test
     fun `gitt at en bygning id eksisterer svarer bygning route ok`() = testApplication {

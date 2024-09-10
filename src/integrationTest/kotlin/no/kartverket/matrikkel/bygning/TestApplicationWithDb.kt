@@ -9,8 +9,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.testcontainers.containers.PostgreSQLContainer
 
-abstract class TestWithDb {
-
+abstract class TestApplicationWithDb {
     companion object {
         private val postgresSQLContainer = PostgreSQLContainer("postgres:15-alpine")
 
