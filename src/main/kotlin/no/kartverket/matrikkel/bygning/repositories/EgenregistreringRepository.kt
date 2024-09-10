@@ -26,7 +26,7 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         return findNewestRegistrering<BygningRegistrering>(bygningId)
     }
 
-    private inline fun <reified T: Registrering> findNewestRegistrering(id: Long): T? {
+    private inline fun <reified T : Registrering> findNewestRegistrering(id: Long): T? {
         val idName = when (T::class) {
             BygningRegistrering::class -> "bygningId"
             BruksenhetRegistrering::class -> "bruksenhetId"
@@ -42,8 +42,10 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
                 order by e.registrering_tidspunkt DESC
                 limit 1;
             """.trimIndent(),
-            { it.setString(1, idName) },
-            { it.setString(2, id.toString()) },
+            {
+                it.setString(1, idName)
+                it.setString(2, id.toString())
+            },
         ) {
             Json.decodeFromString<T>(it.getString("registrering"))
         }.firstOrNull()
@@ -53,10 +55,11 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         return dataSource.withTransaction<Unit> { connection ->
             connection.prepareAndExecuteUpdate(
                 "INSERT INTO bygning.egenregistrering values (?, ?, ?)",
-                { it.setObject(1, egenregistrering.id) },
-                { it.setString(2, egenregistrering.registrerer) },
-                { it.setTimestamp(3, Timestamp.from(egenregistrering.registreringTidspunkt)) },
-            )
+            ) {
+                it.setObject(1, egenregistrering.id)
+                it.setString(2, egenregistrering.registrerer)
+                it.setTimestamp(3, Timestamp.from(egenregistrering.registreringTidspunkt))
+            }
 
             connection.prepareBatchAndExecuteUpdate(
                 "INSERT INTO bygning.registrering values (?, ?, ?)",

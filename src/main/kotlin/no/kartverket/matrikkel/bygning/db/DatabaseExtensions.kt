@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.sql.SQLException
 import java.sql.Statement
 import javax.sql.DataSource
 
@@ -22,11 +21,11 @@ inline fun <T> Connection.prepareStatement(sql: String, block: (PreparedStatemen
 inline fun <T> PreparedStatement.executeQuery(block: (ResultSet) -> T) = executeQuery().use(block)
 
 fun <T> DataSource.executeQueryAndMapPreparedStatement(
-    sql: String, vararg setters: (PreparedStatement) -> Unit, resultMapper: (ResultSet) -> T
+    sql: String, setterBlock: (PreparedStatement) -> Unit, resultMapper: (ResultSet) -> T
 ): List<T> {
     return this.connection { connection ->
         connection.prepareStatement(sql) { preparedStatement ->
-            setters.forEach { it(preparedStatement) }
+            setterBlock(preparedStatement)
             preparedStatement.executeQuery() { resultSet ->
                 generateSequence {
                     if (resultSet.next()) resultMapper(resultSet) else null
@@ -36,17 +35,17 @@ fun <T> DataSource.executeQueryAndMapPreparedStatement(
     }
 }
 
-fun Connection.prepareAndExecuteUpdate(sql: String, vararg setters: (PreparedStatement) -> Unit) {
+fun Connection.prepareAndExecuteUpdate(sql: String, setterBlock: (PreparedStatement) -> Unit) {
     return this.prepareStatement(sql) { preparedStatement ->
-        setters.forEach { it(preparedStatement) }
+        setterBlock(preparedStatement)
         preparedStatement.executeUpdate()
     }
 }
 
-fun Connection.prepareBatchAndExecuteUpdate(sql: String, batchSetters: List<(PreparedStatement) -> Unit>) {
+fun Connection.prepareBatchAndExecuteUpdate(sql: String, setterBlocks: List<(PreparedStatement) -> Unit>) {
     return this.prepareStatement(sql) { preparedStatement ->
-        batchSetters.forEach { setter ->
-            setter(preparedStatement)
+        setterBlocks.forEach { setterBlock ->
+            setterBlock(preparedStatement)
             preparedStatement.addBatch()
         }
         preparedStatement.executeBatch()
@@ -64,7 +63,7 @@ fun <T> DataSource.withTransaction(block: (Connection) -> T): Result<T> {
 
             return Result.Success(result)
 
-        } catch (e: SQLException) {
+        } catch (e: Exception) {
             log.warn("Det skjedde noe galt under eksekvering av SQL", e)
             connection.rollback()
 
