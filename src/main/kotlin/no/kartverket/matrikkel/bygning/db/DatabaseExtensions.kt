@@ -62,7 +62,6 @@ fun <T> DataSource.withTransaction(block: (Connection) -> T): Result<T> {
             connection.commit()
 
             return Result.Success(result)
-
         } catch (e: Exception) {
             log.warn("Det skjedde noe galt under eksekvering av SQL", e)
             connection.rollback()
