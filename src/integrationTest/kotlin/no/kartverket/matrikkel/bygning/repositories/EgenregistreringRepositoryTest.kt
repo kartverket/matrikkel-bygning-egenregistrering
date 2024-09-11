@@ -7,13 +7,14 @@ import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
-class EgenregistreringRepositoryTest() : TestWithDb() {
+class EgenregistreringRepositoryTest : TestWithDb() {
     val egenregistreringRepository = EgenregistreringRepository(dataSource)
 
     val defaultBygningRegistrering = BygningRegistrering(
         registreringId = UUID.randomUUID(),
+        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         bygningId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             bruksareal = 125.0,
@@ -25,6 +26,7 @@ class EgenregistreringRepositoryTest() : TestWithDb() {
 
     val defaultBruksenhetRegistrering = BruksenhetRegistrering(
         registreringId = UUID.randomUUID(),
+        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         bruksenhetId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             bruksareal = 125.0,
@@ -35,7 +37,7 @@ class EgenregistreringRepositoryTest() : TestWithDb() {
 
     val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
-        registreringTidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
+        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         bygningId = 1L,
         bygningRegistrering = defaultBygningRegistrering,
         bruksenhetRegistreringer = emptyList(),
@@ -55,7 +57,7 @@ class EgenregistreringRepositoryTest() : TestWithDb() {
 
         val registrering2 = defaultEgenregistrering.copy(
             id = newUUIDEgenregistrering,
-            defaultEgenregistrering.registreringTidspunkt.plusSeconds(60),
+            defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
             bygningRegistrering = defaultBygningRegistrering.copy(
                 registreringId = newUUIDBygningRegistrering,
                 bruksarealRegistrering = BruksarealRegistrering(
@@ -80,7 +82,7 @@ class EgenregistreringRepositoryTest() : TestWithDb() {
 
         val registrering2 = defaultBruksenhetEgenregistrering.copy(
             id = newUUIDEgenregistrering,
-            defaultEgenregistrering.registreringTidspunkt.plusSeconds(60),
+            defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
             bruksenhetRegistreringer = listOf(
                 defaultBruksenhetRegistrering.copy(
                     registreringId = newUUIDBruksenhetRegistrering,
