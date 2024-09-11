@@ -5,6 +5,7 @@ import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.serializers.UUIDSerializer
 import java.time.Instant
 import java.util.*
 
@@ -38,27 +39,39 @@ data class OppvarmingRegistrering(
     val oppvarminger: List<OppvarmingKode>,
 )
 
-
-interface Registrering {
+sealed interface Registrering {
     val registreringId: UUID
-    val registreringTidspunkt: Instant
+    val bruksarealRegistrering: BruksarealRegistrering?
 }
 
+@Serializable
 data class BygningRegistrering(
+    @Serializable(with = UUIDSerializer::class)
+    override val registreringId: UUID,
     val bygningId: Long,
+    override val bruksarealRegistrering: BruksarealRegistrering?,
     val byggeaarRegistrering: ByggeaarRegistrering?,
-    val bruksarealRegistrering: BruksarealRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,
     val avlopRegistrering: AvlopRegistrering?,
-    override val registreringId: UUID,
-    override val registreringTidspunkt: Instant,
 ) : Registrering
 
+@Serializable
 data class BruksenhetRegistrering(
+    @Serializable(with = UUIDSerializer::class)
+    override val registreringId: UUID,
     val bruksenhetId: Long,
-    val bruksarealRegistrering: BruksarealRegistrering?,
+    override val bruksarealRegistrering: BruksarealRegistrering?,
     val energikildeRegistrering: EnergikildeRegistrering?,
     val oppvarmingRegistrering: OppvarmingRegistrering?,
-    override val registreringId: UUID,
-    override val registreringTidspunkt: Instant,
 ) : Registrering
+
+// Ikke så fan av at egenregistrering har bygningID på toppnivå, og en bygning også har bygningId
+// Per nå trenger man det for at bygningRegistreringer kan hentes opp på bygningId, samt at man må hente riktig bygning og bruksenheter
+// når man egenregistrerer bruksenheter
+data class Egenregistrering(
+    val id: UUID,
+    val registreringTidspunkt: Instant,
+    val bygningId: Long,
+    val bygningRegistrering: BygningRegistrering?,
+    val bruksenhetRegistreringer: List<BruksenhetRegistrering>?
+)

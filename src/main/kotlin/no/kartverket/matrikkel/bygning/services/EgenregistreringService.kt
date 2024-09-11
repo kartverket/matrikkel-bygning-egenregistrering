@@ -1,93 +1,46 @@
 package no.kartverket.matrikkel.bygning.services
 
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
-import no.kartverket.matrikkel.bygning.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.Bygning
-import no.kartverket.matrikkel.bygning.models.BygningRegistrering
+import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.EgenregistreringRequest
-import java.time.Instant
-import java.util.*
+import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 
-class EgenregistreringService(private val bygningClient: BygningClient) {
-    private val bygningRegistreringer: MutableList<BygningRegistrering> = mutableListOf()
-    private val bruksenhetRegistreringer: MutableList<BruksenhetRegistrering> = mutableListOf()
+class EgenregistreringService(
+    private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository
+) {
+    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
 
-    fun addEgenregistreringToBygning(egenregistrering: EgenregistreringRequest): Result<Unit> {
-        val bygningId = egenregistrering.bygningId
-
-        val bygning = bygningClient.getBygningById(bygningId) ?: return Result.ErrorResult(
+        val bygning = bygningClient.getBygningById(egenregistrering.bygningId) ?: return Result.ErrorResult(
             ErrorDetail(
-                detail = "Bygningen finnes ikke i matrikkelen",
+                detail = "Bygning med ID ${egenregistrering.bygningId} finnes ikke i matrikkelen",
             ),
         )
 
-        if (!isAllBruksenheterRegisteredOnCorrectBygning(egenregistrering, bygning)) {
+        val invalidBruksenheter = findBruksenheterNotRegisteredOnCorrectBygning(egenregistrering, bygning)
+        if (invalidBruksenheter.isNotEmpty()) {
             return Result.ErrorResult(
                 ErrorDetail(
-                    detail = "Bruksenheten finnes ikke i bygningen",
+                    detail = "Bruksenhet${if (invalidBruksenheter.size > 1) "er" else ""} med ID ${invalidBruksenheter.joinToString()} finnes ikke i bygning med ID ${bygning.bygningId}",
                 ),
             )
         }
 
-        saveEgenregistreringToBygning(egenregistrering)
-        saveEgenregistreringToBruksenhet(egenregistrering)
-        return Result.Success(Unit)
+        return egenregistreringRepository.saveEgenregistrering(egenregistrering);
     }
 
-    private fun isAllBruksenheterRegisteredOnCorrectBygning(
-        egenregistrering: EgenregistreringRequest, bygning: Bygning
-    ): Boolean {
-        if (egenregistrering.bruksenhetRegistreringer?.isEmpty() == true) return true
+    private fun findBruksenheterNotRegisteredOnCorrectBygning(
+        egenregistrering: Egenregistrering, bygning: Bygning
+    ): List<Long> {
+        return egenregistrering.bruksenhetRegistreringer?.mapNotNull { bruksenhetRegistering ->
+            val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
 
-        return egenregistrering.bruksenhetRegistreringer?.any { bruksenhetRegistering ->
-            bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId } != null
-        } ?: true
-    }
-
-    fun findNewestEgenregistreringForBygning(bygningId: Long): BygningRegistrering? {
-        return bygningRegistreringer
-            .filter { it.bygningId == bygningId }
-            .maxByOrNull { it.registreringTidspunkt }
-    }
-
-    fun findNewestEgenregistreringForBruksenhet(bruksenhetId: Long): BruksenhetRegistrering? {
-        return bruksenhetRegistreringer
-            .filter { it.bruksenhetId == bruksenhetId }
-            .maxByOrNull { it.registreringTidspunkt }
-    }
-
-    // Dummy while no persistence exists
-    private fun saveEgenregistreringToBygning(egenregistrering: EgenregistreringRequest) {
-        egenregistrering.bygningRegistrering?.let {
-            bygningRegistreringer.add(
-                BygningRegistrering(
-                    registreringTidspunkt = Instant.now(),
-                    registreringId = UUID.randomUUID(),
-                    bruksarealRegistrering = egenregistrering.bygningRegistrering.bruksarealRegistrering,
-                    byggeaarRegistrering = egenregistrering.bygningRegistrering.byggeaarRegistrering,
-                    vannforsyningRegistrering = egenregistrering.bygningRegistrering.vannforsyningRegistrering,
-                    avlopRegistrering = egenregistrering.bygningRegistrering.avlopRegistrering,
-                    bygningId = egenregistrering.bygningId,
-                ),
-            )
-        }
-    }
-
-    // Dummy while no persistence exists
-    private fun saveEgenregistreringToBruksenhet(egenregistrering: EgenregistreringRequest) {
-        egenregistrering.bruksenhetRegistreringer?.forEach { bruksenhetRegistrering ->
-            bruksenhetRegistreringer.add(
-                BruksenhetRegistrering(
-                    registreringTidspunkt = Instant.now(),
-                    registreringId = UUID.randomUUID(),
-                    bruksenhetId = bruksenhetRegistrering.bruksenhetId,
-                    bruksarealRegistrering = bruksenhetRegistrering.bruksarealRegistrering,
-                    energikildeRegistrering = bruksenhetRegistrering.energikildeRegistrering,
-                    oppvarmingRegistrering = bruksenhetRegistrering.oppvarmingRegistrering,
-                ),
-            )
-        }
+            if (bruksenhet == null) {
+                bruksenhetRegistering.bruksenhetId
+            } else {
+                null
+            }
+        } ?: emptyList()
     }
 }

@@ -6,7 +6,7 @@ import io.ktor.server.testing.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class InternalRouteTest : TestWithDb() {
+class InternalRouteTest : TestApplicationWithDb() {
 
     @Test
     fun `metrics endepunkt svarer ok`() = testApplication {
