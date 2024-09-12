@@ -5,6 +5,7 @@ import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.serializers.InstantSerializer
 import no.kartverket.matrikkel.bygning.serializers.UUIDSerializer
 import java.time.Instant
 import java.util.*
@@ -41,6 +42,7 @@ data class OppvarmingRegistrering(
 
 sealed interface Registrering {
     val registreringId: UUID
+    val registreringstidspunkt: Instant
     val bruksarealRegistrering: BruksarealRegistrering?
 }
 
@@ -53,6 +55,8 @@ data class BygningRegistrering(
     val byggeaarRegistrering: ByggeaarRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,
     val avlopRegistrering: AvlopRegistrering?,
+    @Serializable(with = InstantSerializer::class)
+    override val registreringstidspunkt: Instant,
 ) : Registrering
 
 @Serializable
@@ -63,6 +67,8 @@ data class BruksenhetRegistrering(
     override val bruksarealRegistrering: BruksarealRegistrering?,
     val energikildeRegistrering: EnergikildeRegistrering?,
     val oppvarmingRegistrering: OppvarmingRegistrering?,
+    @Serializable(with = InstantSerializer::class)
+    override val registreringstidspunkt: Instant,
 ) : Registrering
 
 // Ikke så fan av at egenregistrering har bygningID på toppnivå, og en bygning også har bygningId
@@ -70,7 +76,7 @@ data class BruksenhetRegistrering(
 // når man egenregistrerer bruksenheter
 data class Egenregistrering(
     val id: UUID,
-    val registreringTidspunkt: Instant,
+    val registreringstidspunkt: Instant,
     val bygningId: Long,
     val bygningRegistrering: BygningRegistrering?,
     val bruksenhetRegistreringer: List<BruksenhetRegistrering>?
