@@ -42,25 +42,20 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     return Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = registreringstidspunkt,
-        bygningId = this.bygningId,
         bygningRegistrering = BygningRegistrering(
-                registreringId = UUID.randomUUID(),
-                bygningId = this.bygningId,
-                byggeaarRegistrering = this.bygningRegistrering?.byggeaarRegistrering,
-                bruksarealRegistrering = this.bygningRegistrering?.bruksarealRegistrering,
-                vannforsyningRegistrering = this.bygningRegistrering?.vannforsyningRegistrering,
-                avlopRegistrering = this.bygningRegistrering?.avlopRegistrering,
-                registreringstidspunkt = registreringstidspunkt,
-        ),
-        bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
-            BruksenhetRegistrering(
-                    registreringId = UUID.randomUUID(),
+            bygningId = this.bygningId,
+            byggeaarRegistrering = this.bygningRegistrering?.byggeaarRegistrering,
+            bruksarealRegistrering = this.bygningRegistrering?.bruksarealRegistrering,
+            vannforsyningRegistrering = this.bygningRegistrering?.vannforsyningRegistrering,
+            avlopRegistrering = this.bygningRegistrering?.avlopRegistrering,
+            bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
+                BruksenhetRegistrering(
                     bruksenhetId = bruksenhetRegistrering.bruksenhetId,
                     bruksarealRegistrering = bruksenhetRegistrering.bruksarealRegistrering,
                     energikildeRegistrering = bruksenhetRegistrering.energikildeRegistrering,
                     oppvarmingRegistrering = bruksenhetRegistrering.oppvarmingRegistrering,
-                    registreringstidspunkt = registreringstidspunkt,
-            )
-        },
+                )
+            } ?: emptyList(),
+        ),
     )
 }

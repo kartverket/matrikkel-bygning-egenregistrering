@@ -5,11 +5,10 @@ import no.kartverket.matrikkel.bygning.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
-import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 
 class BygningService(
     private val bygningClient: BygningClient,
-    private val egenregistreringRepository: EgenregistreringRepository,
+    private val egenregistreringService: EgenregistreringService,
 ) {
     fun getBygningWithEgenregistrertData(bygningId: Long): Result<Bygning> {
         val bygning = bygningClient.getBygningById(bygningId)
@@ -19,13 +18,25 @@ class BygningService(
                 ),
             )
 
-        // Burde disse heller komme fra egenregistreringService, i stedet for å sende inn egenregistreringRepository her?
-        val bygningWithEgenregistrertData = egenregistreringRepository.findNewestBygningRegistrering(bygningId)
-            ?.let { bygning.withEgenregistrertData(it) }
-            ?: bygning
+        val newestEgenregistrering = egenregistreringService.findNewestEgenregistreringForBygning(bygningId)
 
-        val bruksenheterWithEgenregistrertData = bygning.bruksenheter
-            .map(::addEgenregistrerteDataForBruksenhet)
+        val bygningWithEgenregistrertData = if (newestEgenregistrering != null) {
+            bygning.withEgenregistrertData(newestEgenregistrering.registreringstidspunkt, newestEgenregistrering.bygningRegistrering)
+        } else bygning
+
+        val bruksenheterWithEgenregistrertData = bygning.bruksenheter.map { bruksenhet ->
+            val bruksenhetRegistrering =
+                newestEgenregistrering?.bygningRegistrering?.bruksenhetRegistreringer?.find { it.bruksenhetId == bruksenhet.bruksenhetId }
+            if (bruksenhetRegistrering != null) {
+                bruksenhet.withEgenregistrertData(newestEgenregistrering.registreringstidspunkt, bruksenhetRegistrering)
+            } else bruksenhet
+        }
+
+
+        val egenregisteringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygningId)
+
+        val aggregatedBygningRegistrering =
+
 
         return Result.Success(bygningWithEgenregistrertData.withBruksenheter(bruksenheterWithEgenregistrertData))
 
@@ -41,7 +52,7 @@ class BygningService(
 
         val bruksenhet = bygning.bruksenheter
             .find { it.bruksenhetId == bruksenhetId }
-            ?.let { addEgenregistrerteDataForBruksenhet(it) }
+//            ?.let { addEgenregistrerteDataForBruksenhet(it) }
             ?: return Result.ErrorResult(
                 ErrorDetail(
                     detail = "Bruksenhet finnes ikke på bygningen",
@@ -49,12 +60,6 @@ class BygningService(
             )
 
         return Result.Success(bruksenhet)
-    }
-
-    private fun addEgenregistrerteDataForBruksenhet(bruksenhet: Bruksenhet): Bruksenhet {
-        return egenregistreringRepository.findNewestBruksenhetRegistrering(bruksenhet.bruksenhetId)
-            ?.let { bruksenhet.withEgenregistrertData(it) }
-            ?: bruksenhet
     }
 }
 

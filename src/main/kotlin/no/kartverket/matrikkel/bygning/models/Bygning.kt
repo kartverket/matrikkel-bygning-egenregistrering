@@ -16,9 +16,7 @@ data class Bygning(
     val vannforsyning: Vannforsyning? = null,
     val avlop: Avlop? = null,
 ) {
-    fun withEgenregistrertData(bygningRegistrering: BygningRegistrering): Bygning {
-        val registreringstidspunkt = bygningRegistrering.registreringstidspunkt
-
+    fun withEgenregistrertData(registreringstidspunkt: Instant, bygningRegistrering: BygningRegistrering): Bygning {
         return this.copy(
             byggeaar = bygningRegistrering.byggeaarRegistrering?.byggeaar?.let {
                 Byggeaar(
@@ -77,8 +75,7 @@ data class Bruksenhet(
     val energikilder: List<Energikilde> = emptyList(),
     val oppvarminger: List<Oppvarming> = emptyList(),
 ) {
-    fun withEgenregistrertData(bruksenhetRegistrering: BruksenhetRegistrering): Bruksenhet {
-        val registreringstidspunkt = bruksenhetRegistrering.registreringstidspunkt
+    fun withEgenregistrertData(registreringstidspunkt: Instant, bruksenhetRegistrering: BruksenhetRegistrering): Bruksenhet {
         return this.copy(
             bruksareal = bruksenhetRegistrering.bruksarealRegistrering?.bruksareal?.let {
                 Bruksareal(
