@@ -50,7 +50,7 @@ jobs:
       image_digest: ${{ needs.build.outputs.image_digest }}
       env: dev
       namespace: matrikkelbygning-main
-      cluster: atgcp1
+      cluster: atkv3
 
   run-pharos:
     needs: [ build ]
