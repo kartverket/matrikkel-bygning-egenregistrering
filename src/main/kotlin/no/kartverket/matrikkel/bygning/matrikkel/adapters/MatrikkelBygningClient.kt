@@ -30,7 +30,7 @@ internal class MatrikkelBygningClient(
 
             return Bygning(
                 bygningId = bygning.id.value,
-                bygningNummer = bygning.bygningsnummer,
+                bygningsnummer = bygning.bygningsnummer,
                 bruksenheter = bruksenheter.map {
                     Bruksenhet(
                         bruksenhetId = it.id.value,
@@ -44,13 +44,13 @@ internal class MatrikkelBygningClient(
         }
     }
 
-    override fun getBygningByBygningNummer(bygningNummer: Long): Bygning? {
+    override fun getBygningByBygningsnummer(bygningsnummer: Long): Bygning? {
         try {
-            val bygningId = matrikkelApi.bygningService().findBygning(bygningNummer, matrikkelApi.matrikkelContext)
+            val bygningId = matrikkelApi.bygningService().findBygning(bygningsnummer, matrikkelApi.matrikkelContext)
 
             return getBygningById(bygningId.value)
         } catch (exception: ServiceException) {
-            log.warn("Noe gikk galt under henting av bygning med nummer {}", bygningNummer, exception)
+            log.warn("Noe gikk galt under henting av bygning med nummer {}", bygningsnummer, exception)
             return null
         }
     }
