@@ -46,14 +46,14 @@ data class AvlopKodeResponse(val data: AvlopKode, val metadata: RegisterMetadata
 data class EnergikildeResponse(val data: EnergikildeKode, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class OppvarmingDTO(val data: OppvarmingKode, val metadata: RegisterMetadataResponse)
+data class OppvarmingResponse(val data: OppvarmingKode, val metadata: RegisterMetadataResponse)
 
 @Serializable
 data class BruksenhetResponse(
     val bruksenhetId: Long,
     val bruksareal: BruksarealResponse? = null,
     val energikilder: List<EnergikildeResponse> = emptyList(),
-    val oppvarminger: List<OppvarmingDTO> = emptyList(),
+    val oppvarminger: List<OppvarmingResponse> = emptyList(),
 )
 
 fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
@@ -108,7 +108,7 @@ private fun Energikilde.toEnergikildeResponse() = EnergikildeResponse(
     )
 )
 
-private fun Oppvarming.toOppvarmingResponse() = OppvarmingDTO(
+private fun Oppvarming.toOppvarmingResponse() = OppvarmingResponse(
     data = this.data,
     metadata = RegisterMetadataResponse(
         registreringsTidspunkt = metadata.registreringstidspunkt
