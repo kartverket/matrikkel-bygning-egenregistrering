@@ -19,7 +19,7 @@ import java.time.Instant
 @Serializable
 data class BygningResponse(
     val bygningId: Long,
-    val bygningNummer: Long,
+    val bygningsnummer: Long,
     val byggeaar: ByggeaarResponse? = null,
     val bruksareal: BruksarealResponse? = null,
     val vannforsyning: VannforsyningKodeResponse? = null,
@@ -28,7 +28,7 @@ data class BygningResponse(
 )
 
 @Serializable
-data class RegisterMetadataResponse(@Serializable(with = InstantSerializer::class) val registreringsTidspunkt: Instant)
+data class RegisterMetadataResponse(@Serializable(with = InstantSerializer::class) val registreringstidspunkt: Instant)
 
 @Serializable
 data class ByggeaarResponse(val data: Int, val metadata: RegisterMetadataResponse)
@@ -58,7 +58,7 @@ data class BruksenhetResponse(
 
 fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
     bygningId = this.bygningId,
-    bygningNummer = this.bygningNummer,
+    bygningsnummer = this.bygningsnummer,
     byggeaar = this.byggeaar?.toByggeaarResponse(),
     bruksareal = this.bruksareal?.toBruksarealResponse(),
     bruksenheter = this.bruksenheter.map { it.toBruksenhetResponse() },
@@ -69,28 +69,28 @@ fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
 private fun Byggeaar.toByggeaarResponse(): ByggeaarResponse = ByggeaarResponse(
     data = this.data,
     metadata = RegisterMetadataResponse(
-        registreringsTidspunkt = metadata.registreringstidspunkt
+        registreringstidspunkt = metadata.registreringstidspunkt
     )
 )
 
 private fun Bruksareal.toBruksarealResponse(): BruksarealResponse = BruksarealResponse(
     data = this.data,
     metadata = RegisterMetadataResponse(
-        registreringsTidspunkt = metadata.registreringstidspunkt,
+        registreringstidspunkt = metadata.registreringstidspunkt,
     ),
 )
 
 private fun Vannforsyning.toVannforsyningResponse(): VannforsyningKodeResponse = VannforsyningKodeResponse(
     data = this.data,
     metadata = RegisterMetadataResponse(
-        registreringsTidspunkt = metadata.registreringstidspunkt
+        registreringstidspunkt = metadata.registreringstidspunkt
     )
 )
 
 private fun Avlop.toAvlopKodeResponse(): AvlopKodeResponse = AvlopKodeResponse(
     data = this.data,
     metadata = RegisterMetadataResponse(
-        registreringsTidspunkt = metadata.registreringstidspunkt
+        registreringstidspunkt = metadata.registreringstidspunkt
     )
 )
 
@@ -104,13 +104,13 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
 private fun Energikilde.toEnergikildeResponse() = EnergikildeResponse(
     data = this.data,
     metadata = RegisterMetadataResponse(
-        registreringsTidspunkt = metadata.registreringstidspunkt
+        registreringstidspunkt = metadata.registreringstidspunkt
     )
 )
 
 private fun Oppvarming.toOppvarmingResponse() = OppvarmingResponse(
     data = this.data,
     metadata = RegisterMetadataResponse(
-        registreringsTidspunkt = metadata.registreringstidspunkt
+        registreringstidspunkt = metadata.registreringstidspunkt
     )
 )

@@ -9,7 +9,7 @@ import java.time.Instant
 // TODO Sette opp DTOer for Bygning/Bruksenhet hentet fra Matrikkel
 data class Bygning(
     val bygningId: Long,
-    val bygningNummer: Long,
+    val bygningsnummer: Long,
     val bruksenheter: List<Bruksenhet>,
     val byggeaar: Byggeaar? = null,
     val bruksareal: Bruksareal? = null,
