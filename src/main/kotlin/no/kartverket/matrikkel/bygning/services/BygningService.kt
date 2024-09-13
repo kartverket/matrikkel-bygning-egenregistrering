@@ -5,6 +5,7 @@ import no.kartverket.matrikkel.bygning.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
+import no.kartverket.matrikkel.bygning.models.withEgenregistrertData
 
 class BygningService(
     private val bygningClient: BygningClient,
