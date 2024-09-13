@@ -36,8 +36,9 @@ class BygningService(
             ),
         )
 
-        val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetId }
-//            ?.let { addEgenregistrerteDataForBruksenhet(it) }
+        val egenregistreringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygningId)
+
+        val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetId }?.withEgenregistrertData(egenregistreringerForBygning)
             ?: return Result.ErrorResult(
                 ErrorDetail(
                     detail = "Bruksenhet finnes ikke på bygningen",
