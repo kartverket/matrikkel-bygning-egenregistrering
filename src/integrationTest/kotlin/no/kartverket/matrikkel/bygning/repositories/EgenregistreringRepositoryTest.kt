@@ -4,6 +4,7 @@ import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.*
@@ -67,5 +68,15 @@ class EgenregistreringRepositoryTest : TestWithDb() {
         val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(2L)
 
         assertThat(registreringer).isEmpty()
+    }
+
+    // Aner ikke om dette er en vettug måte å gjøre dette på? Vi må ha en måte å ha en tom db mellom tester, hvert fall
+    @BeforeEach
+    fun clearEgenregistreringer() {
+        dataSource.connection.use { connection ->
+            connection.createStatement().use { statement ->
+                statement.execute("DELETE FROM bygning.egenregistrering")
+            }
+        }
     }
 }
