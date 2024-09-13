@@ -20,7 +20,7 @@ data class Bygning(
         return egenregistreringer.fold(this) { bygningAggregate, egenregistrering ->
             Bygning(
                 bygningId = bygningAggregate.bygningId,
-                bygningNummer = bygningAggregate.bygningNummer,
+                bygningsnummer = bygningAggregate.bygningsnummer,
                 bruksenheter = bygningAggregate.bruksenheter,
                 byggeaar = bygningAggregate.byggeaar ?: if (egenregistrering.bygningRegistrering.byggeaarRegistrering != null) {
                     Byggeaar(
