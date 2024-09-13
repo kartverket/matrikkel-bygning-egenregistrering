@@ -86,36 +86,36 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
             val now = Instant.now()
             assertThat(bygning.bruksareal?.data).isEqualTo(125.0)
-            assertThat(bygning.bruksareal?.metadata?.registreringsTidspunkt)
+            assertThat(bygning.bruksareal?.metadata?.registreringstidspunkt)
                 .isCloseTo(now, within(1, ChronoUnit.SECONDS))
 
             assertThat(bygning.byggeaar?.data).isEqualTo(2010)
-            assertThat(bygning.byggeaar?.metadata?.registreringsTidspunkt)
+            assertThat(bygning.byggeaar?.metadata?.registreringstidspunkt)
                 .isCloseTo(now, within(1, ChronoUnit.SECONDS))
 
             assertThat(bygning.vannforsyning?.data).isEqualTo(VannforsyningKode.OffentligVannverk)
-            assertThat(bygning.vannforsyning?.metadata?.registreringsTidspunkt)
+            assertThat(bygning.vannforsyning?.metadata?.registreringstidspunkt)
                 .isCloseTo(now, within(1, ChronoUnit.SECONDS))
 
             assertThat(bygning.avlop?.data).isEqualTo(AvlopKode.OffentligKloakk)
-            assertThat(bygning.avlop?.metadata?.registreringsTidspunkt)
+            assertThat(bygning.avlop?.metadata?.registreringstidspunkt)
                 .isCloseTo(now, within(1, ChronoUnit.SECONDS))
 
             val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == 1L } ?: throw IllegalStateException("Fant ikke bruksenhet")
             assertThat(bruksenhet.bruksareal?.data).isEqualTo(100.0)
-            assertThat(bruksenhet.bruksareal?.metadata?.registreringsTidspunkt)
+            assertThat(bruksenhet.bruksareal?.metadata?.registreringstidspunkt)
                 .isCloseTo(now, within(1, ChronoUnit.SECONDS))
 
             assertThat(bruksenhet.energikilder).satisfiesExactly(
                 { energikilde ->
                     assertThat(energikilde.data).isEqualTo(EnergikildeKode.Elektrisitet)
-                    assertThat(energikilde.metadata.registreringsTidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
+                    assertThat(energikilde.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
                 },
             )
             assertThat(bruksenhet.oppvarminger).satisfiesExactly(
                 { oppvarming ->
                     assertThat(oppvarming.data).isEqualTo(OppvarmingKode.Elektrisk)
-                    assertThat(oppvarming.metadata.registreringsTidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
+                    assertThat(oppvarming.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
                 },
             )
         }
@@ -141,19 +141,19 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         assertThat(bruksenhetResponse.status).isEqualTo(HttpStatusCode.OK)
         val bruksenhet = bruksenhetResponse.body<BruksenhetResponse>()
         assertThat(bruksenhet.bruksareal?.data).isEqualTo(100.0)
-        assertThat(bruksenhet.bruksareal?.metadata?.registreringsTidspunkt)
+        assertThat(bruksenhet.bruksareal?.metadata?.registreringstidspunkt)
             .isCloseTo(now, within(1, ChronoUnit.SECONDS))
 
         assertThat(bruksenhet.energikilder).satisfiesExactly(
             { energikilde ->
                 assertThat(energikilde.data).isEqualTo(EnergikildeKode.Elektrisitet)
-                assertThat(energikilde.metadata.registreringsTidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
+                assertThat(energikilde.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
             },
         )
         assertThat(bruksenhet.oppvarminger).satisfiesExactly(
             { oppvarming ->
                 assertThat(oppvarming.data).isEqualTo(OppvarmingKode.Elektrisk)
-                assertThat(oppvarming.metadata.registreringsTidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
+                assertThat(oppvarming.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
             },
         )
     }
