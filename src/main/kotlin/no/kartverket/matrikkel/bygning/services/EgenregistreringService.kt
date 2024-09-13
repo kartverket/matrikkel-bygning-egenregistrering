@@ -46,8 +46,4 @@ class EgenregistreringService(
     fun findAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
         return egenregistreringRepository.getAllEgenregistreringerForBygning(bygningId)
     }
-
-    fun findNewestEgenregistreringForBygning(bygningId: Long): Egenregistrering? {
-        return findAllEgenregistreringerForBygning(bygningId).firstOrNull()
-    }
 }

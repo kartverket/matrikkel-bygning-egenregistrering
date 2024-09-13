@@ -11,47 +11,32 @@ class BygningService(
     private val egenregistreringService: EgenregistreringService,
 ) {
     fun getBygningWithEgenregistrertData(bygningId: Long): Result<Bygning> {
-        val bygning = bygningClient.getBygningById(bygningId)
-            ?: return Result.ErrorResult(
-                ErrorDetail(
-                    detail = "Bygningen finnes ikke i matrikkelen",
-                ),
-            )
+        val bygning = bygningClient.getBygningById(bygningId) ?: return Result.ErrorResult(
+            ErrorDetail(
+                detail = "Bygningen finnes ikke i matrikkelen",
+            ),
+        )
 
-        val newestEgenregistrering = egenregistreringService.findNewestEgenregistreringForBygning(bygningId)
+        val egenregistreringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygningId)
 
-        val bygningWithEgenregistrertData = if (newestEgenregistrering != null) {
-            bygning.withEgenregistrertData(newestEgenregistrering.registreringstidspunkt, newestEgenregistrering.bygningRegistrering)
-        } else bygning
+        val bygningWithEgenregistrertData = bygning.withEgenregistrertData(egenregistreringerForBygning)
 
-        val bruksenheterWithEgenregistrertData = bygning.bruksenheter.map { bruksenhet ->
-            val bruksenhetRegistrering =
-                newestEgenregistrering?.bygningRegistrering?.bruksenhetRegistreringer?.find { it.bruksenhetId == bruksenhet.bruksenhetId }
-            if (bruksenhetRegistrering != null) {
-                bruksenhet.withEgenregistrertData(newestEgenregistrering.registreringstidspunkt, bruksenhetRegistrering)
-            } else bruksenhet
-        }
+        val aggregatedBygningWithAggregatedBruksenheter = bygningWithEgenregistrertData.withBruksenheter(
+            bygningWithEgenregistrertData.bruksenheter.map { it.withEgenregistrertData(egenregistreringerForBygning) },
+        )
 
-
-        val egenregisteringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygningId)
-
-        val aggregatedBygningRegistrering =
-
-
-        return Result.Success(bygningWithEgenregistrertData.withBruksenheter(bruksenheterWithEgenregistrertData))
+        return Result.Success(aggregatedBygningWithAggregatedBruksenheter)
 
     }
 
     fun getBruksenhetWithEgenregistrertData(bygningId: Long, bruksenhetId: Long): Result<Bruksenhet> {
-        val bygning = bygningClient.getBygningById(bygningId)
-            ?: return Result.ErrorResult(
-                ErrorDetail(
-                    detail = "Bygningen finnes ikke i matrikkelen",
-                ),
-            )
+        val bygning = bygningClient.getBygningById(bygningId) ?: return Result.ErrorResult(
+            ErrorDetail(
+                detail = "Bygningen finnes ikke i matrikkelen",
+            ),
+        )
 
-        val bruksenhet = bygning.bruksenheter
-            .find { it.bruksenhetId == bruksenhetId }
+        val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetId }
 //            ?.let { addEgenregistrerteDataForBruksenhet(it) }
             ?: return Result.ErrorResult(
                 ErrorDetail(
