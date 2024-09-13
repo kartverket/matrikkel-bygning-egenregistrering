@@ -16,10 +16,10 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
     fun getAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
         return dataSource.executeQueryAndMapPreparedStatement(
             """
-                select er.id, er.registrering_tidspunkt as registreringstidspunkt, er.registrering as bygningregistrering
+                select er.id, er.registreringstidspunkt, er.registrering as bygningregistrering
                 from bygning.egenregistrering er
                 where er.registrering ->> 'bygningId' = ?
-                order by er.registrering_tidspunkt DESC;
+                order by er.registreringstidspunkt DESC;
             """.trimIndent(),
             {
                 it.setString(1, bygningId.toString())
