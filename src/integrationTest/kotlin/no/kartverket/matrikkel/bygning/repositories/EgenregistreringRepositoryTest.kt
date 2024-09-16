@@ -1,10 +1,10 @@
 package no.kartverket.matrikkel.bygning.repositories
 
 import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
-import no.kartverket.matrikkel.bygning.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.*
@@ -13,8 +13,6 @@ class EgenregistreringRepositoryTest : TestWithDb() {
     val egenregistreringRepository = EgenregistreringRepository(dataSource)
 
     val defaultBygningRegistrering = BygningRegistrering(
-        registreringId = UUID.randomUUID(),
-        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         bygningId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             bruksareal = 125.0,
@@ -22,82 +20,63 @@ class EgenregistreringRepositoryTest : TestWithDb() {
         byggeaarRegistrering = null,
         vannforsyningRegistrering = null,
         avlopRegistrering = null,
-    )
-
-    val defaultBruksenhetRegistrering = BruksenhetRegistrering(
-        registreringId = UUID.randomUUID(),
-        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        bruksenhetId = 1L,
-        bruksarealRegistrering = BruksarealRegistrering(
-            bruksareal = 125.0,
-        ),
-        energikildeRegistrering = null,
-        oppvarmingRegistrering = null,
+        bruksenhetRegistreringer = emptyList()
     )
 
     val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        bygningId = 1L,
         bygningRegistrering = defaultBygningRegistrering,
-        bruksenhetRegistreringer = emptyList(),
-    )
-
-    val defaultBruksenhetEgenregistrering = defaultEgenregistrering.copy(
-        bygningRegistrering = null,
-        bruksenhetRegistreringer = listOf(
-            defaultBruksenhetRegistrering,
-        ),
     )
 
     @Test
-    fun `lagring av to egenregistreringer med bygningregistrering skal returnere nyeste registrering ved henting`() {
-        val newUUIDEgenregistrering = UUID.randomUUID()
-        val newUUIDBygningRegistrering = UUID.randomUUID()
+    fun `lagring av 1 egenregistrering skal kun returnere 1 egenregistrering`() {
+        egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering)
 
-        val registrering2 = defaultEgenregistrering.copy(
-            id = newUUIDEgenregistrering,
-            defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bygningRegistrering = defaultBygningRegistrering.copy(
-                registreringId = newUUIDBygningRegistrering,
-                bruksarealRegistrering = BruksarealRegistrering(
-                    bruksareal = 130.0,
-                ),
-            ),
+        val bygningRegistreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L)
+
+        assertThat(bygningRegistreringer).size().isEqualTo(1)
+        assertThat(bygningRegistreringer[0]).satisfies(
+            { egenregistrering ->
+                assertThat(egenregistrering.id).isEqualTo(defaultEgenregistrering.id)
+                assertThat(egenregistrering.registreringstidspunkt).isEqualTo(defaultEgenregistrering.registreringstidspunkt)
+            }
+        )
+    }
+
+    @Test
+    fun `lagring av 2 egenregistreringer skal returneres i riktig rekkefolge med seneste registreringer forst i listen`() {
+        val laterRegistreringId = UUID.randomUUID()
+        val laterRegistrering = defaultEgenregistrering.copy(
+            id = laterRegistreringId,
+            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60)
         )
 
         egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering)
-        egenregistreringRepository.saveEgenregistrering(registrering2)
+        egenregistreringRepository.saveEgenregistrering(laterRegistrering)
 
-        val newestBygningRegistrering = egenregistreringRepository.findNewestBygningRegistrering(1L)
+        val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L)
 
-        assertThat(newestBygningRegistrering?.bruksarealRegistrering?.bruksareal).isEqualTo(130.0)
+        assertThat(registreringer[0].id).isEqualTo(laterRegistrering.id)
+        assertThat(registreringer[1].id).isEqualTo(defaultEgenregistrering.id)
     }
 
-
     @Test
-    fun `lagring av to egenregistreringer med bruksenhetregistrering skal returnere nyeste registrering ved henting`() {
-        val newUUIDEgenregistrering = UUID.randomUUID()
-        val newUUIDBruksenhetRegistrering = UUID.randomUUID()
+    fun `henting av registreringer skal gi tom liste hvis bygningen ikke har registreringer`() {
+        egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering)
 
-        val registrering2 = defaultBruksenhetEgenregistrering.copy(
-            id = newUUIDEgenregistrering,
-            defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bruksenhetRegistreringer = listOf(
-                defaultBruksenhetRegistrering.copy(
-                    registreringId = newUUIDBruksenhetRegistrering,
-                    bruksarealRegistrering = BruksarealRegistrering(
-                        bruksareal = 130.0,
-                    ),
-                ),
-            ),
-        )
+        val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(2L)
 
-        egenregistreringRepository.saveEgenregistrering(defaultBruksenhetEgenregistrering)
-        egenregistreringRepository.saveEgenregistrering(registrering2)
+        assertThat(registreringer).isEmpty()
+    }
 
-        val newestBruksenhetRegistrering = egenregistreringRepository.findNewestBruksenhetRegistrering(1L)
-
-        assertThat(newestBruksenhetRegistrering?.bruksarealRegistrering?.bruksareal).isEqualTo(130.0)
+    // Aner ikke om dette er en vettug måte å gjøre dette på? Vi må ha en måte å ha en tom db mellom tester, hvert fall
+    @BeforeEach
+    fun clearEgenregistreringer() {
+        dataSource.connection.use { connection ->
+            connection.createStatement().use { statement ->
+                statement.execute("DELETE FROM bygning.egenregistrering")
+            }
+        }
     }
 }

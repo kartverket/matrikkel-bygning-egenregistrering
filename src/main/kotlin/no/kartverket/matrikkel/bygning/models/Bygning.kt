@@ -16,45 +16,6 @@ data class Bygning(
     val vannforsyning: Vannforsyning? = null,
     val avlop: Avlop? = null,
 ) {
-    fun withEgenregistrertData(bygningRegistrering: BygningRegistrering): Bygning {
-        val registreringstidspunkt = bygningRegistrering.registreringstidspunkt
-
-        return this.copy(
-            byggeaar = bygningRegistrering.byggeaarRegistrering?.byggeaar?.let {
-                Byggeaar(
-                    data = it,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = registreringstidspunkt,
-                    ),
-                )
-            },
-            bruksareal = bygningRegistrering.bruksarealRegistrering?.bruksareal?.let {
-                Bruksareal(
-                    data = it,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = registreringstidspunkt,
-                    ),
-                )
-            },
-            vannforsyning = bygningRegistrering.vannforsyningRegistrering?.vannforsyning?.let {
-                Vannforsyning(
-                    data = it,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = registreringstidspunkt,
-                    ),
-                )
-            },
-            avlop = bygningRegistrering.avlopRegistrering?.avlop?.let {
-                Avlop(
-                    data = it,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = registreringstidspunkt,
-                    ),
-                )
-            },
-        )
-    }
-
     fun withBruksenheter(bruksenheter: List<Bruksenhet>): Bygning {
         return this.copy(
             bruksenheter = bruksenheter,
@@ -76,34 +37,4 @@ data class Bruksenhet(
     val bruksareal: Bruksareal? = null,
     val energikilder: List<Energikilde> = emptyList(),
     val oppvarminger: List<Oppvarming> = emptyList(),
-) {
-    fun withEgenregistrertData(bruksenhetRegistrering: BruksenhetRegistrering): Bruksenhet {
-        val registreringstidspunkt = bruksenhetRegistrering.registreringstidspunkt
-        return this.copy(
-            bruksareal = bruksenhetRegistrering.bruksarealRegistrering?.bruksareal?.let {
-                Bruksareal(
-                    data = it,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = registreringstidspunkt,
-                    ),
-                )
-            },
-            energikilder = bruksenhetRegistrering.energikildeRegistrering?.energikilder?.map {
-                Energikilde(
-                    data = it,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = registreringstidspunkt,
-                    ),
-                )
-            } ?: emptyList(),
-            oppvarminger = bruksenhetRegistrering.oppvarmingRegistrering?.oppvarminger?.map {
-                Oppvarming(
-                    data = it,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = registreringstidspunkt,
-                    ),
-                )
-            } ?: emptyList(),
-        )
-    }
-}
+)

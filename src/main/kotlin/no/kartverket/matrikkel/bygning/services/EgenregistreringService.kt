@@ -11,10 +11,9 @@ class EgenregistreringService(
     private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository
 ) {
     fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
-
-        val bygning = bygningClient.getBygningById(egenregistrering.bygningId) ?: return Result.ErrorResult(
+        val bygning = bygningClient.getBygningById(egenregistrering.bygningRegistrering.bygningId) ?: return Result.ErrorResult(
             ErrorDetail(
-                detail = "Bygning med ID ${egenregistrering.bygningId} finnes ikke i matrikkelen",
+                detail = "Bygning med ID ${egenregistrering.bygningRegistrering.bygningId} finnes ikke i matrikkelen",
             ),
         )
 
@@ -33,7 +32,7 @@ class EgenregistreringService(
     private fun findBruksenheterNotRegisteredOnCorrectBygning(
         egenregistrering: Egenregistrering, bygning: Bygning
     ): List<Long> {
-        return egenregistrering.bruksenhetRegistreringer?.mapNotNull { bruksenhetRegistering ->
+        return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistering ->
             val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
 
             if (bruksenhet == null) {
@@ -41,6 +40,10 @@ class EgenregistreringService(
             } else {
                 null
             }
-        } ?: emptyList()
+        }
+    }
+
+    fun findAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
+        return egenregistreringRepository.getAllEgenregistreringerForBygning(bygningId)
     }
 }

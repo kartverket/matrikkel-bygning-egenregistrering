@@ -61,7 +61,7 @@ fun Application.mainModule() {
 
 
     val egenregistreringService = EgenregistreringService(bygningClient, egenregistreringRepository)
-    val bygningService = BygningService(bygningClient, egenregistreringRepository)
+    val bygningService = BygningService(bygningClient, egenregistreringService)
 
     routing {
         swagger()
