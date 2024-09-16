@@ -11,39 +11,38 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
             bygningId = bygningAggregate.bygningId,
             bygningsnummer = bygningAggregate.bygningsnummer,
             bruksenheter = bygningAggregate.bruksenheter,
-            byggeaar = bygningAggregate.byggeaar ?: if (egenregistrering.bygningRegistrering.byggeaarRegistrering != null) {
+            byggeaar = bygningAggregate.byggeaar ?: egenregistrering.bygningRegistrering.byggeaarRegistrering?.let {
                 Byggeaar(
-                    data = egenregistrering.bygningRegistrering.byggeaarRegistrering.byggeaar,
+                    data = it.byggeaar,
                     metadata = RegisterMetadata(
                         registreringstidspunkt = egenregistrering.registreringstidspunkt,
                     ),
                 )
-            } else null,
-            bruksareal = bygningAggregate.bruksareal ?: if (egenregistrering.bygningRegistrering.bruksarealRegistrering != null) {
+            },
+            bruksareal = bygningAggregate.bruksareal ?: egenregistrering.bygningRegistrering.bruksarealRegistrering?.let {
                 Bruksareal(
-                    data = egenregistrering.bygningRegistrering.bruksarealRegistrering.bruksareal,
+                    data = it.bruksareal,
                     metadata = RegisterMetadata(
                         registreringstidspunkt = egenregistrering.registreringstidspunkt,
                     ),
                 )
-            } else null,
-            vannforsyning = bygningAggregate.vannforsyning
-                ?: if (egenregistrering.bygningRegistrering.vannforsyningRegistrering != null) {
-                    Vannforsyning(
-                        data = egenregistrering.bygningRegistrering.vannforsyningRegistrering.vannforsyning,
-                        metadata = RegisterMetadata(
-                            registreringstidspunkt = egenregistrering.registreringstidspunkt,
-                        ),
-                    )
-                } else null,
-            avlop = bygningAggregate.avlop ?: if (egenregistrering.bygningRegistrering.avlopRegistrering != null) {
+            },
+            vannforsyning = bygningAggregate.vannforsyning ?: egenregistrering.bygningRegistrering.vannforsyningRegistrering?.let {
+                Vannforsyning(
+                    data = it.vannforsyning,
+                    metadata = RegisterMetadata(
+                        registreringstidspunkt = egenregistrering.registreringstidspunkt,
+                    ),
+                )
+            },
+            avlop = bygningAggregate.avlop ?: egenregistrering.bygningRegistrering.avlopRegistrering?.let {
                 Avlop(
-                    data = egenregistrering.bygningRegistrering.avlopRegistrering.avlop,
+                    data = it.avlop,
                     metadata = RegisterMetadata(
                         registreringstidspunkt = egenregistrering.registreringstidspunkt,
                     ),
                 )
-            } else null,
+            },
         )
     }
 }
@@ -54,8 +53,7 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
     // Likevel har vi ikke noen logisk sjekk på dette ved registrering, så det bør vi nok ha
     val bruksenhetRegistreringer = egenregistreringer.mapNotNull { egenregistrering ->
         val bruksenhetRegistrering =
-            egenregistrering.bygningRegistrering.bruksenhetRegistreringer.filter { it.bruksenhetId == this.bruksenhetId }
-                .firstOrNull()
+            egenregistrering.bygningRegistrering.bruksenhetRegistreringer.filter { it.bruksenhetId == this.bruksenhetId }.firstOrNull()
 
         if (bruksenhetRegistrering != null) {
             egenregistrering.registreringstidspunkt to bruksenhetRegistrering
@@ -70,18 +68,17 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
         Bruksenhet(
             bruksenhetId = bruksenhetAggregate.bruksenhetId,
             bygningId = bruksenhetAggregate.bygningId,
-            bruksareal = bruksenhetAggregate.bruksareal ?: if (egenregistrering.second.bruksarealRegistrering != null) {
+            bruksareal = bruksenhetAggregate.bruksareal ?: egenregistrering.second.bruksarealRegistrering?.let {
                 Bruksareal(
-                    // ser ikke ut som kotlin skjønner at bruksarealRegistrering ikke er null her
-                    data = egenregistrering.second.bruksarealRegistrering!!.bruksareal,
+                    data = it.bruksareal,
                     metadata = RegisterMetadata(
                         registreringstidspunkt = egenregistrering.first,
                     ),
                 )
-            } else null,
+            },
             energikilder = bruksenhetAggregate.energikilder.takeIf { it.isNotEmpty() }
-                ?: if (egenregistrering.second.energikildeRegistrering?.energikilder?.isNotEmpty() == true) {
-                    egenregistrering.second.energikildeRegistrering!!.energikilder.map { registrertKilde ->
+                ?: egenregistrering.second.energikildeRegistrering?.let {
+                    it.energikilder.map { registrertKilde ->
                         Energikilde(
                             data = registrertKilde,
                             metadata = RegisterMetadata(
@@ -89,10 +86,10 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
                             ),
                         )
                     }
-                } else emptyList(),
+                } ?: emptyList(),
             oppvarminger = bruksenhetAggregate.oppvarminger.takeIf { it.isNotEmpty() }
-                ?: if (egenregistrering.second.oppvarmingRegistrering?.oppvarminger?.isNotEmpty() == true) {
-                    egenregistrering.second.oppvarmingRegistrering!!.oppvarminger.map { registrertOppvarming ->
+                ?: egenregistrering.second.oppvarmingRegistrering?.let {
+                    it.oppvarminger.map { registrertOppvarming ->
                         Oppvarming(
                             data = registrertOppvarming,
                             metadata = RegisterMetadata(
@@ -100,7 +97,7 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
                             ),
                         )
                     }
-                } else emptyList(),
+                } ?: emptyList(),
         )
     }
 }
