@@ -10,32 +10,32 @@ import java.util.*
 
 @Serializable
 data class ByggeaarRegistrering(
-    val byggeaar: Int,
+    val byggeaar: Int?,
 )
 
 @Serializable
 data class BruksarealRegistrering(
-    val bruksareal: Double,
+    val bruksareal: Double?,
 )
 
 @Serializable
 data class VannforsyningRegistrering(
-    val vannforsyning: VannforsyningKode,
+    val vannforsyning: VannforsyningKode?,
 )
 
 @Serializable
 data class AvlopRegistrering(
-    val avlop: AvlopKode,
+    val avlop: AvlopKode?,
 )
 
 @Serializable
 data class EnergikildeRegistrering(
-    val energikilder: List<EnergikildeKode>,
+    val energikilder: List<EnergikildeKode>?,
 )
 
 @Serializable
 data class OppvarmingRegistrering(
-    val oppvarminger: List<OppvarmingKode>,
+    val oppvarminger: List<OppvarmingKode>?,
 )
 
 

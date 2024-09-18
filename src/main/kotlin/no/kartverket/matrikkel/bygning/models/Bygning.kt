@@ -24,10 +24,10 @@ data class Bygning(
 }
 
 data class RegisterMetadata(val registreringstidspunkt: Instant)
-data class Bruksareal(val data: Double, val metadata: RegisterMetadata)
-data class Byggeaar(val data: Int, val metadata: RegisterMetadata)
-data class Vannforsyning(val data: VannforsyningKode, val metadata: RegisterMetadata)
-data class Avlop(val data: AvlopKode, val metadata: RegisterMetadata)
+data class Bruksareal(val data: Double?, val metadata: RegisterMetadata)
+data class Byggeaar(val data: Int?, val metadata: RegisterMetadata)
+data class Vannforsyning(val data: VannforsyningKode?, val metadata: RegisterMetadata)
+data class Avlop(val data: AvlopKode?, val metadata: RegisterMetadata)
 data class Energikilde(val data: EnergikildeKode, val metadata: RegisterMetadata)
 data class Oppvarming(val data: OppvarmingKode, val metadata: RegisterMetadata)
 

@@ -78,7 +78,7 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
             },
             energikilder = bruksenhetAggregate.energikilder.takeIf { it.isNotEmpty() }
                 ?: egenregistrering.second.energikildeRegistrering?.let {
-                    it.energikilder.map { registrertKilde ->
+                    it.energikilder?.map { registrertKilde ->
                         Energikilde(
                             data = registrertKilde,
                             metadata = RegisterMetadata(
@@ -89,7 +89,7 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
                 } ?: emptyList(),
             oppvarminger = bruksenhetAggregate.oppvarminger.takeIf { it.isNotEmpty() }
                 ?: egenregistrering.second.oppvarmingRegistrering?.let {
-                    it.oppvarminger.map { registrertOppvarming ->
+                    it.oppvarminger?.map { registrertOppvarming ->
                         Oppvarming(
                             data = registrertOppvarming,
                             metadata = RegisterMetadata(

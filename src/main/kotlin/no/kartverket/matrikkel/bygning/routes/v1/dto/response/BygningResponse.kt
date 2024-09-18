@@ -31,22 +31,22 @@ data class BygningResponse(
 data class RegisterMetadataResponse(@Serializable(with = InstantSerializer::class) val registreringstidspunkt: Instant)
 
 @Serializable
-data class ByggeaarResponse(val data: Int, val metadata: RegisterMetadataResponse)
+data class ByggeaarResponse(val data: Int?, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class BruksarealResponse(val data: Double, val metadata: RegisterMetadataResponse)
+data class BruksarealResponse(val data: Double?, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class VannforsyningKodeResponse(val data: VannforsyningKode, val metadata: RegisterMetadataResponse)
+data class VannforsyningKodeResponse(val data: VannforsyningKode?, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class AvlopKodeResponse(val data: AvlopKode, val metadata: RegisterMetadataResponse)
+data class AvlopKodeResponse(val data: AvlopKode?, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class EnergikildeResponse(val data: EnergikildeKode, val metadata: RegisterMetadataResponse)
+data class EnergikildeResponse(val data: EnergikildeKode?, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class OppvarmingResponse(val data: OppvarmingKode, val metadata: RegisterMetadataResponse)
+data class OppvarmingResponse(val data: OppvarmingKode?, val metadata: RegisterMetadataResponse)
 
 @Serializable
 data class BruksenhetResponse(
