@@ -1,6 +1,7 @@
 package no.kartverket.matrikkel.bygning.models
 
-import org.assertj.core.api.Assertions.assertThat
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import java.time.Instant
 import java.util.UUID
 import kotlin.test.Test
@@ -10,18 +11,18 @@ class BygningExtensionsTest {
         bygningId = 1L,
         bygningsnummer = 100,
         bruksenheter = emptyList(),
-        byggeaar = null,
-        bruksareal = null,
-        vannforsyning = null,
-        avlop = null,
+        byggeaar = Multikilde(),
+        bruksareal = Multikilde(),
+        vannforsyning = Multikilde(),
+        avlop = Multikilde(),
     )
 
     val defaultBruksenhet = Bruksenhet(
         bruksenhetId = 1L,
         bygningId = 1L,
-        bruksareal = null,
-        energikilder = emptyList(),
-        oppvarminger = emptyList(),
+        bruksareal = Multikilde(),
+        energikilder = Multikilde(),
+        oppvarminger = Multikilde(),
     )
 
     val defaultBruksenhetRegistrering = BruksenhetRegistrering(
@@ -64,7 +65,7 @@ class BygningExtensionsTest {
 
         val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
 
-        assertThat(aggregatedBygning.bruksareal?.data).isEqualTo(150.0)
+        assertThat(aggregatedBygning.bruksareal.egenregistrert?.data).isEqualTo(150.0)
     }
 
     @Test
