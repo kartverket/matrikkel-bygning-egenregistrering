@@ -2,6 +2,7 @@ package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
+import no.kartverket.matrikkel.bygning.matrikkelapi.bygningId
 import no.kartverket.matrikkel.bygning.matrikkelapi.getBruksenheter
 import no.kartverket.matrikkel.bygning.matrikkelapi.getBygning
 import no.kartverket.matrikkel.bygning.matrikkelapi.toInstant
@@ -26,7 +27,7 @@ internal class MatrikkelBygningClient(
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     override fun getBygningById(id: Long): Bygning? {
-        val bygningId: BygningId = BygningId().apply { value = id }
+        val bygningId: BygningId = bygningId(id)
 
         try {
             val bygning = matrikkelApi.storeService().getBygning(bygningId, matrikkelApi.matrikkelContext)
