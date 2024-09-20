@@ -20,7 +20,7 @@ fun Application.configureHTTP() {
             Json {
                 serializersModule = KompendiumSerializersModule.module
                 encodeDefaults = true
-//                explicitNulls = false
+                explicitNulls = false
             },
         )
         removeIgnoredType<String>()

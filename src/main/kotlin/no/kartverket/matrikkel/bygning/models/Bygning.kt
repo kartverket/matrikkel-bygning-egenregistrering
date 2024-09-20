@@ -6,21 +6,26 @@ import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
 import java.time.Instant
 
-// TODO Sette opp DTOer for Bygning/Bruksenhet hentet fra Matrikkel
 data class Bygning(
     val bygningId: Long,
     val bygningsnummer: Long,
     val bruksenheter: List<Bruksenhet>,
-    val byggeaar: Byggeaar? = null,
-    val bruksareal: Bruksareal? = null,
-    val vannforsyning: Vannforsyning? = null,
-    val avlop: Avlop? = null,
+    val byggeaar: Multikilde<Byggeaar> = Multikilde(),
+    val bruksareal: Multikilde<Bruksareal> = Multikilde(),
+    val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
+    val oppvarminger: Multikilde<List<Oppvarming>> = Multikilde(),
+    val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
+    val avlop: Multikilde<Avlop> = Multikilde(),
 ) {
     fun withBruksenheter(bruksenheter: List<Bruksenhet>): Bygning {
         return this.copy(
             bruksenheter = bruksenheter,
         )
     }
+}
+
+data class Multikilde<T : Any>(val autoritativ: T? = null, val egenregistrert: T? = null) {
+    fun withEgenregistrert(verdi: T?): Multikilde<T> = copy(egenregistrert = verdi)
 }
 
 data class RegisterMetadata(val registreringstidspunkt: Instant)
@@ -34,7 +39,7 @@ data class Oppvarming(val data: OppvarmingKode, val metadata: RegisterMetadata)
 data class Bruksenhet(
     val bruksenhetId: Long,
     val bygningId: Long,
-    val bruksareal: Bruksareal? = null,
-    val energikilder: List<Energikilde> = emptyList(),
-    val oppvarminger: List<Oppvarming> = emptyList(),
+    val bruksareal: Multikilde<Bruksareal> = Multikilde(),
+    val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
+    val oppvarminger: Multikilde<List<Oppvarming>> = Multikilde(),
 )

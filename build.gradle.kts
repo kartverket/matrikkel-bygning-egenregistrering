@@ -56,9 +56,6 @@ dependencies {
 
     // OpenAPI
     implementation(libs.kompendium.core)
-
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.assertj)
 }
 
 tasks {
@@ -82,6 +79,15 @@ testing {
     suites {
         withType<JvmTestSuite> {
             useJUnitJupiter()
+        }
+
+        named<JvmTestSuite>("test") {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.assertk)
+                implementation(libs.mockk)
+                implementation(testFixtures(project(":matrikkel-api")))
+            }
         }
 
         register<JvmTestSuite>("integrationTest") {
