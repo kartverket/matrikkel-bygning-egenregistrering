@@ -53,7 +53,7 @@ import kotlin.test.Test
 
 class MatrikkelBygningClientTest {
     @Test
-    fun bygningUnummerertBruksenhetUtenEtasje() {
+    fun `mapping takler minimalt utfylt bygning`() {
         val mockStoreService = mockk<StoreService> {
             val bygningId = bygningId(1L)
             val bruksenhetId = bruksenhetId(2L)
@@ -61,9 +61,6 @@ class MatrikkelBygningClientTest {
                 id = bygningId
                 bygningsnummer = 1000L
                 oppdateringsdato = timestampUtc(2024, 9, 13)
-                vannforsyningsKodeId = MatrikkelVannforsyningKode.IkkeOppgitt()
-                avlopsKodeId = MatrikkelAvlopKode.IkkeOppgitt()
-                etasjedata.bruksarealTotalt = 250.0
                 bruksenhetIds(bruksenhetId)
             }
             every { getObjects(matchIds(bruksenhetId), any()) } returns matrikkelBubbleObjectList(
@@ -89,7 +86,8 @@ class MatrikkelBygningClientTest {
             prop(Bygning::bygningId).isEqualTo(1L)
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
-                prop(Bruksareal::data).isEqualTo(250.0)
+                // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
+                prop(Bruksareal::data).isEqualTo(0.0)
                 prop(Bruksareal::metadata).isMatrikkelfoertBygningstidspunkt()
             }
             prop(Bygning::avlop).isEmpty()
@@ -111,7 +109,8 @@ class MatrikkelBygningClientTest {
     }
 
     @Test
-    fun bygningEneboligMedEtasje() {
+    fun `mapping mapper alle felter i fullt utfylt bygning`() {
+        // Bygningen er ikke fullt utfylt for det som enda ikke blir brukt
         val mockStoreService = mockk<StoreService> {
             val bygningId = bygningId(1L)
             val bruksenhetId = bruksenhetId(2L)
