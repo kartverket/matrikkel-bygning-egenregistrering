@@ -12,6 +12,8 @@ private val earliestDateForDerivingByggeaar = LocalDate.of(2009, 4, 25)
 // TODO: Det vil være mulig å få byggeår hvor bygningsstatus er veldig langt tilbakedatert, og vi kan nok anta at disse er feil.
 // Må gå opp hva "smerteterskelen" for hva som regnes som en ikke-godkjent bygningsstatusdato er
 internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Int? {
+    if (bygning.bygningsstatusHistorikker == null) return null
+
     return bygning.bygningsstatusHistorikker.item
         .filter { isAfterThresholdDate(it.registrertDato) }
         .filter { isCorrectBygningsstatusKode(it.bygningsstatusKodeId) }
