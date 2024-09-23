@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning.matrikkelapi.builders
 
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelAvlopKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelVannforsyningKode
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BruksenhetId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BruksenhetIdList
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning
@@ -34,6 +36,10 @@ fun bygning(scope: Bygning.() -> Unit): Bygning = Bygning()
         if (bruksenhetIds == null) bruksenhetIds = BruksenhetIdList()
         if (energikildeKodeIds == null) energikildeKodeIds = EnergikildeKodeIdList()
         if (oppvarmingsKodeIds == null) oppvarmingsKodeIds = OppvarmingsKodeIdList()
+
+        // Fyller inn standard kodeid hvis det ikke har blitt fylt inn noe annet
+        if(vannforsyningsKodeId == null) vannforsyningsKodeId = MatrikkelVannforsyningKode.IkkeOppgitt()
+        if (avlopsKodeId == null) avlopsKodeId = MatrikkelAvlopKode.IkkeOppgitt()
     }
 
 fun Bygning.bruksenhetIds(vararg bruksenhetIds: BruksenhetId) {
