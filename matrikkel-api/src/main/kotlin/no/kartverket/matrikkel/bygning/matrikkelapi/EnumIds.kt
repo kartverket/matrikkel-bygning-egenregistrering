@@ -1,8 +1,9 @@
 @file:Suppress("unused")
 
-package no.kartverket.matrikkel.bygning.matrikkelapi.builders
+package no.kartverket.matrikkel.bygning.matrikkelapi
 
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.AvlopsKodeId
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.BygningsstatusKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.EnergikildeKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.EtasjeplanKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.KjokkentilgangKodeId
@@ -67,4 +68,12 @@ enum class MatrikkelKjokkentilgangKode(private val idValue: Long) {
     Ukjent(4);
 
     operator fun invoke() = KjokkentilgangKodeId().apply { value = idValue }
+}
+
+enum class MatrikkelBygningsstatusKode(private val idValue: Long) {
+    MidlertidigBrukstillatelse(2),
+    FerdigAttest(3),
+    TattIBruk(4);
+
+    operator fun invoke() = BygningsstatusKodeId().apply { value = idValue }
 }

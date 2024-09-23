@@ -6,7 +6,6 @@ import no.kartverket.matrikkel.bygning.matrikkelapi.bygningId
 import no.kartverket.matrikkel.bygning.matrikkelapi.getBruksenheter
 import no.kartverket.matrikkel.bygning.matrikkelapi.getBygning
 import no.kartverket.matrikkel.bygning.matrikkelapi.toInstant
-import no.kartverket.matrikkel.bygning.matrikkelapi.toLocalDate
 import no.kartverket.matrikkel.bygning.models.Avlop
 import no.kartverket.matrikkel.bygning.models.Bruksareal
 import no.kartverket.matrikkel.bygning.models.Bruksenhet
@@ -21,8 +20,6 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
-import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as MatrikkelBygning
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
 internal class MatrikkelBygningClient(
@@ -45,10 +42,12 @@ internal class MatrikkelBygningClient(
                 bygningId = bygning.id.value,
                 bygningsnummer = bygning.bygningsnummer,
                 byggeaar = Multikilde(
-                    autoritativ = Byggeaar(
-                        data = calculateByggeaarForBygning(bygning),
-                        metadata = bygningsmetadata,
-                    ),
+                    autoritativ = deriveByggeaarForBygning(bygning)?.let {
+                        Byggeaar(
+                            data = it,
+                            metadata = bygningsmetadata,
+                        )
+                    },
                 ),
                 // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                 bruksareal = Multikilde(
@@ -128,24 +127,5 @@ internal class MatrikkelBygningClient(
         }
     }
 
-    // TODO Hvilken dato fra bygningsstatus er det som faktisk regnes som riktig dato å sjekke mot?
-    private fun calculateByggeaarForBygning(bygning: MatrikkelBygning): Int {
-        val bygningsstatuserWithDerivableByggeaar = bygning.bygningsstatusHistorikker.item.filter {
-            // TODO Sjekke faktisk dato
-            val earliestDateForDerivingByggeaar = LocalDate.of(2013, 1, 1)
 
-            val isBygningsstatusDerivable = (it.dato.toLocalDate() >= earliestDateForDerivingByggeaar)
-
-            // TODO Hvilke verdier skal vi faktisk bruke her? Trenger vi å lage en mapper
-            val isCorrectBygningsstatusType = it.bygningsstatusKodeId.value == 0L || it.bygningsstatusKodeId.value == 1L
-
-            isCorrectBygningsstatusType && isBygningsstatusDerivable
-        }
-
-        // Nullability her?
-        if (bygningsstatuserWithDerivableByggeaar.isEmpty()) return -1
-
-        // TODO Hvis det er flere bygningsstatuser som er innafor for å derivere, hvilken skal vi egentlig bruke?
-        return bygningsstatuserWithDerivableByggeaar.sortedBy { it.dato.toLocalDate() }.first().dato.toLocalDate().year
-    }
 }

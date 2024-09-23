@@ -14,12 +14,12 @@ import io.mockk.checkUnnecessaryStub
 import io.mockk.every
 import io.mockk.mockk
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
+import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelAvlopKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelEnergikildeKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelEtasjeplanKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelOppvarmingKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelVannforsyningKode
 import no.kartverket.matrikkel.bygning.matrikkelapi.bruksenhetId
-import no.kartverket.matrikkel.bygning.matrikkelapi.builders.MatrikkelAvlopKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.builders.MatrikkelEnergikildeKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.builders.MatrikkelEtasjeplanKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.builders.MatrikkelOppvarmingKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.builders.MatrikkelVannforsyningKode
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bruksenhet
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bruksenhetIds
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bygning
