@@ -70,12 +70,10 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-            val requestBody = EgenregistreringRequest.validEgenregistrering()
-
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    requestBody,
+                    EgenregistreringRequest.validEgenregistrering(),
                 )
             }
 
