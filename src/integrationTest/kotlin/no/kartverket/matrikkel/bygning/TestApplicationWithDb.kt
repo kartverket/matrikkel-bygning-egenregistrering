@@ -5,6 +5,8 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import io.ktor.server.testing.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.testcontainers.containers.PostgreSQLContainer
@@ -26,6 +28,7 @@ abstract class TestApplicationWithDb {
             postgresSQLContainer.stop()
         }
 
+        @OptIn(ExperimentalSerializationApi::class)
         fun ApplicationTestBuilder.mainModuleWithDatabaseEnvironmentAndClient(): HttpClient {
             setDatabaseConfiguration()
 
@@ -35,7 +38,11 @@ abstract class TestApplicationWithDb {
 
             return createClient {
                 install(ContentNegotiation) {
-                    json()
+                    json(
+                        Json {
+                            explicitNulls = false
+                        },
+                    )
                 }
             }
         }

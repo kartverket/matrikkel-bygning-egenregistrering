@@ -70,10 +70,12 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
 
+            val requestBody = EgenregistreringRequest.validEgenregistrering()
+
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistrering(),
+                    requestBody,
                 )
             }
 
@@ -85,7 +87,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val bygning = bygningResponse.body<BygningResponse>()
 
             val now = Instant.now()
-            assertThat(bygning.bruksareal.egenregistrert).satisfies(
+            assertThat(bygning.bruksareal?.egenregistrert).satisfies(
                 { bruksareal ->
                     assertThat(bruksareal?.data).isEqualTo(125.0)
                     assertThat(bruksareal?.metadata?.registreringstidspunkt)
@@ -93,7 +95,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 },
             )
 
-            assertThat(bygning.byggeaar.egenregistrert).satisfies(
+            assertThat(bygning.byggeaar?.egenregistrert).satisfies(
                 { byggeaar ->
                     assertThat(byggeaar?.data).isEqualTo(2010)
                     assertThat(byggeaar?.metadata?.registreringstidspunkt)
@@ -101,7 +103,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 },
             )
 
-            assertThat(bygning.vannforsyning.egenregistrert).satisfies(
+            assertThat(bygning.vannforsyning?.egenregistrert).satisfies(
                 { vannforsyning ->
                     assertThat(vannforsyning?.data).isEqualTo(VannforsyningKode.OffentligVannverk)
                     assertThat(vannforsyning?.metadata?.registreringstidspunkt)
@@ -109,7 +111,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 },
             )
 
-            assertThat(bygning.avlop.egenregistrert).satisfies(
+            assertThat(bygning.avlop?.egenregistrert).satisfies(
                 { avlop ->
                     assertThat(avlop?.data).isEqualTo(AvlopKode.OffentligKloakk)
                     assertThat(avlop?.metadata?.registreringstidspunkt)
@@ -117,31 +119,38 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 },
             )
 
-            assertThat(bygning.bruksenheter).satisfiesOnlyOnce(
-                { bruksenhet ->
-                    assertThat(bruksenhet.bruksenhetId).isEqualTo(1L)
+            assertThat(bygning.bruksenheter).satisfiesExactly(
+                { bruksenhet0 ->
+                    assertThat(bruksenhet0.bruksenhetId).isEqualTo(1L)
 
-                    assertThat(bruksenhet.bruksareal.egenregistrert).satisfies(
+                    assertThat(bruksenhet0.bruksareal?.egenregistrert).satisfies(
                         { bruksareal ->
                             assertThat(bruksareal?.data).isEqualTo(100.0)
                             assertThat(bruksareal?.metadata?.registreringstidspunkt)
                                 .isCloseTo(now, within(1, ChronoUnit.SECONDS))
-                        }
+                        },
                     )
 
-                    assertThat(bruksenhet.energikilder.egenregistrert).satisfiesExactly(
+                    assertThat(bruksenhet0.energikilder?.egenregistrert).satisfiesExactly(
                         { energikilde ->
                             assertThat(energikilde.data).isEqualTo(EnergikildeKode.Elektrisitet)
-                    assertThat(energikilde.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
+                            assertThat(energikilde.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
                         },
                     )
-                    assertThat(bruksenhet.oppvarminger.egenregistrert).satisfiesExactly(
+                    assertThat(bruksenhet0.oppvarminger?.egenregistrert).satisfiesExactly(
                         { oppvarming ->
                             assertThat(oppvarming.data).isEqualTo(OppvarmingKode.Elektrisk)
-                    assertThat(oppvarming.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
+                            assertThat(oppvarming.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
                         },
                     )
-                }
+                },
+                { bruksenhet1 ->
+                    assertThat(bruksenhet1.bruksenhetId).isEqualTo(2L)
+
+                    assertThat(bruksenhet1.bruksareal?.egenregistrert).isNull()
+                    assertThat(bruksenhet1.oppvarminger?.egenregistrert).isNull()
+                    assertThat(bruksenhet1.energikilder?.egenregistrert).isNull()
+                },
             )
         }
 
@@ -166,20 +175,20 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         assertThat(bruksenhetResponse.status).isEqualTo(HttpStatusCode.OK)
         val bruksenhet = bruksenhetResponse.body<BruksenhetResponse>()
         assertThat(bruksenhet.bruksenhetId).isEqualTo(1L)
-        assertThat(bruksenhet.bruksareal.egenregistrert).satisfies(
+        assertThat(bruksenhet.bruksareal?.egenregistrert).satisfies(
             { bruksareal ->
                 assertThat(bruksareal?.data).isEqualTo(100.0)
                 assertThat(bruksareal?.metadata?.registreringstidspunkt)
                     .isCloseTo(now, within(1, ChronoUnit.SECONDS))
-            }
+            },
         )
-        assertThat(bruksenhet.energikilder.egenregistrert).satisfiesExactly(
+        assertThat(bruksenhet.energikilder?.egenregistrert).satisfiesExactly(
             { energikilde ->
                 assertThat(energikilde.data).isEqualTo(EnergikildeKode.Elektrisitet)
                 assertThat(energikilde.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
             },
         )
-        assertThat(bruksenhet.oppvarminger.egenregistrert).satisfiesExactly(
+        assertThat(bruksenhet.oppvarminger?.egenregistrert).satisfiesExactly(
             { oppvarming ->
                 assertThat(oppvarming.data).isEqualTo(OppvarmingKode.Elektrisk)
                 assertThat(oppvarming.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
@@ -227,17 +236,17 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
             assertThat(bygningResponse.status).isEqualTo(HttpStatusCode.OK)
             val bygning = bygningResponse.body<BygningResponse>()
-            assertThat(bygning.bruksareal.egenregistrert?.data).isEqualTo(120.0)
-            assertThat(bygning.byggeaar.egenregistrert?.data).isEqualTo(2008)
+            assertThat(bygning.bruksareal?.egenregistrert?.data).isEqualTo(120.0)
+            assertThat(bygning.byggeaar?.egenregistrert?.data).isEqualTo(2008)
 
             assertThat(bygning.bruksenheter).satisfiesExactly(
                 { bruksenhet1 ->
                     assertThat(bruksenhet1.bruksenhetId).isEqualTo(1L)
-                    assertThat(bruksenhet1.bruksareal.egenregistrert?.data).isEqualTo(40.0)
+                    assertThat(bruksenhet1.bruksareal?.egenregistrert?.data).isEqualTo(40.0)
                 },
                 { bruksenhet2 ->
                     assertThat(bruksenhet2.bruksenhetId).isEqualTo(2L)
-                    assertThat(bruksenhet2.bruksareal.egenregistrert).isNull()
+                    assertThat(bruksenhet2.bruksareal?.egenregistrert).isNull()
                 },
             )
         }
