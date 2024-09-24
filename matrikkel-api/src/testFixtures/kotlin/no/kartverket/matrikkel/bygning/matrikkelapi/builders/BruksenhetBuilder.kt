@@ -1,6 +1,6 @@
 package no.kartverket.matrikkel.bygning.matrikkelapi.builders
 
-import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelKjokkentilgangKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelKjokkentilgangKode
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bruksenhet
 
 fun bruksenhet(scope: Bruksenhet.() -> Unit) = Bruksenhet()

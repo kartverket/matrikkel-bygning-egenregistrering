@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.matrikkelapi
+package no.kartverket.matrikkel.bygning.matrikkelapi.id
 
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BruksenhetId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId

@@ -1,13 +1,13 @@
 package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
-import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelBygningsstatusKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelBygningsstatusKode
 import no.kartverket.matrikkel.bygning.matrikkelapi.toLocalDate
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.Timestamp
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.BygningsstatusKodeId
 import java.time.LocalDate
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as MatrikkelBygning
 
-private val earliestDateForDerivingByggeaar = LocalDate.of(2009, 4, 25)
+private val EARLIEST_DATE_FOR_DERIVING_BYGGEAAR = LocalDate.of(2009, 4, 25)
 
 // TODO: Det vil være mulig å få byggeår hvor bygningsstatus er veldig langt tilbakedatert, og vi kan nok anta at disse er feil.
 // Må gå opp hva "smerteterskelen" for hva som regnes som en ikke-godkjent bygningsstatusdato er
@@ -30,4 +30,4 @@ private fun isCorrectBygningsstatusKode(bygningsstatusKodeId: BygningsstatusKode
     bygningsstatusKodeId == MatrikkelBygningsstatusKode.FerdigAttest() || bygningsstatusKodeId == MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse()
 
 private fun isAfterThresholdDate(registrertDato: Timestamp): Boolean =
-    (registrertDato.toLocalDate() > earliestDateForDerivingByggeaar)
+    (registrertDato.toLocalDate() > EARLIEST_DATE_FOR_DERIVING_BYGGEAAR)

@@ -2,50 +2,29 @@ package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
 import assertk.assertThat
 import assertk.assertions.isNull
-import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelBygningsstatusKode
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bygning
+import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bygningsstatusHistorikk
+import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bygningsstatusHistorikkList
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.localDateUtc
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.timestampUtc
-import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningsstatusHistorikk
-import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningsstatusHistorikkList
+import no.kartverket.matrikkel.bygning.matrikkelapi.builders.withBygningsstatusKodeId
+import no.kartverket.matrikkel.bygning.matrikkelapi.builders.withDato
+import no.kartverket.matrikkel.bygning.matrikkelapi.builders.withRegistrertDato
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelBygningsstatusKode
 import kotlin.test.Test
 
+
 class ByggeaarDeriverTest {
-    @Test
-    fun `bygning med riktig status som ikke er etter terskeldato skal ikke faa byggeaar`() {
-        val bygningsStatusHistorikkList = BygningsstatusHistorikkList()
-
-        bygningsStatusHistorikkList.item.add(
-            BygningsstatusHistorikk().apply {
-                bygningsstatusKodeId = MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse()
-                registrertDato = timestampUtc(2009, 4, 25)
-                dato = localDateUtc(2009, 4, 23)
-            },
-        )
-
-        val bygning = bygning {
-            bygningsstatusHistorikker = bygningsStatusHistorikkList
-        }
-
-        val derivedByggeaar = deriveByggeaarForBygning(bygning)
-
-        assertThat(derivedByggeaar).isNull()
+    val derivableBygningsstatusHistorikk = bygningsstatusHistorikk {
+        bygningsstatusKodeId = MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse()
+        registrertDato = timestampUtc(2009, 4, 26)
+        dato = localDateUtc(2009, 4, 24)
     }
 
     @Test
-    fun `bygning med riktig status som er etter terskeldato skal faa byggeaar`() {
-        val bygningsStatusHistorikkList = BygningsstatusHistorikkList()
-
-        bygningsStatusHistorikkList.item.add(
-            BygningsstatusHistorikk().apply {
-                bygningsstatusKodeId = MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse()
-                registrertDato = timestampUtc(2009, 4, 26)
-                dato = localDateUtc(2009, 4, 24)
-            },
-        )
-
+    fun `bygning med midlertidig brukstillatelse som er etter terskeldato skal faa byggeaar`() {
         val bygning = bygning {
-            bygningsstatusHistorikker = bygningsStatusHistorikkList
+            bygningsstatusHistorikker = bygningsstatusHistorikkList(derivableBygningsstatusHistorikk)
         }
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
@@ -54,23 +33,52 @@ class ByggeaarDeriverTest {
     }
 
     @Test
-    fun `bygning med feil status som er etter terskeldato skal ikke faa byggeaar`() {
-        val bygningsStatusHistorikkList = BygningsstatusHistorikkList()
-
-        bygningsStatusHistorikkList.item.add(
-            BygningsstatusHistorikk().apply {
-                bygningsstatusKodeId = MatrikkelBygningsstatusKode.TattIBruk()
-                registrertDato = timestampUtc(2009, 4, 26)
-                dato = localDateUtc(2009, 4, 24)
-            },
-        )
-
+    fun `bygning med ferdigattest som er etter terskeldato skal faa byggeaar`() {
         val bygning = bygning {
-            bygningsstatusHistorikker = bygningsStatusHistorikkList
+            bygningsstatusHistorikker = bygningsstatusHistorikkList(
+                derivableBygningsstatusHistorikk.withBygningsstatusKodeId(MatrikkelBygningsstatusKode.FerdigAttest()),
+            )
+        }
+
+        val derivedByggeaar = deriveByggeaarForBygning(bygning)
+
+        assertThat(derivedByggeaar).equals(2009)
+    }
+
+    @Test
+    fun `bygning med riktig status som ikke er etter terskeldato skal ikke faa byggeaar`() {
+        val bygning = bygning {
+            bygningsstatusHistorikker = bygningsstatusHistorikkList(derivableBygningsstatusHistorikk.withRegistrertDato(2009, 4, 25))
         }
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
         assertThat(derivedByggeaar).isNull()
+    }
+
+    @Test
+    fun `bygning med feil status som er etter terskeldato skal ikke faa byggeaar`() {
+        val bygning = bygning {
+            bygningsstatusHistorikker =
+                bygningsstatusHistorikkList(derivableBygningsstatusHistorikk.withBygningsstatusKodeId(MatrikkelBygningsstatusKode.TattIBruk()))
+        }
+
+        val derivedByggeaar = deriveByggeaarForBygning(bygning)
+
+        assertThat(derivedByggeaar).isNull()
+    }
+
+    @Test
+    fun `bygning med flere gyldige statuser skal bruke eldst status for byggeår`() {
+        val bygning = bygning {
+            bygningsstatusHistorikker = bygningsstatusHistorikkList(
+                derivableBygningsstatusHistorikk,
+                derivableBygningsstatusHistorikk.withRegistrertDato(2010, 4, 26).withDato(2010, 4, 26),
+            )
+        }
+
+        val derivedByggeaar = deriveByggeaarForBygning(bygning)
+
+        assertThat(derivedByggeaar).equals(2009)
     }
 }
