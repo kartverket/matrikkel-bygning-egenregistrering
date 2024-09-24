@@ -22,12 +22,12 @@ import java.time.Instant
 data class BygningResponse(
     val bygningId: Long,
     val bygningsnummer: Long,
-    val byggeaar: MultikildeResponse<ByggeaarResponse>,
-    val bruksareal: MultikildeResponse<BruksarealResponse>,
-    val vannforsyning: MultikildeResponse<VannforsyningKodeResponse>,
-    val avlop: MultikildeResponse<AvlopKodeResponse>,
-    val energikilder: MultikildeResponse<List<EnergikildeResponse>>,
-    val oppvarming: MultikildeResponse<List<OppvarmingResponse>>,
+    val byggeaar: MultikildeResponse<ByggeaarResponse>?,
+    val bruksareal: MultikildeResponse<BruksarealResponse>?,
+    val vannforsyning: MultikildeResponse<VannforsyningKodeResponse>?,
+    val avlop: MultikildeResponse<AvlopKodeResponse>?,
+    val energikilder: MultikildeResponse<List<EnergikildeResponse>>?,
+    val oppvarming: MultikildeResponse<List<OppvarmingResponse>>?,
     val bruksenheter: List<BruksenhetResponse>,
 )
 
@@ -58,16 +58,18 @@ data class OppvarmingResponse(val data: OppvarmingKode, val metadata: RegisterMe
 @Serializable
 data class BruksenhetResponse(
     val bruksenhetId: Long,
-    val bruksareal: MultikildeResponse<BruksarealResponse>,
-    val energikilder: MultikildeResponse<List<EnergikildeResponse>>,
-    val oppvarminger: MultikildeResponse<List<OppvarmingResponse>>,
+    val bruksareal: MultikildeResponse<BruksarealResponse>?,
+    val energikilder: MultikildeResponse<List<EnergikildeResponse>>?,
+    val oppvarminger: MultikildeResponse<List<OppvarmingResponse>>?,
 )
 
 fun RegisterMetadata.toRegistermetadataResponse() = RegisterMetadataResponse(
     registreringstidspunkt = this.registreringstidspunkt,
 )
 
-fun <T : Any, R : Any> Multikilde<T>.toMultikildeResponse(mapper: T.() -> R): MultikildeResponse<R> {
+fun <T : Any, R : Any> Multikilde<T>.toMultikildeResponse(mapper: T.() -> R): MultikildeResponse<R>? {
+    if (autoritativ == null && egenregistrert == null) return null
+
     return MultikildeResponse(
         autoritativ?.mapper(),
         egenregistrert?.mapper(),
