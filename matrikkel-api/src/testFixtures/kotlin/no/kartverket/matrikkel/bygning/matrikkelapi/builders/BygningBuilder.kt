@@ -22,6 +22,11 @@ fun bygning(scope: Bygning.() -> Unit): Bygning = Bygning()
         etasjedata.bruttoarealTilBolig = 0.0
         etasjedata.bruttoarealTilAnnet = 0.0
         etasjedata.bruttoarealTotalt = 0.0
+        bygningsstatusHistorikker = bygningsstatusHistorikkList(
+            bygningsstatusHistorikk {
+                registrertDato = timestampUtc(2000, 1, 1)
+            }
+        )
     }
     .apply(scope)
     .apply {
