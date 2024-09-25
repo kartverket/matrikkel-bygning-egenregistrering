@@ -2,13 +2,14 @@ package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
-import no.kartverket.matrikkel.bygning.matrikkelapi.bygningId
 import no.kartverket.matrikkel.bygning.matrikkelapi.getBruksenheter
 import no.kartverket.matrikkel.bygning.matrikkelapi.getBygning
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.bygningId
 import no.kartverket.matrikkel.bygning.matrikkelapi.toInstant
 import no.kartverket.matrikkel.bygning.models.Avlop
 import no.kartverket.matrikkel.bygning.models.Bruksareal
 import no.kartverket.matrikkel.bygning.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.models.Byggeaar
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Energikilde
 import no.kartverket.matrikkel.bygning.models.Multikilde
@@ -40,6 +41,14 @@ internal class MatrikkelBygningClient(
             return Bygning(
                 bygningId = bygning.id.value,
                 bygningsnummer = bygning.bygningsnummer,
+                byggeaar = Multikilde(
+                    autoritativ = deriveByggeaarForBygning(bygning)?.let {
+                        Byggeaar(
+                            data = it,
+                            metadata = bygningsmetadata,
+                        )
+                    },
+                ),
                 // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                 bruksareal = Multikilde(
                     autoritativ = Bruksareal(
