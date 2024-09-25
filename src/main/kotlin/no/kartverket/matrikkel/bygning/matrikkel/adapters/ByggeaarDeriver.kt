@@ -27,6 +27,6 @@ private fun isAfterThresholdDate(bygningsstatus: BygningsstatusHistorikk): Boole
     (bygningsstatus.registrertDato.toLocalDate() > EARLIEST_DATE_FOR_DERIVING_BYGGEAAR)
 
 private fun isCorrectBygningsstatusKode(bygningsstatusKodeId: BygningsstatusKodeId): Boolean =
-    bygningsstatusKodeId == MatrikkelBygningsstatusKode.FerdigAttest() || bygningsstatusKodeId == MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse()
+    bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.FerdigAttest().value || bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse().value
 
 private fun isNotDeleted(bygningsstatus: BygningsstatusHistorikk): Boolean = bygningsstatus.slettetDato == null

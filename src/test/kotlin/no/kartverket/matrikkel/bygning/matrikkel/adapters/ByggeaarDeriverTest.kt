@@ -1,10 +1,12 @@
 package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bygning
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bygningsstatusHistorikk
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bygningsstatusHistorikkList
+import no.kartverket.matrikkel.bygning.matrikkelapi.builders.copy
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.localDateUtc
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.timestampUtc
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.withBygningsstatusKodeId
@@ -29,7 +31,7 @@ class ByggeaarDeriverTest {
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).equals(2009)
+        assertThat(derivedByggeaar).isEqualTo(2009)
     }
 
     @Test
@@ -42,7 +44,7 @@ class ByggeaarDeriverTest {
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).equals(2009)
+        assertThat(derivedByggeaar).isEqualTo(2009)
     }
 
     @Test
@@ -73,12 +75,12 @@ class ByggeaarDeriverTest {
         val bygning = bygning {
             bygningsstatusHistorikker = bygningsstatusHistorikkList(
                 derivableBygningsstatusHistorikk,
-                derivableBygningsstatusHistorikk.withRegistrertDato(2010, 4, 26).withDato(2010, 4, 26),
+                derivableBygningsstatusHistorikk.copy().withRegistrertDato(2010, 4, 26).withDato(2010, 4, 26),
             )
         }
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).equals(2009)
+        assertThat(derivedByggeaar).isEqualTo(2009)
     }
 }
