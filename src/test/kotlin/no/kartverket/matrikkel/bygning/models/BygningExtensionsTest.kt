@@ -7,7 +7,8 @@ import java.util.UUID
 import kotlin.test.Test
 
 class BygningExtensionsTest {
-    val defaultBygning = Bygning(
+
+    private val defaultBygning = Bygning(
         bygningId = 1L,
         bygningsnummer = 100,
         bruksenheter = emptyList(),
@@ -17,7 +18,7 @@ class BygningExtensionsTest {
         avlop = Multikilde(),
     )
 
-    val defaultBruksenhet = Bruksenhet(
+    private val defaultBruksenhet = Bruksenhet(
         bruksenhetId = 1L,
         bygningId = 1L,
         bruksareal = Multikilde(),
@@ -25,7 +26,7 @@ class BygningExtensionsTest {
         oppvarminger = Multikilde(),
     )
 
-    val defaultBruksenhetRegistrering = BruksenhetRegistrering(
+    private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
         bruksenhetId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             bruksareal = 50.0
@@ -34,7 +35,7 @@ class BygningExtensionsTest {
         oppvarmingRegistrering = null
     )
 
-    val defaultBygningRegistrering = BygningRegistrering(
+    private val defaultBygningRegistrering = BygningRegistrering(
         bygningId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             bruksareal = 125.0,
@@ -45,7 +46,7 @@ class BygningExtensionsTest {
         bruksenhetRegistreringer = listOf(defaultBruksenhetRegistrering),
     )
 
-    val defaultEgenregistrering = Egenregistrering(
+    private val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         bygningRegistrering = defaultBygningRegistrering
@@ -76,3 +77,4 @@ class BygningExtensionsTest {
         assertThat(bruksenhet.energikilder).isEmpty()
     }
 }
+

@@ -1,5 +1,17 @@
 package no.kartverket.matrikkel.bygning.v1
 
+import assertk.Assert
+import assertk.all
+import assertk.assertThat
+import assertk.assertions.containsExactly
+import assertk.assertions.extracting
+import assertk.assertions.index
+import assertk.assertions.isBetween
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
+import assertk.assertions.prop
+import assertk.assertions.single
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -18,13 +30,18 @@ import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BygningRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.dto.request.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.AvlopKodeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BruksarealResponse
 import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BruksenhetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.ByggeaarResponse
 import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BygningResponse
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.within
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.EnergikildeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.MultikildeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.OppvarmingResponse
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.RegisterMetadataResponse
+import no.kartverket.matrikkel.bygning.routes.v1.dto.response.VannforsyningKodeResponse
 import org.junit.jupiter.api.Test
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 class EgenregistreringRouteTest : TestApplicationWithDb() {
 
@@ -85,71 +102,67 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val bygning = bygningResponse.body<BygningResponse>()
 
             val now = Instant.now()
-            assertThat(bygning.bruksareal?.egenregistrert).satisfies(
-                { bruksareal ->
-                    assertThat(bruksareal?.data).isEqualTo(125.0)
-                    assertThat(bruksareal?.metadata?.registreringstidspunkt)
-                        .isCloseTo(now, within(1, ChronoUnit.SECONDS))
-                },
-            )
 
-            assertThat(bygning.byggeaar?.egenregistrert).satisfies(
-                { byggeaar ->
-                    assertThat(byggeaar?.data).isEqualTo(2010)
-                    assertThat(byggeaar?.metadata?.registreringstidspunkt)
-                        .isCloseTo(now, within(1, ChronoUnit.SECONDS))
-                },
-            )
+            assertThat(bygning).all {
+                prop(BygningResponse::bruksareal).isNotNull().all {
+                    prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
+                        prop(BruksarealResponse::data).isEqualTo(125.0)
+                        prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
+                }
 
-            assertThat(bygning.vannforsyning?.egenregistrert).satisfies(
-                { vannforsyning ->
-                    assertThat(vannforsyning?.data).isEqualTo(VannforsyningKode.OffentligVannverk)
-                    assertThat(vannforsyning?.metadata?.registreringstidspunkt)
-                        .isCloseTo(now, within(1, ChronoUnit.SECONDS))
-                },
-            )
+                prop(BygningResponse::byggeaar).isNotNull().all {
+                    prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
+                        prop(ByggeaarResponse::data).isEqualTo(2010)
+                        prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
+                }
 
-            assertThat(bygning.avlop?.egenregistrert).satisfies(
-                { avlop ->
-                    assertThat(avlop?.data).isEqualTo(AvlopKode.OffentligKloakk)
-                    assertThat(avlop?.metadata?.registreringstidspunkt)
-                        .isCloseTo(now, within(1, ChronoUnit.SECONDS))
-                },
-            )
+                prop(BygningResponse::vannforsyning).isNotNull().all {
+                    prop(MultikildeResponse<VannforsyningKodeResponse>::egenregistrert).isNotNull().all {
+                        prop(VannforsyningKodeResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
+                        prop(VannforsyningKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
+                }
 
-            assertThat(bygning.bruksenheter).satisfiesExactly(
-                { bruksenhet0 ->
-                    assertThat(bruksenhet0.bruksenhetId).isEqualTo(1L)
+                prop(BygningResponse::avlop).isNotNull().all {
+                    prop(MultikildeResponse<AvlopKodeResponse>::egenregistrert).isNotNull().all {
+                        prop(AvlopKodeResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
+                        prop(AvlopKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
+                }
 
-                    assertThat(bruksenhet0.bruksareal?.egenregistrert).satisfies(
-                        { bruksareal ->
-                            assertThat(bruksareal?.data).isEqualTo(100.0)
-                            assertThat(bruksareal?.metadata?.registreringstidspunkt)
-                                .isCloseTo(now, within(1, ChronoUnit.SECONDS))
-                        },
-                    )
+                prop(BygningResponse::bruksenheter).index(0).all {
+                    prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
+                    prop(BruksenhetResponse::bruksareal).isNotNull().all {
+                        prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
+                            prop(BruksarealResponse::data).isEqualTo(100.0)
+                            prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        }
+                    }
 
-                    assertThat(bruksenhet0.energikilder?.egenregistrert).satisfiesExactly(
-                        { energikilde ->
-                            assertThat(energikilde.data).isEqualTo(EnergikildeKode.Elektrisitet)
-                            assertThat(energikilde.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
-                        },
-                    )
-                    assertThat(bruksenhet0.oppvarminger?.egenregistrert).satisfiesExactly(
-                        { oppvarming ->
-                            assertThat(oppvarming.data).isEqualTo(OppvarmingKode.Elektrisk)
-                            assertThat(oppvarming.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
-                        },
-                    )
-                },
-                { bruksenhet1 ->
-                    assertThat(bruksenhet1.bruksenhetId).isEqualTo(2L)
+                    prop(BruksenhetResponse::energikilder).isNotNull().all {
+                        prop(MultikildeResponse<List<EnergikildeResponse>>::egenregistrert).isNotNull().single().all {
+                            prop(EnergikildeResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                            prop(EnergikildeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        }
+                    }
 
-                    assertThat(bruksenhet1.bruksareal?.egenregistrert).isNull()
-                    assertThat(bruksenhet1.oppvarminger?.egenregistrert).isNull()
-                    assertThat(bruksenhet1.energikilder?.egenregistrert).isNull()
-                },
-            )
+                    prop(BruksenhetResponse::oppvarminger).isNotNull().all {
+                        prop(MultikildeResponse<List<OppvarmingResponse>>::egenregistrert).isNotNull().single().all {
+                            prop(OppvarmingResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                            prop(OppvarmingResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        }
+                    }
+                }
+
+                prop(BygningResponse::bruksenheter).index(1).all {
+                    prop(BruksenhetResponse::bruksenhetId).isEqualTo(2L)
+                    prop(BruksenhetResponse::bruksareal).isNull()
+                    prop(BruksenhetResponse::energikilder).isNull()
+                    prop(BruksenhetResponse::oppvarminger).isNull()
+                }
+            }
         }
 
     @Test
@@ -169,29 +182,34 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
         val bruksenhetResponse = client.get("/v1/bygninger/1/bruksenheter/1")
 
-        val now = Instant.now()
         assertThat(bruksenhetResponse.status).isEqualTo(HttpStatusCode.OK)
         val bruksenhet = bruksenhetResponse.body<BruksenhetResponse>()
-        assertThat(bruksenhet.bruksenhetId).isEqualTo(1L)
-        assertThat(bruksenhet.bruksareal?.egenregistrert).satisfies(
-            { bruksareal ->
-                assertThat(bruksareal?.data).isEqualTo(100.0)
-                assertThat(bruksareal?.metadata?.registreringstidspunkt)
-                    .isCloseTo(now, within(1, ChronoUnit.SECONDS))
-            },
-        )
-        assertThat(bruksenhet.energikilder?.egenregistrert).satisfiesExactly(
-            { energikilde ->
-                assertThat(energikilde.data).isEqualTo(EnergikildeKode.Elektrisitet)
-                assertThat(energikilde.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
-            },
-        )
-        assertThat(bruksenhet.oppvarminger?.egenregistrert).satisfiesExactly(
-            { oppvarming ->
-                assertThat(oppvarming.data).isEqualTo(OppvarmingKode.Elektrisk)
-                assertThat(oppvarming.metadata.registreringstidspunkt).isCloseTo(now, within(1, ChronoUnit.SECONDS))
-            },
-        )
+
+        val now = Instant.now()
+        assertThat(bruksenhet).all {
+            prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
+
+            prop(BruksenhetResponse::bruksareal).isNotNull().all {
+                prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
+                    prop(BruksarealResponse::data).isEqualTo(100.0)
+                    prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
+            }
+
+            prop(BruksenhetResponse::energikilder).isNotNull().all {
+                prop(MultikildeResponse<List<EnergikildeResponse>>::egenregistrert).isNotNull().single().all {
+                    prop(EnergikildeResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                    prop(EnergikildeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
+            }
+
+            prop(BruksenhetResponse::oppvarminger).isNotNull().all {
+                prop(MultikildeResponse<List<OppvarmingResponse>>::egenregistrert).isNotNull().single().all {
+                    prop(OppvarmingResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                    prop(OppvarmingResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
+            }
+        }
     }
 
     @Test
@@ -234,19 +252,27 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
             assertThat(bygningResponse.status).isEqualTo(HttpStatusCode.OK)
             val bygning = bygningResponse.body<BygningResponse>()
-            assertThat(bygning.bruksareal?.egenregistrert?.data).isEqualTo(120.0)
-            assertThat(bygning.byggeaar?.egenregistrert?.data).isEqualTo(2008)
 
-            assertThat(bygning.bruksenheter).satisfiesExactly(
-                { bruksenhet1 ->
-                    assertThat(bruksenhet1.bruksenhetId).isEqualTo(1L)
-                    assertThat(bruksenhet1.bruksareal?.egenregistrert?.data).isEqualTo(40.0)
-                },
-                { bruksenhet2 ->
-                    assertThat(bruksenhet2.bruksenhetId).isEqualTo(2L)
-                    assertThat(bruksenhet2.bruksareal?.egenregistrert).isNull()
-                },
-            )
+            val now = Instant.now()
+            assertThat(bygning).all {
+                prop(BygningResponse::bruksareal).isNotNull().all {
+                    prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
+                        prop(BruksarealResponse::data).isEqualTo(120.0)
+                        prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
+                }
+
+                prop(BygningResponse::byggeaar).isNotNull().all {
+                    prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
+                        prop(ByggeaarResponse::data).isEqualTo(2008)
+                        prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
+                }
+                prop(BygningResponse::bruksenheter)
+                    .extracting(BruksenhetResponse::bruksenhetId) { it.bruksareal?.egenregistrert?.data }
+                    .containsExactly(1L to 40.0, 2L to null)
+
+            }
         }
 
     private fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
@@ -274,4 +300,10 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             ),
         ),
     )
+
+    private fun Assert<RegisterMetadataResponse>.hasRegistreringstidspunktWithinThreshold(now: Instant): () -> Unit {
+        return {
+            prop(RegisterMetadataResponse::registreringstidspunkt).isBetween(now, now.plusSeconds(1))
+        }
+    }
 }

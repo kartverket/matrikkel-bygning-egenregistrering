@@ -1,18 +1,25 @@
 package no.kartverket.matrikkel.bygning.repositories
 
+import assertk.all
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.index
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.prop
+import assertk.assertions.single
 import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.*
 
 class EgenregistreringRepositoryTest : TestWithDb() {
-    val egenregistreringRepository = EgenregistreringRepository(dataSource)
+    private val egenregistreringRepository = EgenregistreringRepository(dataSource)
 
-    val defaultBygningRegistrering = BygningRegistrering(
+    private val defaultBygningRegistrering = BygningRegistrering(
         bygningId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             bruksareal = 125.0,
@@ -23,7 +30,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
         bruksenhetRegistreringer = emptyList()
     )
 
-    val defaultEgenregistrering = Egenregistrering(
+    private val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         bygningRegistrering = defaultBygningRegistrering,
@@ -35,20 +42,18 @@ class EgenregistreringRepositoryTest : TestWithDb() {
 
         val bygningRegistreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L)
 
-        assertThat(bygningRegistreringer).size().isEqualTo(1)
-        assertThat(bygningRegistreringer[0]).satisfies(
-            { egenregistrering ->
-                assertThat(egenregistrering.id).isEqualTo(defaultEgenregistrering.id)
-                assertThat(egenregistrering.registreringstidspunkt).isEqualTo(defaultEgenregistrering.registreringstidspunkt)
-            }
-        )
+        assertThat(bygningRegistreringer).hasSize(1)
+
+        assertThat(bygningRegistreringer).single().all {
+            prop(Egenregistrering::id).isEqualTo(defaultEgenregistrering.id)
+            prop(Egenregistrering::registreringstidspunkt).isEqualTo(defaultEgenregistrering.registreringstidspunkt)
+        }
     }
 
     @Test
     fun `lagring av 2 egenregistreringer skal returneres i riktig rekkefolge med seneste registreringer forst i listen`() {
-        val laterRegistreringId = UUID.randomUUID()
         val laterRegistrering = defaultEgenregistrering.copy(
-            id = laterRegistreringId,
+            id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60)
         )
 
@@ -57,15 +62,17 @@ class EgenregistreringRepositoryTest : TestWithDb() {
 
         val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L)
 
-        assertThat(registreringer[0].id).isEqualTo(laterRegistrering.id)
-        assertThat(registreringer[1].id).isEqualTo(defaultEgenregistrering.id)
+        assertThat(registreringer).index(0).all {
+            prop(Egenregistrering::id).isEqualTo(laterRegistrering.id)
+        }
+        assertThat(registreringer).index(1).all {
+            prop(Egenregistrering::id).isEqualTo(defaultEgenregistrering.id)
+        }
     }
 
     @Test
     fun `henting av registreringer skal gi tom liste hvis bygningen ikke har registreringer`() {
-        egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering)
-
-        val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(2L)
+        val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L)
 
         assertThat(registreringer).isEmpty()
     }
