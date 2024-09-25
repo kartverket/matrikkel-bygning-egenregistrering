@@ -24,7 +24,7 @@ internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Int? {
 }
 
 private fun isAfterThresholdDate(bygningsstatus: BygningsstatusHistorikk): Boolean =
-    (bygningsstatus.registrertDato.toLocalDate() > EARLIEST_DATE_FOR_DERIVING_BYGGEAAR)
+    bygningsstatus.registrertDato.toLocalDate() > EARLIEST_DATE_FOR_DERIVING_BYGGEAAR
 
 private fun isCorrectBygningsstatusKode(bygningsstatusKodeId: BygningsstatusKodeId): Boolean =
     bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.FerdigAttest().value || bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse().value
