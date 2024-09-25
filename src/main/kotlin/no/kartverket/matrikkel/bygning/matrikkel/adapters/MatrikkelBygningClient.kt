@@ -2,9 +2,9 @@ package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
-import no.kartverket.matrikkel.bygning.matrikkelapi.id.bygningId
 import no.kartverket.matrikkel.bygning.matrikkelapi.getBruksenheter
 import no.kartverket.matrikkel.bygning.matrikkelapi.getBygning
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.bygningId
 import no.kartverket.matrikkel.bygning.matrikkelapi.toInstant
 import no.kartverket.matrikkel.bygning.models.Avlop
 import no.kartverket.matrikkel.bygning.models.Bruksareal
@@ -126,6 +126,4 @@ internal class MatrikkelBygningClient(
             return null
         }
     }
-
-
 }

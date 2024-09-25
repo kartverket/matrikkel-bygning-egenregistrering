@@ -11,7 +11,6 @@ import no.kartverket.matrikkel.bygning.matrikkelapi.builders.timestampUtc
 import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelBygningsstatusKode
 import kotlin.test.Test
 
-
 class ByggeaarDeriverTest {
     val derivableBygningsstatusHistorikk = bygningsstatusHistorikk {
         bygningsstatusKodeId = MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse()
@@ -82,7 +81,7 @@ class ByggeaarDeriverTest {
     }
 
     @Test
-    fun `bygning med flere gyldige statuser skal bruke eldst status for byggeår`() {
+    fun `bygning med flere gyldige statuser skal bruke eldste status for byggeaar`() {
         val bygning = bygning {
             bygningsstatusHistorikker = bygningsstatusHistorikkList(
                 derivableBygningsstatusHistorikk,
