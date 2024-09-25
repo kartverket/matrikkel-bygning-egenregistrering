@@ -11,7 +11,6 @@ shadowVersion = "8.1.1"
 kompendiumVersion = "3.14.4"
 jaxwsVersion = "4.0.3"
 hikariVersion = "6.0.0"
-assertjVersion = "3.26.3"
 testcontainersVersion = "1.20.1"
 mockkVersion = "1.13.12"
 assertkVersion = "0.28.1"
@@ -45,7 +44,6 @@ kompendium-core = { group = "io.bkbn", name = "kompendium-core", version.ref = "
 jaxws-rt = { group = "com.sun.xml.ws", name = "jaxws-rt", version.ref = "jaxwsVersion" }
 jaxws-tools = { group = "com.sun.xml.ws", name = "jaxws-tools", version.ref = "jaxwsVersion" }
 
-assertj = { group = "org.assertj", name = "assertj-core", version.ref = "assertjVersion" }
 testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainersVersion" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
 mockk-dsl = { group = "io.mockk", name = "mockk-dsl", version.ref = "mockkVersion" }

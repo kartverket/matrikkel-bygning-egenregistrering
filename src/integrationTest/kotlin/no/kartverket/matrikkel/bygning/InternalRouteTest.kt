@@ -1,9 +1,10 @@
 package no.kartverket.matrikkel.bygning
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class InternalRouteTest : TestApplicationWithDb() {

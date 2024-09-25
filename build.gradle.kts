@@ -100,7 +100,7 @@ testing {
                 implementation(libs.ktor.server.tests)
                 implementation(libs.ktor.client.content.negotation)
 
-                implementation(libs.assertj)
+                implementation(libs.assertk)
                 implementation(libs.testcontainers.postgresql)
             }
         }
