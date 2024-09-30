@@ -40,9 +40,8 @@ dependencies {
     implementation(libs.micrometer.prometheus)
 
     // Logs
-    implementation(libs.logstash.encoder)
     implementation(libs.logback.classic)
-    implementation(libs.jackson.databind)
+    runtimeOnly(libs.logstash.encoder)
 
     // Serialization
     implementation(libs.ktor.server.content.negotiation)
