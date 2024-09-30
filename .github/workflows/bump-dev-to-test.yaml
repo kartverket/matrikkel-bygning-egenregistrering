@@ -1,0 +1,25 @@
+name: Bump Version in Dev to Test
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  registry: ghcr.io
+  image_name: ${{ github.repository }}
+
+jobs:
+  deploy:
+    name: Bump Version
+    uses: kartverket/bygning-github-workflows/.github/workflows/bump-app-env.yaml@main
+    permissions:
+      id-token: write
+    with:
+      application_name: bygning-backend
+      namespace_from: matrikkelbygning-dev
+      namespace_to: matrikkelbygning-test
+      env_from: dev
+      env_to: dev
+      cluster_from: atkv3
+      cluster_to: atkv3
