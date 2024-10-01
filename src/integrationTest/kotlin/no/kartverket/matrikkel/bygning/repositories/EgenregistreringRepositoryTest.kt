@@ -11,6 +11,7 @@ import assertk.assertions.single
 import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.models.valuetype.Foedselsnummer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -33,6 +34,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
     private val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
+        registrerer = Foedselsnummer("01010154321"),
         bygningRegistrering = defaultBygningRegistrering,
     )
 

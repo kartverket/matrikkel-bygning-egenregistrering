@@ -47,6 +47,7 @@ private fun Route.egenregistreringDoc() {
                 examples(
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningId = 1,
+                        registrerer = "01010154132",
                         bygningRegistrering = BygningRegistreringRequest(
                             bruksarealRegistrering = BruksarealRegistreringRequest(
                                 bruksareal = 125.0,

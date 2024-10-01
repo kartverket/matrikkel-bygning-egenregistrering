@@ -24,6 +24,7 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
                         data = it.bruksareal,
                         metadata = RegisterMetadata(
                             registreringstidspunkt = egenregistrering.registreringstidspunkt,
+                            registrerer = egenregistrering.registrerer
                         ),
                     )
                 }

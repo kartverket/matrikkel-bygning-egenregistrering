@@ -14,6 +14,7 @@ import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.models.valuetype.Foedselsnummer
 import java.time.Instant
 import java.util.*
 
@@ -37,6 +38,7 @@ data class BruksenhetRegistreringRequest(
 @Serializable
 data class EgenregistreringRequest(
     val bygningId: Long,
+    val registrerer: String,
     val bygningRegistrering: BygningRegistreringRequest?,
     val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
@@ -75,6 +77,7 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     val registreringstidspunkt = Instant.now()
     return Egenregistrering(
         id = UUID.randomUUID(),
+        registrerer = Foedselsnummer(this.registrerer),
         registreringstidspunkt = registreringstidspunkt,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,
