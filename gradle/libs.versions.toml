@@ -11,7 +11,7 @@ shadowVersion = "8.1.1"
 kompendiumVersion = "3.14.4"
 jaxwsVersion = "4.0.3"
 hikariVersion = "6.0.0"
-testcontainersVersion = "1.20.1"
+testcontainersVersion = "1.20.2"
 mockkVersion = "1.13.12"
 assertkVersion = "0.28.1"
 
