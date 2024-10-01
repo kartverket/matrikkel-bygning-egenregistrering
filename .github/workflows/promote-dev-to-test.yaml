@@ -1,4 +1,4 @@
-name: Bump Version in Dev to Test
+name: Promote Version in Dev to Test
 on:
   workflow_dispatch:
 
@@ -12,7 +12,7 @@ env:
 jobs:
   deploy:
     name: Bump Version
-    uses: kartverket/bygning-github-workflows/.github/workflows/bump-app-env.yaml@main
+    uses: kartverket/bygning-github-workflows/.github/workflows/promote-app.yaml@main
     permissions:
       id-token: write
     with:
