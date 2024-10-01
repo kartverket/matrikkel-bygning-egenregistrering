@@ -1,7 +1,8 @@
-package no.kartverket.matrikkel.bygning.routes.v1
+package no.kartverket.matrikkel.bygning.routes.v1.egenregistrering
 
 import io.bkbn.kompendium.core.metadata.PostInfo
 import io.bkbn.kompendium.core.plugin.NotarizedRoute
+import io.bkbn.kompendium.core.plugin.NotarizedRoute.invoke
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -11,12 +12,6 @@ import no.kartverket.matrikkel.bygning.models.Result.ErrorResult
 import no.kartverket.matrikkel.bygning.models.Result.Success
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BruksarealRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BruksenhetRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BygningRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.EnergikildeRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.toEgenregistrering
 import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 
 fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {

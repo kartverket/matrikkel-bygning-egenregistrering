@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.dto.request
+package no.kartverket.matrikkel.bygning.routes.v1.egenregistrering
 
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.models.AvlopRegistrering

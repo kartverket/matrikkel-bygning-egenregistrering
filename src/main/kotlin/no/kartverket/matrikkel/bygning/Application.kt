@@ -18,9 +18,9 @@ import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
 import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 import no.kartverket.matrikkel.bygning.repositories.HealthRepository
 import no.kartverket.matrikkel.bygning.routes.internalRouting
-import no.kartverket.matrikkel.bygning.routes.v1.bygningRouting
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistreringRouting
-import no.kartverket.matrikkel.bygning.routes.v1.kodelisteRouting
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.bygningRouting
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.egenregistreringRouting
+import no.kartverket.matrikkel.bygning.routes.v1.kodeliste.kodelisteRouting
 import no.kartverket.matrikkel.bygning.services.BygningService
 import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 import no.kartverket.matrikkel.bygning.services.HealthService
