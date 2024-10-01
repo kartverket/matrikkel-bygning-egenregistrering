@@ -49,7 +49,7 @@ jobs:
       image_tag: ${{ needs.build.outputs.image_tag }}
       image_digest: ${{ needs.build.outputs.image_digest }}
       env: dev
-      namespace: matrikkelbygning-main
+      namespace: matrikkelbygning-dev
       cluster: atkv3
 
   run-pharos:
