@@ -5,10 +5,6 @@ on:
 permissions:
   contents: write
 
-env:
-  registry: ghcr.io
-  image_name: ${{ github.repository }}
-
 jobs:
   deploy:
     name: Bump Version
