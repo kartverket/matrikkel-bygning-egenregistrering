@@ -10,24 +10,28 @@ import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.models.VannforsyningRegistrering
+import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
+import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
 import java.time.Instant
 import java.util.*
 
 
 @Serializable
 data class BygningRegistreringRequest(
-    val bruksarealRegistrering: BruksarealRegistrering?,
-    val byggeaarRegistrering: ByggeaarRegistrering?,
-    val vannforsyningRegistrering: VannforsyningRegistrering?,
-    val avlopRegistrering: AvlopRegistrering?
+    val bruksarealRegistrering: BruksarealRegistreringRequest?,
+    val byggeaarRegistrering: ByggeaarRegistreringRequest?,
+    val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
+    val avlopRegistrering: AvlopRegistreringRequest?
 )
 
 @Serializable
 data class BruksenhetRegistreringRequest(
     val bruksenhetId: Long,
-    val bruksarealRegistrering: BruksarealRegistrering?,
-    val energikildeRegistrering: EnergikildeRegistrering?,
-    val oppvarmingRegistrering: OppvarmingRegistrering?
+    val bruksarealRegistrering: BruksarealRegistreringRequest?,
+    val energikildeRegistrering: EnergikildeRegistreringRequest?,
+    val oppvarmingRegistrering: OppvarmingRegistreringRequest?
 )
 
 @Serializable
@@ -37,6 +41,36 @@ data class EgenregistreringRequest(
     val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
 
+@Serializable
+data class ByggeaarRegistreringRequest(
+    val byggeaar: Int?,
+)
+
+@Serializable
+data class BruksarealRegistreringRequest(
+    val bruksareal: Double?,
+)
+
+@Serializable
+data class VannforsyningRegistreringRequest(
+    val vannforsyning: VannforsyningKode?,
+)
+
+@Serializable
+data class AvlopRegistreringRequest(
+    val avlop: AvlopKode?,
+)
+
+@Serializable
+data class EnergikildeRegistreringRequest(
+    val energikilder: List<EnergikildeKode>?,
+)
+
+@Serializable
+data class OppvarmingRegistreringRequest(
+    val oppvarminger: List<OppvarmingKode>?,
+)
+
 fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     val registreringstidspunkt = Instant.now()
     return Egenregistrering(
@@ -44,16 +78,44 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
         registreringstidspunkt = registreringstidspunkt,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,
-            byggeaarRegistrering = this.bygningRegistrering?.byggeaarRegistrering,
-            bruksarealRegistrering = this.bygningRegistrering?.bruksarealRegistrering,
-            vannforsyningRegistrering = this.bygningRegistrering?.vannforsyningRegistrering,
-            avlopRegistrering = this.bygningRegistrering?.avlopRegistrering,
+            byggeaarRegistrering = this.bygningRegistrering?.byggeaarRegistrering?.let {
+                ByggeaarRegistrering(
+                    byggeaar = it.byggeaar,
+                )
+            },
+            bruksarealRegistrering = this.bygningRegistrering?.bruksarealRegistrering?.let {
+                BruksarealRegistrering(
+                    bruksareal = it.bruksareal,
+                )
+            },
+            vannforsyningRegistrering = this.bygningRegistrering?.vannforsyningRegistrering?.let {
+                VannforsyningRegistrering(
+                    vannforsyning = it.vannforsyning,
+                )
+            },
+            avlopRegistrering = this.bygningRegistrering?.avlopRegistrering?.let {
+                AvlopRegistrering(
+                    avlop = it.avlop,
+                )
+            },
             bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
                 BruksenhetRegistrering(
                     bruksenhetId = bruksenhetRegistrering.bruksenhetId,
-                    bruksarealRegistrering = bruksenhetRegistrering.bruksarealRegistrering,
-                    energikildeRegistrering = bruksenhetRegistrering.energikildeRegistrering,
-                    oppvarmingRegistrering = bruksenhetRegistrering.oppvarmingRegistrering,
+                    bruksarealRegistrering = bruksenhetRegistrering.bruksarealRegistrering?.let {
+                        BruksarealRegistrering(
+                            bruksareal = it.bruksareal,
+                        )
+                    },
+                    energikildeRegistrering = bruksenhetRegistrering.energikildeRegistrering?.let {
+                        EnergikildeRegistrering(
+                            energikilder = it.energikilder,
+                        )
+                    },
+                    oppvarmingRegistrering = bruksenhetRegistrering.oppvarmingRegistrering?.let {
+                        OppvarmingRegistrering(
+                            oppvarminger = it.oppvarminger,
+                        )
+                    },
                 )
             } ?: emptyList(),
         ),
