@@ -19,7 +19,5 @@ jobs:
       application_name: bygning-backend
       namespace_from: matrikkelbygning-dev
       namespace_to: matrikkelbygning-test
-      env_from: dev
-      env_to: dev
-      cluster_from: atkv3
-      cluster_to: atkv3
+      cluster_from: atkv3-dev
+      cluster_to: atkv3-dev
