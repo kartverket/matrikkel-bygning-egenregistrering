@@ -1,7 +1,8 @@
-package no.kartverket.matrikkel.bygning.routes.v1
+package no.kartverket.matrikkel.bygning.routes.v1.kodeliste
 
 import io.bkbn.kompendium.core.metadata.GetInfo
 import io.bkbn.kompendium.core.plugin.NotarizedRoute
+import io.bkbn.kompendium.core.plugin.NotarizedRoute.invoke
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -9,11 +10,8 @@ import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.IKode
-import no.kartverket.matrikkel.bygning.models.kodelister.Kode
-import no.kartverket.matrikkel.bygning.models.kodelister.KodelisterResponse
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.models.kodelister.toKodeList
 import kotlin.reflect.KClass
 
 fun Route.kodelisteRouting() {

@@ -1,22 +1,17 @@
-package no.kartverket.matrikkel.bygning.routes.v1
+package no.kartverket.matrikkel.bygning.routes.v1.egenregistrering
 
 import io.bkbn.kompendium.core.metadata.PostInfo
 import io.bkbn.kompendium.core.plugin.NotarizedRoute
+import io.bkbn.kompendium.core.plugin.NotarizedRoute.invoke
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
-import no.kartverket.matrikkel.bygning.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.Result.ErrorResult
 import no.kartverket.matrikkel.bygning.models.Result.Success
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.responses.ErrorResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BruksenhetRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BygningRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.toEgenregistrering
 import no.kartverket.matrikkel.bygning.services.EgenregistreringService
 
 fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
@@ -53,7 +48,7 @@ private fun Route.egenregistreringDoc() {
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningId = 1,
                         bygningRegistrering = BygningRegistreringRequest(
-                            bruksarealRegistrering = BruksarealRegistrering(
+                            bruksarealRegistrering = BruksarealRegistreringRequest(
                                 bruksareal = 125.0,
                             ),
                             null,
@@ -64,7 +59,7 @@ private fun Route.egenregistreringDoc() {
                             BruksenhetRegistreringRequest(
                                 bruksenhetId = 1L,
                                 null,
-                                energikildeRegistrering = EnergikildeRegistrering(
+                                energikildeRegistrering = EnergikildeRegistreringRequest(
                                     energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
                                 ),
                                 null,

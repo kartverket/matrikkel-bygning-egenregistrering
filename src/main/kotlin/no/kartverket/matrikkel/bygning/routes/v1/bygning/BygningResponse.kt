@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.dto.response
+package no.kartverket.matrikkel.bygning.routes.v1.bygning
 
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.models.Avlop

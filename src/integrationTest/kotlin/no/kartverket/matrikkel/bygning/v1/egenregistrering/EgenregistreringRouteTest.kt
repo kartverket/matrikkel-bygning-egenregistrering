@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.v1
+package no.kartverket.matrikkel.bygning.v1.egenregistrering
 
 import assertk.Assert
 import assertk.all
@@ -17,29 +17,29 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
-import no.kartverket.matrikkel.bygning.models.AvlopRegistrering
-import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
-import no.kartverket.matrikkel.bygning.models.ByggeaarRegistrering
-import no.kartverket.matrikkel.bygning.models.EnergikildeRegistrering
-import no.kartverket.matrikkel.bygning.models.OppvarmingRegistrering
-import no.kartverket.matrikkel.bygning.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BruksenhetRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.BygningRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.request.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.AvlopKodeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BruksarealResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BruksenhetResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.ByggeaarResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BygningResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.EnergikildeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.MultikildeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.OppvarmingResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.RegisterMetadataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.VannforsyningKodeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.AvlopKodeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.BruksarealResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.BruksenhetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.ByggeaarResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.BygningResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.EnergikildeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.MultikildeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.OppvarmingResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.RegisterMetadataResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.VannforsyningKodeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.AvlopRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksarealRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksenhetRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.ByggeaarRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BygningRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EnergikildeRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.OppvarmingRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.VannforsyningRegistreringRequest
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -230,15 +230,15 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 setBody(
                     EgenregistreringRequest.validEgenregistrering().copy(
                         bygningRegistrering = BygningRegistreringRequest(
-                            bruksarealRegistrering = BruksarealRegistrering(bruksareal = 120.0),
-                            byggeaarRegistrering = ByggeaarRegistrering(byggeaar = 2008),
+                            bruksarealRegistrering = BruksarealRegistreringRequest(bruksareal = 120.0),
+                            byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008),
                             vannforsyningRegistrering = null,
                             avlopRegistrering = null,
                         ),
                         bruksenhetRegistreringer = listOf(
                             BruksenhetRegistreringRequest(
                                 bruksenhetId = 1L,
-                                bruksarealRegistrering = BruksarealRegistrering(bruksareal = 40.0),
+                                bruksarealRegistrering = BruksarealRegistreringRequest(bruksareal = 40.0),
                                 energikildeRegistrering = null,
                                 oppvarmingRegistrering = null,
                             ),
@@ -278,23 +278,23 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     private fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
         bygningId = 1L,
         bygningRegistrering = BygningRegistreringRequest(
-            bruksarealRegistrering = BruksarealRegistrering(125.0),
-            byggeaarRegistrering = ByggeaarRegistrering(2010),
-            vannforsyningRegistrering = VannforsyningRegistrering(
+            bruksarealRegistrering = BruksarealRegistreringRequest(125.0),
+            byggeaarRegistrering = ByggeaarRegistreringRequest(2010),
+            vannforsyningRegistrering = VannforsyningRegistreringRequest(
                 VannforsyningKode.OffentligVannverk,
             ),
-            avlopRegistrering = AvlopRegistrering(
+            avlopRegistrering = AvlopRegistreringRequest(
                 avlop = AvlopKode.OffentligKloakk,
             ),
         ),
         bruksenhetRegistreringer = listOf(
             BruksenhetRegistreringRequest(
                 bruksenhetId = 1L,
-                bruksarealRegistrering = BruksarealRegistrering(bruksareal = 100.0),
-                energikildeRegistrering = EnergikildeRegistrering(
+                bruksarealRegistrering = BruksarealRegistreringRequest(bruksareal = 100.0),
+                energikildeRegistrering = EnergikildeRegistreringRequest(
                     listOf(EnergikildeKode.Elektrisitet),
                 ),
-                oppvarmingRegistrering = OppvarmingRegistrering(
+                oppvarmingRegistrering = OppvarmingRegistreringRequest(
                     listOf(OppvarmingKode.Elektrisk),
                 ),
             ),

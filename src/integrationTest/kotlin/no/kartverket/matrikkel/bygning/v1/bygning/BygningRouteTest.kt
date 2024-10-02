@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.v1
+package no.kartverket.matrikkel.bygning.v1.bygning
 
 import assertk.all
 import assertk.assertThat
@@ -10,7 +10,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
-import no.kartverket.matrikkel.bygning.routes.v1.dto.response.BygningResponse
+import no.kartverket.matrikkel.bygning.routes.v1.bygning.BygningResponse
 import org.junit.jupiter.api.Test
 
 class BygningRouteTest : TestApplicationWithDb() {

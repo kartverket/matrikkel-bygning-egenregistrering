@@ -1,22 +1,11 @@
 package no.kartverket.matrikkel.bygning.models.kodelister
 
-import kotlinx.serialization.Serializable
-import kotlin.reflect.KClass
-
 // Kan det finnes flere presentasjonsnavn på én kode? For eksempel per ett på bokmål og ett på nynorsk?
 interface IKode {
     val presentasjonsnavn: String
     val beskrivelse: String
 }
 
-@Serializable
-data class Kode(
-    val kode: String,
-    val presentasjonsnavn: String,
-    val beskrivelse: String
-)
-
-@Serializable
 enum class VannforsyningKode(
     override val presentasjonsnavn: String,
     override val beskrivelse: String
@@ -36,7 +25,6 @@ enum class VannforsyningKode(
     )
 }
 
-@Serializable
 enum class AvlopKode(
     override val presentasjonsnavn: String,
     override val beskrivelse: String
@@ -46,7 +34,6 @@ enum class AvlopKode(
     IngenKloakk("Ingen kloakk", "Ingen tilknytning til kloakk")
 }
 
-@Serializable
 enum class EnergikildeKode(
     override val presentasjonsnavn: String,
     override val beskrivelse: String
@@ -64,7 +51,6 @@ enum class EnergikildeKode(
     Varmepumpe("Varmepumpe", "Energikildekode for varmepumpe"),
 }
 
-@Serializable
 enum class OppvarmingKode(
     override val presentasjonsnavn: String,
     override val beskrivelse: String
@@ -72,26 +58,4 @@ enum class OppvarmingKode(
     Elektrisk("Elektrisk", "Elektrisk oppvarming"),
     Sentralvarme("Sentralvarme", "Sentralvarme"),
     AnnenOppvarming("Annen oppvarming", "Annen oppvarming")
-}
-
-@Serializable
-data class KodelisterResponse(
-    val vannforsyningKoder: List<Kode>,
-    val avlopKoder: List<Kode>,
-    val energikildeKoder: List<Kode>,
-    val oppvarmingKoder: List<Kode>,
-)
-
-/*
- * Enums i Kotlin returnerer kun name parameteret ved bruk av EnumClass.entries(). Denne extension functionen er til for å kunne returnere
- * alle relevante parametere
- */
-inline fun <reified T> KClass<T>.toKodeList(): List<Kode> where T : Enum<T>, T : IKode {
-    return enumValues<T>().map {
-        Kode(
-            kode = it.name,
-            presentasjonsnavn = it.presentasjonsnavn,
-            beskrivelse = it.beskrivelse,
-        )
-    }
 }
