@@ -2,7 +2,6 @@ import no.kartverket.matrikkel.bygning.gradle.wsimport.WsImportTask
 
 plugins {
     `java-library`
-    `java-test-fixtures`
     kotlin("jvm")
     idea
 }
@@ -13,11 +12,9 @@ val jaxws: Configuration by configurations.creating {
 }
 
 dependencies {
-    implementation(libs.jaxws.rt) {
+    api(libs.jaxws.rt) {
         exclude(group = "org.eclipse.angus") // Ekskluderer angus email
     }
-
-    testFixturesApi(libs.mockk.dsl)
 
     jaxws(libs.jaxws.tools)
 }
