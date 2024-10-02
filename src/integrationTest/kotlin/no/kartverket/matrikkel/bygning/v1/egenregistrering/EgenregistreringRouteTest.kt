@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.v1
+package no.kartverket.matrikkel.bygning.v1.egenregistrering
 
 import assertk.Assert
 import assertk.all

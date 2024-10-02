@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.v1
+package no.kartverket.matrikkel.bygning.v1.bygning
 
 import assertk.all
 import assertk.assertThat
