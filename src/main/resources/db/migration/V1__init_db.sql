@@ -4,6 +4,6 @@ CREATE TABLE egenregistrering
 (
     id                     UUID PRIMARY KEY,
     registreringstidspunkt TIMESTAMP WITH TIME ZONE NOT NULL,
-    registrerer            VARCHAR(32)              NOT NULL,
+    eier                   VARCHAR(32)              NOT NULL,
     registrering           JSONB                    NOT NULL
 );

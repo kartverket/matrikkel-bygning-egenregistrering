@@ -35,9 +35,11 @@ internal class MatrikkelBygningClient(
 
             val bruksenheter = matrikkelApi.storeService().getBruksenheter(bygning.bruksenhetIds.item, matrikkelApi.matrikkelContext)
 
-            val bygningsmetadata = RegisterMetadata(
+            val bygningsmetadata = RegisterMetadata.Autoritativ(
                 bygning.oppdateringsdato.toInstant(),
+                bygning.oppdatertAv,
             )
+
             return Bygning(
                 bygningId = bygning.id.value,
                 bygningsnummer = bygning.bygningsnummer,
@@ -94,8 +96,9 @@ internal class MatrikkelBygningClient(
                 ),
                 // TODO: Burde vi ha en måte å angi ukjent / ikke oppgitt?
                 bruksenheter = bruksenheter.map {
-                    val bruksenhetsmetadata = RegisterMetadata(
+                    val bruksenhetsmetadata = RegisterMetadata.Autoritativ(
                         it.oppdateringsdato.toInstant(),
+                        it.oppdatertAv,
                     )
                     Bruksenhet(
                         bruksenhetId = it.id.value,

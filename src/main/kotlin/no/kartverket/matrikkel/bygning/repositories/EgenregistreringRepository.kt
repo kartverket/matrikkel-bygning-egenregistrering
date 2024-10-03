@@ -18,7 +18,7 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         return dataSource.executeQueryAndMapPreparedStatement(
             """
                 select er.id as id, 
-                er.registrerer as registrerer, 
+                er.eier as eier, 
                 er.registreringstidspunkt as registreringstidspunkt, 
                 er.registrering as bygningregistrering
                 from bygning.egenregistrering er
@@ -31,7 +31,7 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         ) {
             Egenregistrering(
                 id = UUID.fromString(it.getString("id")),
-                registrerer = Foedselsnummer(it.getString("registrerer")),
+                eier = Foedselsnummer(it.getString("eier")),
                 registreringstidspunkt = it.getTimestamp("registreringstidspunkt").toInstant(),
                 bygningRegistrering = Json.decodeFromString<BygningRegistrering>(it.getString("bygningregistrering")),
             )
@@ -42,12 +42,12 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         return dataSource.withTransaction { connection ->
             connection.prepareAndExecuteUpdate(
                 "INSERT INTO bygning.egenregistrering " +
-                    "(id, registreringstidspunkt, registrerer, registrering) " +
+                    "(id, registreringstidspunkt, eier, registrering) " +
                     "values (?, ?, ?, ?)",
             ) {
                 it.setObject(1, egenregistrering.id)
                 it.setTimestamp(2, Timestamp.from(egenregistrering.registreringstidspunkt))
-                it.setString(3, egenregistrering.registrerer.getValue())
+                it.setString(3, egenregistrering.eier.getValue())
                 it.setObject(4, PGobject().apply {
                     this.type = "jsonb"
                     // Av en eller annen grunn må jeg eksplisitt nevne serializer typen her

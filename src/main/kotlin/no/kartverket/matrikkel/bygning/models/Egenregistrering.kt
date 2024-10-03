@@ -58,10 +58,9 @@ data class BruksenhetRegistrering(
     val oppvarmingRegistrering: OppvarmingRegistrering?,
 )
 
-
 data class Egenregistrering(
     val id: UUID,
-    val registrerer: Foedselsnummer,
+    val eier: Foedselsnummer,
     val registreringstidspunkt: Instant,
     val bygningRegistrering: BygningRegistrering,
 )

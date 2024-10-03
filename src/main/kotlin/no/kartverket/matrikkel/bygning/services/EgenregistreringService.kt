@@ -11,6 +11,13 @@ class EgenregistreringService(
     private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository
 ) {
     fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
+        val validationErrors = EgenregistreringValidator.validateEgenregistrering(egenregistrering)
+
+        // Vil gjerne at vi går opp en feilhåndteringsløype, for vet ikke om jeg er blodfan av å bruke ErrorDetail ut fra validators sånn som dette
+        if (validationErrors.isNotEmpty()) {
+            return Result.ErrorResult(validationErrors)
+        }
+
         val bygning = bygningClient.getBygningById(egenregistrering.bygningRegistrering.bygningId) ?: return Result.ErrorResult(
             ErrorDetail(
                 detail = "Bygning med ID ${egenregistrering.bygningRegistrering.bygningId} finnes ikke i matrikkelen",

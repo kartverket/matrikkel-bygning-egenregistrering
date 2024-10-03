@@ -284,7 +284,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.validEgenregistrering().copy(
-                        registrerer = "01010154321",
+                        eier = "31129956715",
                     ),
                 )
             }
@@ -300,7 +300,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 prop(BygningResponse::bruksareal).isNotNull().all {
                     prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
                         prop(BruksarealResponse::metadata).all {
-                            prop(RegisterMetadataResponse::registrerer).isEqualTo("01010154321")
+                            prop(RegisterMetadataResponse::registrertAv).isEqualTo("31129956715")
                         }
                     }
                 }
@@ -309,7 +309,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
     private fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
         bygningId = 1L,
-        registrerer = "01010154321",
+        eier = "31129956715",
         bygningRegistrering = BygningRegistreringRequest(
             bruksarealRegistrering = BruksarealRegistreringRequest(125.0),
             byggeaarRegistrering = ByggeaarRegistreringRequest(2010),

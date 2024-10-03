@@ -38,7 +38,7 @@ data class BruksenhetRegistreringRequest(
 @Serializable
 data class EgenregistreringRequest(
     val bygningId: Long,
-    val registrerer: String,
+    val eier: String,
     val bygningRegistrering: BygningRegistreringRequest?,
     val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
@@ -77,7 +77,7 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     val registreringstidspunkt = Instant.now()
     return Egenregistrering(
         id = UUID.randomUUID(),
-        registrerer = Foedselsnummer(this.registrerer),
+        eier = Foedselsnummer(this.eier),
         registreringstidspunkt = registreringstidspunkt,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,

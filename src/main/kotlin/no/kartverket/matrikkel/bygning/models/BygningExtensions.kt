@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning.models
 
+import no.kartverket.matrikkel.bygning.models.valuetype.Foedselsnummer
+
 /**
  * Burde vi kanskje sortere egenregistreringer her, da vi er avhengig av at egenregistreringene er sortert her,
  * men ikke nødvendigvis andre steder?
@@ -7,14 +9,17 @@ package no.kartverket.matrikkel.bygning.models
 
 fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): Bygning {
     return egenregistreringer.fold(this) { bygningAggregate, egenregistrering ->
+        val metadata = RegisterMetadata.Egenregistrert(
+            registreringstidspunkt = egenregistrering.registreringstidspunkt,
+            eier = egenregistrering.eier,
+        )
+
         bygningAggregate.copy(
             byggeaar = bygningAggregate.byggeaar.aggregate {
                 egenregistrering.bygningRegistrering.byggeaarRegistrering?.let {
                     Byggeaar(
                         data = it.byggeaar,
-                        metadata = RegisterMetadata(
-                            registreringstidspunkt = egenregistrering.registreringstidspunkt,
-                        ),
+                        metadata = metadata,
                     )
                 }
             },
@@ -22,10 +27,7 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
                 egenregistrering.bygningRegistrering.bruksarealRegistrering?.let {
                     Bruksareal(
                         data = it.bruksareal,
-                        metadata = RegisterMetadata(
-                            registreringstidspunkt = egenregistrering.registreringstidspunkt,
-                            registrerer = egenregistrering.registrerer
-                        ),
+                        metadata = metadata,
                     )
                 }
             },
@@ -33,9 +35,7 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
                 egenregistrering.bygningRegistrering.vannforsyningRegistrering?.let {
                     Vannforsyning(
                         data = it.vannforsyning,
-                        metadata = RegisterMetadata(
-                            registreringstidspunkt = egenregistrering.registreringstidspunkt,
-                        ),
+                        metadata = metadata,
                     )
                 }
             },
@@ -43,9 +43,7 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
                 egenregistrering.bygningRegistrering.avlopRegistrering?.let {
                     Avlop(
                         data = it.avlop,
-                        metadata = RegisterMetadata(
-                            registreringstidspunkt = egenregistrering.registreringstidspunkt,
-                        ),
+                        metadata = metadata,
                     )
                 }
             },
@@ -67,18 +65,21 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
             null
         }
     }
+    // TODO Trenger både registreringstidspunkt og eier her, ikke bare tidspunkt. Pair holder ikke helt lenger
 
     // Jeg er litt usikker på om det er nødvendig å filtrere ut og lage et Pair, så folde på bare bruksenhetregistreringene
     // fremfor å gjøre det på hele bygningregistreringen dersom vi legger til logikk for å kun godkjenne én registrering
     return bruksenhetRegistreringer.fold(this) { bruksenhetAggregate, egenregistrering ->
+        val metadata = RegisterMetadata.Egenregistrert(
+            registreringstidspunkt = egenregistrering.first,
+            eier = Foedselsnummer("TODO"),
+        )
         bruksenhetAggregate.copy(
             bruksareal = bruksenhetAggregate.bruksareal.aggregate {
                 egenregistrering.second.bruksarealRegistrering?.let {
                     Bruksareal(
                         data = it.bruksareal,
-                        metadata = RegisterMetadata(
-                            registreringstidspunkt = egenregistrering.first,
-                        ),
+                        metadata = metadata,
                     )
                 }
             },
@@ -87,9 +88,7 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
                     it.energikilder?.map { registrertKilde ->
                         Energikilde(
                             data = registrertKilde,
-                            metadata = RegisterMetadata(
-                                registreringstidspunkt = egenregistrering.first,
-                            ),
+                            metadata = metadata,
                         )
                     }
                 }
@@ -99,9 +98,7 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
                     it.oppvarminger?.map { registrertOppvarming ->
                         Oppvarming(
                             data = registrertOppvarming,
-                            metadata = RegisterMetadata(
-                                registreringstidspunkt = egenregistrering.first,
-                            ),
+                            metadata = metadata,
                         )
                     }
                 }

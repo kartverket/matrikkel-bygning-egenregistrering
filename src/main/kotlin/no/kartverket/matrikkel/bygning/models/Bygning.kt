@@ -29,11 +29,20 @@ data class Multikilde<T : Any>(val autoritativ: T? = null, val egenregistrert: T
     fun withEgenregistrert(verdi: T?): Multikilde<T> = copy(egenregistrert = verdi)
 }
 
-data class RegisterMetadata(
-    val registreringstidspunkt: Instant,
-    // TODO: Gir ikke mening med foedselsnummer her for autoriative data, men da har man heller en signatur
-    val registrerer: Foedselsnummer? = null
-)
+sealed interface RegisterMetadata {
+    val registreringstidspunkt: Instant
+
+    data class Egenregistrert(
+        override val registreringstidspunkt: Instant,
+        val eier: Foedselsnummer? = null,
+    ) : RegisterMetadata
+
+    data class Autoritativ(
+        override val registreringstidspunkt: Instant,
+        val registrertAv: String,
+    ) : RegisterMetadata
+}
+
 data class Bruksareal(val data: Double?, val metadata: RegisterMetadata)
 data class Byggeaar(val data: Int?, val metadata: RegisterMetadata)
 data class Vannforsyning(val data: VannforsyningKode?, val metadata: RegisterMetadata)

@@ -1,8 +1,12 @@
 package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
+import no.kartverket.matrikkel.bygning.models.Bruksareal
 import no.kartverket.matrikkel.bygning.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.models.Bygning
+import no.kartverket.matrikkel.bygning.models.Multikilde
+import no.kartverket.matrikkel.bygning.models.RegisterMetadata
+import java.time.Instant
 
 internal class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
@@ -29,6 +33,15 @@ internal class LocalBygningClient : BygningClient {
             bygningId = 1L,
             bygningsnummer = 100L,
             bruksenheter = bruksenheter.subList(0, 2),
+            bruksareal = Multikilde(
+                autoritativ = Bruksareal(
+                    data = 150.0,
+                    metadata = RegisterMetadata.Autoritativ(
+                        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
+                        registrertAv = "Kommune"
+                    )
+                )
+            )
         ),
         Bygning(
             bygningId = 2L,
