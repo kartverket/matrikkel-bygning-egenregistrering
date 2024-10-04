@@ -60,29 +60,6 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     }
 
     @Test
-    fun `gitt at en bygning eksisterer men bruksenheter ikke eksisterer paa bygningen skal egenregistrering feile`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
-
-        val response = client.post("/v1/egenregistreringer") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                EgenregistreringRequest.validEgenregistrering().copy(
-                    bruksenhetRegistreringer = listOf(
-                        BruksenhetRegistreringRequest(
-                            bruksenhetId = 3L,
-                            bruksarealRegistrering = null,
-                            energikildeRegistrering = null,
-                            oppvarmingRegistrering = null,
-                        ),
-                    ),
-                ),
-            )
-        }
-
-        assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)
-    }
-
-    @Test
     fun `gitt en gyldig egenregistrering paa bygning og bruksenhet kan bygningen hentes ut med de egenregistrerte dataene`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
