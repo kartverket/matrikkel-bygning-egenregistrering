@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class FoedselsnummerTest {
     @Test
-    fun `for kort foedselsnummer skal feile validering`() {
+    fun `fnr som er for kort skal feile validering`() {
         val fnr = Foedselsnummer("123")
 
         val isValid = fnr.validate()
@@ -16,7 +16,7 @@ class FoedselsnummerTest {
     }
 
     @Test
-    fun `foedselsnummer med tekst skal feile validering`() {
+    fun `fnr med tekst men riktig lengde skal feile validering`() {
         val fnr = Foedselsnummer("1234567890a")
 
         val isValid = fnr.validate()
