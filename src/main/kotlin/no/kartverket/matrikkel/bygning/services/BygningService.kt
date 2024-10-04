@@ -22,11 +22,7 @@ class BygningService(
 
         val bygningWithEgenregistrertData = bygning.withEgenregistrertData(egenregistreringerForBygning)
 
-        val aggregatedBygningWithAggregatedBruksenheter = bygningWithEgenregistrertData.withBruksenheter(
-            bygningWithEgenregistrertData.bruksenheter.map { it.withEgenregistrertData(egenregistreringerForBygning) },
-        )
-
-        return Result.Success(aggregatedBygningWithAggregatedBruksenheter)
+        return Result.Success(bygningWithEgenregistrertData)
 
     }
 

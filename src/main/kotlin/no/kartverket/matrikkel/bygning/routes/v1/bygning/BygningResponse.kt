@@ -45,18 +45,11 @@ data class BruksenhetResponse(
     val oppvarminger: MultikildeResponse<List<OppvarmingResponse>>?,
 )
 
-// TODO Ikke noe ordentlig, bare for å teste
-enum class Rolle {
-    Eier,
-    Foerer,
-}
-
 @Serializable
 data class RegisterMetadataResponse(
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
     val registrertAv: String? = null,
-    val rolle: Rolle,
 )
 
 @Serializable
@@ -78,25 +71,9 @@ data class EnergikildeResponse(val data: EnergikildeKode?, val metadata: Registe
 data class OppvarmingResponse(val data: OppvarmingKode?, val metadata: RegisterMetadataResponse)
 
 
-/**
- * Kan være det er en bedre idé å lage to forskjellige typer metadataresponse, men akkurat nå så fungerer dette som en løsning
- *
- * Føler dette kanskje er nok et symptom på at det tidvis kjennes litt snålt ut å skulle representere egenregistrert og autoritativ
- * data på bygninger på så likt format som vi gjør, og at det kanskje er hensiktsmessig å skille ut
- *
- */
 fun RegisterMetadata.toRegisterMetadataResponse() = RegisterMetadataResponse(
     registreringstidspunkt = this.registreringstidspunkt,
-    registrertAv = when (val metadata = this) {
-        is RegisterMetadata.Autoritativ -> metadata.registrertAv
-        is RegisterMetadata.Egenregistrert -> metadata.eier?.getValue()
-    },
-    // TODO Her skal man nok ikke automatisk anta at det er Eier som har ført, men heller sjekke registreringen om eier = registrertAv,
-    // men vet ikke om vi skal legge opp for muligheten for en "på vegne av" registrering helt ennå
-    rolle = when (this) {
-        is RegisterMetadata.Autoritativ -> Rolle.Foerer
-        is RegisterMetadata.Egenregistrert -> Rolle.Eier
-    },
+    registrertAv = this.registrertAv,
 )
 
 

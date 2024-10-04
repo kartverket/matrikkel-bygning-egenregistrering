@@ -7,10 +7,6 @@ import kotlin.text.Regex
 private val kontrollsiffer1Numbers = listOf(3, 7, 6, 1, 8, 9, 4, 5, 2, 1)
 private val kontrollsiffer2Numbers = listOf(5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1)
 
-/**
- * Vet ikke om jeg er så fan av navnet "valuetype" på pakken her, har vi en bedre fellesbetegnelse på "enkle felt som trenger wrapper-klasser med litt ekstra snacks" tro?
- */
-
 @JvmInline
 @Serializable
 value class Foedselsnummer(private val value: String) {

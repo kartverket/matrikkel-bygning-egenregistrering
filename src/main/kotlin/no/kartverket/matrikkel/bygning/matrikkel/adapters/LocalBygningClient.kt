@@ -36,12 +36,12 @@ internal class LocalBygningClient : BygningClient {
             bruksareal = Multikilde(
                 autoritativ = Bruksareal(
                     data = 150.0,
-                    metadata = RegisterMetadata.Autoritativ(
+                    metadata = RegisterMetadata(
                         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-                        registrertAv = "Kommune"
-                    )
-                )
-            )
+                        registrertAv = "norola",
+                    ),
+                ),
+            ),
         ),
         Bygning(
             bygningId = 2L,
