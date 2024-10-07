@@ -55,7 +55,9 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
 private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Bruksenhet {
     val bruksenhetRegistrering =
         egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetId == this.bruksenhetId }
-    if (bruksenhetRegistrering == null) return this
+    if (bruksenhetRegistrering == null) {
+        return this
+    }
 
     val metadata = RegisterMetadata(
         registreringstidspunkt = egenregistrering.registreringstidspunkt,
