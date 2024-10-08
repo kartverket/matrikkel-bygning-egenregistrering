@@ -8,7 +8,9 @@ import kotlin.text.Regex
 @Serializable
 value class Foedselsnummer(private val value: String) {
     init {
-        if (!FodselsnummerValidator.isValid(value)) (throw IllegalArgumentException("Fødselsnummer er ikke gyldig"))
+        if (!FodselsnummerValidator.isValid(value)) {
+            throw IllegalArgumentException("Fødselsnummer er ikke gyldig")
+        }
     }
 
     fun getValue(): String = value
