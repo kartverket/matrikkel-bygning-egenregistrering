@@ -49,7 +49,7 @@ data class BruksenhetResponse(
 data class RegisterMetadataResponse(
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
-    val registrertAv: String? = null,
+    val registrertAv: String,
 )
 
 @Serializable
