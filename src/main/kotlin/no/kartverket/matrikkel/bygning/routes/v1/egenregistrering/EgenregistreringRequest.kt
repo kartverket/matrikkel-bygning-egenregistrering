@@ -9,12 +9,12 @@ import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.OppvarmingRegistrering
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.models.valuetype.Foedselsnummer
 import java.time.Instant
 import java.util.*
 
@@ -77,7 +77,7 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     val registreringstidspunkt = Instant.now()
     return Egenregistrering(
         id = UUID.randomUUID(),
-        eier = Foedselsnummer(this.eier),
+        eier = RegistreringAktoer.Foedselsnummer(this.eier),
         registreringstidspunkt = registreringstidspunkt,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,

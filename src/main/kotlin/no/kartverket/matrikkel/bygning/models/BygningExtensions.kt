@@ -9,7 +9,7 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
     return egenregistreringer.fold(this) { bygningAggregate, egenregistrering ->
         val metadata = RegisterMetadata(
             registreringstidspunkt = egenregistrering.registreringstidspunkt,
-            registrertAv = egenregistrering.eier.getValue(),
+            registrertAv = egenregistrering.eier,
         )
 
         bygningAggregate.copy(
@@ -61,7 +61,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
 
     val metadata = RegisterMetadata(
         registreringstidspunkt = egenregistrering.registreringstidspunkt,
-        registrertAv = egenregistrering.eier.getValue(),
+        registrertAv = egenregistrering.eier,
     )
 
     return this.copy(

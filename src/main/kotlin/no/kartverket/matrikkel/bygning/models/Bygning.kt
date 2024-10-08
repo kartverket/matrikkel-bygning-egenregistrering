@@ -24,7 +24,7 @@ data class Multikilde<T : Any>(val autoritativ: T? = null, val egenregistrert: T
 
 data class RegisterMetadata(
     val registreringstidspunkt: Instant,
-    val registrertAv: String
+    val registrertAv: RegistreringAktoer
 )
 
 data class Bruksareal(val data: Double?, val metadata: RegisterMetadata)

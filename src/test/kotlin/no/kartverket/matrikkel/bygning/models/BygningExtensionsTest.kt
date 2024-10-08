@@ -2,7 +2,6 @@ package no.kartverket.matrikkel.bygning.models
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import no.kartverket.matrikkel.bygning.models.valuetype.Foedselsnummer
 import java.time.Instant
 import java.util.UUID
 import kotlin.test.Test
@@ -50,7 +49,7 @@ class BygningExtensionsTest {
     private val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        eier = Foedselsnummer("31129956715"),
+        eier = RegistreringAktoer.Foedselsnummer("31129956715"),
         bygningRegistrering = defaultBygningRegistrering
     )
 

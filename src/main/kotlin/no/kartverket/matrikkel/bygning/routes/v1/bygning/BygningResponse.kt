@@ -73,7 +73,7 @@ data class OppvarmingResponse(val data: OppvarmingKode?, val metadata: RegisterM
 
 fun RegisterMetadata.toRegisterMetadataResponse() = RegisterMetadataResponse(
     registreringstidspunkt = this.registreringstidspunkt,
-    registrertAv = this.registrertAv,
+    registrertAv = this.registrertAv.value,
 )
 
 
