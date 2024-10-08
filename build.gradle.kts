@@ -55,6 +55,9 @@ dependencies {
 
     // OpenAPI
     implementation(libs.kompendium.core)
+
+    // Norwegian Commons
+    implementation(libs.norwegian.commons)
 }
 
 tasks {

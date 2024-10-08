@@ -5,7 +5,6 @@ logbackVersion = "1.5.8"
 logstashVersion = "8.0"
 prometheusVersion = "1.13.5"
 flywayVersion = "10.19.0"
-jacksonVersion = "2.18.0"
 postgresVersion = "42.7.4"
 shadowVersion = "8.1.1"
 kompendiumVersion = "3.14.4"
@@ -14,6 +13,7 @@ hikariVersion = "6.0.0"
 testcontainersVersion = "1.20.2"
 mockkVersion = "1.13.12"
 assertkVersion = "0.28.1"
+norwegianCommonsVersion = "0.16.0"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -36,7 +36,6 @@ flyway-database-postgresql = { group = "org.flywaydb", name = "flyway-database-p
 micrometer-prometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "prometheusVersion" }
 logstash-encoder = { group = "net.logstash.logback", name = "logstash-logback-encoder", version.ref = "logstashVersion" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
-jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jacksonVersion" }
 postgres = { group = "org.postgresql", name = "postgresql", version.ref = "postgresVersion" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlinVersion" }
 kompendium-core = { group = "io.bkbn", name = "kompendium-core", version.ref = "kompendiumVersion" }
@@ -48,6 +47,8 @@ testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql",
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
 mockk-dsl = { group = "io.mockk", name = "mockk-dsl", version.ref = "mockkVersion" }
 assertk = { group = "com.willowtreeapps.assertk", name = "assertk", version.ref = "assertkVersion" }
+
+norwegian-commons = { group = "no.bekk.bekkopen", name = "nocommons", version.ref = "norwegianCommonsVersion" }
 
 [plugins]
 kotlin-jvm = { id = "jvm", version.ref = "kotlinVersion" }
