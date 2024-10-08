@@ -6,7 +6,7 @@ import no.kartverket.matrikkel.bygning.db.prepareAndExecuteUpdate
 import no.kartverket.matrikkel.bygning.db.withTransaction
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.models.RegistreringAktoer
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.models.Result
 import org.postgresql.util.PGobject
 import java.sql.Timestamp
@@ -17,13 +17,13 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
     fun getAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
         return dataSource.executeQueryAndMapPreparedStatement(
             """
-                select er.id as id, 
-                er.eier as eier, 
-                er.registreringstidspunkt as registreringstidspunkt, 
-                er.registrering as bygningregistrering
-                from bygning.egenregistrering er
-                where er.registrering ->> 'bygningId' = ?
-                order by er.registreringstidspunkt DESC;
+                SELECT er.id AS id, 
+                er.eier AS eier, 
+                er.registreringstidspunkt AS registreringstidspunkt, 
+                er.registrering AS bygningregistrering
+                FROM bygning.egenregistrering er
+                WHERE er.registrering ->> 'bygningId' = ?
+                ORDER BY er.registreringstidspunkt DESC;
             """.trimIndent(),
             {
                 it.setString(1, bygningId.toString())
@@ -31,7 +31,7 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
         ) {
             Egenregistrering(
                 id = UUID.fromString(it.getString("id")),
-                eier = RegistreringAktoer.Foedselsnummer(it.getString("eier")),
+                eier = Foedselsnummer(it.getString("eier")),
                 registreringstidspunkt = it.getTimestamp("registreringstidspunkt").toInstant(),
                 bygningRegistrering = Json.decodeFromString<BygningRegistrering>(it.getString("bygningregistrering")),
             )
@@ -41,7 +41,11 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
     fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
         return dataSource.withTransaction { connection ->
             connection.prepareAndExecuteUpdate(
-                "INSERT INTO bygning.egenregistrering " + "(id, registreringstidspunkt, eier, registrering) " + "values (?, ?, ?, ?)",
+                """
+                   INSERT INTO bygning.egenregistrering
+                   (id, registreringstidspunkt, eier, registrering)
+                   VALUES (?, ?, ?, ?)
+                """.trimIndent(),
             ) {
                 it.setObject(1, egenregistrering.id)
                 it.setTimestamp(2, Timestamp.from(egenregistrering.registreringstidspunkt))

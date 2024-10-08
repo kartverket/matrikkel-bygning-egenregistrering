@@ -12,6 +12,7 @@ import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.RegistreringAktoer
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -34,7 +35,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
     private val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        eier = RegistreringAktoer.Foedselsnummer("31129956715"),
+        eier = Foedselsnummer("31129956715"),
         bygningRegistrering = defaultBygningRegistrering,
     )
 
@@ -49,6 +50,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
         assertThat(bygningRegistreringer).single().all {
             prop(Egenregistrering::id).isEqualTo(defaultEgenregistrering.id)
             prop(Egenregistrering::registreringstidspunkt).isEqualTo(defaultEgenregistrering.registreringstidspunkt)
+            prop(Egenregistrering::eier).isEqualTo(defaultEgenregistrering.eier)
         }
     }
 

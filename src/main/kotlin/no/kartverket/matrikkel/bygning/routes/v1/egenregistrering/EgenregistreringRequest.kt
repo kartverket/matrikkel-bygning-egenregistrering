@@ -9,7 +9,7 @@ import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.models.OppvarmingRegistrering
-import no.kartverket.matrikkel.bygning.models.RegistreringAktoer
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
@@ -77,7 +77,7 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     val registreringstidspunkt = Instant.now()
     return Egenregistrering(
         id = UUID.randomUUID(),
-        eier = RegistreringAktoer.Foedselsnummer(this.eier),
+        eier = Foedselsnummer(this.eier),
         registreringstidspunkt = registreringstidspunkt,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,

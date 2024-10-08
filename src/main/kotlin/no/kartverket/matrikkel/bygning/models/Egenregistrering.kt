@@ -1,6 +1,7 @@
 package no.kartverket.matrikkel.bygning.models
 
 import kotlinx.serialization.Serializable
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
@@ -59,7 +60,7 @@ data class BruksenhetRegistrering(
 
 data class Egenregistrering(
     val id: UUID,
-    val eier: RegistreringAktoer.Foedselsnummer,
+    val eier: Foedselsnummer,
     val registreringstidspunkt: Instant,
     val bygningRegistrering: BygningRegistrering,
 )

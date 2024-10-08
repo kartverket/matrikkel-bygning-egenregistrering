@@ -2,10 +2,10 @@ package no.kartverket.matrikkel.bygning.models
 
 import no.bekk.bekkopen.person.FodselsnummerValidator
 
-sealed class RegistreringAktoer() {
+sealed class RegistreringAktoer {
     abstract val value: String
 
-    data class Foedselsnummer(override val value: String) : RegistreringAktoer(){
+    data class Foedselsnummer(override val value: String) : RegistreringAktoer() {
         init {
             if (!FodselsnummerValidator.isValid(value)) {
                 throw IllegalArgumentException("Fødselsnummer er ikke gyldig")

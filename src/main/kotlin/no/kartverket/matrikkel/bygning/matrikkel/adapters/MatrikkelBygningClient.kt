@@ -15,7 +15,7 @@ import no.kartverket.matrikkel.bygning.models.Energikilde
 import no.kartverket.matrikkel.bygning.models.Multikilde
 import no.kartverket.matrikkel.bygning.models.Oppvarming
 import no.kartverket.matrikkel.bygning.models.RegisterMetadata
-import no.kartverket.matrikkel.bygning.models.RegistreringAktoer
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.models.Vannforsyning
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
@@ -38,7 +38,7 @@ internal class MatrikkelBygningClient(
 
             val bygningsmetadata = RegisterMetadata(
                 bygning.oppdateringsdato.toInstant(),
-                RegistreringAktoer.Signatur(bygning.oppdatertAv),
+                Signatur(bygning.oppdatertAv),
             )
 
             return Bygning(
@@ -99,7 +99,7 @@ internal class MatrikkelBygningClient(
                 bruksenheter = bruksenheter.map {
                     val bruksenhetsmetadata = RegisterMetadata(
                         it.oppdateringsdato.toInstant(),
-                        RegistreringAktoer.Signatur(it.oppdatertAv),
+                        Signatur(it.oppdatertAv),
                     )
 
                     Bruksenhet(

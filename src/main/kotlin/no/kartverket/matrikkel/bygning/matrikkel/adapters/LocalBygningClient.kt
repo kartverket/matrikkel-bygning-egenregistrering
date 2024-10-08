@@ -6,7 +6,7 @@ import no.kartverket.matrikkel.bygning.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Multikilde
 import no.kartverket.matrikkel.bygning.models.RegisterMetadata
-import no.kartverket.matrikkel.bygning.models.RegistreringAktoer
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
 import java.time.Instant
 
 internal class LocalBygningClient : BygningClient {
@@ -39,7 +39,7 @@ internal class LocalBygningClient : BygningClient {
                     data = 150.0,
                     metadata = RegisterMetadata(
                         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-                        registrertAv = RegistreringAktoer.Signatur("norola"),
+                        registrertAv = Signatur("norola"),
                     ),
                 ),
             ),
