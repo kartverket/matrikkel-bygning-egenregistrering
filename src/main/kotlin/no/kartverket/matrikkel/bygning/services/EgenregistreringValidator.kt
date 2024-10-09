@@ -10,15 +10,15 @@ class EgenregistreringValidator {
         fun validateEgenregistrering(egenregistrering: Egenregistrering, bygning: Bygning): List<ErrorDetail> {
             return listOfNotNull(
                 validateBruksenheterRegistreredOnCorrectBygning(egenregistrering, bygning),
-                validateRepeatedBruksenheter(egenregistrering)
+                validateRepeatedBruksenheter(egenregistrering),
             )
         }
 
         private fun validateBruksenheterRegistreredOnCorrectBygning(
             egenregistrering: Egenregistrering, bygning: Bygning
         ): ErrorDetail? {
-            val invalidBruksenheter =
-                egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistering ->
+            val invalidBruksenheter = egenregistrering.bygningRegistrering.bruksenhetRegistreringer
+                .mapNotNull { bruksenhetRegistering ->
                     val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
 
                     if (bruksenhet == null) {
@@ -38,9 +38,11 @@ class EgenregistreringValidator {
         }
 
         private fun validateRepeatedBruksenheter(egenregistrering: Egenregistrering): ErrorDetail? {
-            val repeatedBruksenheter =
-                egenregistrering.bygningRegistrering.bruksenhetRegistreringer.groupBy { it.bruksenhetId }
-                    .filter { it.value.size > 1 }.map { it.key }
+            val repeatedBruksenheter = egenregistrering.bygningRegistrering.bruksenhetRegistreringer
+                .groupBy { it.bruksenhetId }
+                .filter { it.value.size > 1 }
+                .map { it.key }
+
 
             if (repeatedBruksenheter.isNotEmpty()) {
                 return ErrorDetail(
