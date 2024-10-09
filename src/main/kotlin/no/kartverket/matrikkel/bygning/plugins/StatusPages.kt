@@ -66,7 +66,7 @@ fun Application.configureStatusPages() {
 
                         else -> {
                             val message = exception.message
-                            if (message != null && message.contains("Fødselsnummer ereoirgj ikke gyldig")) {
+                            if (message != null && message.contains("Fødselsnummer er ikke gyldig")) {
                                 call.respond(
                                     HttpStatusCode.BadRequest,
                                     ErrorResponse.BadRequestError(
