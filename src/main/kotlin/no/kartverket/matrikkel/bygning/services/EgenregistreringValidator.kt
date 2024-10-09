@@ -46,7 +46,7 @@ class EgenregistreringValidator {
 
             if (repeatedBruksenheter.isNotEmpty()) {
                 return ErrorDetail(
-                    detail = "Bruksenhet ${if (repeatedBruksenheter.size > 1) "er" else ""} med ID ${repeatedBruksenheter.joinToString()} har flere registreringer på seg. Vennligst send inn kun én registrering per bruksenhet",
+                    detail = "Bruksenhet ${if (repeatedBruksenheter.size > 1) "er" else ""} med ID ${repeatedBruksenheter.joinToString()} har flere registreringer på seg. Kun én registrering per bruksenhet kan sendes inn",
                 )
             }
 
