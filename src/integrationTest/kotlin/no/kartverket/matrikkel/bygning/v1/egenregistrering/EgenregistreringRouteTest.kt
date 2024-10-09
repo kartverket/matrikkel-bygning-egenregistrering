@@ -275,8 +275,41 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             }
         }
 
+    @Test
+    fun `gitt at egenregistrering sender info om hvem har registrert blir dette lagret og sendt ut igjen`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+
+            val response = client.post("/v1/egenregistreringer") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    EgenregistreringRequest.validEgenregistrering().copy(
+                        eier = "31129956715",
+                    ),
+                )
+            }
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.Created)
+
+            val bygningResponse = client.get("/v1/bygninger/1")
+
+            assertThat(bygningResponse.status).isEqualTo(HttpStatusCode.OK)
+            val bygning = bygningResponse.body<BygningResponse>()
+
+            assertThat(bygning).all {
+                prop(BygningResponse::bruksareal).isNotNull().all {
+                    prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
+                        prop(BruksarealResponse::metadata).all {
+                            prop(RegisterMetadataResponse::registrertAv).isEqualTo("31129956715")
+                        }
+                    }
+                }
+            }
+        }
+
     private fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
         bygningId = 1L,
+        eier = "31129956715",
         bygningRegistrering = BygningRegistreringRequest(
             bruksarealRegistrering = BruksarealRegistreringRequest(125.0),
             byggeaarRegistrering = ByggeaarRegistreringRequest(2010),

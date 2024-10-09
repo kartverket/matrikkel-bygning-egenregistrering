@@ -46,7 +46,11 @@ data class BruksenhetResponse(
 )
 
 @Serializable
-data class RegisterMetadataResponse(@Serializable(with = InstantSerializer::class) val registreringstidspunkt: Instant)
+data class RegisterMetadataResponse(
+    @Serializable(with = InstantSerializer::class)
+    val registreringstidspunkt: Instant,
+    val registrertAv: String,
+)
 
 @Serializable
 data class ByggeaarResponse(val data: Int?, val metadata: RegisterMetadataResponse)
@@ -69,7 +73,9 @@ data class OppvarmingResponse(val data: OppvarmingKode?, val metadata: RegisterM
 
 fun RegisterMetadata.toRegisterMetadataResponse() = RegisterMetadataResponse(
     registreringstidspunkt = this.registreringstidspunkt,
+    registrertAv = this.registrertAv.value,
 )
+
 
 fun <T : Any, R : Any> Multikilde<T>.toMultikildeResponse(mapper: T.() -> R): MultikildeResponse<R>? {
     return MultikildeResponse(

@@ -26,7 +26,7 @@ class EgenregistreringService(
             )
         }
 
-        return egenregistreringRepository.saveEgenregistrering(egenregistrering);
+        return egenregistreringRepository.saveEgenregistrering(egenregistrering)
     }
 
     private fun findBruksenheterNotRegisteredOnCorrectBygning(

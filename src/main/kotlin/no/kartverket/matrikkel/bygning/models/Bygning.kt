@@ -16,19 +16,17 @@ data class Bygning(
     val oppvarminger: Multikilde<List<Oppvarming>> = Multikilde(),
     val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
     val avlop: Multikilde<Avlop> = Multikilde(),
-) {
-    fun withBruksenheter(bruksenheter: List<Bruksenhet>): Bygning {
-        return this.copy(
-            bruksenheter = bruksenheter,
-        )
-    }
-}
+)
 
 data class Multikilde<T : Any>(val autoritativ: T? = null, val egenregistrert: T? = null) {
     fun withEgenregistrert(verdi: T?): Multikilde<T> = copy(egenregistrert = verdi)
 }
 
-data class RegisterMetadata(val registreringstidspunkt: Instant)
+data class RegisterMetadata(
+    val registreringstidspunkt: Instant,
+    val registrertAv: RegistreringAktoer
+)
+
 data class Bruksareal(val data: Double?, val metadata: RegisterMetadata)
 data class Byggeaar(val data: Int?, val metadata: RegisterMetadata)
 data class Vannforsyning(val data: VannforsyningKode?, val metadata: RegisterMetadata)

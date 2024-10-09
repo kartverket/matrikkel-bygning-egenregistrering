@@ -14,12 +14,6 @@ import io.mockk.checkUnnecessaryStub
 import io.mockk.every
 import io.mockk.mockk
 import no.kartverket.matrikkel.bygning.matrikkelapi.MatrikkelApi
-import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelAvlopKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelEnergikildeKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelEtasjeplanKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelOppvarmingKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelVannforsyningKode
-import no.kartverket.matrikkel.bygning.matrikkelapi.id.bruksenhetId
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bruksenhet
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bruksenhetIds
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.bygning
@@ -29,6 +23,12 @@ import no.kartverket.matrikkel.bygning.matrikkelapi.builders.etasjer
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.matrikkelBubbleObjectList
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.oppvarmingsKodeIdList
 import no.kartverket.matrikkel.bygning.matrikkelapi.builders.timestampUtc
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelAvlopKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelEnergikildeKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelEtasjeplanKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelOppvarmingKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.MatrikkelVannforsyningKode
+import no.kartverket.matrikkel.bygning.matrikkelapi.id.bruksenhetId
 import no.kartverket.matrikkel.bygning.matrikkelapi.id.bygningId
 import no.kartverket.matrikkel.bygning.matrikkelapi.matchers.matchId
 import no.kartverket.matrikkel.bygning.matrikkelapi.matchers.matchIds
@@ -61,6 +61,7 @@ class MatrikkelBygningClientTest {
                 id = bygningId
                 bygningsnummer = 1000L
                 oppdateringsdato = timestampUtc(2024, 9, 13)
+                oppdatertAv = "TestAnsatt"
                 bruksenhetIds(bruksenhetId)
             }
             every { getObjects(matchIds(bruksenhetId), any()) } returns matrikkelBubbleObjectList(
@@ -68,6 +69,7 @@ class MatrikkelBygningClientTest {
                     id = bruksenhetId
                     byggId = bygningId
                     oppdateringsdato = timestampUtc(2024, 9, 12)
+                    oppdatertAv = "TestAnsatt"
                 },
             )
         }
@@ -118,6 +120,7 @@ class MatrikkelBygningClientTest {
                 id = bygningId
                 bygningsnummer = 1000L
                 oppdateringsdato = timestampUtc(2024, 9, 12)
+                oppdatertAv = "TestAnsatt"
                 vannforsyningsKodeId = MatrikkelVannforsyningKode.TilknyttetOffVannverk()
                 avlopsKodeId = MatrikkelAvlopKode.OffentligKloakk()
                 energikildeKodeIds = energikildeKodeIdList(
@@ -142,6 +145,7 @@ class MatrikkelBygningClientTest {
                     id = bruksenhetId
                     byggId = bygningId
                     oppdateringsdato = timestampUtc(2024, 9, 13)
+                    oppdatertAv = "TestAnsatt"
                     bruksareal = 140.0
                 },
             )
