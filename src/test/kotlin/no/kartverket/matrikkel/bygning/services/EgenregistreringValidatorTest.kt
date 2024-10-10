@@ -8,6 +8,7 @@ import no.kartverket.matrikkel.bygning.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.Foedselsnummer
 import java.time.Instant
 import java.util.UUID
 import kotlin.test.Test
@@ -24,6 +25,7 @@ class EgenregistreringValidatorTest {
     private val baseEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
+        eier = Foedselsnummer("31129956715"),
         bygningRegistrering = BygningRegistrering(
             bygningId = 1L,
             bruksarealRegistrering = null,
