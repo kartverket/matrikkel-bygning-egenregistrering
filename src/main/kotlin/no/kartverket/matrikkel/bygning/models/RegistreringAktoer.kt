@@ -7,6 +7,9 @@ sealed class RegistreringAktoer {
 
     data class Foedselsnummer(override val value: String) : RegistreringAktoer() {
         init {
+            // TODO Dette burde ikke være lov når vi er i prod, da må vi sjekke miljøet vi er i
+            FodselsnummerValidator.ALLOW_SYNTHETIC_NUMBERS = true
+
             if (!FodselsnummerValidator.isValid(value)) {
                 throw IllegalArgumentException("Fødselsnummer er ikke gyldig")
             }

@@ -16,60 +16,61 @@ private val logger: Logger = LoggerFactory.getLogger(object {}::class.java)
 fun Application.configureStatusPages() {
     install(StatusPages) {
         exception<Throwable> { call, exception ->
-            logger.error("Noe gikk galt", exception)
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorResponse.InternalServerError(),
-            )
-        }
+            when (exception) {
+                is BadRequestException -> {
+                    logger.warn("Bad request exception", exception)
+                    when (val cause = exception.cause) {
+                        is JsonConvertException -> {
+                            call.respond(
+                                HttpStatusCode.BadRequest,
+                                ErrorResponse.BadRequestError(
+                                    details = listOf(
+                                        ErrorDetail(
+                                            detail = cause.message ?: "Ukjent feil etter serialisering av request objekt",
+                                        ),
+                                    ),
+                                ),
+                            )
+                        }
 
-        exception<BadRequestException> { call, exception ->
-            logger.warn("Bad request exception", exception)
+                        else -> {
+                            call.respond(
+                                HttpStatusCode.BadRequest,
+                                ErrorResponse.BadRequestError(
+                                    details = listOf(
+                                        ErrorDetail(
+                                            detail = exception.message
+                                                ?: "Ukjent feil med request gjør at server ikke kan håndtere forespørselen",
+                                        ),
+                                    ),
+                                ),
+                            )
+                        }
+                    }
+                }
 
-            when (val cause = exception.cause) {
-                is JsonConvertException -> {
+                is IllegalArgumentException -> {
+                    logger.warn("Illegal argument exception", exception)
+
                     call.respond(
                         HttpStatusCode.BadRequest,
                         ErrorResponse.BadRequestError(
                             details = listOf(
                                 ErrorDetail(
-                                    detail = cause.message ?: "Ukjent feil etter serialisering av request objekt",
-                                ),
-                            ),
-                        ),
+                                    detail = exception.message ?: "Et eller flere felter i requesten var ugyldig"
+                                )
+                            )
+                        )
                     )
                 }
 
                 else -> {
+                    logger.error("Uhåndtert exception kastet", exception)
                     call.respond(
-                        HttpStatusCode.BadRequest,
-                        ErrorResponse.BadRequestError(
-                            details = listOf(
-                                ErrorDetail(
-                                    detail = exception.message
-                                        ?: "Ukjent feil med request gjør at server ikke kan håndtere forespørselen",
-                                ),
-                            ),
-                        ),
+                        HttpStatusCode.InternalServerError,
+                        ErrorResponse.InternalServerError(),
                     )
                 }
-            }
-        }
-
-        exception<IllegalArgumentException> { call, exception ->
-            logger.warn("Illegal argument exception", exception)
-
-            when (exception) {
-                is NumberFormatException -> call.respond(
-                    HttpStatusCode.BadRequest,
-                    ErrorResponse.BadRequestError(
-                        details = listOf(
-                            ErrorDetail(
-                                detail = "Et parameter/argument i requesten din kunne ikke formateres. Sjekk at alle IDer har riktig type.",
-                            ),
-                        ),
-                    ),
-                )
             }
         }
     }
