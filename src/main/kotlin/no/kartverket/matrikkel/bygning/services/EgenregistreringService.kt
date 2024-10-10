@@ -1,7 +1,6 @@
 package no.kartverket.matrikkel.bygning.services
 
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
-import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
@@ -17,31 +16,16 @@ class EgenregistreringService(
             ),
         )
 
-        val invalidBruksenheter = findBruksenheterNotRegisteredOnCorrectBygning(egenregistrering, bygning)
-        if (invalidBruksenheter.isNotEmpty()) {
+        val validationErrors = EgenregistreringValidator.validateEgenregistrering(egenregistrering, bygning)
+        if (validationErrors.isNotEmpty()) {
             return Result.ErrorResult(
-                ErrorDetail(
-                    detail = "Bruksenhet${if (invalidBruksenheter.size > 1) "er" else ""} med ID ${invalidBruksenheter.joinToString()} finnes ikke i bygning med ID ${bygning.bygningId}",
-                ),
+                errors = validationErrors,
             )
         }
 
         return egenregistreringRepository.saveEgenregistrering(egenregistrering)
     }
 
-    private fun findBruksenheterNotRegisteredOnCorrectBygning(
-        egenregistrering: Egenregistrering, bygning: Bygning
-    ): List<Long> {
-        return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistering ->
-            val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
-
-            if (bruksenhet == null) {
-                bruksenhetRegistering.bruksenhetId
-            } else {
-                null
-            }
-        }
-    }
 
     fun findAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
         return egenregistreringRepository.getAllEgenregistreringerForBygning(bygningId)
