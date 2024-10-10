@@ -14,6 +14,6 @@ class HealthRepository(private val dataSource: DataSource) {
             { it.setInt(1, 1) },
         ) { res -> res.getInt(1) }
 
-        return resultSet.isNotEmpty()
+        return resultSet?.isNotEmpty() == true
     }
 }

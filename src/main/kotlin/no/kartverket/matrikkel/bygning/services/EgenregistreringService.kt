@@ -1,32 +1,39 @@
 package no.kartverket.matrikkel.bygning.services
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.flatMap
+import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 
 class EgenregistreringService(
     private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository
 ) {
-    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
-        val bygning = bygningClient.getBygningById(egenregistrering.bygningRegistrering.bygningId) ?: return Result.ErrorResult(
+    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, ErrorDetail> {
+        return bygningClient.getBygningById(egenregistrering.bygningRegistrering.bygningId).toResultOr {
             ErrorDetail(
                 detail = "Bygning med ID ${egenregistrering.bygningRegistrering.bygningId} finnes ikke i matrikkelen",
-            ),
-        )
-
-        val invalidBruksenheter = findBruksenheterNotRegisteredOnCorrectBygning(egenregistrering, bygning)
-        if (invalidBruksenheter.isNotEmpty()) {
-            return Result.ErrorResult(
-                ErrorDetail(
-                    detail = "Bruksenhet${if (invalidBruksenheter.size > 1) "er" else ""} med ID ${invalidBruksenheter.joinToString()} finnes ikke i bygning med ID ${bygning.bygningId}",
-                ),
             )
-        }
+        }.flatMap {
+            val invalidBruksenheter = findBruksenheterNotRegisteredOnCorrectBygning(egenregistrering, it)
 
-        return egenregistreringRepository.saveEgenregistrering(egenregistrering)
+            if (invalidBruksenheter.isNotEmpty()) {
+                Err(
+                    ErrorDetail(
+                        detail = "Bruksenhet${if (invalidBruksenheter.size > 1) "er" else ""} med ID ${invalidBruksenheter.joinToString()} finnes ikke i bygning med ID ${it.bygningId}",
+                    ),
+                )
+            } else {
+                Ok(it)
+            }
+        }.flatMap {
+            egenregistreringRepository.saveEgenregistrering(egenregistrering)
+        }
     }
 
     private fun findBruksenheterNotRegisteredOnCorrectBygning(
@@ -43,7 +50,7 @@ class EgenregistreringService(
         }
     }
 
-    fun findAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
+    fun findAllEgenregistreringerForBygning(bygningId: Long): Result<List<Egenregistrering>, ErrorDetail> {
         return egenregistreringRepository.getAllEgenregistreringerForBygning(bygningId)
     }
 }

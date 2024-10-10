@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning.repositories
 
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.toResultOr
 import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.db.executeQueryAndMapPreparedStatement
 import no.kartverket.matrikkel.bygning.db.prepareAndExecuteUpdate
@@ -7,14 +9,17 @@ import no.kartverket.matrikkel.bygning.db.withTransaction
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
-import no.kartverket.matrikkel.bygning.models.Result
+import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import org.postgresql.util.PGobject
 import java.sql.Timestamp
 import java.util.UUID
 import javax.sql.DataSource
 
+// TODO Ikke egentlig blodfan av hvordan ting håndteres ut av repository. Kan man få noe mer informasjon ut i ErrorDetail? Det er jo antageligvis en exception som skjer
+// hvis noe først går gæli her
+
 class EgenregistreringRepository(private val dataSource: DataSource) {
-    fun getAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
+    fun getAllEgenregistreringerForBygning(bygningId: Long): Result<List<Egenregistrering>, ErrorDetail> {
         return dataSource.executeQueryAndMapPreparedStatement(
             """
                 SELECT er.id AS id, 
@@ -35,10 +40,14 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
                 registreringstidspunkt = it.getTimestamp("registreringstidspunkt").toInstant(),
                 bygningRegistrering = Json.decodeFromString<BygningRegistrering>(it.getString("bygningregistrering")),
             )
+        }.toResultOr {
+            ErrorDetail(
+                detail = "Noe gikk galt under henting av egenregistreringer",
+            )
         }
     }
 
-    fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
+    fun saveEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, ErrorDetail> {
         return dataSource.withTransaction { connection ->
             connection.prepareAndExecuteUpdate(
                 """
@@ -59,6 +68,10 @@ class EgenregistreringRepository(private val dataSource: DataSource) {
                     },
                 )
             }
+        }.toResultOr {
+            ErrorDetail(
+                detail = "Noe gikk galt under lagring av egenregistrering",
+            )
         }
     }
 }

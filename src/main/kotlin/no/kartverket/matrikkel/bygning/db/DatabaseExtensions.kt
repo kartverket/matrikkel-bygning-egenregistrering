@@ -1,7 +1,5 @@
 package no.kartverket.matrikkel.bygning.db
 
-import no.kartverket.matrikkel.bygning.models.Result
-import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
@@ -20,10 +18,30 @@ inline fun <T> Statement.executeQuery(sql: String, block: (ResultSet) -> T) = ex
 inline fun <T> Connection.prepareStatement(sql: String, block: (PreparedStatement) -> T) = prepareStatement(sql).use(block)
 inline fun <T> PreparedStatement.executeQuery(block: (ResultSet) -> T) = executeQuery().use(block)
 
+fun <T> DataSource.withTransaction(block: (Connection) -> T): T? {
+    connection.use { connection ->
+        try {
+            connection.autoCommit = false
+
+            val result = block(connection)
+
+            connection.commit()
+
+            return result
+        } catch (e: Exception) {
+            log.warn("Det skjedde noe galt under eksekvering av SQL", e)
+
+            connection.rollback()
+
+            return null
+        }
+    }
+}
+
 fun <T> DataSource.executeQueryAndMapPreparedStatement(
     sql: String, setterBlock: (PreparedStatement) -> Unit, resultMapper: (ResultSet) -> T
-): List<T> {
-    return this.connection { connection ->
+): List<T>? {
+    return this.withTransaction { connection ->
         connection.prepareStatement(sql) { preparedStatement ->
             setterBlock(preparedStatement)
             preparedStatement.executeQuery() { resultSet ->
@@ -49,29 +67,6 @@ fun Connection.prepareBatchAndExecuteUpdate(sql: String, setterBlocks: List<(Pre
             preparedStatement.addBatch()
         }
         preparedStatement.executeBatch()
-    }
-}
-
-fun <T> DataSource.withTransaction(block: (Connection) -> T): Result<T> {
-    connection.use { connection ->
-        try {
-            connection.autoCommit = false
-
-            val result = block(connection)
-
-            connection.commit()
-
-            return Result.Success(result)
-        } catch (e: Exception) {
-            log.warn("Det skjedde noe galt under eksekvering av SQL", e)
-            connection.rollback()
-
-            return Result.ErrorResult(
-                error = ErrorDetail(
-                    detail = "Noe gikk galt",
-                ),
-            )
-        }
     }
 }
 
