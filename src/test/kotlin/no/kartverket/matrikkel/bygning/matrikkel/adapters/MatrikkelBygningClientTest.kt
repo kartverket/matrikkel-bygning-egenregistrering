@@ -84,7 +84,7 @@ class MatrikkelBygningClientTest {
         val isMatrikkelfoertBygningstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-13T00:00:00.00Z"))
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-12T00:00:00.00Z"))
 
-        assertThat(bygning, "bygning").isNotNull().all {
+        assertThat(bygning.value, "bygning").all {
             prop(Bygning::bygningId).isEqualTo(1L)
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
@@ -161,7 +161,7 @@ class MatrikkelBygningClientTest {
         val isMatrikkelfoertBygningstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-12T00:00:00.00Z"))
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-13T00:00:00.00Z"))
 
-        assertThat(bygning, "bygning").isNotNull().all {
+        assertThat(bygning.value, "bygning").isNotNull().all {
             prop(Bygning::bygningId).isEqualTo(1L)
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
