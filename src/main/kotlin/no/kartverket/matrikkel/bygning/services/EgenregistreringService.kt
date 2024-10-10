@@ -5,7 +5,6 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.andThen
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
-import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
@@ -14,36 +13,21 @@ class EgenregistreringService(
     private val bygningClient: BygningClient,
     private val egenregistreringRepository: EgenregistreringRepository,
 ) {
+    // TODO ErrorDetail er ikke godt nok for å faktisk plukke opp flere Errors, så her dukker det opp litt problem
+    // Hvordan skal vi håndtere potensielle flere feil? Trenger vi egne feiltyper overalt?
     fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, ErrorDetail> {
         return bygningClient
             .getBygningById(egenregistrering.bygningRegistrering.bygningId)
             .andThen { bygning ->
-                val invalidBruksenheter = findBruksenheterNotRegisteredOnCorrectBygning(egenregistrering, bygning)
+                val validationErrors = EgenregistreringValidator.validateEgenregistrering(egenregistrering, bygning)
 
-                if (invalidBruksenheter.isEmpty()) {
+                if (validationErrors.isEmpty()) {
                     Ok(bygning)
                 } else {
-                    Err(
-                        ErrorDetail(
-                            detail = "Bruksenhet${if (invalidBruksenheter.size > 1) "er" else ""} med ID ${invalidBruksenheter.joinToString()} finnes ikke i bygning med ID $ { it.bygningId }",
-                        ),
-                    )
+                    Err(validationErrors.first())
                 }
             }
             .andThen { egenregistreringRepository.saveEgenregistrering(egenregistrering) }
-    }
-
-    private fun findBruksenheterNotRegisteredOnCorrectBygning(egenregistrering: Egenregistrering, bygning: Bygning): List<Long> {
-        return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistering ->
-            val bruksenhet =
-                bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
-
-            if (bruksenhet == null) {
-                bruksenhetRegistering.bruksenhetId
-            } else {
-                null
-            }
-        }
     }
 
     fun findAllEgenregistreringerForBygning(bygningId: Long): Result<List<Egenregistrering>, ErrorDetail> {
