@@ -8,6 +8,7 @@ import no.kartverket.matrikkel.bygning.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.Foedselsnummer
 import java.time.Instant
 import java.util.UUID
 import kotlin.test.Test
@@ -31,7 +32,8 @@ class EgenregistreringValidatorTest {
             vannforsyningRegistrering = null,
             avlopRegistrering = null,
             bruksenhetRegistreringer = emptyList()
-        )
+        ),
+        eier = Foedselsnummer("31129956715"),
     )
 
     @Test
