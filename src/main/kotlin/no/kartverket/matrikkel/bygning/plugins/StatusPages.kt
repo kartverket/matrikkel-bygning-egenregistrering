@@ -52,39 +52,16 @@ fun Application.configureStatusPages() {
                 is IllegalArgumentException -> {
                     logger.warn("Illegal argument exception", exception)
 
-                    when (exception) {
-                        is NumberFormatException -> call.respond(
-                            HttpStatusCode.BadRequest,
-                            ErrorResponse.BadRequestError(
-                                details = listOf(
-                                    ErrorDetail(
-                                        detail = "Et parameter/argument i requesten din kunne ikke formateres. Sjekk at alle IDer har riktig type.",
-                                    ),
-                                ),
-                            ),
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse.BadRequestError(
+                            details = listOf(
+                                ErrorDetail(
+                                    detail = exception.message ?: "Et eller flere felter i requesten var ugyldig"
+                                )
+                            )
                         )
-
-                        else -> {
-                            val message = exception.message
-                            if (message != null && message.contains("Fødselsnummer er ikke gyldig")) {
-                                call.respond(
-                                    HttpStatusCode.BadRequest,
-                                    ErrorResponse.BadRequestError(
-                                        details = listOf(
-                                            ErrorDetail(
-                                                detail = "Et av fødselsnummerene i requesten din kunne ikke valideres",
-                                            ),
-                                        ),
-                                    ),
-                                )
-                            } else {
-                                call.respond(
-                                    HttpStatusCode.InternalServerError,
-                                    ErrorResponse.InternalServerError(),
-                                )
-                            }
-                        }
-                    }
+                    )
                 }
 
                 else -> {
