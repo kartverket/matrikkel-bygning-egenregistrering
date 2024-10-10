@@ -29,7 +29,7 @@ fun <T> DataSource.withTransaction(block: (Connection) -> T): T? {
 
             return result
         } catch (e: Exception) {
-            log.warn("Det skjedde noe galt under eksekvering av SQL", e)
+            log.error("Det skjedde noe galt under eksekvering av SQL", e)
 
             connection.rollback()
 
