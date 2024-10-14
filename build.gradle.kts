@@ -59,7 +59,8 @@ dependencies {
     // Norwegian Commons
     implementation(libs.norwegian.commons)
 
-    implementation("com.michael-bull.kotlin-result:kotlin-result:2.0.0")
+    // Error handling
+    implementation(libs.kotlin.result)
 }
 
 tasks {
