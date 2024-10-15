@@ -34,7 +34,6 @@ class EgenregistreringValidatorTest {
             avlopRegistrering = null,
             bruksenhetRegistreringer = emptyList()
         ),
-        eier = Foedselsnummer("31129956715"),
     )
 
     @Test
