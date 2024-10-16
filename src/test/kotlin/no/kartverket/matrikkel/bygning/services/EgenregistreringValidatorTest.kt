@@ -33,7 +33,7 @@ class EgenregistreringValidatorTest {
             vannforsyningRegistrering = null,
             avlopRegistrering = null,
             bruksenhetRegistreringer = emptyList()
-        )
+        ),
     )
 
     @Test

@@ -1,33 +1,36 @@
 package no.kartverket.matrikkel.bygning.services
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.andThen
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.models.Result
 import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import no.kartverket.matrikkel.bygning.repositories.EgenregistreringRepository
 
 class EgenregistreringService(
-    private val bygningClient: BygningClient, private val egenregistreringRepository: EgenregistreringRepository
+    private val bygningClient: BygningClient,
+    private val egenregistreringRepository: EgenregistreringRepository,
 ) {
-    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit> {
-        val bygning = bygningClient.getBygningById(egenregistrering.bygningRegistrering.bygningId) ?: return Result.ErrorResult(
-            ErrorDetail(
-                detail = "Bygning med ID ${egenregistrering.bygningRegistrering.bygningId} finnes ikke i matrikkelen",
-            ),
-        )
+    // TODO ErrorDetail er ikke godt nok for å faktisk plukke opp flere Errors, så her dukker det opp litt problem
+    // Hvordan skal vi håndtere potensielle flere feil? Trenger vi egne feiltyper overalt?
+    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, ErrorDetail> {
+        return bygningClient
+            .getBygningById(egenregistrering.bygningRegistrering.bygningId)
+            .andThen { bygning ->
+                val validationErrors = EgenregistreringValidator.validateEgenregistrering(egenregistrering, bygning)
 
-        val validationErrors = EgenregistreringValidator.validateEgenregistrering(egenregistrering, bygning)
-        if (validationErrors.isNotEmpty()) {
-            return Result.ErrorResult(
-                errors = validationErrors,
-            )
-        }
-
-        return egenregistreringRepository.saveEgenregistrering(egenregistrering)
+                if (validationErrors.isEmpty()) {
+                    Ok(bygning)
+                } else {
+                    Err(validationErrors.first())
+                }
+            }
+            .andThen { egenregistreringRepository.saveEgenregistrering(egenregistrering) }
     }
 
-
-    fun findAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
+    fun findAllEgenregistreringerForBygning(bygningId: Long): Result<List<Egenregistrering>, ErrorDetail> {
         return egenregistreringRepository.getAllEgenregistreringerForBygning(bygningId)
     }
 }

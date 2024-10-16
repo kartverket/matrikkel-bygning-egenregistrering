@@ -58,6 +58,9 @@ dependencies {
 
     // Norwegian Commons
     implementation(libs.norwegian.commons)
+
+    // Error handling
+    implementation(libs.kotlin.result)
 }
 
 tasks {
@@ -104,6 +107,8 @@ testing {
 
                 implementation(libs.assertk)
                 implementation(libs.testcontainers.postgresql)
+
+                implementation("com.michael-bull.kotlin-result:kotlin-result:2.0.0")
             }
         }
     }

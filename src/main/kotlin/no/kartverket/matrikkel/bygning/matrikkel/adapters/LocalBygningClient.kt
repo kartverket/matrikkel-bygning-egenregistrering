@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning.matrikkel.adapters
 
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.matrikkel.BygningClient
 import no.kartverket.matrikkel.bygning.models.Bruksareal
 import no.kartverket.matrikkel.bygning.models.Bruksenhet
@@ -7,6 +9,7 @@ import no.kartverket.matrikkel.bygning.models.Bygning
 import no.kartverket.matrikkel.bygning.models.Multikilde
 import no.kartverket.matrikkel.bygning.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.models.responses.ErrorDetail
 import java.time.Instant
 
 internal class LocalBygningClient : BygningClient {
@@ -51,11 +54,19 @@ internal class LocalBygningClient : BygningClient {
         ),
     )
 
-    override fun getBygningById(id: Long): Bygning? {
-        return bygninger.find { it.bygningId == id }
+    override fun getBygningById(id: Long): Result<Bygning, ErrorDetail> {
+        return bygninger
+            .find { it.bygningId == id }
+            .toResultOr { ErrorDetail(detail = "Bygning med ID $id finnes ikke i matrikkelen") }
     }
 
-    override fun getBygningByBygningsnummer(bygningsnummer: Long): Bygning? {
-        return bygninger.find { it.bygningsnummer == bygningsnummer }
+    override fun getBygningByBygningsnummer(bygningsnummer: Long): Result<Bygning, ErrorDetail> {
+        return bygninger
+            .find { it.bygningsnummer == bygningsnummer }
+            .toResultOr {
+                ErrorDetail(
+                    detail = "Bygning med bygningsnummer $bygningsnummer finnes ikke i matrikkelen",
+                )
+            }
     }
 }
