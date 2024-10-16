@@ -1,7 +1,7 @@
 [versions]
 ktorVersion = "2.3.12"
 kotlinVersion = "2.0.0"
-logbackVersion = "1.5.10"
+logbackVersion = "1.5.11"
 logstashVersion = "8.0"
 prometheusVersion = "1.13.6"
 flywayVersion = "10.19.0"
