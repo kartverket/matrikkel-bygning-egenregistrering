@@ -40,7 +40,10 @@ data class BygningResponse(
 @Serializable
 data class BruksenhetResponse(
     val bruksenhetId: Long,
+    val byggeaar: MultikildeResponse<ByggeaarResponse>?,
     val bruksareal: MultikildeResponse<BruksarealResponse>?,
+    val vannforsyning: MultikildeResponse<VannforsyningKodeResponse>?,
+    val avlop: MultikildeResponse<AvlopKodeResponse>?,
     val energikilder: MultikildeResponse<List<EnergikildeResponse>>?,
     val oppvarminger: MultikildeResponse<List<OppvarmingResponse>>?,
 )
@@ -98,9 +101,12 @@ fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
 
 fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
     bruksenhetId = this.bruksenhetId,
+    byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
     bruksareal = this.bruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
     energikilder = this.energikilder.toMultikildeResponse { map(Energikilde::toEnergikildeResponse) },
     oppvarminger = this.oppvarminger.toMultikildeResponse { map(Oppvarming::toOppvarmingResponse) },
+    vannforsyning = this.vannforsyning.toMultikildeResponse(Vannforsyning::toVannforsyningResponse),
+    avlop = this.avlop.toMultikildeResponse(Avlop::toAvlopKodeResponse),
 )
 
 private fun Byggeaar.toByggeaarResponse(): ByggeaarResponse = ByggeaarResponse(

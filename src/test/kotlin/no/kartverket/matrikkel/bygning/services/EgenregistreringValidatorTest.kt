@@ -28,10 +28,6 @@ class EgenregistreringValidatorTest {
         eier = Foedselsnummer("31129956715"),
         bygningRegistrering = BygningRegistrering(
             bygningId = 1L,
-            bruksarealRegistrering = null,
-            byggeaarRegistrering = null,
-            vannforsyningRegistrering = null,
-            avlopRegistrering = null,
             bruksenhetRegistreringer = emptyList()
         ),
     )
@@ -47,12 +43,18 @@ class EgenregistreringValidatorTest {
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
+                            byggeaarRegistrering = null,
+                            vannforsyningRegistrering = null,
+                            avlopRegistrering = null,
                         ),
                         BruksenhetRegistrering(
                             bruksenhetId = 1L,
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
+                            byggeaarRegistrering = null,
+                            vannforsyningRegistrering = null,
+                            avlopRegistrering = null,
                         ),
                     )
                 )
@@ -74,6 +76,9 @@ class EgenregistreringValidatorTest {
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
+                            byggeaarRegistrering = null,
+                            vannforsyningRegistrering = null,
+                            avlopRegistrering = null,
                         ),
                     )
                 )

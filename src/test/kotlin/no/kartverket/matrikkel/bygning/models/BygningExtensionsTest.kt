@@ -9,16 +9,6 @@ import kotlin.test.Test
 
 class BygningExtensionsTest {
 
-    private val defaultBygning = Bygning(
-        bygningId = 1L,
-        bygningsnummer = 100,
-        bruksenheter = emptyList(),
-        byggeaar = Multikilde(),
-        bruksareal = Multikilde(),
-        vannforsyning = Multikilde(),
-        avlop = Multikilde(),
-    )
-
     private val defaultBruksenhet = Bruksenhet(
         bruksenhetId = 1L,
         bygningId = 1L,
@@ -27,23 +17,30 @@ class BygningExtensionsTest {
         oppvarminger = Multikilde(),
     )
 
+    private val defaultBygning = Bygning(
+        bygningId = 1L,
+        bygningsnummer = 100,
+        bruksenheter = listOf(defaultBruksenhet),
+        byggeaar = Multikilde(),
+        bruksareal = Multikilde(),
+        vannforsyning = Multikilde(),
+        avlop = Multikilde(),
+    )
+
     private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
         bruksenhetId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             bruksareal = 50.0
         ),
+        byggeaarRegistrering = null,
         energikildeRegistrering = null,
-        oppvarmingRegistrering = null
+        oppvarmingRegistrering = null,
+        vannforsyningRegistrering = null,
+        avlopRegistrering = null,
     )
 
     private val defaultBygningRegistrering = BygningRegistrering(
         bygningId = 1L,
-        bruksarealRegistrering = BruksarealRegistrering(
-            bruksareal = 125.0,
-        ),
-        byggeaarRegistrering = null,
-        vannforsyningRegistrering = null,
-        avlopRegistrering = null,
         bruksenhetRegistreringer = listOf(defaultBruksenhetRegistrering),
     )
 
@@ -55,20 +52,24 @@ class BygningExtensionsTest {
     )
 
     @Test
-    fun `bygning med to egenregistreringer paa ett felt skal kun gi nyeste feltet`() {
+    fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste feltet`() {
         val laterRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
             bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
-                bruksarealRegistrering = BruksarealRegistrering(
-                    bruksareal = 150.0,
+                bruksenhetRegistreringer = listOf(
+                    defaultBruksenhetRegistrering.copy(
+                        bruksarealRegistrering = BruksarealRegistrering(
+                            bruksareal = 150.0,
+                        ),
+                    )
                 ),
             ),
         )
 
         val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
 
-        assertThat(aggregatedBygning.bruksareal.egenregistrert?.data).isEqualTo(150.0)
+        assertThat(aggregatedBygning.bruksenheter.single().bruksareal.egenregistrert?.data).isEqualTo(150.0)
     }
 
     @Test

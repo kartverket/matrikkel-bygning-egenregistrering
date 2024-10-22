@@ -37,7 +37,10 @@ data class Oppvarming(val data: OppvarmingKode, val metadata: RegisterMetadata)
 data class Bruksenhet(
     val bruksenhetId: Long,
     val bygningId: Long,
+    val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val bruksareal: Multikilde<Bruksareal> = Multikilde(),
     val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
     val oppvarminger: Multikilde<List<Oppvarming>> = Multikilde(),
+    val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
+    val avlop: Multikilde<Avlop> = Multikilde(),
 )

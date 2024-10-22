@@ -8,11 +8,9 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.prop
 import assertk.assertions.single
-import no.kartverket.matrikkel.bygning.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.models.RegistreringAktoer
-import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.models.RegistreringAktoer.Foedselsnummer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -23,12 +21,6 @@ class EgenregistreringRepositoryTest : TestWithDb() {
 
     private val defaultBygningRegistrering = BygningRegistrering(
         bygningId = 1L,
-        bruksarealRegistrering = BruksarealRegistrering(
-            bruksareal = 125.0,
-        ),
-        byggeaarRegistrering = null,
-        vannforsyningRegistrering = null,
-        avlopRegistrering = null,
         bruksenhetRegistreringer = emptyList()
     )
 
