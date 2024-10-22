@@ -14,32 +14,6 @@ spec:
   - "matrikkel-bygning-egenregistrering-api"
 ---
 apiVersion: "backstage.io/v1alpha1"
-kind: "Group"
-metadata:
-  name: "security_champion_matrikkel-bygning-egenregistrering"
-  title: "Security Champion matrikkel-bygning-egenregistrering"
-spec:
-  type: "security_champion"
-  parent: "eiendom_security_champions"
-  members:
-  - "ljooys"
-  children:
-  - "resource:matrikkel-bygning-egenregistrering"
----
-apiVersion: "backstage.io/v1alpha1"
-kind: "Resource"
-metadata:
-  name: "matrikkel-bygning-egenregistrering"
-  links:
-  - url: "https://github.com/kartverket/matrikkel-bygning-egenregistrering"
-    title: "matrikkel-bygning-egenregistrering på GitHub"
-spec:
-  type: "repo"
-  owner: "security_champion_matrikkel-bygning-egenregistrering"
-  dependencyOf:
-  - "component:matrikkel-bygning-egenregistrering"
----
-apiVersion: "backstage.io/v1alpha1"
 kind: "API"
 metadata:
   name: "matrikkel-bygning-egenregistrering-api"
