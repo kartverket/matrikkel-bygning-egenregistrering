@@ -20,26 +20,20 @@ import java.util.*
 
 
 @Serializable
-data class BygningRegistreringRequest(
-    val bruksarealRegistrering: BruksarealRegistreringRequest?,
-    val byggeaarRegistrering: ByggeaarRegistreringRequest?,
-    val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
-    val avlopRegistrering: AvlopRegistreringRequest?
-)
-
-@Serializable
 data class BruksenhetRegistreringRequest(
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistreringRequest?,
+    val byggeaarRegistrering: ByggeaarRegistreringRequest?,
     val energikildeRegistrering: EnergikildeRegistreringRequest?,
-    val oppvarmingRegistrering: OppvarmingRegistreringRequest?
+    val oppvarmingRegistrering: OppvarmingRegistreringRequest?,
+    val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
+    val avlopRegistrering: AvlopRegistreringRequest?,
 )
 
 @Serializable
 data class EgenregistreringRequest(
     val bygningId: Long,
     val eier: String,
-    val bygningRegistrering: BygningRegistreringRequest?,
     val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
 
@@ -81,32 +75,27 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
         registreringstidspunkt = registreringstidspunkt,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,
-            byggeaarRegistrering = this.bygningRegistrering?.byggeaarRegistrering?.let {
-                ByggeaarRegistrering(
-                    byggeaar = it.byggeaar,
-                )
-            },
-            bruksarealRegistrering = this.bygningRegistrering?.bruksarealRegistrering?.let {
-                BruksarealRegistrering(
-                    bruksareal = it.bruksareal,
-                )
-            },
-            vannforsyningRegistrering = this.bygningRegistrering?.vannforsyningRegistrering?.let {
-                VannforsyningRegistrering(
-                    vannforsyning = it.vannforsyning,
-                )
-            },
-            avlopRegistrering = this.bygningRegistrering?.avlopRegistrering?.let {
-                AvlopRegistrering(
-                    avlop = it.avlop,
-                )
-            },
             bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
                 BruksenhetRegistrering(
                     bruksenhetId = bruksenhetRegistrering.bruksenhetId,
                     bruksarealRegistrering = bruksenhetRegistrering.bruksarealRegistrering?.let {
                         BruksarealRegistrering(
                             bruksareal = it.bruksareal,
+                        )
+                    },
+                    byggeaarRegistrering = bruksenhetRegistrering.byggeaarRegistrering?.let {
+                        ByggeaarRegistrering(
+                            byggeaar = it.byggeaar,
+                        )
+                    },
+                    vannforsyningRegistrering = bruksenhetRegistrering.vannforsyningRegistrering?.let {
+                        VannforsyningRegistrering(
+                            vannforsyning = it.vannforsyning,
+                        )
+                    },
+                    avlopRegistrering = bruksenhetRegistrering.avlopRegistrering?.let {
+                        AvlopRegistrering(
+                            avlop = it.avlop,
                         )
                     },
                     energikildeRegistrering = bruksenhetRegistrering.energikildeRegistrering?.let {

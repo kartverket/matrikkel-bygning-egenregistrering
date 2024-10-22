@@ -43,10 +43,6 @@ data class OppvarmingRegistrering(
 @Serializable
 data class BygningRegistrering(
     val bygningId: Long,
-    val bruksarealRegistrering: BruksarealRegistrering?,
-    val byggeaarRegistrering: ByggeaarRegistrering?,
-    val vannforsyningRegistrering: VannforsyningRegistrering?,
-    val avlopRegistrering: AvlopRegistrering?,
     val bruksenhetRegistreringer: List<BruksenhetRegistrering>
 )
 
@@ -54,6 +50,9 @@ data class BygningRegistrering(
 data class BruksenhetRegistrering(
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistrering?,
+    val byggeaarRegistrering: ByggeaarRegistrering?,
+    val vannforsyningRegistrering: VannforsyningRegistrering?,
+    val avlopRegistrering: AvlopRegistrering?,
     val energikildeRegistrering: EnergikildeRegistrering?,
     val oppvarmingRegistrering: OppvarmingRegistrering?,
 )

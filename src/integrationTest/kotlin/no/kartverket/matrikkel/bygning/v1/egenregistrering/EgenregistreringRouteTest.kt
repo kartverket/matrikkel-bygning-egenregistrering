@@ -3,8 +3,6 @@ package no.kartverket.matrikkel.bygning.v1.egenregistrering
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.containsExactly
-import assertk.assertions.extracting
 import assertk.assertions.index
 import assertk.assertions.isBetween
 import assertk.assertions.isEqualTo
@@ -12,6 +10,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
 import assertk.assertions.single
+import assertk.assertions.support.appendName
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -35,7 +34,6 @@ import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.AvlopRegistrer
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.ByggeaarRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BygningRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EnergikildeRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.OppvarmingRegistreringRequest
@@ -81,40 +79,33 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val now = Instant.now()
 
             assertThat(bygning).all {
-                prop(BygningResponse::bruksareal).isNotNull().all {
-                    prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                        prop(BruksarealResponse::data).isEqualTo(125.0)
-                        prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
-                    }
-                }
-
-                prop(BygningResponse::byggeaar).isNotNull().all {
-                    prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
-                        prop(ByggeaarResponse::data).isEqualTo(2010)
-                        prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
-                    }
-                }
-
-                prop(BygningResponse::vannforsyning).isNotNull().all {
-                    prop(MultikildeResponse<VannforsyningKodeResponse>::egenregistrert).isNotNull().all {
-                        prop(VannforsyningKodeResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
-                        prop(VannforsyningKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
-                    }
-                }
-
-                prop(BygningResponse::avlop).isNotNull().all {
-                    prop(MultikildeResponse<AvlopKodeResponse>::egenregistrert).isNotNull().all {
-                        prop(AvlopKodeResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
-                        prop(AvlopKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
-                    }
-                }
-
                 prop(BygningResponse::bruksenheter).index(0).all {
                     prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
                     prop(BruksenhetResponse::bruksareal).isNotNull().all {
                         prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                            prop(BruksarealResponse::data).isEqualTo(100.0)
+                            prop(BruksarealResponse::data).isEqualTo(125.0)
                             prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        }
+                    }
+
+                    prop(BruksenhetResponse::byggeaar).isNotNull().all {
+                        prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
+                            prop(ByggeaarResponse::data).isEqualTo(2010)
+                            prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        }
+                    }
+
+                    prop(BruksenhetResponse::vannforsyning).isNotNull().all {
+                        prop(MultikildeResponse<VannforsyningKodeResponse>::egenregistrert).isNotNull().all {
+                            prop(VannforsyningKodeResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
+                            prop(VannforsyningKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        }
+                    }
+
+                    prop(BruksenhetResponse::avlop).isNotNull().all {
+                        prop(MultikildeResponse<AvlopKodeResponse>::egenregistrert).isNotNull().all {
+                            prop(AvlopKodeResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
+                            prop(AvlopKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
@@ -149,9 +140,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         val response = client.post("/v1/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
-                EgenregistreringRequest.validEgenregistrering().copy(
-                    bygningRegistrering = null,
-                ),
+                EgenregistreringRequest.validEgenregistrering(),
             )
         }
 
@@ -168,7 +157,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
             prop(BruksenhetResponse::bruksareal).isNotNull().all {
                 prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                    prop(BruksarealResponse::data).isEqualTo(100.0)
+                    prop(BruksarealResponse::data).isEqualTo(125.0)
                     prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
@@ -206,16 +195,13 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.validEgenregistrering().copy(
-                        bygningRegistrering = BygningRegistreringRequest(
-                            bruksarealRegistrering = BruksarealRegistreringRequest(bruksareal = 120.0),
-                            byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008),
-                            vannforsyningRegistrering = null,
-                            avlopRegistrering = null,
-                        ),
                         bruksenhetRegistreringer = listOf(
                             BruksenhetRegistreringRequest(
                                 bruksenhetId = 1L,
                                 bruksarealRegistrering = BruksarealRegistreringRequest(bruksareal = 40.0),
+                                byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008),
+                                vannforsyningRegistrering = null,
+                                avlopRegistrering = null,
                                 energikildeRegistrering = null,
                                 oppvarmingRegistrering = null,
                             ),
@@ -231,24 +217,25 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val bygning = bygningResponse.body<BygningResponse>()
 
             val now = Instant.now()
-            assertThat(bygning).all {
-                prop(BygningResponse::bruksareal).isNotNull().all {
-                    prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                        prop(BruksarealResponse::data).isEqualTo(120.0)
-                        prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+            assertThat(bygning).prop(BygningResponse::bruksenheter).all {
+                withBruksenhetId(1L).all {
+                    prop(BruksenhetResponse::byggeaar).isNotNull().all {
+                        prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
+                            prop(ByggeaarResponse::data).isEqualTo(2008)
+                            prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        }
+                    }
+                    prop(BruksenhetResponse::bruksareal).isNotNull().all {
+                        prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
+                            prop(BruksarealResponse::data).isEqualTo(40.0)
+                            prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        }
                     }
                 }
-
-                prop(BygningResponse::byggeaar).isNotNull().all {
-                    prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
-                        prop(ByggeaarResponse::data).isEqualTo(2008)
-                        prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
-                    }
+                withBruksenhetId(2L).all {
+                    prop(BruksenhetResponse::byggeaar).isNull()
+                    prop(BruksenhetResponse::bruksareal).isNull()
                 }
-                prop(BygningResponse::bruksenheter)
-                    .extracting(BruksenhetResponse::bruksenhetId) { it.bruksareal?.egenregistrert?.data }
-                    .containsExactly(1L to 40.0, 2L to null)
-
             }
         }
 
@@ -274,33 +261,35 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val bygning = bygningResponse.body<BygningResponse>()
 
             assertThat(bygning).all {
-                prop(BygningResponse::bruksareal).isNotNull().all {
-                    prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                        prop(BruksarealResponse::metadata).all {
-                            prop(RegisterMetadataResponse::registrertAv).isEqualTo("31129956715")
+                prop(BygningResponse::bruksareal).isNotNull().prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNull()
+                prop(BygningResponse::bruksenheter).withBruksenhetId(1L)
+                    .prop(BruksenhetResponse::bruksareal).isNotNull().all {
+                        prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
+                            prop(BruksarealResponse::metadata).all {
+                                prop(RegisterMetadataResponse::registrertAv).isEqualTo("31129956715")
+                            }
                         }
                     }
-                }
             }
         }
+
+    private fun Assert<List<BruksenhetResponse>>.withBruksenhetId(bruksenhetId: Long) =
+        transform(appendName("[bruksenhetId=$bruksenhetId]")) { it.find { br -> br.bruksenhetId == bruksenhetId }!! }
 
     private fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
         bygningId = 1L,
         eier = "31129956715",
-        bygningRegistrering = BygningRegistreringRequest(
-            bruksarealRegistrering = BruksarealRegistreringRequest(125.0),
-            byggeaarRegistrering = ByggeaarRegistreringRequest(2010),
-            vannforsyningRegistrering = VannforsyningRegistreringRequest(
-                VannforsyningKode.OffentligVannverk,
-            ),
-            avlopRegistrering = AvlopRegistreringRequest(
-                avlop = AvlopKode.OffentligKloakk,
-            ),
-        ),
         bruksenhetRegistreringer = listOf(
             BruksenhetRegistreringRequest(
                 bruksenhetId = 1L,
-                bruksarealRegistrering = BruksarealRegistreringRequest(bruksareal = 100.0),
+                bruksarealRegistrering = BruksarealRegistreringRequest(125.0),
+                byggeaarRegistrering = ByggeaarRegistreringRequest(2010),
+                vannforsyningRegistrering = VannforsyningRegistreringRequest(
+                    VannforsyningKode.OffentligVannverk,
+                ),
+                avlopRegistrering = AvlopRegistreringRequest(
+                    avlop = AvlopKode.OffentligKloakk,
+                ),
                 energikildeRegistrering = EnergikildeRegistreringRequest(
                     listOf(EnergikildeKode.Elektrisitet),
                 ),

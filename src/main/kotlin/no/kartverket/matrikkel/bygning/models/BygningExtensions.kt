@@ -7,44 +7,7 @@ package no.kartverket.matrikkel.bygning.models
 
 fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): Bygning {
     return egenregistreringer.fold(this) { bygningAggregate, egenregistrering ->
-        val metadata = RegisterMetadata(
-            registreringstidspunkt = egenregistrering.registreringstidspunkt,
-            registrertAv = egenregistrering.eier,
-        )
-
         bygningAggregate.copy(
-            byggeaar = bygningAggregate.byggeaar.aggregate {
-                egenregistrering.bygningRegistrering.byggeaarRegistrering?.let {
-                    Byggeaar(
-                        data = it.byggeaar,
-                        metadata = metadata,
-                    )
-                }
-            },
-            bruksareal = bygningAggregate.bruksareal.aggregate {
-                egenregistrering.bygningRegistrering.bruksarealRegistrering?.let {
-                    Bruksareal(
-                        data = it.bruksareal,
-                        metadata = metadata,
-                    )
-                }
-            },
-            vannforsyning = bygningAggregate.vannforsyning.aggregate {
-                egenregistrering.bygningRegistrering.vannforsyningRegistrering?.let {
-                    Vannforsyning(
-                        data = it.vannforsyning,
-                        metadata = metadata,
-                    )
-                }
-            },
-            avlop = bygningAggregate.avlop.aggregate {
-                egenregistrering.bygningRegistrering.avlopRegistrering?.let {
-                    Avlop(
-                        data = it.avlop,
-                        metadata = metadata,
-                    )
-                }
-            },
             bruksenheter = bygningAggregate.bruksenheter.map {
                 it.applyEgenregistrering(egenregistrering)
             },
@@ -65,10 +28,34 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
     )
 
     return this.copy(
+        byggeaar = this.byggeaar.aggregate {
+            bruksenhetRegistrering.byggeaarRegistrering?.let {
+                Byggeaar(
+                    data = it.byggeaar,
+                    metadata = metadata,
+                )
+            }
+        },
         bruksareal = this.bruksareal.aggregate {
             bruksenhetRegistrering.bruksarealRegistrering?.let {
                 Bruksareal(
                     data = it.bruksareal,
+                    metadata = metadata,
+                )
+            }
+        },
+        vannforsyning = this.vannforsyning.aggregate {
+            bruksenhetRegistrering.vannforsyningRegistrering?.let {
+                Vannforsyning(
+                    data = it.vannforsyning,
+                    metadata = metadata,
+                )
+            }
+        },
+        avlop = this.avlop.aggregate {
+            bruksenhetRegistrering.avlopRegistrering?.let {
+                Avlop(
+                    data = it.avlop,
                     metadata = metadata,
                 )
             }

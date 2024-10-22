@@ -49,22 +49,17 @@ private fun Route.egenregistreringDoc() {
                     "Bygning Id 1" to EgenregistreringRequest(
                         bygningId = 1,
                         eier = "31129956715",
-                        bygningRegistrering = BygningRegistreringRequest(
-                            bruksarealRegistrering = BruksarealRegistreringRequest(
-                                bruksareal = 125.0,
-                            ),
-                            null,
-                            null,
-                            null,
-                        ),
                         bruksenhetRegistreringer = listOf(
                             BruksenhetRegistreringRequest(
                                 bruksenhetId = 1L,
                                 null,
+                                byggeaarRegistrering = null,
                                 energikildeRegistrering = EnergikildeRegistreringRequest(
                                     energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
                                 ),
-                                null,
+                                oppvarmingRegistrering = null,
+                                vannforsyningRegistrering = null,
+                                avlopRegistrering = null,
                             ),
                         ),
                     ),
