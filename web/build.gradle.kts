@@ -6,7 +6,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 
 plugins {
     application
-    kotlin("jvm").version(libs.versions.kotlinVersion)
+    kotlin("jvm")
     kotlin("plugin.serialization").version(libs.versions.kotlinVersion)
     alias(libs.plugins.shadow)
     `jvm-test-suite`
@@ -44,13 +44,11 @@ application {
     mainClass.set("no.kartverket.matrikkel.bygning.ApplicationKt")
 }
 
-tasks {
-    named<ShadowJar>("shadowJar") {
-        mergeServiceFiles()
-        archiveBaseName.set("app")
-        archiveClassifier.set("")
-        archiveVersion.set("")
-    }
+tasks.named<ShadowJar>("shadowJar") {
+    mergeServiceFiles()
+    archiveBaseName.set("app")
+    archiveClassifier.set("")
+    archiveVersion.set("")
 }
 
 tasks.withType<Test> {

@@ -9,8 +9,8 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":application"))
     implementation(project(":matrikkel-api"))
+    api(project(":application"))
 
     implementation(libs.logback.classic)
 
