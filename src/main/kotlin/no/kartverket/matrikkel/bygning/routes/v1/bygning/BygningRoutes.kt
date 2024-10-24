@@ -34,6 +34,23 @@ fun Route.bygningRouting(
             )
         }
 
+        route("egenregistrert") {
+            bygningEgenregistrertDoc()
+            get {
+                val bygningId = call.parameters.getOrFail("bygningId").toLong()
+
+                bygningService.getBygningWithEgenregistrertData(bygningId).fold(
+                    success = { call.respond(HttpStatusCode.OK, it.toBygningEgenregistrertResponse()) },
+                    failure = {
+                        call.respond(
+                            HttpStatusCode.NotFound,
+                            it.detail,
+                        )
+                    },
+                )
+            }
+        }
+
         route("bruksenheter") {
             route("{bruksenhetId}") {
                 bruksenhetDoc()
@@ -51,6 +68,24 @@ fun Route.bygningRouting(
                             )
                         },
                     )
+                }
+
+                route("egenregistrert") {
+                    bruksenhetEgenregistrertDoc()
+                    get {
+                        val bygningId = call.parameters.getOrFail("bygningId").toLong()
+                        val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
+
+                        bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).fold(
+                            success = { call.respond(HttpStatusCode.OK, it.toBruksenhetEgenregistrertResponse()) },
+                            failure = {
+                                call.respond(
+                                    HttpStatusCode.NotFound,
+                                    it.detail,
+                                )
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -85,6 +120,34 @@ private fun Route.bygningDoc() {
     }
 }
 
+private fun Route.bygningEgenregistrertDoc() {
+    install(NotarizedRoute()) {
+        tags = setOf("Bygninger")
+        parameters = listOf(
+            Parameter(
+                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
+        )
+
+        get = GetInfo.builder {
+            summary("Hent en bygning med kun egenregistrert data")
+            description("Henter en bygning med tilhørende bruksenheter, men kun egenregistrert data.")
+
+            response {
+                responseCode(HttpStatusCode.OK)
+                responseType<BygningSimpleResponse>()
+                description("Bygning med tilhørende bruksenheter")
+            }
+
+            canRespond {
+                responseCode(HttpStatusCode.NotFound)
+                responseType<ErrorResponse.NotFoundError>()
+                description("Fant ikke bygning med gitt id")
+            }
+        }
+    }
+}
+
 private fun Route.bruksenhetDoc() {
     install(NotarizedRoute()) {
         tags = setOf("Bygninger")
@@ -104,6 +167,37 @@ private fun Route.bruksenhetDoc() {
             response {
                 responseCode(HttpStatusCode.OK)
                 responseType<BruksenhetResponse>()
+                description("Bruksenhet")
+            }
+
+            canRespond {
+                responseCode(HttpStatusCode.NotFound)
+                responseType<ErrorResponse.NotFoundError>()
+                description("Fant ikke bruksenhet med gitt id")
+            }
+        }
+    }
+}
+
+private fun Route.bruksenhetEgenregistrertDoc() {
+    install(NotarizedRoute()) {
+        tags = setOf("Bygninger")
+        parameters = listOf(
+            Parameter(
+                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
+            Parameter(
+                name = "bruksenhetId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
+        )
+
+        get = GetInfo.builder {
+            summary("Hent egenregistrerte verdier for bruksenhet")
+            description("Henter en bruksenhet, men kun med verdier som er egenregistrert")
+
+            response {
+                responseCode(HttpStatusCode.OK)
+                responseType<BruksenhetSimpleResponse>()
                 description("Bruksenhet")
             }
 
