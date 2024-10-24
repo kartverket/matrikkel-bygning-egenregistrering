@@ -117,7 +117,7 @@ fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
     oppvarming = this.oppvarminger.toMultikildeResponse { map(Oppvarming::toOppvarmingResponse) },
 )
 
-fun Bygning.toBygningEgenregistrertResponse(): BygningSimpleResponse = BygningSimpleResponse(
+fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
     bygningId = this.bygningId,
     bygningsnummer = this.bygningsnummer,
     bruksenheter = this.bruksenheter.map { it.toBruksenhetEgenregistrertResponse() },

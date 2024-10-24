@@ -40,7 +40,7 @@ fun Route.bygningRouting(
                 val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
                 bygningService.getBygningWithEgenregistrertData(bygningId).fold(
-                    success = { call.respond(HttpStatusCode.OK, it.toBygningEgenregistrertResponse()) },
+                    success = { call.respond(HttpStatusCode.OK, it.toBygningSimpleResponseFromEgenregistrertData()) },
                     failure = {
                         call.respond(
                             HttpStatusCode.NotFound,
