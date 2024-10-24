@@ -4,7 +4,6 @@ import assertk.Assert
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.index
-import assertk.assertions.isBetween
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
@@ -30,14 +29,12 @@ import no.kartverket.matrikkel.bygning.routes.v1.bygning.MultikildeResponse
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.OppvarmingResponse
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.RegisterMetadataResponse
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.VannforsyningKodeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.AvlopRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EnergikildeRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.OppvarmingRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.VannforsyningRegistreringRequest
+import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
+import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -275,34 +272,4 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
     private fun Assert<List<BruksenhetResponse>>.withBruksenhetId(bruksenhetId: Long) =
         transform(appendName("[bruksenhetId=$bruksenhetId]")) { it.find { br -> br.bruksenhetId == bruksenhetId }!! }
-
-    private fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
-        bygningId = 1L,
-        eier = "31129956715",
-        bruksenhetRegistreringer = listOf(
-            BruksenhetRegistreringRequest(
-                bruksenhetId = 1L,
-                bruksarealRegistrering = BruksarealRegistreringRequest(125.0),
-                byggeaarRegistrering = ByggeaarRegistreringRequest(2010),
-                vannforsyningRegistrering = VannforsyningRegistreringRequest(
-                    VannforsyningKode.OffentligVannverk,
-                ),
-                avlopRegistrering = AvlopRegistreringRequest(
-                    avlop = AvlopKode.OffentligKloakk,
-                ),
-                energikildeRegistrering = EnergikildeRegistreringRequest(
-                    listOf(EnergikildeKode.Elektrisitet),
-                ),
-                oppvarmingRegistrering = OppvarmingRegistreringRequest(
-                    listOf(OppvarmingKode.Elektrisk),
-                ),
-            ),
-        ),
-    )
-
-    private fun Assert<RegisterMetadataResponse>.hasRegistreringstidspunktWithinThreshold(now: Instant): () -> Unit {
-        return {
-            prop(RegisterMetadataResponse::registreringstidspunkt).isBetween(now, now.plusSeconds(1))
-        }
-    }
 }
