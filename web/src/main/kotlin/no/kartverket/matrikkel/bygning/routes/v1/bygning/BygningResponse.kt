@@ -120,7 +120,7 @@ fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
 fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
     bygningId = this.bygningId,
     bygningsnummer = this.bygningsnummer,
-    bruksenheter = this.bruksenheter.map { it.toBruksenhetEgenregistrertResponse() },
+    bruksenheter = this.bruksenheter.map { it.toBruksenhetSimpleResponseFromEgenregistrertData() },
 )
 
 fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
@@ -133,7 +133,7 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
     avlop = this.avlop.toMultikildeResponse(Avlop::toAvlopKodeResponse),
 )
 
-fun Bruksenhet.toBruksenhetEgenregistrertResponse(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
+fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
     bruksenhetId = this.bruksenhetId,
     byggeaar = this.byggeaar.egenregistrert?.toByggeaarResponse(),
     bruksareal = this.bruksareal.egenregistrert?.toBruksarealResponse(),

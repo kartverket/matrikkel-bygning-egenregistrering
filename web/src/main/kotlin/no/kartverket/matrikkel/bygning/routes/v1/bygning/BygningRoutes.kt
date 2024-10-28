@@ -76,7 +76,7 @@ fun Route.bygningRouting(
                         val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
                         bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).fold(
-                            success = { call.respond(HttpStatusCode.OK, it.toBruksenhetEgenregistrertResponse()) },
+                            success = { call.respond(HttpStatusCode.OK, it.toBruksenhetSimpleResponseFromEgenregistrertData()) },
                             failure = {
                                 call.respond(
                                     HttpStatusCode.NotFound,
@@ -130,7 +130,7 @@ private fun Route.bygningEgenregistrertDoc() {
 
         get = GetInfo.builder {
             summary("Hent en bygning med kun egenregistrert data")
-            description("Henter en bygning med tilhørende bruksenheter, men kun egenregistrert data.")
+            description("Henter en bygning med tilhørende bruksenheter, men kun egenregistrert data")
 
             response {
                 responseCode(HttpStatusCode.OK)
@@ -191,8 +191,8 @@ private fun Route.bruksenhetEgenregistrertDoc() {
         )
 
         get = GetInfo.builder {
-            summary("Hent egenregistrerte verdier for bruksenhet")
-            description("Henter en bruksenhet, men kun med verdier som er egenregistrert")
+            summary("Hent en bruksenhet med kun egenregistrert data")
+            description("Henter en bruksenhet, men kun egenregistrert data")
 
             response {
                 responseCode(HttpStatusCode.OK)
