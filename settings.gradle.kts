@@ -10,3 +10,6 @@ dependencyResolutionManagement {
 }
 
 include(":matrikkel-api")
+include(":application")
+include(":infrastructure")
+include(":web")
