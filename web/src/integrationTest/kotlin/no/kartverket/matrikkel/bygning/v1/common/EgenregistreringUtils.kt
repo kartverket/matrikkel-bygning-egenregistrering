@@ -3,10 +3,10 @@ package no.kartverket.matrikkel.bygning.v1.common
 import assertk.Assert
 import assertk.assertions.isBetween
 import assertk.assertions.prop
-import no.kartverket.matrikkel.bygning.models.kodelister.AvlopKode
-import no.kartverket.matrikkel.bygning.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.models.kodelister.OppvarmingKode
-import no.kartverket.matrikkel.bygning.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.RegisterMetadataResponse
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.AvlopRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksarealRegistreringRequest
