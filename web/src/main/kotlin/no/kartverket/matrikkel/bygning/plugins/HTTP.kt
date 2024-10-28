@@ -1,6 +1,5 @@
 package no.kartverket.matrikkel.bygning.plugins
 
-import io.bkbn.kompendium.oas.serialization.KompendiumSerializersModule
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -18,7 +17,6 @@ fun Application.configureHTTP() {
     install(ContentNegotiation) {
         json(
             Json {
-                serializersModule = KompendiumSerializersModule.module
                 encodeDefaults = true
                 explicitNulls = false
             },

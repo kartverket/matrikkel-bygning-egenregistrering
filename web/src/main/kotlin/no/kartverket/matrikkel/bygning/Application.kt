@@ -1,24 +1,25 @@
 package no.kartverket.matrikkel.bygning
 
-import io.bkbn.kompendium.core.routes.swagger
+import io.github.smiley4.ktorswaggerui.routing.openApiSpec
+import io.github.smiley4.ktorswaggerui.routing.swaggerUI
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import no.kartverket.matrikkel.bygning.config.loadConfiguration
-import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
-import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
-import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
-import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
-import no.kartverket.matrikkel.bygning.plugins.configureHTTP
-import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
-import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HealthRepositoryImpl
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
+import no.kartverket.matrikkel.bygning.config.loadConfiguration
+import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
+import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
+import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
+import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HealthRepositoryImpl
+import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
+import no.kartverket.matrikkel.bygning.plugins.configureHTTP
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
@@ -79,7 +80,12 @@ fun Application.mainModule() {
     val bygningService = BygningService(bygningClient, egenregistreringService)
 
     routing {
-        swagger()
+        route("api.json") {
+            openApiSpec()
+        }
+        route("swagger-ui") {
+            swaggerUI("/api.json")
+        }
 
         route("v1") {
             route("kodelister") {
