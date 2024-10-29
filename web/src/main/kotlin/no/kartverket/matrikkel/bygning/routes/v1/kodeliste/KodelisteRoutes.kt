@@ -45,17 +45,17 @@ private inline fun <reified T> Route.kodelisteRoute(
 ): Route where T : Enum<T>, T : IKode {
     return route(name) {
         get(
-                {
-                    summary = "Henter kodeliste relatert til $name"
-                    description = "Henter kodeliste relatert til $name, med tilhørende kode, kodenavn, presentasjonsnavn og beskrivelse"
-                    response {
-                        code(HttpStatusCode.OK) {
-                            body<List<Kode>>() {
-                                description = "Kodeliste for $name"
-                            }
+            {
+                summary = "Henter kodeliste relatert til $name"
+                description = "Henter kodeliste relatert til $name, med tilhørende kode, kodenavn, presentasjonsnavn og beskrivelse"
+                response {
+                    code(HttpStatusCode.OK) {
+                        body<List<Kode>>() {
+                            description = "Kodeliste for $name"
                         }
                     }
-                },
+                }
+            },
         ) {
             call.respond(kodeClass.toKodeList())
         }
