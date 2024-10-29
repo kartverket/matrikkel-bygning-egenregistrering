@@ -86,7 +86,7 @@ testing {
                 implementation(libs.ktor.serialization.kotlinx)
 
                 implementation(libs.kotlin.test)
-                implementation(libs.ktor.server.tests)
+                implementation(libs.ktor.server.test.host)
                 implementation(libs.ktor.client.content.negotation)
 
                 implementation(libs.assertk)

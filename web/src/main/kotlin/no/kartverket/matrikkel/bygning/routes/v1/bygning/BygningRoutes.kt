@@ -17,7 +17,7 @@ fun Route.bygningRouting(
             {
                 summary = "Henter en bygning"
                 description =
-                    "Henter en bygning med en gitt bygningId"
+                    "Henter en bygning med tilhørende bruksenheter"
                 request {
                     queryParameter<String>("bygningId") {
                         required = true
@@ -26,12 +26,12 @@ fun Route.bygningRouting(
                 response {
                     code(HttpStatusCode.OK) {
                         body<BygningResponse> {
-                            description = "Bygningen"
+                            description = "Bygningen med tilhørende bruksenheter"
                         }
                         description = "Bygningen finnes og ble hentet"
                     }
                     code(HttpStatusCode.NotFound) {
-                        description = "Bygningen finnes ikke"
+                        description = "Fant ikke bygning med gitt bygningId"
                     }
                 }
             },
@@ -49,13 +49,50 @@ fun Route.bygningRouting(
             )
         }
 
+        route("egenregistrert") {
+            get(
+                {
+                    summary = "Hent egenregistrert data for en bygning"
+                    description =
+                        "Hent egenregistrert data for en bygning med tilhørende bruksenheter"
+                    request {
+                        queryParameter<String>("bygningId") {
+                            required = true
+                        }
+                    }
+                    response {
+                        code(HttpStatusCode.OK) {
+                            body<BygningSimpleResponse> {
+                                description = "Bygning med én datakilde - kun egenregistrerte data"
+                            }
+                            description = "Bygningen finnes og ble hentet"
+                        }
+                        code(HttpStatusCode.NotFound) {
+                            description = "Fant ikke bygning med gitt bygningId"
+                        }
+                    }
+                },
+            ) {
+                val bygningId = call.parameters.getOrFail("bygningId").toLong()
+
+                bygningService.getBygningWithEgenregistrertData(bygningId).fold(
+                    success = { call.respond(HttpStatusCode.OK, it.toBygningSimpleResponseFromEgenregistrertData()) },
+                    failure = {
+                        call.respond(
+                            HttpStatusCode.NotFound,
+                            it.detail,
+                        )
+                    },
+                )
+            }
+        }
+
         route("bruksenheter") {
             route("{bruksenhetId}") {
                 get(
                     {
-                        summary = "Henter en bruksenhet"
-                        description =
-                            "Henter en bruksenhet med en gitt bruksenhetId for en gitt bygning. Dersom bruksenheten ikke finnes på bygningen vil den ikke hentes"
+                        summary = "Hent en bruksenhet"
+                        description = "Hent en bruksenhet"
                         request {
                             queryParameter<String>("bygningId") {
                                 required = true
@@ -67,12 +104,12 @@ fun Route.bygningRouting(
                         response {
                             code(HttpStatusCode.OK) {
                                 body<BruksenhetResponse> {
-                                    description = "Bruksenheten"
+                                    description = "Bruksenhet"
                                 }
                                 description = "Bruksenheten finnes og ble hentet"
                             }
                             code(HttpStatusCode.NotFound) {
-                                description = "Bruksenheten finnes ikke"
+                                description = "Fant ikke bruksenhet med gitt bruksenhetId for gitt bygningId"
                             }
                         }
                     },
@@ -89,6 +126,47 @@ fun Route.bygningRouting(
                             )
                         },
                     )
+                }
+
+                route("egenregistrert") {
+                    get(
+                        {
+                            summary = "Hent egenregistrert data for en bruksenhet"
+                            description = "Hent egenregistrert data en bruksenhet"
+                            request {
+                                queryParameter<String>("bygningId") {
+                                    required = true
+                                }
+                                queryParameter<String>("bruksenhetId") {
+                                    required = true
+                                }
+                            }
+                            response {
+                                code(HttpStatusCode.OK) {
+                                    body<BruksenhetSimpleResponse> {
+                                        description = "Bruksenhet med én datakilde - kun egenregistrerte data"
+                                    }
+                                    description = "Bruksenheten finnes og ble hentet"
+                                }
+                                code(HttpStatusCode.NotFound) {
+                                    description = "Fant ikke bruksenhet med gitt bruksenhetId for gitt bygningId"
+                                }
+                            }
+                        },
+                    ) {
+                        val bygningId = call.parameters.getOrFail("bygningId").toLong()
+                        val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
+
+                        bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).fold(
+                            success = { call.respond(HttpStatusCode.OK, it.toBruksenhetSimpleResponseFromEgenregistrertData()) },
+                            failure = {
+                                call.respond(
+                                    HttpStatusCode.NotFound,
+                                    it.detail,
+                                )
+                            },
+                        )
+                    }
                 }
             }
         }

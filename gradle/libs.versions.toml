@@ -1,7 +1,7 @@
 [versions]
 ktorVersion = "3.0.0"
 kotlinVersion = "2.0.0"
-logbackVersion = "1.5.11"
+logbackVersion = "1.5.12"
 logstashVersion = "8.0"
 prometheusVersion = "1.13.6"
 flywayVersion = "10.20.1"
@@ -19,7 +19,7 @@ kotlinResultVersion = "2.0.0"
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
 ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktorVersion" }
 ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktorVersion" }
-ktor-server-tests = { group = "io.ktor", name = "ktor-server-tests-jvm", version.ref = "ktorVersion" }
+ktor-server-test-host = { group = "io.ktor", name = "ktor-server-test-host", version.ref = "ktorVersion" }
 ktor-server-call-logging = { group = "io.ktor", name = "ktor-server-call-logging", version.ref = "ktorVersion" }
 ktor-server-call-id = { group = "io.ktor", name = "ktor-server-call-id", version.ref = "ktorVersion" }
 ktor-server-metrics-micrometer = { group = "io.ktor", name = "ktor-server-metrics-micrometer", version.ref = "ktorVersion" }
