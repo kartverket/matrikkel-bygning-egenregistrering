@@ -113,7 +113,7 @@ private fun Route.bygningDoc() {
             canRespond {
                 responseCode(HttpStatusCode.NotFound)
                 responseType<ErrorResponse.NotFoundError>()
-                description("Fant ikke bygning med gitt id")
+                description("Fant ikke bygning med gitt bygningId")
             }
         }
     }
@@ -129,19 +129,19 @@ private fun Route.bygningEgenregistrertDoc() {
         )
 
         get = GetInfo.builder {
-            summary("Hent en bygning med kun egenregistrert data")
-            description("Henter en bygning med tilhørende bruksenheter, men kun egenregistrert data")
+            summary("Hent egenregistrert data for en bygning")
+            description("Hent egenregistrert data for en bygning med tilhørende bruksenheter")
 
             response {
                 responseCode(HttpStatusCode.OK)
                 responseType<BygningSimpleResponse>()
-                description("Bygning med tilhørende bruksenheter")
+                description("Bygning med én datakilde - kun egenregistrerte data")
             }
 
             canRespond {
                 responseCode(HttpStatusCode.NotFound)
                 responseType<ErrorResponse.NotFoundError>()
-                description("Fant ikke bygning med gitt id")
+                description("Fant ikke bygning med gitt bygningId")
             }
         }
     }
@@ -161,7 +161,7 @@ private fun Route.bruksenhetDoc() {
 
         get = GetInfo.builder {
             summary("Hent en bruksenhet")
-            description("Henter en bruksenhet")
+            description("Hent en bruksenhet")
 
             response {
                 responseCode(HttpStatusCode.OK)
@@ -172,7 +172,7 @@ private fun Route.bruksenhetDoc() {
             canRespond {
                 responseCode(HttpStatusCode.NotFound)
                 responseType<ErrorResponse.NotFoundError>()
-                description("Fant ikke bruksenhet med gitt id")
+                description("Fant ikke bruksenhet med gitt bruksenhetId for gitt bygningId")
             }
         }
     }
@@ -191,19 +191,19 @@ private fun Route.bruksenhetEgenregistrertDoc() {
         )
 
         get = GetInfo.builder {
-            summary("Hent en bruksenhet med kun egenregistrert data")
-            description("Henter en bruksenhet, men kun egenregistrert data")
+            summary("Hent egenregistrert data for en bruksenhet")
+            description("Hent egenregistrerte data for en bruksenhet")
 
             response {
                 responseCode(HttpStatusCode.OK)
                 responseType<BruksenhetSimpleResponse>()
-                description("Bruksenhet")
+                description("Bruksenhet med én datakilde - kun egenregistrerte data")
             }
 
             canRespond {
                 responseCode(HttpStatusCode.NotFound)
                 responseType<ErrorResponse.NotFoundError>()
-                description("Fant ikke bruksenhet med gitt id")
+                description("Fant ikke bruksenhet med gitt bruksenhetId for gitt bygningId")
             }
         }
     }
