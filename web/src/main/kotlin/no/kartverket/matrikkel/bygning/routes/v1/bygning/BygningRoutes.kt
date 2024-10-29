@@ -33,6 +33,23 @@ fun Route.bygningRouting(
             )
         }
 
+        route("egenregistrert") {
+            bygningEgenregistrertDoc()
+            get {
+                val bygningId = call.parameters.getOrFail("bygningId").toLong()
+
+                bygningService.getBygningWithEgenregistrertData(bygningId).fold(
+                    success = { call.respond(HttpStatusCode.OK, it.toBygningSimpleResponseFromEgenregistrertData()) },
+                    failure = {
+                        call.respond(
+                            HttpStatusCode.NotFound,
+                            it.detail,
+                        )
+                    },
+                )
+            }
+        }
+
         route("bruksenheter") {
             route("{bruksenhetId}") {
                 bruksenhetDoc()
@@ -50,6 +67,24 @@ fun Route.bygningRouting(
                             )
                         },
                     )
+                }
+
+                route("egenregistrert") {
+                    bruksenhetEgenregistrertDoc()
+                    get {
+                        val bygningId = call.parameters.getOrFail("bygningId").toLong()
+                        val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
+
+                        bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).fold(
+                            success = { call.respond(HttpStatusCode.OK, it.toBruksenhetSimpleResponseFromEgenregistrertData()) },
+                            failure = {
+                                call.respond(
+                                    HttpStatusCode.NotFound,
+                                    it.detail,
+                                )
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -78,7 +113,35 @@ private fun Route.bygningDoc() {
             canRespond {
                 responseCode(HttpStatusCode.NotFound)
                 responseType<ErrorResponse.NotFoundError>()
-                description("Fant ikke bygning med gitt id")
+                description("Fant ikke bygning med gitt bygningId")
+            }
+        }
+    }
+}
+
+private fun Route.bygningEgenregistrertDoc() {
+    install(NotarizedRoute()) {
+        tags = setOf("Bygninger")
+        parameters = listOf(
+            Parameter(
+                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
+        )
+
+        get = GetInfo.builder {
+            summary("Hent egenregistrert data for en bygning")
+            description("Hent egenregistrert data for en bygning med tilhørende bruksenheter")
+
+            response {
+                responseCode(HttpStatusCode.OK)
+                responseType<BygningSimpleResponse>()
+                description("Bygning med én datakilde - kun egenregistrerte data")
+            }
+
+            canRespond {
+                responseCode(HttpStatusCode.NotFound)
+                responseType<ErrorResponse.NotFoundError>()
+                description("Fant ikke bygning med gitt bygningId")
             }
         }
     }
@@ -98,7 +161,7 @@ private fun Route.bruksenhetDoc() {
 
         get = GetInfo.builder {
             summary("Hent en bruksenhet")
-            description("Henter en bruksenhet")
+            description("Hent en bruksenhet")
 
             response {
                 responseCode(HttpStatusCode.OK)
@@ -109,7 +172,38 @@ private fun Route.bruksenhetDoc() {
             canRespond {
                 responseCode(HttpStatusCode.NotFound)
                 responseType<ErrorResponse.NotFoundError>()
-                description("Fant ikke bruksenhet med gitt id")
+                description("Fant ikke bruksenhet med gitt bruksenhetId for gitt bygningId")
+            }
+        }
+    }
+}
+
+private fun Route.bruksenhetEgenregistrertDoc() {
+    install(NotarizedRoute()) {
+        tags = setOf("Bygninger")
+        parameters = listOf(
+            Parameter(
+                name = "bygningId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
+            Parameter(
+                name = "bruksenhetId", `in` = Parameter.Location.path, schema = TypeDefinition.STRING,
+            ),
+        )
+
+        get = GetInfo.builder {
+            summary("Hent egenregistrert data for en bruksenhet")
+            description("Hent egenregistrerte data for en bruksenhet")
+
+            response {
+                responseCode(HttpStatusCode.OK)
+                responseType<BruksenhetSimpleResponse>()
+                description("Bruksenhet med én datakilde - kun egenregistrerte data")
+            }
+
+            canRespond {
+                responseCode(HttpStatusCode.NotFound)
+                responseType<ErrorResponse.NotFoundError>()
+                description("Fant ikke bruksenhet med gitt bruksenhetId for gitt bygningId")
             }
         }
     }

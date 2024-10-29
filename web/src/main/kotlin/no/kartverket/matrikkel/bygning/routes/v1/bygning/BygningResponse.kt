@@ -38,6 +38,13 @@ data class BygningResponse(
 )
 
 @Serializable
+data class BygningSimpleResponse(
+    val bygningId: Long,
+    val bygningsnummer: Long,
+    val bruksenheter: List<BruksenhetSimpleResponse>,
+)
+
+@Serializable
 data class BruksenhetResponse(
     val bruksenhetId: Long,
     val byggeaar: MultikildeResponse<ByggeaarResponse>?,
@@ -46,6 +53,17 @@ data class BruksenhetResponse(
     val avlop: MultikildeResponse<AvlopKodeResponse>?,
     val energikilder: MultikildeResponse<List<EnergikildeResponse>>?,
     val oppvarminger: MultikildeResponse<List<OppvarmingResponse>>?,
+)
+
+@Serializable
+data class BruksenhetSimpleResponse(
+    val bruksenhetId: Long,
+    val byggeaar: ByggeaarResponse?,
+    val bruksareal: BruksarealResponse?,
+    val vannforsyning: VannforsyningKodeResponse?,
+    val avlop: AvlopKodeResponse?,
+    val energikilder: List<EnergikildeResponse>?,
+    val oppvarminger: List<OppvarmingResponse>?,
 )
 
 @Serializable
@@ -99,6 +117,12 @@ fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
     oppvarming = this.oppvarminger.toMultikildeResponse { map(Oppvarming::toOppvarmingResponse) },
 )
 
+fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
+    bygningId = this.bygningId,
+    bygningsnummer = this.bygningsnummer,
+    bruksenheter = this.bruksenheter.map { it.toBruksenhetSimpleResponseFromEgenregistrertData() },
+)
+
 fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
     bruksenhetId = this.bruksenhetId,
     byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
@@ -108,6 +132,17 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
     vannforsyning = this.vannforsyning.toMultikildeResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeResponse(Avlop::toAvlopKodeResponse),
 )
+
+fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
+    bruksenhetId = this.bruksenhetId,
+    byggeaar = this.byggeaar.egenregistrert?.toByggeaarResponse(),
+    bruksareal = this.bruksareal.egenregistrert?.toBruksarealResponse(),
+    vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
+    avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
+    energikilder = this.energikilder.egenregistrert?.map { it.toEnergikildeResponse() },
+    oppvarminger = this.oppvarminger.egenregistrert?.map { it.toOppvarmingResponse() },
+)
+
 
 private fun Byggeaar.toByggeaarResponse(): ByggeaarResponse = ByggeaarResponse(
     data = this.data,
