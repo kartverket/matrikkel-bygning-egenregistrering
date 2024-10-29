@@ -27,7 +27,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                             bruksenhetRegistreringer = listOf(
                                 BruksenhetRegistreringRequest(
                                     bruksenhetId = 1L,
-                                    null,
+                                    bruksarealRegistrering = null,
                                     byggeaarRegistrering = null,
                                     energikildeRegistrering = EnergikildeRegistreringRequest(
                                         energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
