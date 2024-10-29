@@ -19,7 +19,7 @@ fun Route.bygningRouting(
                 description =
                     "Henter en bygning med tilhørende bruksenheter"
                 request {
-                    queryParameter<String>("bygningId") {
+                    pathParameter<String>("bygningId") {
                         required = true
                     }
                 }
@@ -56,7 +56,7 @@ fun Route.bygningRouting(
                     description =
                         "Hent egenregistrert data for en bygning med tilhørende bruksenheter"
                     request {
-                        queryParameter<String>("bygningId") {
+                        pathParameter<String>("bygningId") {
                             required = true
                         }
                     }
@@ -94,10 +94,10 @@ fun Route.bygningRouting(
                         summary = "Hent en bruksenhet"
                         description = "Hent en bruksenhet"
                         request {
-                            queryParameter<String>("bygningId") {
+                            pathParameter<String>("bygningId") {
                                 required = true
                             }
-                            queryParameter<String>("bruksenhetId") {
+                            pathParameter<String>("bruksenhetId") {
                                 required = true
                             }
                         }
@@ -134,10 +134,10 @@ fun Route.bygningRouting(
                             summary = "Hent egenregistrert data for en bruksenhet"
                             description = "Hent egenregistrert data en bruksenhet"
                             request {
-                                queryParameter<String>("bygningId") {
+                                pathParameter<String>("bygningId") {
                                     required = true
                                 }
-                                queryParameter<String>("bruksenhetId") {
+                                pathParameter<String>("bruksenhetId") {
                                     required = true
                                 }
                             }
