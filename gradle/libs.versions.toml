@@ -14,6 +14,7 @@ mockkVersion = "1.13.13"
 assertkVersion = "0.28.1"
 norwegianCommonsVersion = "0.16.0"
 kotlinResultVersion = "2.0.0"
+ktorSwaggerUIVersion = "4.0.0"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -49,6 +50,8 @@ assertk = { group = "com.willowtreeapps.assertk", name = "assertk", version.ref 
 norwegian-commons = { group = "no.bekk.bekkopen", name = "nocommons", version.ref = "norwegianCommonsVersion" }
 
 kotlin-result = { group = "com.michael-bull.kotlin-result", name = "kotlin-result", version.ref = "kotlinResultVersion" }
+
+ktor-swagger-ui = {group = "io.github.smiley4", name = "ktor-swagger-ui", version.ref = "ktorSwaggerUIVersion"}
 
 [plugins]
 kotlin-jvm = { id = "jvm", version.ref = "kotlinVersion" }

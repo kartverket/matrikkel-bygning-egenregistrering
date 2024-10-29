@@ -36,8 +36,8 @@ dependencies {
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx)
 
-    // OpenAPI
-    implementation ("io.github.smiley4:ktor-swagger-ui:4.0.0")
+    // OpenAPI / Swagger
+    implementation (libs.ktor.swagger.ui)
 }
 
 application {
