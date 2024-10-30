@@ -9,8 +9,8 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.routes.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.common.toErrorDetailResponse
 
@@ -53,7 +53,7 @@ private fun Route.egenregistreringDoc() {
                         bruksenhetRegistreringer = listOf(
                             BruksenhetRegistreringRequest(
                                 bruksenhetId = 1L,
-                                null,
+                                bruksarealRegistrering = null,
                                 byggeaarRegistrering = null,
                                 energikildeRegistrering = EnergikildeRegistreringRequest(
                                     energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
