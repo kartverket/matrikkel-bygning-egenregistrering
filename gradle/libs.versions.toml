@@ -1,5 +1,5 @@
 [versions]
-ktorVersion = "2.3.12"
+ktorVersion = "3.0.0"
 kotlinVersion = "2.0.0"
 logbackVersion = "1.5.12"
 logstashVersion = "8.0"
@@ -7,7 +7,6 @@ prometheusVersion = "1.13.6"
 flywayVersion = "10.20.1"
 postgresVersion = "42.7.4"
 shadowVersion = "8.1.1"
-kompendiumVersion = "3.14.4"
 jaxwsVersion = "4.0.3"
 hikariVersion = "6.0.0"
 testcontainersVersion = "1.20.3"
@@ -15,12 +14,13 @@ mockkVersion = "1.13.13"
 assertkVersion = "0.28.1"
 norwegianCommonsVersion = "0.16.0"
 kotlinResultVersion = "2.0.0"
+ktorSwaggerUIVersion = "4.0.0"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
 ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktorVersion" }
 ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktorVersion" }
-ktor-server-tests = { group = "io.ktor", name = "ktor-server-tests-jvm", version.ref = "ktorVersion" }
+ktor-server-test-host = { group = "io.ktor", name = "ktor-server-test-host", version.ref = "ktorVersion" }
 ktor-server-call-logging = { group = "io.ktor", name = "ktor-server-call-logging", version.ref = "ktorVersion" }
 ktor-server-call-id = { group = "io.ktor", name = "ktor-server-call-id", version.ref = "ktorVersion" }
 ktor-server-metrics-micrometer = { group = "io.ktor", name = "ktor-server-metrics-micrometer", version.ref = "ktorVersion" }
@@ -39,8 +39,6 @@ logstash-encoder = { group = "net.logstash.logback", name = "logstash-logback-en
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
 postgres = { group = "org.postgresql", name = "postgresql", version.ref = "postgresVersion" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlinVersion" }
-kompendium-core = { group = "io.bkbn", name = "kompendium-core", version.ref = "kompendiumVersion" }
-
 jaxws-rt = { group = "com.sun.xml.ws", name = "jaxws-rt", version.ref = "jaxwsVersion" }
 jaxws-tools = { group = "com.sun.xml.ws", name = "jaxws-tools", version.ref = "jaxwsVersion" }
 
@@ -52,6 +50,8 @@ assertk = { group = "com.willowtreeapps.assertk", name = "assertk", version.ref 
 norwegian-commons = { group = "no.bekk.bekkopen", name = "nocommons", version.ref = "norwegianCommonsVersion" }
 
 kotlin-result = { group = "com.michael-bull.kotlin-result", name = "kotlin-result", version.ref = "kotlinResultVersion" }
+
+ktor-swagger-ui = {group = "io.github.smiley4", name = "ktor-swagger-ui", version.ref = "ktorSwaggerUIVersion"}
 
 [plugins]
 kotlin-jvm = { id = "jvm", version.ref = "kotlinVersion" }

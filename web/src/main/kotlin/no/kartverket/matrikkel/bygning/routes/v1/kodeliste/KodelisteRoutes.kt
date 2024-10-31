@@ -1,10 +1,7 @@
 package no.kartverket.matrikkel.bygning.routes.v1.kodeliste
 
-import io.bkbn.kompendium.core.metadata.GetInfo
-import io.bkbn.kompendium.core.plugin.NotarizedRoute
-import io.bkbn.kompendium.core.plugin.NotarizedRoute.invoke
-import io.ktor.http.*
-import io.ktor.server.application.*
+import io.github.smiley4.ktorswaggerui.dsl.routing.get
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
@@ -15,8 +12,18 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Vannforsyni
 import kotlin.reflect.KClass
 
 fun Route.kodelisteRouting() {
-    kodelisterDoc()
-    get {
+    get(
+        {
+            summary = "Henter alle kodelister relatert til egenregistreringer"
+            description =
+                "Henter alle kodelister relatert til egenregistreringer, med tilhørende kode, kodenavn, presentasjonsnavn og beskrivelse"
+            response {
+                code(HttpStatusCode.OK) {
+                    body<KodelisterResponse>()
+                }
+            }
+        },
+    ) {
         call.respond(
             KodelisterResponse(
                 energikildeKoder = EnergikildeKode::class.toKodeList(),
@@ -37,41 +44,20 @@ private inline fun <reified T> Route.kodelisteRoute(
     name: String, kodeClass: KClass<T>
 ): Route where T : Enum<T>, T : IKode {
     return route(name) {
-        kodelisteDoc(name)
-        get {
+        get(
+            {
+                summary = "Henter kodeliste relatert til $name"
+                description = "Henter kodeliste relatert til $name, med tilhørende kode, kodenavn, presentasjonsnavn og beskrivelse"
+                response {
+                    code(HttpStatusCode.OK) {
+                        body<List<Kode>>() {
+                            description = "Kodeliste for $name"
+                        }
+                    }
+                }
+            },
+        ) {
             call.respond(kodeClass.toKodeList())
-        }
-    }
-}
-
-private fun Route.kodelisterDoc() {
-    install(NotarizedRoute()) {
-        tags = setOf("Kodelister")
-        get = GetInfo.builder {
-            summary("Henter alle kodelister relatert til egenregistreringer")
-            description("Henter alle kodelister relatert til egenregistreringer, med tilhørende kode, kodenavn, presentasjonsnavn og beskrivelse")
-
-            response {
-                responseCode(HttpStatusCode.OK)
-                responseType<KodelisterResponse>()
-                description("Kodelister")
-            }
-        }
-    }
-}
-
-private fun Route.kodelisteDoc(name: String) {
-    install(NotarizedRoute()) {
-        tags = setOf("Kodelister")
-        get = GetInfo.builder {
-            summary("Henter kodeliste relatert til $name")
-            description("Henter kodeliste relatert til $name, med tilhørende kode, kodenavn, presentasjonsnavn og beskrivelse")
-
-            response {
-                responseCode(HttpStatusCode.OK)
-                responseType<List<Kode>>()
-                description("Kodeliste for $name")
-            }
         }
     }
 }
