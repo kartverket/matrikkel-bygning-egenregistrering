@@ -10,13 +10,12 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as Mat
 // TODO: Hvordan dokumentere hvor denne datoen kommer fra?
 private val EARLIEST_DATE_FOR_DERIVING_BYGGEAAR = LocalDate.of(2009, 4, 25)
 
-// TODO: Det vil være mulig å få byggeår hvor bygningsstatus er veldig langt tilbakedatert, og vi kan nok anta at disse er feil.
-// Må gå opp hva "smerteterskelen" for hva som regnes som en ikke-godkjent bygningsstatusdato er
 internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Int? {
     return bygning.bygningsstatusHistorikker.item
         .filter { isAfterThresholdDate(it) }
         .filter { isCorrectBygningsstatusKode(it.bygningsstatusKodeId) }
         .filter { isNotDeleted(it) }
+        .filter { isDatesNotDubious(it) }
         .minByOrNull { it.dato.toLocalDate() }
         ?.dato
         ?.toLocalDate()
@@ -30,3 +29,19 @@ private fun isCorrectBygningsstatusKode(bygningsstatusKodeId: BygningsstatusKode
     bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.FerdigAttest().value || bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse().value
 
 private fun isNotDeleted(bygningsstatus: BygningsstatusHistorikk): Boolean = bygningsstatus.slettetDato == null
+
+private fun isDatesNotDubious(bygningsstatus: BygningsstatusHistorikk): Boolean {
+    val today = LocalDate.now()
+    val inOneHundredYears = today.plusYears(100)
+    val tooOldDate = today.withYear(1000)
+
+    // Vet ikke hvor bra sammenlikning med matrikkelens LocalDate fungerer, så bare oversetter disse til Kotlins for å være safe
+    val isVedtaksdatoAfterRegistrertDato = bygningsstatus.dato.toLocalDate() > bygningsstatus.registrertDato.toLocalDate()
+
+    val isDatesTooFarIntoFuture =
+        bygningsstatus.dato.toLocalDate() > inOneHundredYears || bygningsstatus.registrertDato.toLocalDate() > inOneHundredYears
+
+    val isVedtaksDatoTooOld = bygningsstatus.dato.toLocalDate() < tooOldDate
+
+    return !(isVedtaksdatoAfterRegistrertDato || isDatesTooFarIntoFuture || isVedtaksDatoTooOld)
+}
