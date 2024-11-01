@@ -7,7 +7,6 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.Bygnings
 import java.time.LocalDate
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as MatrikkelBygning
 
-// TODO: Hvordan dokumentere hvor denne datoen kommer fra?
 private val EARLIEST_DATE_FOR_DERIVING_BYGGEAAR = LocalDate.of(2009, 4, 25)
 
 internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Int? {
@@ -15,7 +14,7 @@ internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Int? {
         .filter { isAfterThresholdDate(it) }
         .filter { isCorrectBygningsstatusKode(it.bygningsstatusKodeId) }
         .filter { isNotDeleted(it) }
-        .filter { isDatesNotDubious(it) }
+        .filter { isRegistrertDatoAfterVedtaksdato(it) }
         .minByOrNull { it.dato.toLocalDate() }
         ?.dato
         ?.toLocalDate()
@@ -30,18 +29,4 @@ private fun isCorrectBygningsstatusKode(bygningsstatusKodeId: BygningsstatusKode
 
 private fun isNotDeleted(bygningsstatus: BygningsstatusHistorikk): Boolean = bygningsstatus.slettetDato == null
 
-private fun isDatesNotDubious(bygningsstatus: BygningsstatusHistorikk): Boolean {
-    val today = LocalDate.now()
-    val inOneHundredYears = today.plusYears(100)
-    val tooOldDate = today.withYear(1000)
-
-    // Vet ikke hvor bra sammenlikning med matrikkelens LocalDate fungerer, så bare oversetter disse til Kotlins for å være safe
-    val isVedtaksdatoAfterRegistrertDato = bygningsstatus.dato.toLocalDate() > bygningsstatus.registrertDato.toLocalDate()
-
-    val isDatesTooFarIntoFuture =
-        bygningsstatus.dato.toLocalDate() > inOneHundredYears || bygningsstatus.registrertDato.toLocalDate() > inOneHundredYears
-
-    val isVedtaksDatoTooOld = bygningsstatus.dato.toLocalDate() < tooOldDate
-
-    return !(isVedtaksdatoAfterRegistrertDato || isDatesTooFarIntoFuture || isVedtaksDatoTooOld)
-}
+private fun isRegistrertDatoAfterVedtaksdato(bygningsstatus: BygningsstatusHistorikk): Boolean = bygningsstatus.dato.toLocalDate() <= bygningsstatus.registrertDato.toLocalDate()

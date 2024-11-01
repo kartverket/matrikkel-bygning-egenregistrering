@@ -18,8 +18,6 @@ gjelde:
 2. Statusen må være registrert fra og med 25.04.2009*
 3. Statusen skal være gjeldende, og ikke være en status markert som slettet
 4. Vedtaksdato skal ikke være etter registreringsdato
-5. Vedtaksdato skal ikke være langt tilbake i tid, vurdert til år 1000 (sjekke opp)
-6. Vedtaksdato og registreringsdato skal ikke være langt frem i tid, vurdert til 100 år fra i dag
 
 \* _Datoen er satt i forbindelse med at alle kommuner var over på et system hvor de kunne føre ferdigattest og
 midlertidig brukstillatelse_  
