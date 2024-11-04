@@ -86,7 +86,7 @@ class ByggeaarDeriverTest {
             bygningsstatusHistorikker = bygningsstatusHistorikkList(
                 derivableBygningsstatusHistorikk,
                 bygningsstatusHistorikk {
-                    bygningsstatusKodeId = MatrikkelBygningsstatusKode.TattIBruk()
+                    bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
                     registrertDato = timestampUtc(2010, 4, 26)
                     dato = localDateUtc(2010, 4, 24)
                 }
@@ -96,5 +96,22 @@ class ByggeaarDeriverTest {
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
         assertThat(derivedByggeaar).isEqualTo(2009)
+    }
+
+    @Test
+    fun `bygning med registrertdato foer vedtaksdato skal ikke faa byggeaar`() {
+        val bygning = bygning {
+            bygningsstatusHistorikker = bygningsstatusHistorikkList(
+                bygningsstatusHistorikk {
+                    bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
+                    registrertDato = timestampUtc(2010, 4, 26)
+                    dato = localDateUtc(2010, 4, 27)
+                }
+            )
+        }
+
+        val derivedByggeaar = deriveByggeaarForBygning(bygning)
+
+        assertThat(derivedByggeaar).isNull()
     }
 }
