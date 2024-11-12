@@ -67,7 +67,7 @@ class BygningRouteTest : TestApplicationWithDb() {
         assertThat(response.body<BygningSimpleResponse>()).all {
             prop(BygningSimpleResponse::bruksenheter).hasSize(2)
             prop(BygningSimpleResponse::bruksenheter).index(0).all {
-                prop(BruksenhetSimpleResponse::bruksareal).isNull()
+                prop(BruksenhetSimpleResponse::totalBruksareal).isNull()
                 prop(BruksenhetSimpleResponse::avlop).isNull()
                 prop(BruksenhetSimpleResponse::byggeaar).isNull()
                 prop(BruksenhetSimpleResponse::oppvarminger).isNull()
@@ -96,7 +96,7 @@ class BygningRouteTest : TestApplicationWithDb() {
         assertThat(response.body<BygningSimpleResponse>()).all {
             prop(BygningSimpleResponse::bruksenheter).hasSize(2)
             prop(BygningSimpleResponse::bruksenheter).index(0).all {
-                prop(BruksenhetSimpleResponse::bruksareal).isNotNull().all {
+                prop(BruksenhetSimpleResponse::totalBruksareal).isNotNull().all {
                     prop(BruksarealResponse::data).isEqualTo(125.0)
                     prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }

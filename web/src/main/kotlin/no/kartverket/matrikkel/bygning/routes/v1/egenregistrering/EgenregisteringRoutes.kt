@@ -32,13 +32,13 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                         etasjeRegistreringer = listOf(
                                             EtasjeBruksarealRegistreringRequest(
                                                 bruksareal = 50.0,
-                                                etasjenummer = "H01"
+                                                etasjenummer = "H01",
                                             ),
                                             EtasjeBruksarealRegistreringRequest(
                                                 bruksareal = 30.0,
-                                                etasjenummer = "H02"
-                                            )
-                                        )
+                                                etasjenummer = "H02",
+                                            ),
+                                        ),
                                     ),
                                     byggeaarRegistrering = null,
                                     energikildeRegistrering = EnergikildeRegistreringRequest(
@@ -71,10 +71,21 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
     ) {
         val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
-        val egenregistrering = egenregistreringRequest.toEgenregistrering()
 
-        egenregistreringService.addEgenregistrering(egenregistrering).fold(
-            success = { call.respond(HttpStatusCode.Created) },
+        egenregistreringRequest.toEgenregistrering().fold(
+            success = {
+                egenregistreringService.addEgenregistrering(it).fold(
+                    success = { call.respond(HttpStatusCode.Created) },
+                    failure = {
+                        call.respond(
+                            status = HttpStatusCode.BadRequest,
+                            ErrorResponse.ValidationError(
+                                details = listOf(it.toErrorDetailResponse()),
+                            ),
+                        )
+                    },
+                )
+            },
             failure = {
                 call.respond(
                     status = HttpStatusCode.BadRequest,
@@ -84,5 +95,6 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 )
             },
         )
+
     }
 }

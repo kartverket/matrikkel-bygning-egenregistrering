@@ -7,6 +7,7 @@ import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Etasje.*
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
@@ -20,8 +21,7 @@ import java.time.Instant
 
 @Serializable
 data class MultikildeResponse<T : Any>(
-    val autoritativ: T? = null,
-    val egenregistrert: T? = null
+    val autoritativ: T? = null, val egenregistrert: T? = null
 )
 
 @Serializable
@@ -41,14 +41,28 @@ data class BygningResponse(
 data class BygningSimpleResponse(
     val bygningId: Long,
     val bygningsnummer: Long,
-    val bruksenheter: List<BruksenhetSimpleResponse>,
+    val bruksenheter: List<BruksenhetSimpleResponse>
 )
+
+@Serializable
+data class BruksenhetEtasjeReponse(
+    val etasjenummer: String,
+    val bruksareal: MultikildeResponse<BruksarealResponse>?,
+)
+
+@Serializable
+data class BruksenhetSimpleEtasjeReponse(
+    val etasjenummer: String,
+    val bruksareal: BruksarealResponse?,
+)
+
 
 @Serializable
 data class BruksenhetResponse(
     val bruksenhetId: Long,
+    val etasjer: List<BruksenhetEtasjeReponse>?,
     val byggeaar: MultikildeResponse<ByggeaarResponse>?,
-    val bruksareal: MultikildeResponse<BruksarealResponse>?,
+    val totalBruksareal: MultikildeResponse<BruksarealResponse>?,
     val vannforsyning: MultikildeResponse<VannforsyningKodeResponse>?,
     val avlop: MultikildeResponse<AvlopKodeResponse>?,
     val energikilder: MultikildeResponse<List<EnergikildeResponse>>?,
@@ -58,8 +72,9 @@ data class BruksenhetResponse(
 @Serializable
 data class BruksenhetSimpleResponse(
     val bruksenhetId: Long,
+    val etasjer: List<BruksenhetSimpleEtasjeReponse>?,
     val byggeaar: ByggeaarResponse?,
-    val bruksareal: BruksarealResponse?,
+    val totalBruksareal: BruksarealResponse?,
     val vannforsyning: VannforsyningKodeResponse?,
     val avlop: AvlopKodeResponse?,
     val energikilder: List<EnergikildeResponse>?,
@@ -68,8 +83,7 @@ data class BruksenhetSimpleResponse(
 
 @Serializable
 data class RegisterMetadataResponse(
-    @Serializable(with = InstantSerializer::class)
-    val registreringstidspunkt: Instant,
+    @Serializable(with = InstantSerializer::class) val registreringstidspunkt: Instant,
     val registrertAv: String,
 )
 
@@ -126,7 +140,8 @@ fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleRespon
 fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
     bruksenhetId = this.bruksenhetId,
     byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
-    bruksareal = this.bruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
+    etasjer = this.etasjer.map { it.toBruksenhetEtasjeResponse() },
+    totalBruksareal = this.totalBruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
     energikilder = this.energikilder.toMultikildeResponse { map(Energikilde::toEnergikildeResponse) },
     oppvarminger = this.oppvarminger.toMultikildeResponse { map(Oppvarming::toOppvarmingResponse) },
     vannforsyning = this.vannforsyning.toMultikildeResponse(Vannforsyning::toVannforsyningResponse),
@@ -136,13 +151,24 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
 fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
     bruksenhetId = this.bruksenhetId,
     byggeaar = this.byggeaar.egenregistrert?.toByggeaarResponse(),
-    bruksareal = this.bruksareal.egenregistrert?.toBruksarealResponse(),
+    etasjer = this.etasjer.map { it.toBruksenhetSimpleEtasjeResponse() },
+    totalBruksareal = this.totalBruksareal.egenregistrert?.toBruksarealResponse(),
     vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
     avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
     energikilder = this.energikilder.egenregistrert?.map { it.toEnergikildeResponse() },
     oppvarminger = this.oppvarminger.egenregistrert?.map { it.toOppvarmingResponse() },
 )
 
+
+private fun BruksenhetEtasje.toBruksenhetSimpleEtasjeResponse(): BruksenhetSimpleEtasjeReponse = BruksenhetSimpleEtasjeReponse(
+    etasjenummer = this.etasjenummer.toString(),
+    bruksareal = this.bruksareal.egenregistrert?.toBruksarealResponse(),
+)
+
+private fun BruksenhetEtasje.toBruksenhetEtasjeResponse(): BruksenhetEtasjeReponse = BruksenhetEtasjeReponse(
+    etasjenummer = this.etasjenummer.toString(),
+    bruksareal = this.bruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
+)
 
 private fun Byggeaar.toByggeaarResponse(): ByggeaarResponse = ByggeaarResponse(
     data = this.data,

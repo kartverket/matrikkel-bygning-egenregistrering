@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning.application.models
 
+import no.kartverket.matrikkel.bygning.application.models.Etasje.*
+
 /**
  * Burde vi kanskje sortere egenregistreringer her, da vi er avhengig av at egenregistreringene er sortert her,
  * men ikke nødvendigvis andre steder?
@@ -27,6 +29,16 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
         registrertAv = egenregistrering.eier,
     )
 
+    val etasjerInRegistreringNotOnBruksenhet =
+        bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer?.filter { etasjeRegistrering ->
+            this.etasjer.find { etasje -> etasje.etasjenummer == etasjeRegistrering.etasjenummer } == null
+        }?.map {
+            BruksenhetEtasje(
+                etasjenummer = it.etasjenummer,
+                bruksareal = Multikilde(),
+            )
+        }
+
     return this.copy(
         byggeaar = this.byggeaar.aggregate {
             bruksenhetRegistrering.byggeaarRegistrering?.let {
@@ -36,10 +48,10 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                 )
             }
         },
-        bruksareal = this.bruksareal.aggregate {
-            bruksenhetRegistrering.bruksarealRegistrering?.let {
+        totalBruksareal = this.totalBruksareal.aggregate {
+            bruksenhetRegistrering.bruksarealRegistrering?.totalBruksareal?.let {
                 Bruksareal(
-                    data = it.totalBruksareal,
+                    data = it,
                     metadata = metadata,
                 )
             }
@@ -79,6 +91,29 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                     )
                 }
             }
+        },
+        etasjer = this.etasjer.plus(etasjerInRegistreringNotOnBruksenhet ?: emptyList()).map {
+            it.applyBruksenhetRegistrering(bruksenhetRegistrering, metadata)
+        },
+    )
+}
+
+fun BruksenhetEtasje.applyBruksenhetRegistrering(
+    bruksenhetRegistrering: BruksenhetRegistrering, metadata: RegisterMetadata
+): BruksenhetEtasje {
+    val relevantEtasjeRegistrering =
+        bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer?.find { it.etasjenummer == this.etasjenummer }
+
+    if (relevantEtasjeRegistrering == null || this.bruksareal.egenregistrert != null) {
+        return this
+    }
+
+    return this.copy(
+        bruksareal = this.bruksareal.aggregate {
+            Bruksareal(
+                data = relevantEtasjeRegistrering.bruksareal,
+                metadata = metadata,
+            )
         },
     )
 }

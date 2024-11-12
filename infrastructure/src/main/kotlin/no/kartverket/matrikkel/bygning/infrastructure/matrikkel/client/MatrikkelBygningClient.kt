@@ -13,6 +13,7 @@ import no.kartverket.matrikkel.bygning.application.models.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.application.models.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
@@ -20,7 +21,6 @@ import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBygning
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.bygningId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.toInstant
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import org.slf4j.Logger
@@ -111,14 +111,23 @@ internal class MatrikkelBygningClient(
                             bruksenhetId = it.id.value,
                             bygningId = it.byggId.value,
                             // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
-                            bruksareal = Multikilde(
+                            totalBruksareal = Multikilde(
                                 autoritativ = Bruksareal(
                                     it.bruksareal,
                                     bruksenhetsmetadata,
                                 ),
                             ),
+                            etasjer = emptyList(),
                         )
                     },
+                    etasjer = emptyList(),
+//                    bygning.etasjer.item.map { etasje ->
+//                        BygningEtasje(
+//                            // TODO noe for å hente etasjenummer fra etasje
+//                            etasjenummer = etasje.etasjenummer,
+//                            etasjeId = etasje.id,
+//                        )
+//                    },
                 ),
             )
         } catch (exception: ServiceException) {
@@ -141,7 +150,7 @@ internal class MatrikkelBygningClient(
             return Err(
                 ErrorDetail(
                     detail = "Bygning med nummer $bygningsnummer finnes ikke i matrikkelen",
-                )
+                ),
             )
         }
     }

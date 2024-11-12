@@ -99,7 +99,7 @@ class MatrikkelBygningClientTest {
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetId).isEqualTo(2L)
                 prop(Bruksenhet::bygningId).isEqualTo(1L)
-                prop(Bruksenhet::bruksareal).erAutoritativIkkeEgenregistrert {
+                prop(Bruksenhet::totalBruksareal).erAutoritativIkkeEgenregistrert {
                     // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
                     prop(Bruksareal::data).isEqualTo(0.0)
                     prop(Bruksareal::metadata).isMatrikkelfoertBruksenhetstidspunkt()
@@ -197,7 +197,7 @@ class MatrikkelBygningClientTest {
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetId).isEqualTo(2L)
                 prop(Bruksenhet::bygningId).isEqualTo(1L)
-                prop(Bruksenhet::bruksareal).erAutoritativIkkeEgenregistrert {
+                prop(Bruksenhet::totalBruksareal).erAutoritativIkkeEgenregistrert {
                     prop(Bruksareal::data).isEqualTo(140.0)
                     prop(Bruksareal::metadata).isMatrikkelfoertBruksenhetstidspunkt()
                 }

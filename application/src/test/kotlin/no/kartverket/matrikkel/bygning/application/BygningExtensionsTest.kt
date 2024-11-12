@@ -20,7 +20,7 @@ class BygningExtensionsTest {
     private val defaultBruksenhet = Bruksenhet(
         bruksenhetId = 1L,
         bygningId = 1L,
-        bruksareal = Multikilde(),
+        totalBruksareal = Multikilde(),
         energikilder = Multikilde(),
         oppvarminger = Multikilde(),
     )
@@ -77,7 +77,7 @@ class BygningExtensionsTest {
 
         val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
 
-        assertThat(aggregatedBygning.bruksenheter.single().bruksareal.egenregistrert?.data).isEqualTo(150.0)
+        assertThat(aggregatedBygning.bruksenheter.single().totalBruksareal.egenregistrert?.data).isEqualTo(150.0)
     }
 
     @Test
