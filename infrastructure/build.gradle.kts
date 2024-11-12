@@ -13,6 +13,7 @@ dependencies {
     api(project(":application"))
 
     implementation(libs.logback.classic)
+    implementation(libs.kotlinx.coroutines.core)
 
     // Persistence
     implementation(libs.postgres)
@@ -66,9 +67,11 @@ testing {
                 implementation(libs.kotli.query)
 
                 implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
 
                 implementation(libs.assertk)
                 implementation(libs.testcontainers.postgresql)
+                implementation(libs.wiremock)
             }
         }
     }
