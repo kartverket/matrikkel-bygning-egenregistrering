@@ -12,7 +12,6 @@ import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
-import no.kartverket.matrikkel.bygning.config.Env
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.TransactionalSupport
@@ -22,9 +21,8 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.Heal
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HendelseRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygning.BygningRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
-import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
-import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client.LocalBygningClient
-import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client.MatrikkelBygningClient
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiFactory
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
 import no.kartverket.matrikkel.bygning.plugins.authentication.configureAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
@@ -34,7 +32,6 @@ import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
 import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.eksternRouting
 import no.kartverket.matrikkel.bygning.routes.v1.intern.internRouting
-import java.net.URI
 
 fun main() {
     val internalPort = System.getenv("INTERNAL_PORT")?.toIntOrNull() ?: 8081
@@ -63,7 +60,6 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    configureAuthentication(config)
 
     val dataSource = createDataSource(
         DatabaseConfig(
@@ -73,19 +69,15 @@ fun Application.mainModule() {
         ),
     )
 
-    val bygningClient = if (Env.isLocal() && config.property("matrikkel.useStub").getString().toBoolean()) {
-        log.warn("Bruker stub for matrikkel APIet. Skal kun brukes lokalt!")
-        LocalBygningClient()
-    } else {
-        MatrikkelBygningClient(
-            MatrikkelApi(
-                URI(config.property("matrikkel.baseUrl").getString()),
-            ).withAuth(
-                config.property("matrikkel.username").getString(),
-                config.property("matrikkel.password").getString(),
-            ),
-        )
-    }
+    val matrikkelApiConfig = MatrikkelApiConfig(
+        useStub = config.property("matrikkel.useStub").getString().toBoolean(),
+        baseUrl = config.propertyOrNull("matrikkel.baseUrl")?.getString() ?: "",
+        username = config.propertyOrNull("matrikkel.username")?.getString() ?: "",
+        password = config.propertyOrNull("matrikkel.password")?.getString() ?: "",
+    )
+    val matrikkelApiFactory = MatrikkelApiFactory(matrikkelApiConfig)
+    val bygningClient = matrikkelApiFactory.createBygningClient()
+    val matrikkelAuth = matrikkelApiFactory.createAuthService()
 
     val egenregistreringRepository = EgenregistreringRepositoryImpl()
     val bygningRepository = BygningRepositoryImpl(dataSource)
@@ -99,6 +91,8 @@ fun Application.mainModule() {
     val hendelseService = HendelseService(
         hendelseRepository = hendelseRepository,
     )
+
+    configureAuthentication(config, matrikkelAuth)
 
     val egenregistreringService = EgenregistreringService(
         bygningService = bygningService,

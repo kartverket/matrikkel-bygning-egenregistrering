@@ -9,6 +9,9 @@ class MockOAuth2ServerExtensions {
         internal const val DEFAULT_AUDIENCE = "default"
         internal const val DEFAULT_PID = "66860475309"
 
+        internal const val MATRIKKEL_ISSUER = "testMatrikkel"
+        internal const val MATRIKKEL_AUDIENCE = "matrikkelserver"
+
         fun MockOAuth2Server.issueMaskinportenJWT(scope: String = "kartverk:riktig:scope") = issueToken(
             issuerId = DEFAULT_ISSUER,
             claims = mapOf(
