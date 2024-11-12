@@ -39,7 +39,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
         bruksareal = this.bruksareal.aggregate {
             bruksenhetRegistrering.bruksarealRegistrering?.let {
                 Bruksareal(
-                    data = it.bruksareal,
+                    data = it.totalBruksareal,
                     metadata = metadata,
                 )
             }

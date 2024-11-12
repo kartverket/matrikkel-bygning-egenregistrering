@@ -27,7 +27,19 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                             bruksenhetRegistreringer = listOf(
                                 BruksenhetRegistreringRequest(
                                     bruksenhetId = 1L,
-                                    bruksarealRegistrering = null,
+                                    bruksarealRegistrering = BruksarealRegistreringRequest(
+                                        totalBruksareal = null,
+                                        etasjeRegistreringer = listOf(
+                                            EtasjeBruksarealRegistreringRequest(
+                                                bruksareal = 50.0,
+                                                etasjenummer = "H01"
+                                            ),
+                                            EtasjeBruksarealRegistreringRequest(
+                                                bruksareal = 30.0,
+                                                etasjenummer = "H02"
+                                            )
+                                        )
+                                    ),
                                     byggeaarRegistrering = null,
                                     energikildeRegistrering = EnergikildeRegistreringRequest(
                                         energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),

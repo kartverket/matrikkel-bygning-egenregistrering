@@ -8,13 +8,15 @@ import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
+import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.application.models.toEtasjenummer
 import java.time.Instant
 import java.util.*
 
@@ -43,8 +45,15 @@ data class ByggeaarRegistreringRequest(
 )
 
 @Serializable
-data class BruksarealRegistreringRequest(
+data class EtasjeBruksarealRegistreringRequest(
     val bruksareal: Double?,
+    val etasjenummer: String
+)
+
+@Serializable
+data class BruksarealRegistreringRequest(
+    val totalBruksareal: Double?,
+    val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?
 )
 
 @Serializable
@@ -67,6 +76,14 @@ data class OppvarmingRegistreringRequest(
     val oppvarminger: List<OppvarmingKode>?,
 )
 
+fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
+    return EtasjeBruksarealRegistrering(
+        bruksareal = this.bruksareal,
+        // TODO Nullability
+        etasjenummer = this.etasjenummer.toEtasjenummer()!!,
+    )
+}
+
 fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     val registreringstidspunkt = Instant.now()
     return Egenregistrering(
@@ -80,7 +97,10 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
                     bruksenhetId = bruksenhetRegistrering.bruksenhetId,
                     bruksarealRegistrering = bruksenhetRegistrering.bruksarealRegistrering?.let {
                         BruksarealRegistrering(
-                            bruksareal = it.bruksareal,
+                            totalBruksareal = it.totalBruksareal,
+                            // TODO Hva skjer hvis man én gang har sendt inn total men en annen gang sender inn etasjer?
+                            // Kan man registrere én og én etasje?
+                            etasjeRegistreringer = it.etasjeRegistreringer?.map { it.toEtasjeBruksarealRegistrering() },
                         )
                     },
                     byggeaarRegistrering = bruksenhetRegistrering.byggeaarRegistrering?.let {

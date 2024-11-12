@@ -38,7 +38,7 @@ class BygningExtensionsTest {
     private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
         bruksenhetId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
-            bruksareal = 50.0
+            totalBruksareal = 50.0
         ),
         byggeaarRegistrering = null,
         energikildeRegistrering = null,
@@ -68,7 +68,7 @@ class BygningExtensionsTest {
                 bruksenhetRegistreringer = listOf(
                     defaultBruksenhetRegistrering.copy(
                         bruksarealRegistrering = BruksarealRegistrering(
-                            bruksareal = 150.0,
+                            totalBruksareal = 150.0,
                         ),
                     )
                 ),
