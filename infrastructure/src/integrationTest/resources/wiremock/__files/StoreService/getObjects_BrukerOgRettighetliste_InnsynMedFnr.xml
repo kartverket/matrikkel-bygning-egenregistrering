@@ -1,0 +1,97 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <ns2:getObjectsResponse xmlns="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain" xmlns:ns2="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/service/store" xmlns:ns3="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/exception" xmlns:ns4="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/geometri" xmlns:ns5="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/matrikkelenhet" xmlns:ns6="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/adresse" xmlns:ns7="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/util" xmlns:ns8="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/forretning" xmlns:ns9="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/kommunetillegg" xmlns:ns10="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/bygning" xmlns:ns11="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/sefrak" xmlns:ns12="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/kulturminne" xmlns:ns13="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/grunnforurensing" xmlns:ns14="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/bruker" xmlns:ns15="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/kommune" xmlns:ns16="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/konsesjon" xmlns:ns17="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/metadata" xmlns:ns18="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/person" xmlns:ns19="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/kommunetillegg/koder" xmlns:ns20="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/kodeliste" xmlns:ns21="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/aktivitetsliste" xmlns:ns22="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/elektronisktinglysing" xmlns:ns23="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/adresse/koder" xmlns:ns24="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/bygning/koder" xmlns:ns25="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/endringslogg" xmlns:ns26="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/jobb" xmlns:ns27="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/geometri/koder" xmlns:ns28="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/bruker/koder" xmlns:ns29="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/matrikkelenhet/koder" xmlns:ns30="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/sefrak/koder" xmlns:ns31="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/rapport/koder" xmlns:ns32="http://matrikkel.statkart.no/matrikkelapi/wsapi/v1/domain/person/koder">
+            <ns2:return>
+                <item xsi:type="ns14:Bruker" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    <id xsi:type="ns14:BrukerId">
+                        <value>2</value>
+                    </id>
+                    <metadata/><!-- Uvesentlig -->
+                    <oppdateringsdato>
+                        <timestamp>2025-01-01T00:00:00.0+01:00</timestamp>
+                    </oppdateringsdato>
+                    <versjonId>1</versjonId>
+                    <oppdatertAv>admin</oppdatertAv>
+                    <versjon>0</versjon>
+                    <ns14:brukernavn>testbruker</ns14:brukernavn>
+                    <ns14:navn>Testbruker</ns14:navn>
+                    <ns14:postadresse><!-- Trengs ikke --></ns14:postadresse>
+                    <ns14:epost><!-- Trengs ikke --></ns14:epost>
+                    <ns14:endrePassordVedInnlogging>false</ns14:endrePassordVedInnlogging>
+                    <ns14:sprakformId>
+                        <value>1</value>
+                    </ns14:sprakformId>
+                    <ns14:standardMalestokk>4500</ns14:standardMalestokk>
+                    <ns14:pekeRadius>10.0</ns14:pekeRadius>
+                    <ns14:snappetoleranse>10.0</ns14:snappetoleranse>
+                    <ns14:aktuellKommuneId>
+                        <value>3305</value>
+                    </ns14:aktuellKommuneId>
+                    <ns14:brukStoreKnapper>false</ns14:brukStoreKnapper>
+                    <ns14:dataForWMSer/>
+                    <ns14:ndBruker>false</ns14:ndBruker>
+                    <ns14:opprettetAvId>
+                        <value>1</value>
+                    </ns14:opprettetAvId>
+                    <ns14:opprettetDato>
+                        <timestamp>2025-01-01T00:00:00.0+01:00</timestamp>
+                    </ns14:opprettetDato>
+                    <ns14:sistOppdatertAvId>
+                        <value>1</value>
+                    </ns14:sistOppdatertAvId>
+                    <ns14:sistOppdatertDato>
+                        <timestamp>2025-01-01T00:00:00.0+01:00</timestamp>
+                    </ns14:sistOppdatertDato>
+                    <ns14:programvareBruker>false</ns14:programvareBruker>
+                    <ns14:brukergruppeId>
+                        <value>0</value>
+                    </ns14:brukergruppeId>
+                </item>
+                <item xsi:type="ns14:BrukerRettighetListe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    <id xsi:type="ns14:BrukerRettighetListeId">
+                        <value>3</value>
+                    </id>
+                    <metadata/>
+                    <oppdateringsdato>
+                        <timestamp>2025-01-01T00:00:00.0+01:00</timestamp>
+                    </oppdateringsdato>
+                    <versjonId>1</versjonId>
+                    <oppdatertAv>admin</oppdatertAv>
+                    <versjon>0</versjon>
+                    <ns14:rettigheter>
+                        <ns14:item>
+                            <metadata/>
+                            <oppdateringsdato>
+                                <timestamp>2025-01-01T00:00:00.0+01:00</timestamp>
+                            </oppdateringsdato>
+                            <versjonId>1</versjonId>
+                            <oppdatertAv>admin</oppdatertAv>
+                            <!--ns14:id></ns14:id-->
+                            <ns14:rolleId>
+                                <value>13</value>
+                            </ns14:rolleId>
+                            <ns14:forvaltningsomrade xsi:type="ns14:LandForvaltningsomrade">
+                                <metadata/>
+                                <oppdateringsdato>
+                                    <timestamp>2025-01-07T06:00:21.161351000+01:00</timestamp>
+                                </oppdateringsdato>
+                                <versjonId>1</versjonId>
+                                <oppdatertAv>admin</oppdatertAv>
+                                <!--ns14:id></ns14:id-->
+                            </ns14:forvaltningsomrade>
+                            <ns14:tildeltAvId>
+                                <value>1</value>
+                            </ns14:tildeltAvId>
+                            <ns14:tildeltDato>
+                                <timestamp>2025-01-01T00:00:00.0+01:00</timestamp>
+                            </ns14:tildeltDato>
+                        </ns14:item>
+                    </ns14:rettigheter>
+                    <ns14:brukerId>
+                        <value>2</value>
+                    </ns14:brukerId>
+                </item>
+            </ns2:return>
+        </ns2:getObjectsResponse>
+    </soap:Body>
+</soap:Envelope>

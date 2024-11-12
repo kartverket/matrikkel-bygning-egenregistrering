@@ -4,6 +4,8 @@ import jakarta.xml.ws.BindingProvider
 import jakarta.xml.ws.handler.MessageContext
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.MatrikkelContext
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.geometri.koder.KoordinatsystemKodeId
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.bruker.BrukerService
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.bruker.BrukerServiceWS
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.bygning.BygningService
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.bygning.BygningServiceWS
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.kommune.KommuneService
@@ -24,6 +26,7 @@ class MatrikkelApi(private val baseUrl: URI) {
     private val storeServiceFactory = StoreServiceWS()
     private val kommuneServiceFactory = KommuneServiceWS()
     private val bygningServiceFactory = BygningServiceWS()
+    private val brukerServiceFactory = BrukerServiceWS()
 
     // TODO: Uheldig at denne er mutabel, for da kan noe ødelegge for andre. Kanskje er det ikke for dyrt å lage en nye hver gang.
     val matrikkelContext = MatrikkelContext().apply {
@@ -46,6 +49,7 @@ class MatrikkelApi(private val baseUrl: URI) {
         fun storeService(): StoreService
         fun kommuneService(): KommuneService
         fun bygningService(): BygningService
+        fun brukerService(): BrukerService
         val matrikkelContext: MatrikkelContext
     }
 
@@ -79,6 +83,13 @@ class MatrikkelApi(private val baseUrl: URI) {
             val bygningService = bygningServiceFactory.getBygningServicePort()
             (bygningService as BindingProvider).configure("/matrikkelapi/wsapi/v1/BygningServiceWS")
             return bygningService
+        }
+
+        override fun brukerService(): BrukerService {
+            @Suppress("UsePropertyAccessSyntax") // getBrukerServicePort er ikke en getter for en property
+            val brukerService = brukerServiceFactory.getBrukerServicePort()
+            (brukerService as BindingProvider).configure("/matrikkelapi/wsapi/v1/BrukerServiceWS")
+            return brukerService
         }
 
         override val matrikkelContext: MatrikkelContext

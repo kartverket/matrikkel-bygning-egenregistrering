@@ -5,16 +5,22 @@ import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.http.auth.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
 import no.kartverket.matrikkel.bygning.config.Env
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.auth.AuthService
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.auth.Matrikkelrolle
 import no.kartverket.matrikkel.bygning.plugins.authentication.ApplicationRoles.ACCESS_AS_APPLICATION
 import no.kartverket.matrikkel.bygning.plugins.authentication.ApplicationRoles.BYGNING_ARKIVARISK_HISTORIKK
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_BERETTIGET_INTERESSE
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_MED_PERSONDATA
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_UTEN_PERSONDATA
 import no.kartverket.matrikkel.bygning.plugins.authentication.mock.mockJwt
 import java.net.URI
 import java.util.concurrent.TimeUnit
@@ -23,6 +29,9 @@ object AuthenticationConstants {
     const val IDPORTEN_PROVIDER_NAME = "idporten"
     const val MASKINPORTEN_PROVIDER_NAME = "maskinporten"
     const val ENTRA_ID_ARKIVARISK_HISTORIKK_NAME = "entra_arkivarisk_historikk"
+    const val MATRIKKEL_AUTH_BERETTIGET_INTERESSE = "matrikkel_auth_berettiget_interesse"
+    const val MATRIKKEL_AUTH_UTEN_PERSONDATA = "matrikkel_auth_uten_persondata"
+    const val MATRIKKEL_AUTH_MED_PERSONDATA = "matrikkel_auth_med_persondata"
 }
 
 object ApplicationRoles {
@@ -43,11 +52,12 @@ data class JWTAuthenticationConfig(
             .build()
 }
 
-fun Application.configureAuthentication(config: ApplicationConfig) {
+fun Application.configureAuthentication(config: ApplicationConfig, matrikkelAuth: AuthService) {
     install(Authentication) {
         jwtMaskinporten(config)
         jwtIDPorten(config)
         jwtEntraIdArkivariskHistorikk(config)
+        configureMatrikkelAuth(config, matrikkelAuth)
     }
 }
 
@@ -124,3 +134,57 @@ private fun AuthenticationConfig.jwtEntraIdArkivariskHistorikk(config: Applicati
 
 private fun isProviderDisabled(config: ApplicationConfig, name: String): Boolean =
     config.property("${name}.disabled").getString().toBoolean()
+
+private fun AuthenticationConfig.configureMatrikkelAuth(config: ApplicationConfig, authService: AuthService) {
+    if (Env.isLocal() && isProviderDisabled(config, "matrikkel.oidc")) {
+        // Må registrere authenticators med disse navnene, men uten noe å sjekke mot, så avslår de alt.
+        val authenticate: suspend ApplicationCall.(BearerTokenCredential) -> Any? = { _ -> null }
+        bearer(MATRIKKEL_AUTH_BERETTIGET_INTERESSE) {
+            authenticate(authenticate)
+        }
+        bearer(MATRIKKEL_AUTH_UTEN_PERSONDATA) {
+            authenticate(authenticate)
+        }
+        bearer(MATRIKKEL_AUTH_MED_PERSONDATA) {
+            authenticate(authenticate)
+        }
+    } else {
+        val authConfig = JWTAuthenticationConfig(
+            jwksUri = config.property("matrikkel.oidc.jwksUri").getString(),
+            issuer = config.property("matrikkel.oidc.issuer").getString(),
+            audience = config.property("matrikkel.oidc.audience").getString(),
+        )
+
+        jwt(MATRIKKEL_AUTH_BERETTIGET_INTERESSE) {
+            realm = "Bygning berettiget interesse"
+            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.BerettigetInteresse)
+        }
+        jwt(MATRIKKEL_AUTH_UTEN_PERSONDATA) {
+            realm = "Bygning uten personidentifikasjon"
+            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.InnsynUtenPersondata)
+        }
+        jwt(MATRIKKEL_AUTH_MED_PERSONDATA) {
+            realm = "Bygning med personidentifikasjon"
+            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.InnsynMedPersondata)
+        }
+    }
+}
+
+private fun JWTAuthenticationProvider.Config.configureMatrikkelAuth(
+    authConfig: JWTAuthenticationConfig,
+    authService: AuthService,
+    rolle: Matrikkelrolle
+) {
+    verifier(authConfig.jwkProvider, authConfig.issuer) {
+        acceptLeeway(3)
+        withAudience(authConfig.audience)
+    }
+    validate { _ ->
+        // Må ha det fulle tokenet for å sende videre, og det er ikke det som blir sendt som parameter.
+        // Siden vi har kommet hit, så vet vi at Authorization-header er på forventet format.
+        val authHeader = request.parseAuthorizationHeader() as HttpAuthHeader.Single
+        val token = authHeader.blob
+        authService.harMatrikkeltilgang(token, rolle)
+            ?.let { UserIdPrincipal(it) }
+    }
+}
