@@ -1,6 +1,7 @@
 [versions]
 ktorVersion = "3.1.1"
 kotlinVersion = "2.1.20"
+kotlinxCoroutinesVersion = "1.10.1" # Match versjonen ktor bruker
 logbackVersion = "1.5.18"
 logstashVersion = "8.0"
 prometheusVersion = "1.14.5"
@@ -19,6 +20,7 @@ mockOauth2Server = "2.1.10"
 matrikkelWsClientVersion = "4.18.1.0"
 jacksonVersion = "2.18.3"
 kotliQueryVersion = "1.9.1"
+wiremockVersion = "3.9.2"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -66,6 +68,12 @@ schema-kenerator-reflection = { group = "io.github.smiley4", name = "schema-kene
 schema-kenerator-swagger = { group = "io.github.smiley4", name = "schema-kenerator-swagger" }
 
 fasterxml-jackson-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jacksonVersion" }
+
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesVersion" }
+
+wiremock = { group = "org.wiremock", name = "wiremock", version.ref = "wiremockVersion" }
+
 [plugins]
 # Dette er så dependabot skjønner at kotlinVersion er det som styrer disse pluginene.
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }

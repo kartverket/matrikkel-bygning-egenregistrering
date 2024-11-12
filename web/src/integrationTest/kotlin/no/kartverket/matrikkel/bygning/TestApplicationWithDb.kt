@@ -8,6 +8,8 @@ import io.ktor.server.testing.*
 import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.DEFAULT_AUDIENCE
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.DEFAULT_ISSUER
+import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.MATRIKKEL_AUDIENCE
+import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.MATRIKKEL_ISSUER
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -69,6 +71,10 @@ abstract class TestApplicationWithDb {
                     "storage.username" to postgresSQLContainer.username,
                     "storage.password" to postgresSQLContainer.password,
                     "matrikkel.useStub" to "true",
+                    "matrikkel.oidc.issuer" to mockOAuthServer.issuerUrl(MATRIKKEL_ISSUER).toString(),
+                    "matrikkel.oidc.jwksUri" to mockOAuthServer.jwksUrl(MATRIKKEL_ISSUER).toString(),
+                    "matrikkel.oidc.audience" to MATRIKKEL_AUDIENCE,
+                    "matrikkel.oidc.disabled" to "false",
                     "maskinporten.issuer" to mockOAuthServer.issuerUrl(DEFAULT_ISSUER).toString(),
                     "maskinporten.jwksUri" to mockOAuthServer.jwksUrl(DEFAULT_ISSUER).toString(),
                     "maskinporten.scopes" to "kartverk:riktig:scope",
