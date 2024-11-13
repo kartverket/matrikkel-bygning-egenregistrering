@@ -24,6 +24,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Vannforsyni
 import no.kartverket.matrikkel.bygning.application.models.toEtasjenummer
 import java.time.Instant
 import java.util.*
+import kotlin.collections.map
 
 
 @Serializable
@@ -86,10 +87,58 @@ fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Result
     }
 }
 
+fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): Result<BruksenhetRegistrering, ErrorDetail> {
+    return Ok(
+        BruksenhetRegistrering(
+            bruksenhetId = bruksenhetId,
+            bruksarealRegistrering = bruksarealRegistrering?.let {
+                BruksarealRegistrering(
+                    totalBruksareal = it.totalBruksareal,
+                    etasjeRegistreringer = it.etasjeRegistreringer?.map {
+                        val etasjeBruksarealRegistrering = it.toEtasjeBruksarealRegistrering()
+                        if (etasjeBruksarealRegistrering.isOk) {
+                            etasjeBruksarealRegistrering.value
+                        } else {
+                            return Err(etasjeBruksarealRegistrering.error)
+                        }
+                    },
+                )
+            },
+            byggeaarRegistrering = byggeaarRegistrering?.let {
+                ByggeaarRegistrering(
+                    byggeaar = it.byggeaar,
+                )
+            },
+            vannforsyningRegistrering = vannforsyningRegistrering?.let {
+                VannforsyningRegistrering(
+                    vannforsyning = it.vannforsyning,
+                )
+            },
+            avlopRegistrering = avlopRegistrering?.let {
+                AvlopRegistrering(
+                    avlop = it.avlop,
+                )
+            },
+            energikildeRegistrering = energikildeRegistrering?.let {
+                EnergikildeRegistrering(
+                    energikilder = it.energikilder,
+                )
+            },
+            oppvarmingRegistrering = oppvarmingRegistrering?.let {
+                OppvarmingRegistrering(
+                    oppvarminger = it.oppvarminger,
+                )
+            },
+        ),
+    )
+}
+
 fun EgenregistreringRequest.toEgenregistrering(): Result<Egenregistrering, ErrorDetail> {
     val registreringstidspunkt = Instant.now()
 
-    // Ikke supersmud med return Ok helt på toppen her. Vil prøve å finne noen bedre måte
+    // Synes ikke feilhåndteringen ble veldig smud her, så gjerne kom med innspill på hvordan best gjøre det når det
+    // er potensielle feilkilder i instansieringen
+    // Gjelder forsåvidt både her og i .toBruksenhetRegistrering()
     return Ok(
         Egenregistrering(
             id = UUID.randomUUID(),
@@ -98,48 +147,13 @@ fun EgenregistreringRequest.toEgenregistrering(): Result<Egenregistrering, Error
             bygningRegistrering = BygningRegistrering(
                 bygningId = this.bygningId,
                 bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
-                    BruksenhetRegistrering(
-                        bruksenhetId = bruksenhetRegistrering.bruksenhetId,
-                        bruksarealRegistrering = bruksenhetRegistrering.bruksarealRegistrering?.let {
-                            BruksarealRegistrering(
-                                totalBruksareal = it.totalBruksareal,
-                                etasjeRegistreringer = it.etasjeRegistreringer?.map {
-                                    val etasjeBruksarealRegistrering = it.toEtasjeBruksarealRegistrering()
+                    val bruksenhetRegistrering = bruksenhetRegistrering.toBruksenhetRegistrering()
 
-                                    if (etasjeBruksarealRegistrering.isOk) {
-                                        etasjeBruksarealRegistrering.value
-                                    } else {
-                                        return Err(etasjeBruksarealRegistrering.error)
-                                    }
-                                },
-                            )
-                        },
-                        byggeaarRegistrering = bruksenhetRegistrering.byggeaarRegistrering?.let {
-                            ByggeaarRegistrering(
-                                byggeaar = it.byggeaar,
-                            )
-                        },
-                        vannforsyningRegistrering = bruksenhetRegistrering.vannforsyningRegistrering?.let {
-                            VannforsyningRegistrering(
-                                vannforsyning = it.vannforsyning,
-                            )
-                        },
-                        avlopRegistrering = bruksenhetRegistrering.avlopRegistrering?.let {
-                            AvlopRegistrering(
-                                avlop = it.avlop,
-                            )
-                        },
-                        energikildeRegistrering = bruksenhetRegistrering.energikildeRegistrering?.let {
-                            EnergikildeRegistrering(
-                                energikilder = it.energikilder,
-                            )
-                        },
-                        oppvarmingRegistrering = bruksenhetRegistrering.oppvarmingRegistrering?.let {
-                            OppvarmingRegistrering(
-                                oppvarminger = it.oppvarminger,
-                            )
-                        },
-                    )
+                    if (bruksenhetRegistrering.isOk) {
+                        bruksenhetRegistrering.value
+                    } else {
+                        return Err(bruksenhetRegistrering.error)
+                    }
                 } ?: emptyList(),
             ),
         ),

@@ -9,8 +9,8 @@ import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
-import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 import java.time.Instant
 import java.util.*
 import kotlin.test.Test
@@ -23,6 +23,7 @@ class BygningExtensionsTest {
         totalBruksareal = Multikilde(),
         energikilder = Multikilde(),
         oppvarminger = Multikilde(),
+        etasjer = emptyList(),
     )
 
     private val defaultBygning = Bygning(
@@ -33,12 +34,14 @@ class BygningExtensionsTest {
         bruksareal = Multikilde(),
         vannforsyning = Multikilde(),
         avlop = Multikilde(),
+        etasjer = emptyList(),
     )
 
     private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
         bruksenhetId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
-            totalBruksareal = 50.0
+            totalBruksareal = 50.0,
+            etasjeRegistreringer = emptyList(),
         ),
         byggeaarRegistrering = null,
         energikildeRegistrering = null,
@@ -69,6 +72,7 @@ class BygningExtensionsTest {
                     defaultBruksenhetRegistrering.copy(
                         bruksarealRegistrering = BruksarealRegistrering(
                             totalBruksareal = 150.0,
+                            etasjeRegistreringer = emptyList()
                         ),
                     )
                 ),

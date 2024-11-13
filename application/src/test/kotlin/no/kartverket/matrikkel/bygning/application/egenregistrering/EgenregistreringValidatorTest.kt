@@ -15,11 +15,13 @@ import kotlin.test.Test
 
 class EgenregistreringValidatorTest {
     private val baseBygning = Bygning(
-        bygningId = 1L, bygningsnummer = 100L, bruksenheter = listOf(
+        bygningId = 1L, bygningsnummer = 100L,
+        bruksenheter = listOf(
             Bruksenhet(
-                bruksenhetId = 1L, bygningId = 1L
-            )
-        )
+                bruksenhetId = 1L, bygningId = 1L, etasjer = emptyList(),
+            ),
+        ),
+        etasjer = emptyList(),
     )
 
     private val baseEgenregistrering = Egenregistrering(
@@ -28,7 +30,7 @@ class EgenregistreringValidatorTest {
         eier = Foedselsnummer("31129956715"),
         bygningRegistrering = BygningRegistrering(
             bygningId = 1L,
-            bruksenhetRegistreringer = emptyList()
+            bruksenhetRegistreringer = emptyList(),
         ),
     )
 
@@ -56,9 +58,10 @@ class EgenregistreringValidatorTest {
                             vannforsyningRegistrering = null,
                             avlopRegistrering = null,
                         ),
-                    )
-                )
-            ), baseBygning
+                    ),
+                ),
+            ),
+            baseBygning,
         )
 
         assertThat(validationErrors).hasSize(1)
@@ -80,9 +83,10 @@ class EgenregistreringValidatorTest {
                             vannforsyningRegistrering = null,
                             avlopRegistrering = null,
                         ),
-                    )
-                )
-            ), baseBygning
+                    ),
+                ),
+            ),
+            baseBygning,
         )
 
         assertThat(validationErrors).hasSize(1)
