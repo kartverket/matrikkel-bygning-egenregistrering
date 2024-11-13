@@ -195,7 +195,10 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                         bruksenhetRegistreringer = listOf(
                             BruksenhetRegistreringRequest(
                                 bruksenhetId = 1L,
-                                bruksarealRegistrering = BruksarealRegistreringRequest(totalBruksareal = 40.0),
+                                bruksarealRegistrering = BruksarealRegistreringRequest(
+                                    totalBruksareal = 40.0,
+                                    etasjeRegistreringer = emptyList(),
+                                ),
                                 byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008),
                                 vannforsyningRegistrering = null,
                                 avlopRegistrering = null,
