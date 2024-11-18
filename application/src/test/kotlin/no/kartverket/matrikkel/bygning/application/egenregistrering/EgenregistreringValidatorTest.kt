@@ -10,7 +10,7 @@ import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import kotlin.test.Test
 
 class EgenregistreringValidatorTest {
@@ -64,8 +64,8 @@ class EgenregistreringValidatorTest {
             baseBygning,
         )
 
-        assertThat(validationErrors).hasSize(1)
-        assertThat(validationErrors.first().detail).contains("flere registreringer")
+        assertThat(validationErrors.error.errors).hasSize(1)
+        assertThat(validationErrors.error.errors.first().message).contains("flere registreringer")
     }
 
     @Test
@@ -89,7 +89,7 @@ class EgenregistreringValidatorTest {
             baseBygning,
         )
 
-        assertThat(validationErrors).hasSize(1)
-        assertThat(validationErrors.first().detail).contains("finnes ikke")
+        assertThat(validationErrors.error.errors).hasSize(1)
+        assertThat(validationErrors.error.errors.first().message).contains("finnes ikke")
     }
 }

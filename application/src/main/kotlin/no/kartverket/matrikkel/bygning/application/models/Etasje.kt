@@ -1,11 +1,6 @@
 package no.kartverket.matrikkel.bygning.application.models
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.models.Etasjenummer.Companion.getEtasjeplanKodeFromString
-import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 
 sealed interface Etasje {
@@ -18,24 +13,25 @@ sealed interface Etasje {
 
 
 @Serializable
-data class Etasjeteller(
+data class Etasjeteller private constructor (
     val teller: Int
 ) {
-    // Trenger dette egentlig være en begrensning? Hva om Norge i 2050 får en bygning som er 101 hovedetasjer?
-    init {
-        if (teller > 99 || teller < 0) {
-            // TODO Hvordan bør vi egentlig håndtere init feil? Skal vi returne en result her med en custom constructor?
-            throw RuntimeException("Isje lov")
+    companion object {
+        fun of(teller: Int): Etasjeteller {
+            if (teller > 99 || teller < 0) {
+                // TODO Hvordan bør vi egentlig håndtere init feil? Skal vi returne en result her med en custom constructor?
+                throw IllegalArgumentException("Ugyldig etasjeteller: $teller")
+            }
+            return Etasjeteller(teller)
         }
     }
-
     override fun toString(): String {
         return teller.toString().padStart(2, '0')
     }
 }
 
 @Serializable
-data class Etasjenummer(
+data class Etasjenummer private constructor(
     val etasjeplanKode: EtasjeplanKode,
     // TODO Har dette et annet vettugt navn enn "etasjeteller"?
     val etasjeteller: Etasjeteller,
@@ -62,13 +58,27 @@ data class Etasjenummer(
     }
 
     companion object {
-        fun getEtasjeplanKodeFromString(etasjeplanKode: String): EtasjeplanKode? {
+        fun of(etasjenummer: String): Etasjenummer {
+            val etasjeplanKode = getEtasjeplanKodeFromString(etasjenummer.slice(0..0))
+            val etasjeteller = etasjenummer.slice(1..2).toIntOrNull()
+
+            if (etasjeteller != null && etasjenummer.length == 3) {
+                return Etasjenummer(
+                    etasjeplanKode = etasjeplanKode,
+                    etasjeteller = Etasjeteller.of(etasjeteller),
+                )
+            }
+
+            throw IllegalArgumentException("Ugyldig etasjenummer: $etasjenummer")
+        }
+
+        private fun getEtasjeplanKodeFromString(etasjeplanKode: String): EtasjeplanKode {
             return when (etasjeplanKode) {
                 "L" -> EtasjeplanKode.Loftetasje
                 "H" -> EtasjeplanKode.Hovedetasje
                 "U" -> EtasjeplanKode.Underetasje
                 "K" -> EtasjeplanKode.Kjelleretasje
-                else -> null
+                else -> throw IllegalArgumentException("Ugyldig etasjeplankode: $etasjeplanKode")
             }
         }
     }
@@ -77,26 +87,4 @@ data class Etasjenummer(
         return "${etasjeplanKode.toString().first()}${etasjeteller}"
     }
 
-}
-
-// TODO Validering før man kommer hit? Eller returnere result?
-fun String.toEtasjenummer(): Result<Etasjenummer, ErrorDetail> {
-    val etasjeplanKode = getEtasjeplanKodeFromString(this.slice(0..0))
-
-    val etasjeteller = this.slice(1..2).toIntOrNull()
-
-    if (etasjeplanKode != null && etasjeteller != null && this.length == 3) {
-        return Ok(
-            Etasjenummer(
-                etasjeplanKode = etasjeplanKode,
-                etasjeteller = Etasjeteller(etasjeteller),
-            ),
-        )
-    }
-
-    return Err(
-        ErrorDetail(
-            detail = "Etasjenummer var ikke gyldig, forventet format er for eksempel: H10, K01, L02",
-        ),
-    )
 }

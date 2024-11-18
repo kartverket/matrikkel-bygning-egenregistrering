@@ -1,48 +1,45 @@
 package no.kartverket.matrikkel.bygning.application.bygning
 
-import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
-import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
-import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.andThen
-import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.toResultOr
+import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
+import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
+import no.kartverket.matrikkel.bygning.application.models.error.DomainError
+import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 
 class BygningService(
     private val bygningClient: BygningClient,
     private val egenregistreringService: EgenregistreringService
 ) {
-    fun getBygningWithEgenregistrertData(bygningId: Long): Result<Bygning, ErrorDetail> {
-
+    fun getBygningWithEgenregistrertData(bygningId: Long): Result<Bygning, DomainError> {
         return bygningClient
             .getBygningById(bygningId)
-            .andThen { bygning ->
-                egenregistreringService
-                    .findAllEgenregistreringerForBygning(bygningId)
-                    .map { egenregistreringerForBygning ->
-                        bygning.withEgenregistrertData(egenregistreringerForBygning)
-                    }
+            .map { bygning ->
+                val egenregistreringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygningId)
+                bygning.withEgenregistrertData(egenregistreringerForBygning)
             }
     }
 
-    fun getBruksenhetWithEgenregistrertData(bygningId: Long, bruksenhetId: Long): Result<Bruksenhet, ErrorDetail> {
+    fun getBruksenhetWithEgenregistrertData(bygningId: Long, bruksenhetId: Long): Result<Bruksenhet, DomainError> {
         return bygningClient
             .getBygningById(bygningId)
-            .andThen { bygning ->
-                egenregistreringService
-                    .findAllEgenregistreringerForBygning(bygningId)
-                    .flatMap { egenregistreringerForBygning ->
-                        val bruksenhet = bygning.bruksenheter
-                            .find { it.bruksenhetId == bruksenhetId }
-                            ?.withEgenregistrertData(egenregistreringerForBygning)
+            .andThen { getBruksenhetWithEgenregistrertData(it, bruksenhetId) }
+    }
 
-                        bruksenhet.toResultOr {
-                            ErrorDetail(detail = "Bruksenhet finnes ikke på bygningen")
-                        }
-                    }
+    private fun getBruksenhetWithEgenregistrertData(
+        bygning: Bygning,
+        bruksenhetId: Long
+    ): Result<Bruksenhet, DomainError> {
+        val egenregistreringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygning.bygningId)
+        return bygning.bruksenheter
+            .find { it.bruksenhetId == bruksenhetId }
+            ?.withEgenregistrertData(egenregistreringerForBygning)
+            .toResultOr {
+                BruksenhetNotFound(message = "Bruksenhet finnes ikke på bygningen")
             }
     }
 }

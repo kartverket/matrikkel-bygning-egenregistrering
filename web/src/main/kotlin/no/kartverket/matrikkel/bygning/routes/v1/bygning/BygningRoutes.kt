@@ -1,6 +1,6 @@
 package no.kartverket.matrikkel.bygning.routes.v1.bygning
 
-import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.mapBoth
 import io.github.smiley4.ktorswaggerui.dsl.routing.get
 import io.github.smiley4.ktorswaggerui.dsl.routing.route
 import io.ktor.http.*
@@ -8,6 +8,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
+import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 
 fun Route.bygningRouting(
     bygningService: BygningService
@@ -38,15 +39,13 @@ fun Route.bygningRouting(
         ) {
             val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-            bygningService.getBygningWithEgenregistrertData(bygningId).fold(
-                success = { call.respond(HttpStatusCode.OK, it.toBygningResponse()) },
-                failure = {
-                    call.respond(
-                        HttpStatusCode.NotFound,
-                        it.detail,
-                    )
-                },
-            )
+            val (statusCode, body) = bygningService.getBygningWithEgenregistrertData(bygningId)
+                .mapBoth(
+                    { HttpStatusCode.OK to it.toBygningResponse() },
+                    ::domainErrorToResponse,
+                )
+
+            call.respond(statusCode, body)
         }
 
         route("egenregistrert") {
@@ -75,15 +74,12 @@ fun Route.bygningRouting(
             ) {
                 val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-                bygningService.getBygningWithEgenregistrertData(bygningId).fold(
-                    success = { call.respond(HttpStatusCode.OK, it.toBygningSimpleResponseFromEgenregistrertData()) },
-                    failure = {
-                        call.respond(
-                            HttpStatusCode.NotFound,
-                            it.detail,
-                        )
-                    },
+                val (status, body) = bygningService.getBygningWithEgenregistrertData(bygningId).mapBoth(
+                    { HttpStatusCode.OK to it.toBygningSimpleResponseFromEgenregistrertData() },
+                    ::domainErrorToResponse
                 )
+
+                call.respond(status, body)
             }
         }
 
@@ -117,15 +113,12 @@ fun Route.bygningRouting(
                     val bygningId = call.parameters.getOrFail("bygningId").toLong()
                     val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
-                    bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).fold(
-                        success = { call.respond(HttpStatusCode.OK, it.toBruksenhetResponse()) },
-                        failure = {
-                            call.respond(
-                                HttpStatusCode.NotFound,
-                                it.detail,
-                            )
-                        },
+                    val (status, body) = bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).mapBoth(
+                        { HttpStatusCode.OK to it.toBruksenhetResponse() },
+                        ::domainErrorToResponse,
                     )
+
+                    call.respond(status, body)
                 }
 
                 route("egenregistrert") {
@@ -157,15 +150,12 @@ fun Route.bygningRouting(
                         val bygningId = call.parameters.getOrFail("bygningId").toLong()
                         val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
-                        bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).fold(
-                            success = { call.respond(HttpStatusCode.OK, it.toBruksenhetSimpleResponseFromEgenregistrertData()) },
-                            failure = {
-                                call.respond(
-                                    HttpStatusCode.NotFound,
-                                    it.detail,
-                                )
-                            },
+                        val (status, body) = bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).mapBoth(
+                            { HttpStatusCode.OK to it.toBruksenhetSimpleResponseFromEgenregistrertData() },
+                            ::domainErrorToResponse,
                         )
+
+                        call.respond(status, body)
                     }
                 }
             }
