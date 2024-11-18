@@ -117,7 +117,6 @@ internal class MatrikkelBygningClient(
                                     bruksenhetsmetadata,
                                 ),
                             ),
-                            etasjer = emptyList(),
                         )
                     },
                     etasjer = emptyList(),

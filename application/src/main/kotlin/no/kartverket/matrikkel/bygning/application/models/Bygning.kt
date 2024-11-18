@@ -1,6 +1,5 @@
 package no.kartverket.matrikkel.bygning.application.models
 
-import no.kartverket.matrikkel.bygning.application.models.Etasje.*
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
@@ -38,7 +37,7 @@ data class Oppvarming(val data: OppvarmingKode, val metadata: RegisterMetadata)
 data class Bruksenhet(
     val bruksenhetId: Long,
     val bygningId: Long,
-    val etasjer: List<BruksenhetEtasje>,
+    val etasjer: Multikilde<List<BruksenhetEtasje>> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val totalBruksareal: Multikilde<Bruksareal> = Multikilde(),
     val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
@@ -46,5 +45,3 @@ data class Bruksenhet(
     val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
     val avlop: Multikilde<Avlop> = Multikilde(),
 )
-
-

@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.Avlop
 import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetEtasje
 import no.kartverket.matrikkel.bygning.application.models.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Energikilde
-import no.kartverket.matrikkel.bygning.application.models.Etasje.*
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
@@ -46,21 +46,14 @@ data class BygningSimpleResponse(
 
 @Serializable
 data class BruksenhetEtasjeReponse(
-    val etasjenummer: String,
-    val bruksareal: MultikildeResponse<BruksarealResponse>?,
-)
-
-@Serializable
-data class BruksenhetSimpleEtasjeReponse(
-    val etasjenummer: String,
+    val etasjeIdentifikator: String,
     val bruksareal: BruksarealResponse?,
 )
-
 
 @Serializable
 data class BruksenhetResponse(
     val bruksenhetId: Long,
-    val etasjer: List<BruksenhetEtasjeReponse>?,
+    val etasjer: MultikildeResponse<List<BruksenhetEtasjeReponse>>?,
     val byggeaar: MultikildeResponse<ByggeaarResponse>?,
     val totalBruksareal: MultikildeResponse<BruksarealResponse>?,
     val vannforsyning: MultikildeResponse<VannforsyningKodeResponse>?,
@@ -72,7 +65,7 @@ data class BruksenhetResponse(
 @Serializable
 data class BruksenhetSimpleResponse(
     val bruksenhetId: Long,
-    val etasjer: List<BruksenhetSimpleEtasjeReponse>?,
+    val etasjer: List<BruksenhetEtasjeReponse>?,
     val byggeaar: ByggeaarResponse?,
     val totalBruksareal: BruksarealResponse?,
     val vannforsyning: VannforsyningKodeResponse?,
@@ -140,7 +133,7 @@ fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleRespon
 fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
     bruksenhetId = this.bruksenhetId,
     byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
-    etasjer = this.etasjer.map { it.toBruksenhetEtasjeResponse() },
+    etasjer = this.etasjer.toMultikildeResponse { map(BruksenhetEtasje::toBruksenhetEtasjeResponse) },
     totalBruksareal = this.totalBruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
     energikilder = this.energikilder.toMultikildeResponse { map(Energikilde::toEnergikildeResponse) },
     oppvarminger = this.oppvarminger.toMultikildeResponse { map(Oppvarming::toOppvarmingResponse) },
@@ -151,7 +144,7 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
 fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
     bruksenhetId = this.bruksenhetId,
     byggeaar = this.byggeaar.egenregistrert?.toByggeaarResponse(),
-    etasjer = this.etasjer.map { it.toBruksenhetSimpleEtasjeResponse() },
+    etasjer = this.etasjer.egenregistrert?.map { it.toBruksenhetEtasjeResponse() },
     totalBruksareal = this.totalBruksareal.egenregistrert?.toBruksarealResponse(),
     vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
     avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
@@ -159,15 +152,9 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
     oppvarminger = this.oppvarminger.egenregistrert?.map { it.toOppvarmingResponse() },
 )
 
-
-private fun BruksenhetEtasje.toBruksenhetSimpleEtasjeResponse(): BruksenhetSimpleEtasjeReponse = BruksenhetSimpleEtasjeReponse(
-    etasjenummer = this.etasjenummer.toString(),
-    bruksareal = this.bruksareal.egenregistrert?.toBruksarealResponse(),
-)
-
 private fun BruksenhetEtasje.toBruksenhetEtasjeResponse(): BruksenhetEtasjeReponse = BruksenhetEtasjeReponse(
-    etasjenummer = this.etasjenummer.toString(),
-    bruksareal = this.bruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
+    etasjeIdentifikator = this.etasjeIdentifikator.toString(),
+    bruksareal = this.bruksareal?.toBruksarealResponse(),
 )
 
 private fun Byggeaar.toByggeaarResponse(): ByggeaarResponse = ByggeaarResponse(

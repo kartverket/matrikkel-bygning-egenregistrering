@@ -17,22 +17,18 @@ internal class LocalBygningClient : BygningClient {
         Bruksenhet(
             bruksenhetId = 1L,
             bygningId = 1L,
-            etasjer = emptyList(),
         ),
         Bruksenhet(
             bruksenhetId = 2L,
             bygningId = 1L,
-            etasjer = emptyList(),
         ),
         Bruksenhet(
             bruksenhetId = 3L,
             bygningId = 2L,
-            etasjer = emptyList(),
         ),
         Bruksenhet(
             bruksenhetId = 4L,
             bygningId = 2L,
-            etasjer = emptyList(),
         ),
     )
 

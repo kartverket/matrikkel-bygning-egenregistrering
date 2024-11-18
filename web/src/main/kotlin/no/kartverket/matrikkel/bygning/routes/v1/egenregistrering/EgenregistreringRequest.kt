@@ -13,6 +13,7 @@ import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
+import no.kartverket.matrikkel.bygning.application.models.EtasjeIdentifikator.Companion.toEtasjeIdentifikator
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
@@ -21,7 +22,6 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.application.models.toEtasjenummer
 import java.time.Instant
 import java.util.*
 import kotlin.collections.map
@@ -79,10 +79,10 @@ data class OppvarmingRegistreringRequest(
 )
 
 fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Result<EtasjeBruksarealRegistrering, ErrorDetail> {
-    return this.etasjenummer.toEtasjenummer().map { etasjenummer ->
+    return this.etasjenummer.toEtasjeIdentifikator().map { etasjenummer ->
         EtasjeBruksarealRegistrering(
             bruksareal = this.bruksareal,
-            etasjenummer = etasjenummer,
+            etasjeIdentifikator = etasjenummer,
         )
     }
 }
@@ -158,6 +158,4 @@ fun EgenregistreringRequest.toEgenregistrering(): Result<Egenregistrering, Error
             ),
         ),
     )
-
-
 }
