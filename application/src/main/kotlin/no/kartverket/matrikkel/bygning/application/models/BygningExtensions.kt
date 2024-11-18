@@ -27,19 +27,6 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
         registrertAv = egenregistrering.eier,
     )
 
-//    val etasjerInRegistreringNotOnBruksenhet =
-//        bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer?.filter { etasjeRegistrering ->
-//            this.etasjer.egenregistrert?.find { etasje -> etasje.etasjeIdentifikator == etasjeRegistrering.etasjeIdentifikator } == null
-//        }?.map {
-//            BruksenhetEtasje(
-//                etasjeIdentifikator = it.etasjeIdentifikator,
-//                bruksareal = Bruksareal(
-//                    data = it.bruksareal,
-//                    metadata = metadata
-//                ),
-//            )
-//        }
-
     return this.copy(
         byggeaar = this.byggeaar.aggregate {
             bruksenhetRegistrering.byggeaarRegistrering?.let {
@@ -108,27 +95,6 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
         }
     )
 }
-//
-//fun BruksenhetEtasje.applyBruksenhetRegistrering(
-//    bruksenhetRegistrering: BruksenhetRegistrering, metadata: RegisterMetadata
-//): BruksenhetEtasje {
-//    val relevantEtasjeRegistrering =
-//        bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer?.find { it.etasjeIdentifikator == this.etasjeIdentifikator }
-//
-//    if (relevantEtasjeRegistrering == null || this.bruksareal.egenregistrert != null) {
-//        return this
-//    }
-//
-//    return this.copy(
-//        bruksareal = this.bruksareal.aggregate {
-//            Bruksareal(
-//                data = relevantEtasjeRegistrering.bruksareal,
-//                metadata = metadata,
-//            )
-//        },
-//    )
-//}
-
 
 fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): Bruksenhet {
     return egenregistreringer.fold(this) { bruksenhetAggregate, egenregistrering ->
