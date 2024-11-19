@@ -72,6 +72,14 @@ data class Etasjebetegnelse private constructor(
             throw IllegalArgumentException("Ugyldig etasjebetegnelse: $etasjeBetegnelse")
         }
 
+        fun of(etasjenummer: Int, etasjeplanKode: EtasjeplanKode): Etasjebetegnelse {
+            return Etasjebetegnelse(
+                etasjeplanKode = etasjeplanKode,
+                etasjenummer = Etasjenummer.of(etasjenummer),
+            )
+        }
+
+
         fun getEtasjeplanKodeFromString(etasjeplanKode: String): EtasjeplanKode {
             return when (etasjeplanKode) {
                 "H" -> EtasjeplanKode.Hovedetasje

@@ -13,9 +13,6 @@ import java.sql.Timestamp
 import java.util.UUID
 import javax.sql.DataSource
 
-// TODO Ikke egentlig blodfan av hvordan ting håndteres ut av repository. Kan man få noe mer informasjon ut i ErrorDetail? Det er jo antageligvis en exception som skjer
-// hvis noe først går gæli her
-
 class EgenregistreringRepositoryImpl(private val dataSource: DataSource) : EgenregistreringRepository {
     override fun getAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
         return dataSource.executeQueryAndMapPreparedStatement(

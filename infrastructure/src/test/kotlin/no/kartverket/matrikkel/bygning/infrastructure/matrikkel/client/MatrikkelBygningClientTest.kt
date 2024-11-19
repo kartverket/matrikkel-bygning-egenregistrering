@@ -133,6 +133,7 @@ class MatrikkelBygningClientTest {
                 etasjedata.bruksarealTotalt = 150.0
                 etasjer(
                     etasje {
+                        id = 1L
                         etasjeplanKodeId = MatrikkelEtasjeplanKode.Hovedetasje()
                         etasjenummer = 1
                         bruksarealTotalt = 150.0

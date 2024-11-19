@@ -122,13 +122,21 @@ internal class MatrikkelBygningClient(
                             ),
                         )
                     },
-                    etasjer = bygning.etasjer.item.map { etasje ->
-                        BygningEtasje(
-                            etasjeId = etasje.id,
-                            // Vi ønsker ikke unummererte bruksenheter o.l. i ny bygningsdel,
-                            // men hvordan skal vi deale med tomme etasjeplankoder som er tilfellet for unummererte bruksenheter?
-                            etasjeBetegnelse = Etasjebetegnelse.of("${mapEtasjeplanKode(etasje.etasjeplanKodeId).toString()}${etasje.etasjenummer}"),
-                        )
+                    etasjer = bygning.etasjer.item.mapNotNull { etasje ->
+                        val etasjeplanKode = mapEtasjeplanKode(etasje.etasjeplanKodeId)
+
+                        // Vi ønsker ikke unummererte bruksenheter o.l. i ny bygningsdel,
+                        // men hvordan skal vi deale med tomme etasjeplankoder som er tilfellet for unummererte bruksenheter?
+                        if (etasjeplanKode != null) {
+                            BygningEtasje(
+                                etasjeId = etasje.id,
+                                etasjeBetegnelse = Etasjebetegnelse.of(
+                                    etasjenummer = etasje.etasjenummer,
+                                    etasjeplanKode = etasjeplanKode,
+                                ),
+                            )
+                        }
+                        null
                     },
                 ),
             )

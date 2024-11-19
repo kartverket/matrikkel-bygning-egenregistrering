@@ -27,7 +27,7 @@ fun bygning(scope: Bygning.() -> Unit): Bygning = Bygning()
         bygningsstatusHistorikker = bygningsstatusHistorikkList(
             bygningsstatusHistorikk {
                 registrertDato = timestampUtc(2000, 1, 1)
-            }
+            },
         )
     }
     .apply(scope)
@@ -36,9 +36,11 @@ fun bygning(scope: Bygning.() -> Unit): Bygning = Bygning()
         if (bruksenhetIds == null) bruksenhetIds = BruksenhetIdList()
         if (energikildeKodeIds == null) energikildeKodeIds = EnergikildeKodeIdList()
         if (oppvarmingsKodeIds == null) oppvarmingsKodeIds = OppvarmingsKodeIdList()
+        // Vet ikke om denne bør være fylt ut med noe, vet ikke hvordan matrikkelen dealer med tomme etasjer?
+        if (etasjer == null) etasjer = EtasjeList()
 
         // Fyller inn standard kodeid hvis det ikke har blitt fylt inn noe annet
-        if(vannforsyningsKodeId == null) vannforsyningsKodeId = MatrikkelVannforsyningKode.IkkeOppgitt()
+        if (vannforsyningsKodeId == null) vannforsyningsKodeId = MatrikkelVannforsyningKode.IkkeOppgitt()
         if (avlopsKodeId == null) avlopsKodeId = MatrikkelAvlopKode.IkkeOppgitt()
     }
 
