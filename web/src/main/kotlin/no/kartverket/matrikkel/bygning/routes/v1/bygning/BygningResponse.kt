@@ -45,15 +45,15 @@ data class BygningSimpleResponse(
 )
 
 @Serializable
-data class BruksenhetEtasjeReponse(
-    val etasjeIdentifikator: String,
+data class BruksenhetEtasjeResponse(
+    val etasjebetegnelse: String,
     val bruksareal: BruksarealResponse?,
 )
 
 @Serializable
 data class BruksenhetResponse(
     val bruksenhetId: Long,
-    val etasjer: MultikildeResponse<List<BruksenhetEtasjeReponse>>?,
+    val etasjer: MultikildeResponse<List<BruksenhetEtasjeResponse>>?,
     val byggeaar: MultikildeResponse<ByggeaarResponse>?,
     val totalBruksareal: MultikildeResponse<BruksarealResponse>?,
     val vannforsyning: MultikildeResponse<VannforsyningKodeResponse>?,
@@ -65,7 +65,7 @@ data class BruksenhetResponse(
 @Serializable
 data class BruksenhetSimpleResponse(
     val bruksenhetId: Long,
-    val etasjer: List<BruksenhetEtasjeReponse>?,
+    val etasjer: List<BruksenhetEtasjeResponse>?,
     val byggeaar: ByggeaarResponse?,
     val totalBruksareal: BruksarealResponse?,
     val vannforsyning: VannforsyningKodeResponse?,
@@ -152,8 +152,8 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
     oppvarminger = this.oppvarminger.egenregistrert?.map { it.toOppvarmingResponse() },
 )
 
-private fun BruksenhetEtasje.toBruksenhetEtasjeResponse(): BruksenhetEtasjeReponse = BruksenhetEtasjeReponse(
-    etasjeIdentifikator = this.etasjeBetegnelse.toString(),
+private fun BruksenhetEtasje.toBruksenhetEtasjeResponse(): BruksenhetEtasjeResponse = BruksenhetEtasjeResponse(
+    etasjebetegnelse = this.etasjeBetegnelse.toString(),
     bruksareal = this.bruksareal?.toBruksarealResponse(),
 )
 

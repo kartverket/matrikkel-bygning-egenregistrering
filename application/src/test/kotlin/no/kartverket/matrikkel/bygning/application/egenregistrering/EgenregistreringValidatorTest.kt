@@ -3,11 +3,16 @@ package no.kartverket.matrikkel.bygning.application.egenregistrering
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.hasSize
+import assertk.assertions.isTrue
+import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
+import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
+import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import java.time.Instant
 import java.util.UUID
@@ -18,7 +23,7 @@ class EgenregistreringValidatorTest {
         bygningId = 1L, bygningsnummer = 100L,
         bruksenheter = listOf(
             Bruksenhet(
-                bruksenhetId = 1L, bygningId = 1L, etasjer = emptyList(),
+                bruksenhetId = 1L, bygningId = 1L, etasjer = Multikilde(),
             ),
         ),
         etasjer = emptyList(),
@@ -36,7 +41,7 @@ class EgenregistreringValidatorTest {
 
     @Test
     fun `egenregistrering med flere registreringer paa samme bruksenhet skal feile`() {
-        val validationErrors = EgenregistreringValidator.validateEgenregistrering(
+        val validationResult = EgenregistreringValidator.validateEgenregistrering(
             baseEgenregistrering.copy(
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
@@ -64,13 +69,14 @@ class EgenregistreringValidatorTest {
             baseBygning,
         )
 
-        assertThat(validationErrors).hasSize(1)
-        assertThat(validationErrors.first().detail).contains("flere registreringer")
+        assertThat(validationResult.isErr).isTrue()
+        assertThat(validationResult.error.errors).hasSize(1)
+        assertThat(validationResult.error.errors.first().message).contains("flere registreringer")
     }
 
     @Test
     fun `egenregistrering med bruksenhetregistrering hvor bruksenhet ikke finnes paa bygning skal feile`() {
-        val validationErrors = EgenregistreringValidator.validateEgenregistrering(
+        val validationResult = EgenregistreringValidator.validateEgenregistrering(
             baseEgenregistrering.copy(
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
@@ -89,7 +95,42 @@ class EgenregistreringValidatorTest {
             baseBygning,
         )
 
-        assertThat(validationErrors).hasSize(1)
-        assertThat(validationErrors.first().detail).contains("finnes ikke")
+        assertThat(validationResult.isErr).isTrue()
+        assertThat(validationResult.error.errors).hasSize(1)
+        assertThat(validationResult.error.errors.first().message).contains("finnes ikke")
+    }
+
+    @Test
+    fun `egenregistrering med bruksarealregistrering med baade total og etasjeregistrering skal feile`() {
+        val validationResult = EgenregistreringValidator.validateEgenregistrering(
+            baseEgenregistrering.copy(
+                bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
+                    bruksenhetRegistreringer = listOf(
+                        BruksenhetRegistrering(
+                            bruksenhetId = 1L,
+                            bruksarealRegistrering = BruksarealRegistrering(
+                                totalBruksareal = 125.0,
+                                etasjeRegistreringer = listOf(
+                                    EtasjeBruksarealRegistrering(
+                                        bruksareal = 125.0,
+                                        etasjeBetegnelse = Etasjebetegnelse.of("H01"),
+                                    ),
+                                ),
+                            ),
+                            byggeaarRegistrering = null,
+                            vannforsyningRegistrering = null,
+                            avlopRegistrering = null,
+                            energikildeRegistrering = null,
+                            oppvarmingRegistrering = null,
+                        ),
+                    ),
+                ),
+            ),
+            baseBygning,
+        )
+
+        assertThat(validationResult.isErr).isTrue()
+        assertThat(validationResult.error.errors).hasSize(1)
+        assertThat(validationResult.error.errors.first().message).contains("totalt bruksareal og areal per etasje")
     }
 }

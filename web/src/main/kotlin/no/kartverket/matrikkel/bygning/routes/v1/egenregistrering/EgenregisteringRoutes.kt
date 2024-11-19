@@ -73,7 +73,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
             }
         },
     ) {
-        // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom reveice-metode.
+        // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
         val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
         val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering() }

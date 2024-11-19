@@ -1,13 +1,23 @@
 package no.kartverket.matrikkel.bygning.application
 
+import assertk.all
 import assertk.assertThat
+import assertk.assertions.index
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
+import assertk.assertions.prop
+import assertk.assertions.single
+import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetEtasje
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
+import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
@@ -15,15 +25,14 @@ import java.time.Instant
 import java.util.*
 import kotlin.test.Test
 
-class BygningExtensionsTest {
-
+class BygningEgenregistreringAggregeringTest {
     private val defaultBruksenhet = Bruksenhet(
         bruksenhetId = 1L,
         bygningId = 1L,
         totalBruksareal = Multikilde(),
         energikilder = Multikilde(),
         oppvarminger = Multikilde(),
-        etasjer = emptyList(),
+        etasjer = Multikilde(),
     )
 
     private val defaultBygning = Bygning(
@@ -41,7 +50,7 @@ class BygningExtensionsTest {
         bruksenhetId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             totalBruksareal = 50.0,
-            etasjeRegistreringer = emptyList(),
+            etasjeRegistreringer = null,
         ),
         byggeaarRegistrering = null,
         energikildeRegistrering = null,
@@ -59,7 +68,7 @@ class BygningExtensionsTest {
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         eier = Foedselsnummer("31129956715"),
-        bygningRegistrering = defaultBygningRegistrering
+        bygningRegistrering = defaultBygningRegistrering,
     )
 
     @Test
@@ -72,9 +81,9 @@ class BygningExtensionsTest {
                     defaultBruksenhetRegistrering.copy(
                         bruksarealRegistrering = BruksarealRegistrering(
                             totalBruksareal = 150.0,
-                            etasjeRegistreringer = emptyList()
+                            etasjeRegistreringer = null,
                         ),
-                    )
+                    ),
                 ),
             ),
         )
@@ -85,10 +94,53 @@ class BygningExtensionsTest {
     }
 
     @Test
+    fun `bruksarealregistrering skal sette nyeste av etasje og total bruksareal`() {
+        val laterRegistrering = defaultEgenregistrering.copy(
+            id = UUID.randomUUID(),
+            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
+            bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
+                bruksenhetRegistreringer = listOf(
+                    defaultBruksenhetRegistrering.copy(
+                        bruksarealRegistrering = BruksarealRegistrering(
+                            totalBruksareal = null,
+                            etasjeRegistreringer = listOf(
+                                EtasjeBruksarealRegistrering(
+                                    bruksareal = 125.0,
+                                    etasjeBetegnelse = Etasjebetegnelse.of("H01"),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
+
+        assertThat(aggregatedBygning.bruksenheter.single().totalBruksareal.egenregistrert).isNull()
+
+        assertThat(aggregatedBygning).all {
+            prop(Bygning::bruksenheter).index(0).all {
+                prop(Bruksenhet::etasjer).all {
+                    prop(Multikilde<List<BruksenhetEtasje>>::egenregistrert).isNotNull().single().all {
+                        prop(BruksenhetEtasje::bruksareal).isNotNull().all {
+                            prop(Bruksareal::data).isEqualTo(125.0)
+                        }
+                        prop(BruksenhetEtasje::etasjeBetegnelse).isEqualTo(Etasjebetegnelse.of("H01"))
+                    }
+                }
+                prop(Bruksenhet::totalBruksareal).all {
+                    prop(Multikilde<Bruksareal>::egenregistrert).isNull()
+                }
+            }
+        }
+    }
+
+    @Test
     fun `registrering med tom liste paa listeregistering skal ikke sette felt paa bruksenhet`() {
         val bruksenhet = defaultBruksenhet.withEgenregistrertData(listOf(defaultEgenregistrering))
 
-       assertThat(bruksenhet.oppvarminger).isEmpty()
+        assertThat(bruksenhet.oppvarminger).isEmpty()
         assertThat(bruksenhet.energikilder).isEmpty()
     }
 }

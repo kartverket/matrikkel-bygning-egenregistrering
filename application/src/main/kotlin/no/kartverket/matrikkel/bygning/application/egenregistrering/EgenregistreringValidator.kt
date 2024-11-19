@@ -11,12 +11,12 @@ import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 
 class EgenregistreringValidator {
     companion object {
-        // Begge disse validatorene kunne ha lagt ved indeks på bruksenheten og gitt dette i pointer, men blir det litt overkill?
         fun validateEgenregistrering(egenregistrering: Egenregistrering, bygning: Bygning): Result<Unit, MultipleValidationError> {
 
             val errors = listOfNotNull(
                 validateBruksenheterRegistreredOnCorrectBygning(egenregistrering, bygning),
                 validateRepeatedBruksenheter(egenregistrering),
+                validateBruksarealRegistreringForBruksenheter(egenregistrering),
             )
 
             return if (errors.isEmpty()) {
@@ -59,6 +59,35 @@ class EgenregistreringValidator {
             if (repeatedBruksenheter.isNotEmpty()) {
                 return ValidationError(
                     message = "Bruksenhet ${if (repeatedBruksenheter.size > 1) "er" else ""} med ID ${repeatedBruksenheter.joinToString()} har flere registreringer på seg. Kun én registrering per bruksenhet kan sendes inn",
+                )
+            }
+
+            return null
+        }
+
+        // Dette er ikke helt bestemt ennå, men per nå så skal vi ta på oss støyten for å registrere et totalt bruksareal ut i fra etasjeregistreringer, fremfor at klienter gjør det selv
+        private fun validateBruksarealRegistreringForBruksenheter(egenregistrering: Egenregistrering): ValidationError? {
+            val invalidBruksarealRegistreringer = egenregistrering.bygningRegistrering.bruksenhetRegistreringer
+                .filter {
+                    if (it.bruksarealRegistrering == null) {
+                        return@filter false
+                    }
+
+                    val hasTotalRegistrering = it.bruksarealRegistrering.totalBruksareal != null
+                    val hasEtasjeRegistrering = it.bruksarealRegistrering.etasjeRegistreringer != null
+
+                    hasTotalRegistrering && hasEtasjeRegistrering
+                }
+                .map {
+                    // Hvordan slippe å bruke !! her?
+                    it.bruksenhetId to it.bruksarealRegistrering!!
+                }
+
+            if (invalidBruksarealRegistreringer.isNotEmpty()) {
+                return ValidationError(
+                    message = "Bruksenhet${if (invalidBruksarealRegistreringer.size > 1) "er" else ""} med ID [${
+                        invalidBruksarealRegistreringer.map { it.first }.joinToString()
+                    }], har både totalt bruksareal og areal per etasje registrert. Kun én av disse kan registreres om gangen",
                 )
             }
 

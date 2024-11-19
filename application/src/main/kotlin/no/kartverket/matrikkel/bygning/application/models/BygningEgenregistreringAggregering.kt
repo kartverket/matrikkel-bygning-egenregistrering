@@ -36,14 +36,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                 )
             }
         },
-        totalBruksareal = this.totalBruksareal.aggregate {
-            bruksenhetRegistrering.bruksarealRegistrering?.totalBruksareal?.let {
-                Bruksareal(
-                    data = it,
-                    metadata = metadata,
-                )
-            }
-        },
+        totalBruksareal = this.aggregateTotalBruksareal(bruksenhetRegistrering.bruksarealRegistrering, metadata),
         vannforsyning = this.vannforsyning.aggregate {
             bruksenhetRegistrering.vannforsyningRegistrering?.let {
                 Vannforsyning(
@@ -80,19 +73,42 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                 }
             }
         },
-        etasjer = this.etasjer.aggregate {
-            bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer?.let {
-                it.map {
-                    BruksenhetEtasje(
-                        etasjeBetegnelse = it.etasjeBetegnelse,
-                        bruksareal = Bruksareal(
-                            data = it.bruksareal,
-                            metadata = metadata,
-                        )
-                    )
-                }
-            }
-        }
+        etasjer = aggregateEtasjer(bruksenhetRegistrering.bruksarealRegistrering, metadata),
+    )
+}
+
+private fun Bruksenhet.aggregateEtasjer(
+    bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
+): Multikilde<List<BruksenhetEtasje>> {
+    if (this.etasjer.egenregistrert != null || this.totalBruksareal.egenregistrert != null || bruksarealRegistrering?.etasjeRegistreringer == null) {
+        return this.etasjer
+    }
+
+    return this.etasjer.copy(
+        egenregistrert = bruksarealRegistrering.etasjeRegistreringer.map {
+            BruksenhetEtasje(
+                etasjeBetegnelse = it.etasjeBetegnelse,
+                bruksareal = Bruksareal(
+                    data = it.bruksareal,
+                    metadata = metadata,
+                ),
+            )
+        },
+    )
+}
+
+private fun Bruksenhet.aggregateTotalBruksareal(
+    bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
+): Multikilde<Bruksareal> {
+    if (this.etasjer.egenregistrert != null || this.totalBruksareal.egenregistrert != null || bruksarealRegistrering?.totalBruksareal == null) {
+        return this.totalBruksareal
+    }
+
+    return this.totalBruksareal.copy(
+        egenregistrert = Bruksareal(
+            data = bruksarealRegistrering.totalBruksareal,
+            metadata = metadata,
+        ),
     )
 }
 

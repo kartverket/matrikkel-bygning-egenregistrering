@@ -121,11 +121,11 @@ internal class MatrikkelBygningClient(
                         )
                     },
                     etasjer = emptyList(),
-//                    bygning.etasjer.item.map { etasje ->
+                    // TODO Må mappe fra etasjeplankodeid til faktisk kode
+//                    etasjer = bygning.etasjer.item.map { etasje ->
 //                        BygningEtasje(
-//                            // TODO noe for å hente etasjenummer fra etasje
-//                            etasjenummer = etasje.etasjenummer,
 //                            etasjeId = etasje.id,
+//                            etasjeBetegnelse = Etasjebetegnelse.of("${etasje.etasjeplanKodeId}${etasje.etasjenummer}"),
 //                        )
 //                    },
                 ),
