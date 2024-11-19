@@ -14,7 +14,7 @@ data class Etasjenummer private constructor(val teller: Int) {
     companion object {
         fun of(teller: Int): Etasjenummer {
             // TODO Ta opp med fag: Trenger dette egentlig være en begrensning? Hva om Norge i 2050 får en bygning som har 101 hovedetasjer?
-            if (teller > 99 || teller < 0) {
+            if (teller > 99 || teller <= 0) {
                 throw IllegalArgumentException("Ugylding etasjenummer: $teller")
             }
 
@@ -56,17 +56,16 @@ data class Etasjebetegnelse private constructor(
 
     companion object {
         fun of(etasjeBetegnelse: String): Etasjebetegnelse {
-            val etasjeplanKode = getEtasjeplanKodeFromString(etasjeBetegnelse.slice(0..0))
+            if (etasjeBetegnelse.length == 3) {
+                val etasjeplanKode = EtasjeplanKode.of(etasjeBetegnelse.slice(0..0))
+                val etasjenummer = etasjeBetegnelse.slice(1..2).toIntOrNull()
 
-            val etasjenummer = etasjeBetegnelse.slice(1..2).toIntOrNull()
-
-            if (etasjenummer != null && etasjeBetegnelse.length == 3) {
-                val etasjenummer = Etasjenummer.of(etasjenummer)
-
-                return Etasjebetegnelse(
-                    etasjeplanKode = etasjeplanKode,
-                    etasjenummer = etasjenummer,
-                )
+                if (etasjenummer != null) {
+                    return of(
+                        etasjenummer = etasjenummer,
+                        etasjeplanKode = etasjeplanKode,
+                    )
+                }
             }
 
             throw IllegalArgumentException("Ugyldig etasjebetegnelse: $etasjeBetegnelse")
@@ -77,17 +76,6 @@ data class Etasjebetegnelse private constructor(
                 etasjeplanKode = etasjeplanKode,
                 etasjenummer = Etasjenummer.of(etasjenummer),
             )
-        }
-
-
-        fun getEtasjeplanKodeFromString(etasjeplanKode: String): EtasjeplanKode {
-            return when (etasjeplanKode) {
-                "H" -> EtasjeplanKode.Hovedetasje
-                "U" -> EtasjeplanKode.Underetasje
-                "L" -> EtasjeplanKode.Loftetasje
-                "K" -> EtasjeplanKode.Kjelleretasje
-                else -> throw IllegalArgumentException("Ugyldig etasjeplankode: $etasjeplanKode")
-            }
         }
     }
 

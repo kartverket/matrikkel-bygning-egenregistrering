@@ -14,10 +14,22 @@ enum class EtasjeplanKode(
     ),
     Underetasje(
         presentasjonsnavn = "Underetasje",
-        beskrivelse = "Et plan der underkant dekke eller himling er høyere enn 0,75m, men høyst 1,5m over planert gjennomsnittsnivå"
+        beskrivelse = "Et plan der underkant dekke eller himling er høyere enn 0,75m, men høyst 1,5m over planert gjennomsnittsnivå",
     ),
     Kjelleretasje(
         presentasjonsnavn = "Kjelleretasje",
         beskrivelse = "Et plan der underkant dekke eller himling er høyst 0,75m over planert terreng gjennonsnittsnivå rundt bygningen",
-    ),
+    );
+
+    companion object {
+        fun of(etasjeplanKode: String): EtasjeplanKode {
+            return when (etasjeplanKode.uppercase()) {
+                "H" -> Hovedetasje
+                "U" -> Underetasje
+                "L" -> Loftetasje
+                "K" -> Kjelleretasje
+                else -> throw IllegalArgumentException("Ugyldig etasjeplankode: $etasjeplanKode")
+            }
+        }
+    }
 }

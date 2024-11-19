@@ -77,10 +77,14 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
     )
 }
 
+private fun Bruksenhet.isEgenregistrertBruksarealRegistreringPresent(): Boolean =
+    this.etasjer.egenregistrert != null || this.totalBruksareal.egenregistrert != null
+
+
 private fun Bruksenhet.aggregateEtasjer(
     bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
 ): Multikilde<List<BruksenhetEtasje>> {
-    if (this.etasjer.egenregistrert != null || this.totalBruksareal.egenregistrert != null || bruksarealRegistrering?.etasjeRegistreringer == null) {
+    if (this.isEgenregistrertBruksarealRegistreringPresent() || bruksarealRegistrering?.etasjeRegistreringer == null) {
         return this.etasjer
     }
 
@@ -100,7 +104,7 @@ private fun Bruksenhet.aggregateEtasjer(
 private fun Bruksenhet.aggregateTotalBruksareal(
     bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
 ): Multikilde<Bruksareal> {
-    if (this.etasjer.egenregistrert != null || this.totalBruksareal.egenregistrert != null || bruksarealRegistrering?.totalBruksareal == null) {
+    if (this.isEgenregistrertBruksarealRegistreringPresent() || bruksarealRegistrering?.totalBruksareal == null) {
         return this.totalBruksareal
     }
 

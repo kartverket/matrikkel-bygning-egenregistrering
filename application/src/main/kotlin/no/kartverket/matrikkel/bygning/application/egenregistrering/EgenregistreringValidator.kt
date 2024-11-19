@@ -68,25 +68,21 @@ class EgenregistreringValidator {
         // Dette er ikke helt bestemt ennå, men per nå så skal vi ta på oss støyten for å registrere et totalt bruksareal ut i fra etasjeregistreringer, fremfor at klienter gjør det selv
         private fun validateBruksarealRegistreringForBruksenheter(egenregistrering: Egenregistrering): ValidationError? {
             val invalidBruksarealRegistreringer = egenregistrering.bygningRegistrering.bruksenhetRegistreringer
+                .filter { it.bruksarealRegistrering != null }
                 .filter {
-                    if (it.bruksarealRegistrering == null) {
-                        return@filter false
-                    }
-
-                    val hasTotalRegistrering = it.bruksarealRegistrering.totalBruksareal != null
-                    val hasEtasjeRegistrering = it.bruksarealRegistrering.etasjeRegistreringer != null
+                    val hasTotalRegistrering = it.bruksarealRegistrering?.totalBruksareal != null
+                    val hasEtasjeRegistrering = it.bruksarealRegistrering?.etasjeRegistreringer != null
 
                     hasTotalRegistrering && hasEtasjeRegistrering
                 }
                 .map {
-                    // Hvordan slippe å bruke !! her?
-                    it.bruksenhetId to it.bruksarealRegistrering!!
+                    it.bruksenhetId
                 }
 
             if (invalidBruksarealRegistreringer.isNotEmpty()) {
                 return ValidationError(
                     message = "Bruksenhet${if (invalidBruksarealRegistreringer.size > 1) "er" else ""} med ID [${
-                        invalidBruksarealRegistreringer.map { it.first }.joinToString()
+                        invalidBruksarealRegistreringer.joinToString()
                     }], har både totalt bruksareal og areal per etasje registrert. Kun én av disse kan registreres om gangen",
                 )
             }
