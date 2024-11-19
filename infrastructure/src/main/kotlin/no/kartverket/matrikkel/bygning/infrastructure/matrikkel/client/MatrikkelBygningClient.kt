@@ -9,7 +9,9 @@ import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.BygningEtasje
 import no.kartverket.matrikkel.bygning.application.models.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
@@ -120,14 +122,14 @@ internal class MatrikkelBygningClient(
                             ),
                         )
                     },
-                    etasjer = emptyList(),
-                    // TODO Må mappe fra etasjeplankodeid til faktisk kode
-//                    etasjer = bygning.etasjer.item.map { etasje ->
-//                        BygningEtasje(
-//                            etasjeId = etasje.id,
-//                            etasjeBetegnelse = Etasjebetegnelse.of("${etasje.etasjeplanKodeId}${etasje.etasjenummer}"),
-//                        )
-//                    },
+                    etasjer = bygning.etasjer.item.map { etasje ->
+                        BygningEtasje(
+                            etasjeId = etasje.id,
+                            // Vi ønsker ikke unummererte bruksenheter o.l. i ny bygningsdel,
+                            // men hvordan skal vi deale med tomme etasjeplankoder som er tilfellet for unummererte bruksenheter?
+                            etasjeBetegnelse = Etasjebetegnelse.of("${mapEtasjeplanKode(etasje.etasjeplanKodeId).toString()}${etasje.etasjenummer}"),
+                        )
+                    },
                 ),
             )
         } catch (exception: ServiceException) {
