@@ -6,8 +6,8 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
-import no.kartverket.matrikkel.bygning.routes.common.ErrorDetailResponse
-import no.kartverket.matrikkel.bygning.routes.common.ErrorResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorDetailResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

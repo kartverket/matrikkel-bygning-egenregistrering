@@ -1,6 +1,9 @@
 package no.kartverket.matrikkel.bygning.routes.v1.egenregistrering
 
-import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.andThen
+import com.github.michaelbull.result.mapBoth
+import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.runCatching
 import io.github.smiley4.ktorswaggerui.dsl.routing.post
 import io.ktor.http.*
 import io.ktor.server.request.*
@@ -8,8 +11,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.routes.common.ErrorResponse
-import no.kartverket.matrikkel.bygning.routes.common.toErrorDetailResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
 
 fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
     post(
@@ -32,11 +36,11 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                         etasjeRegistreringer = listOf(
                                             EtasjeBruksarealRegistreringRequest(
                                                 bruksareal = 50.0,
-                                                etasjenummer = "H01",
+                                                etasjebetegnelse = "H01",
                                             ),
                                             EtasjeBruksarealRegistreringRequest(
                                                 bruksareal = 30.0,
-                                                etasjenummer = "H02",
+                                                etasjebetegnelse = "H02",
                                             ),
                                         ),
                                     ),
@@ -69,32 +73,22 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
             }
         },
     ) {
+        // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom reveice-metode.
         val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
+        val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering() }
+            .mapError(::exceptionToDomainError)
+            .andThen { egenregistreringService.addEgenregistrering(it) }
+            .mapBoth(
+                { HttpStatusCode.Created to null },
+                ::domainErrorToResponse,
+            )
 
-        egenregistreringRequest.toEgenregistrering().fold(
-            success = {
-                egenregistreringService.addEgenregistrering(it).fold(
-                    success = { call.respond(HttpStatusCode.Created) },
-                    failure = {
-                        call.respond(
-                            status = HttpStatusCode.BadRequest,
-                            ErrorResponse.ValidationError(
-                                details = listOf(it.toErrorDetailResponse()),
-                            ),
-                        )
-                    },
-                )
-            },
-            failure = {
-                call.respond(
-                    status = HttpStatusCode.BadRequest,
-                    ErrorResponse.ValidationError(
-                        details = listOf(it.toErrorDetailResponse()),
-                    ),
-                )
-            },
-        )
-
+        if (body != null) {
+            call.respond(status, body)
+        } else {
+            call.respond(status)
+        }
     }
+
 }

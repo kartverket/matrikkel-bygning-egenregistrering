@@ -1,9 +1,5 @@
 package no.kartverket.matrikkel.bygning.routes.v1.egenregistrering
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.map
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
@@ -13,11 +9,10 @@ import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
-import no.kartverket.matrikkel.bygning.application.models.EtasjeIdentifikator.Companion.toEtasjeIdentifikator
+import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
-import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
@@ -50,7 +45,7 @@ data class ByggeaarRegistreringRequest(
 
 @Serializable
 data class EtasjeBruksarealRegistreringRequest(
-    val bruksareal: Double?, val etasjenummer: String
+    val bruksareal: Double?, val etasjebetegnelse: String
 )
 
 @Serializable
@@ -78,84 +73,64 @@ data class OppvarmingRegistreringRequest(
     val oppvarminger: List<OppvarmingKode>?,
 )
 
-fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Result<EtasjeBruksarealRegistrering, ErrorDetail> {
-    return this.etasjenummer.toEtasjeIdentifikator().map { etasjenummer ->
-        EtasjeBruksarealRegistrering(
-            bruksareal = this.bruksareal,
-            etasjeIdentifikator = etasjenummer,
-        )
-    }
-}
-
-fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): Result<BruksenhetRegistrering, ErrorDetail> {
-    return Ok(
-        BruksenhetRegistrering(
-            bruksenhetId = bruksenhetId,
-            bruksarealRegistrering = bruksarealRegistrering?.let {
-                BruksarealRegistrering(
-                    totalBruksareal = it.totalBruksareal,
-                    etasjeRegistreringer = it.etasjeRegistreringer?.map {
-                        val etasjeBruksarealRegistrering = it.toEtasjeBruksarealRegistrering()
-                        if (etasjeBruksarealRegistrering.isOk) {
-                            etasjeBruksarealRegistrering.value
-                        } else {
-                            return Err(etasjeBruksarealRegistrering.error)
-                        }
-                    },
-                )
-            },
-            byggeaarRegistrering = byggeaarRegistrering?.let {
-                ByggeaarRegistrering(
-                    byggeaar = it.byggeaar,
-                )
-            },
-            vannforsyningRegistrering = vannforsyningRegistrering?.let {
-                VannforsyningRegistrering(
-                    vannforsyning = it.vannforsyning,
-                )
-            },
-            avlopRegistrering = avlopRegistrering?.let {
-                AvlopRegistrering(
-                    avlop = it.avlop,
-                )
-            },
-            energikildeRegistrering = energikildeRegistrering?.let {
-                EnergikildeRegistrering(
-                    energikilder = it.energikilder,
-                )
-            },
-            oppvarmingRegistrering = oppvarmingRegistrering?.let {
-                OppvarmingRegistrering(
-                    oppvarminger = it.oppvarminger,
-                )
-            },
-        ),
+fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
+    return EtasjeBruksarealRegistrering(
+        bruksareal = this.bruksareal,
+        etasjeBetegnelse = Etasjebetegnelse.of(this.etasjebetegnelse),
     )
 }
 
-fun EgenregistreringRequest.toEgenregistrering(): Result<Egenregistrering, ErrorDetail> {
+fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
+    return BruksenhetRegistrering(
+        bruksenhetId = bruksenhetId,
+        bruksarealRegistrering = bruksarealRegistrering?.let {
+            BruksarealRegistrering(
+                totalBruksareal = it.totalBruksareal,
+                etasjeRegistreringer = it.etasjeRegistreringer?.map {
+                    it.toEtasjeBruksarealRegistrering()
+                },
+            )
+        },
+        byggeaarRegistrering = byggeaarRegistrering?.let {
+            ByggeaarRegistrering(
+                byggeaar = it.byggeaar,
+            )
+        },
+        vannforsyningRegistrering = vannforsyningRegistrering?.let {
+            VannforsyningRegistrering(
+                vannforsyning = it.vannforsyning,
+            )
+        },
+        avlopRegistrering = avlopRegistrering?.let {
+            AvlopRegistrering(
+                avlop = it.avlop,
+            )
+        },
+        energikildeRegistrering = energikildeRegistrering?.let {
+            EnergikildeRegistrering(
+                energikilder = it.energikilder,
+            )
+        },
+        oppvarmingRegistrering = oppvarmingRegistrering?.let {
+            OppvarmingRegistrering(
+                oppvarminger = it.oppvarminger,
+            )
+        },
+    )
+}
+
+fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
     val registreringstidspunkt = Instant.now()
 
-    // Synes ikke feilhåndteringen ble veldig smud her, så gjerne kom med innspill på hvordan best gjøre det når det
-    // er potensielle feilkilder i instansieringen
-    // Gjelder forsåvidt både her og i .toBruksenhetRegistrering()
-    return Ok(
-        Egenregistrering(
-            id = UUID.randomUUID(),
-            eier = Foedselsnummer(this.eier),
-            registreringstidspunkt = registreringstidspunkt,
-            bygningRegistrering = BygningRegistrering(
-                bygningId = this.bygningId,
-                bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
-                    val bruksenhetRegistrering = bruksenhetRegistrering.toBruksenhetRegistrering()
-
-                    if (bruksenhetRegistrering.isOk) {
-                        bruksenhetRegistrering.value
-                    } else {
-                        return Err(bruksenhetRegistrering.error)
-                    }
-                } ?: emptyList(),
-            ),
+    return Egenregistrering(
+        id = UUID.randomUUID(),
+        eier = Foedselsnummer(this.eier),
+        registreringstidspunkt = registreringstidspunkt,
+        bygningRegistrering = BygningRegistrering(
+            bygningId = this.bygningId,
+            bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
+                bruksenhetRegistrering.toBruksenhetRegistrering()
+            } ?: emptyList(),
         ),
     )
 }

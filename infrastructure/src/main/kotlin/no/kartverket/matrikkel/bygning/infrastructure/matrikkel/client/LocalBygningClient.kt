@@ -9,7 +9,8 @@ import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
-import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
+import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
+import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import java.time.Instant
 
 internal class LocalBygningClient : BygningClient {
@@ -56,18 +57,20 @@ internal class LocalBygningClient : BygningClient {
         ),
     )
 
-    override fun getBygningById(id: Long): Result<Bygning, ErrorDetail> {
+    override fun getBygningById(id: Long): Result<Bygning, DomainError> {
         return bygninger
             .find { it.bygningId == id }
-            .toResultOr { ErrorDetail(detail = "Bygning med ID $id finnes ikke i matrikkelen") }
+            .toResultOr {
+                BygningNotFound(message = "Bygning med ID $id finnes ikke i matrikkelen")
+            }
     }
 
-    override fun getBygningByBygningsnummer(bygningsnummer: Long): Result<Bygning, ErrorDetail> {
+    override fun getBygningByBygningsnummer(bygningsnummer: Long): Result<Bygning, DomainError> {
         return bygninger
             .find { it.bygningsnummer == bygningsnummer }
             .toResultOr {
-                ErrorDetail(
-                    detail = "Bygning med bygningsnummer $bygningsnummer finnes ikke i matrikkelen",
+                BygningNotFound(
+                    message = "Bygning med bygningsnummer $bygningsnummer finnes ikke i matrikkelen",
                 )
             }
     }

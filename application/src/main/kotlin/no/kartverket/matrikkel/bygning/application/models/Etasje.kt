@@ -1,33 +1,24 @@
 package no.kartverket.matrikkel.bygning.application.models
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.map
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
+import kotlin.text.slice
 
-data class BygningEtasje(val etasjeIdentifikator: EtasjeIdentifikator, val etasjeId: Long)
+data class BygningEtasje(val etasjeBetegnelse: Etasjebetegnelse, val etasjeId: Long)
 
-data class BruksenhetEtasje(val etasjeIdentifikator: EtasjeIdentifikator, val bruksareal: Bruksareal?)
+data class BruksenhetEtasje(val etasjeBetegnelse: Etasjebetegnelse, val bruksareal: Bruksareal?)
 
+@ConsistentCopyVisibility
 @Serializable
-class Etasjenummer(val teller: Int) {
-    // Dette unngår jo ikke egentlig at noen bare lager Etasjenummer(101) som blir "gyldig".
-    // Er det noen måte å force dette? Unngå en konstruktør av noe slag?
+data class Etasjenummer private constructor(val teller: Int) {
     companion object {
-        fun of(teller: Int): Result<Etasjenummer, ErrorDetail> {
+        fun of(teller: Int): Etasjenummer {
             // TODO Ta opp med fag: Trenger dette egentlig være en begrensning? Hva om Norge i 2050 får en bygning som har 101 hovedetasjer?
             if (teller > 99 || teller < 0) {
-                return Err(
-                    ErrorDetail(
-                        detail = "Etasjenummer kan kun være et tall mellom 1 og 99",
-                    ),
-                )
+                throw IllegalArgumentException("Ugylding etasjenummer: $teller")
             }
 
-            return Ok(Etasjenummer(teller))
+            return Etasjenummer(teller)
         }
     }
 
@@ -36,67 +27,60 @@ class Etasjenummer(val teller: Int) {
     }
 }
 
+@ConsistentCopyVisibility
 @Serializable
-data class EtasjeIdentifikator(
+data class Etasjebetegnelse private constructor(
     val etasjeplanKode: EtasjeplanKode,
     val etasjenummer: Etasjenummer,
 ) {
     // Bare et eksempel på at det kan være nice å lage Etasjenummer til en egen klasse fremfor å bare bruke en string
     // kunne kanskje til og med vært en compareTo, men anyways!
-    fun isEtasjenummerOverAnnenEtasjenummer(annenEtasjeIdentifikator: EtasjeIdentifikator): Boolean {
+    fun isEtasjenummerOverAnnenEtasjenummer(annenEtasjebetegnelse: Etasjebetegnelse): Boolean {
         val etasjeplanKoderOekende = listOf(EtasjeplanKode.Hovedetasje, EtasjeplanKode.Loftetasje)
 
-        return if (etasjeplanKode == annenEtasjeIdentifikator.etasjeplanKode) {
+        return if (etasjeplanKode == annenEtasjebetegnelse.etasjeplanKode) {
             if (etasjeplanKoderOekende.contains(etasjeplanKode)) {
-                etasjenummer.teller > annenEtasjeIdentifikator.etasjenummer.teller
+                etasjenummer.teller > annenEtasjebetegnelse.etasjenummer.teller
             } else {
-                etasjenummer.teller < annenEtasjeIdentifikator.etasjenummer.teller
+                etasjenummer.teller < annenEtasjebetegnelse.etasjenummer.teller
             }
         } else {
             when (etasjeplanKode) {
                 EtasjeplanKode.Loftetasje -> true
-                EtasjeplanKode.Hovedetasje -> annenEtasjeIdentifikator.etasjeplanKode != EtasjeplanKode.Loftetasje
-                EtasjeplanKode.Underetasje -> annenEtasjeIdentifikator.etasjeplanKode == EtasjeplanKode.Kjelleretasje
+                EtasjeplanKode.Hovedetasje -> annenEtasjebetegnelse.etasjeplanKode != EtasjeplanKode.Loftetasje
+                EtasjeplanKode.Underetasje -> annenEtasjebetegnelse.etasjeplanKode == EtasjeplanKode.Kjelleretasje
                 EtasjeplanKode.Kjelleretasje -> false
             }
         }
     }
 
     companion object {
-        fun getEtasjeplanKodeFromString(etasjeplanKode: String): EtasjeplanKode? {
+        fun of(etasjeBetegnelse: String): Etasjebetegnelse {
+            val etasjeplanKode = getEtasjeplanKodeFromString(etasjeBetegnelse.slice(0..0))
+
+            val etasjenummer = etasjeBetegnelse.slice(1..2).toIntOrNull()
+
+            if (etasjenummer != null && etasjeBetegnelse.length == 3) {
+                val etasjenummer = Etasjenummer.of(etasjenummer)
+
+                return Etasjebetegnelse(
+                    etasjeplanKode = etasjeplanKode,
+                    etasjenummer = etasjenummer,
+                )
+            }
+
+            throw IllegalArgumentException("Ugyldig etasjebetegnelse: $etasjeBetegnelse")
+        }
+
+        fun getEtasjeplanKodeFromString(etasjeplanKode: String): EtasjeplanKode {
             return when (etasjeplanKode) {
-                "L" -> EtasjeplanKode.Loftetasje
                 "H" -> EtasjeplanKode.Hovedetasje
                 "U" -> EtasjeplanKode.Underetasje
+                "L" -> EtasjeplanKode.Loftetasje
                 "K" -> EtasjeplanKode.Kjelleretasje
-                else -> null
+                else -> throw IllegalArgumentException("Ugyldig etasjeplankode: $etasjeplanKode")
             }
         }
-
-
-        fun String.toEtasjeIdentifikator(): Result<EtasjeIdentifikator, ErrorDetail> {
-            val etasjeplanKode = getEtasjeplanKodeFromString(this.slice(0..0))
-
-            val etasjenummer = this.slice(1..2).toIntOrNull()
-
-            if (etasjeplanKode != null && etasjenummer != null && this.length == 3) {
-                val etasjenummerIfValid = Etasjenummer.of(etasjenummer)
-
-                return etasjenummerIfValid.map {
-                    EtasjeIdentifikator(
-                        etasjeplanKode = etasjeplanKode,
-                        etasjenummer = it,
-                    )
-                }
-            }
-
-            return Err(
-                ErrorDetail(
-                    detail = "Etasjenummer var ikke gyldig, forventet format er for eksempel: H10, K01, L02",
-                ),
-            )
-        }
-
     }
 
     override fun toString(): String {

@@ -23,7 +23,7 @@ data class BruksarealRegistrering(
 @Serializable
 data class EtasjeBruksarealRegistrering(
     val bruksareal: Double?,
-    val etasjeIdentifikator: EtasjeIdentifikator
+    val etasjeBetegnelse: Etasjebetegnelse
 )
 
 @Serializable

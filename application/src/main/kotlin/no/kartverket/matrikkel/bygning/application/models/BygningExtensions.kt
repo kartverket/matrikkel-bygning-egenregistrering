@@ -84,7 +84,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
             bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer?.let {
                 it.map {
                     BruksenhetEtasje(
-                        etasjeIdentifikator = it.etasjeIdentifikator,
+                        etasjeBetegnelse = it.etasjeBetegnelse,
                         bruksareal = Bruksareal(
                             data = it.bruksareal,
                             metadata = metadata,

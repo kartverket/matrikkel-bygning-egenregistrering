@@ -15,7 +15,8 @@ import no.kartverket.matrikkel.bygning.application.models.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.application.models.Vannforsyning
-import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
+import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
+import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBygning
@@ -32,7 +33,7 @@ internal class MatrikkelBygningClient(
 ) : BygningClient {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
-    override fun getBygningById(id: Long): Result<Bygning, ErrorDetail> {
+    override fun getBygningById(id: Long): Result<Bygning, DomainError> {
         val bygningId: BygningId = bygningId(id)
 
         try {
@@ -132,14 +133,14 @@ internal class MatrikkelBygningClient(
         } catch (exception: ServiceException) {
             log.warn("Noe gikk galt under henting av bygning med id {}", bygningId.value, exception)
             return Err(
-                ErrorDetail(
-                    detail = "Bygning med ID ${bygningId.value} finnes ikke i matrikkelen",
+                BygningNotFound(
+                    message = "Bygning med ID ${bygningId.value} finnes ikke i matrikkelen",
                 ),
             )
         }
     }
 
-    override fun getBygningByBygningsnummer(bygningsnummer: Long): Result<Bygning, ErrorDetail> {
+    override fun getBygningByBygningsnummer(bygningsnummer: Long): Result<Bygning, DomainError> {
         try {
             val bygningId = matrikkelApi.bygningService().findBygning(bygningsnummer, matrikkelApi.matrikkelContext)
 
@@ -147,8 +148,8 @@ internal class MatrikkelBygningClient(
         } catch (exception: ServiceException) {
             log.warn("Noe gikk galt under henting av bygning med bygningsnummer {}", bygningsnummer, exception)
             return Err(
-                ErrorDetail(
-                    detail = "Bygning med nummer $bygningsnummer finnes ikke i matrikkelen",
+                BygningNotFound(
+                    message = "Bygning med nummer $bygningsnummer finnes ikke i matrikkelen",
                 ),
             )
         }
