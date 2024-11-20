@@ -47,8 +47,8 @@ fun mapVannforsyning(kodeId: VannforsyningsKodeId): VannforsyningKode? = when (k
     else -> throw RuntimeException("Ukjent vannforsyningskode: ${kodeId.value}")
 }
 
-fun mapEtasjeplanKode(kodeId: EtasjeplanKodeId): EtasjeplanKode? = when (kodeId.value) {
-    0L -> null
+fun mapEtasjeplanKode(kodeId: EtasjeplanKodeId): EtasjeplanKode = when (kodeId.value) {
+    0L -> EtasjeplanKode.IkkeOppgitt
     1L -> EtasjeplanKode.Hovedetasje
     2L -> EtasjeplanKode.Kjelleretasje
     3L -> EtasjeplanKode.Loftetasje

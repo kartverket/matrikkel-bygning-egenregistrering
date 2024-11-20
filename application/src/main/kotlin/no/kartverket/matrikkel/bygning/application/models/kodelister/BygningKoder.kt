@@ -7,22 +7,27 @@ enum class EtasjeplanKode(
     Loftetasje(
         presentasjonsnavn = "Loftetasje",
         beskrivelse = "Et tilgjengelig rom over øverste alminnelige etasje som ikke oppfyller kravene til alminnelig etasje. Fri høyde må være større eller lik 1,9m i en bredde på minst 0,6 m. Loftsarealet måles til 0,6m utenfor høyde på minst 1,9m",
-        kortnavn = "L"
+        kortnavn = "L",
     ),
     Hovedetasje(
         presentasjonsnavn = "Hovedetasje",
         beskrivelse = "Et plan der underkant dekke er høyere enn 1,5m over planert terrengs gjennonsnittsnivå rundt bygningen, og der den frie bredden i høyde 1,9m må minst være 1,9m",
-        kortnavn = "H"
+        kortnavn = "H",
     ),
     Underetasje(
         presentasjonsnavn = "Underetasje",
         beskrivelse = "Et plan der underkant dekke eller himling er høyere enn 0,75m, men høyst 1,5m over planert gjennomsnittsnivå",
-        kortnavn = "U"
+        kortnavn = "U",
     ),
     Kjelleretasje(
         presentasjonsnavn = "Kjelleretasje",
         beskrivelse = "Et plan der underkant dekke eller himling er høyst 0,75m over planert terreng gjennonsnittsnivå rundt bygningen",
-        kortnavn = "K"
+        kortnavn = "K",
+    ),
+    IkkeOppgitt(
+        presentasjonsnavn = "Ikke Oppgitt",
+        beskrivelse = "Ikke oppgitt. Brukes på unummererte bruksenheter",
+        kortnavn = "IO"
     );
 
     companion object {

@@ -123,20 +123,13 @@ internal class MatrikkelBygningClient(
                         )
                     },
                     etasjer = bygning.etasjer.item.mapNotNull { etasje ->
-                        val etasjeplanKode = mapEtasjeplanKode(etasje.etasjeplanKodeId)
-
-                        // Vi ønsker ikke unummererte bruksenheter o.l. i ny bygningsdel,
-                        // men hvordan skal vi deale med tomme etasjeplankoder som er tilfellet for unummererte bruksenheter?
-                        if (etasjeplanKode != null) {
-                            BygningEtasje(
-                                etasjeId = etasje.id,
-                                etasjeBetegnelse = Etasjebetegnelse.of(
-                                    etasjenummer = etasje.etasjenummer,
-                                    etasjeplanKode = etasjeplanKode,
-                                ),
-                            )
-                        }
-                        null
+                        BygningEtasje(
+                            etasjeId = etasje.id,
+                            etasjeBetegnelse = Etasjebetegnelse.of(
+                                etasjenummer = etasje.etasjenummer,
+                                etasjeplanKode = mapEtasjeplanKode(etasje.etasjeplanKodeId),
+                            ),
+                        )
                     },
                 ),
             )
