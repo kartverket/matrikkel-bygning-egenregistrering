@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning.routes.v1.bygning
 
+import io.github.smiley4.schemakenerator.core.annotations.Format
+import io.github.smiley4.schemakenerator.core.annotations.Type
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.Avlop
 import no.kartverket.matrikkel.bygning.application.models.Bruksareal
@@ -69,6 +71,8 @@ data class BruksenhetSimpleResponse(
 @Serializable
 data class RegisterMetadataResponse(
     @Serializable(with = InstantSerializer::class)
+    @Format("date-time")
+    @Type("string")
     val registreringstidspunkt: Instant,
     val registrertAv: String,
 )

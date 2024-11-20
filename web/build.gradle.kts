@@ -37,7 +37,11 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx)
 
     // OpenAPI / Swagger
-    implementation (libs.ktor.swagger.ui)
+    implementation(libs.ktor.swagger.ui)
+    implementation("io.github.smiley4:schema-kenerator-core:1.6.0")
+//    implementation("io.github.smiley4:schema-kenerator-serialization:1.6.0")
+    implementation("io.github.smiley4:schema-kenerator-swagger:1.6.0")
+    implementation("io.github.smiley4:schema-kenerator-reflection:1.6.0")
 }
 
 application {
