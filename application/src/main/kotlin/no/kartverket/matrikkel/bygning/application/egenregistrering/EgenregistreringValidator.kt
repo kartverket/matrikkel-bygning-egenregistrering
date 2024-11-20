@@ -16,7 +16,7 @@ class EgenregistreringValidator {
             val errors = listOfNotNull(
                 validateBruksenheterRegistreredOnCorrectBygning(egenregistrering, bygning),
                 validateRepeatedBruksenheter(egenregistrering),
-                validateBruksarealRegistreringForBruksenheter(egenregistrering),
+                validateBruksarealRegistreringerHasSingleRegistreringType(egenregistrering),
             )
 
             return if (errors.isEmpty()) {
@@ -66,18 +66,11 @@ class EgenregistreringValidator {
         }
 
         // Dette er ikke helt bestemt ennå, men per nå så skal vi ta på oss støyten for å registrere et totalt bruksareal ut i fra etasjeregistreringer, fremfor at klienter gjør det selv
-        private fun validateBruksarealRegistreringForBruksenheter(egenregistrering: Egenregistrering): ValidationError? {
+        private fun validateBruksarealRegistreringerHasSingleRegistreringType(egenregistrering: Egenregistrering): ValidationError? {
             val invalidBruksarealRegistreringer = egenregistrering.bygningRegistrering.bruksenhetRegistreringer
                 .filter { it.bruksarealRegistrering != null }
-                .filter {
-                    val hasTotalRegistrering = it.bruksarealRegistrering?.totalBruksareal != null
-                    val hasEtasjeRegistrering = it.bruksarealRegistrering?.etasjeRegistreringer != null
-
-                    hasTotalRegistrering && hasEtasjeRegistrering
-                }
-                .map {
-                    it.bruksenhetId
-                }
+                .filter { it.bruksarealRegistrering?.totalBruksareal != null && it.bruksarealRegistrering.etasjeRegistreringer != null }
+                .map { it.bruksenhetId }
 
             if (invalidBruksarealRegistreringer.isNotEmpty()) {
                 return ValidationError(

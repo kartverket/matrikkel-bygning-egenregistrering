@@ -80,14 +80,14 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
             .mapError(::exceptionToDomainError)
             .andThen { egenregistreringService.addEgenregistrering(it) }
             .mapBoth(
-                { HttpStatusCode.Created to null },
-                ::domainErrorToResponse,
+                success = { HttpStatusCode.Created to null },
+                failure = ::domainErrorToResponse,
             )
 
         if (body != null) {
-            call.respond(status, body)
-        } else {
             call.respond(status)
+        } else {
+            call.respond(status, body)
         }
     }
 

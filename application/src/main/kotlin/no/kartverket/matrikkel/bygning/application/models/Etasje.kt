@@ -80,6 +80,6 @@ data class Etasjebetegnelse private constructor(
     }
 
     override fun toString(): String {
-        return "${etasjeplanKode.toString().first()}${etasjenummer}"
+        return "${etasjeplanKode}${etasjenummer}"
     }
 }
