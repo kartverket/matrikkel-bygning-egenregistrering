@@ -50,6 +50,7 @@ data class Etasjebetegnelse private constructor(
                 EtasjeplanKode.Hovedetasje -> annenEtasjebetegnelse.etasjeplanKode != EtasjeplanKode.Loftetasje
                 EtasjeplanKode.Underetasje -> annenEtasjebetegnelse.etasjeplanKode == EtasjeplanKode.Kjelleretasje
                 EtasjeplanKode.Kjelleretasje -> false
+                EtasjeplanKode.IkkeOppgitt -> false
             }
         }
     }
