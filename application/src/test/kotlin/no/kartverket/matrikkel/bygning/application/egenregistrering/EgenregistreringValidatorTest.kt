@@ -12,8 +12,10 @@ import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
+import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import java.time.Instant
 import java.util.UUID
 import kotlin.test.Test
@@ -113,7 +115,10 @@ class EgenregistreringValidatorTest {
                                 etasjeRegistreringer = listOf(
                                     EtasjeBruksarealRegistrering(
                                         bruksareal = 125.0,
-                                        etasjeBetegnelse = Etasjebetegnelse.of("H01"),
+                                        etasjeBetegnelse = Etasjebetegnelse.of(
+                                            etasjeplanKode = EtasjeplanKode.Hovedetasje,
+                                            etasjenummer = Etasjenummer.of(1),
+                                        ),
                                     ),
                                 ),
                             ),

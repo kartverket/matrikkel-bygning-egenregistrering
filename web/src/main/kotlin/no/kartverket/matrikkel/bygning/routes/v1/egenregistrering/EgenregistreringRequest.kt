@@ -10,11 +10,13 @@ import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
+import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
@@ -44,8 +46,14 @@ data class ByggeaarRegistreringRequest(
 )
 
 @Serializable
+data class EtasjeBetegnelseRequest(
+    val etasjeplanKode: String,
+    val etasjenummer: Int,
+)
+
+@Serializable
 data class EtasjeBruksarealRegistreringRequest(
-    val bruksareal: Double?, val etasjebetegnelse: String
+    val bruksareal: Double?, val etasjebetegnelse: EtasjeBetegnelseRequest
 )
 
 @Serializable
@@ -76,7 +84,10 @@ data class OppvarmingRegistreringRequest(
 fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
     return EtasjeBruksarealRegistrering(
         bruksareal = this.bruksareal,
-        etasjeBetegnelse = Etasjebetegnelse.of(this.etasjebetegnelse),
+        etasjeBetegnelse = Etasjebetegnelse.of(
+            etasjenummer = Etasjenummer.of(this.etasjebetegnelse.etasjenummer),
+            etasjeplanKode = EtasjeplanKode.of(this.etasjebetegnelse.etasjeplanKode),
+        ),
     )
 }
 

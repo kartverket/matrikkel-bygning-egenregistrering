@@ -36,11 +36,17 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                         etasjeRegistreringer = listOf(
                                             EtasjeBruksarealRegistreringRequest(
                                                 bruksareal = 50.0,
-                                                etasjebetegnelse = "H01",
+                                                etasjebetegnelse = EtasjeBetegnelseRequest(
+                                                    etasjeplanKode = "H",
+                                                    etasjenummer = 1,
+                                                ),
                                             ),
                                             EtasjeBruksarealRegistreringRequest(
                                                 bruksareal = 30.0,
-                                                etasjebetegnelse = "H02",
+                                                etasjebetegnelse = EtasjeBetegnelseRequest(
+                                                    etasjeplanKode = "H",
+                                                    etasjenummer = 2,
+                                                ),
                                             ),
                                         ),
                                     ),

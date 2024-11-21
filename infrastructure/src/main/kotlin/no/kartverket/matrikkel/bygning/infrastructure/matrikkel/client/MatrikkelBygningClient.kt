@@ -12,6 +12,7 @@ import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningEtasje
 import no.kartverket.matrikkel.bygning.application.models.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
+import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
@@ -126,7 +127,7 @@ internal class MatrikkelBygningClient(
                         BygningEtasje(
                             etasjeId = etasje.id,
                             etasjeBetegnelse = Etasjebetegnelse.of(
-                                etasjenummer = etasje.etasjenummer,
+                                etasjenummer = Etasjenummer.of(etasje.etasjenummer),
                                 etasjeplanKode = mapEtasjeplanKode(etasje.etasjeplanKodeId),
                             ),
                         )

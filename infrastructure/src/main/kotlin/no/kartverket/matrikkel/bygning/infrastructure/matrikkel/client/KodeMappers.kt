@@ -35,7 +35,7 @@ fun mapAvloep(kodeId: AvlopsKodeId): AvlopKode? = when (kodeId.value) {
     1L -> AvlopKode.OffentligKloakk
     2L -> AvlopKode.PrivatKloakk
     3L -> AvlopKode.IngenKloakk
-    else -> throw RuntimeException("Ukjent avløpsskode: ${kodeId.value}")
+    else -> throw RuntimeException("Ukjent avløpskode: ${kodeId.value}")
 }
 
 fun mapVannforsyning(kodeId: VannforsyningsKodeId): VannforsyningKode? = when (kodeId.value) {

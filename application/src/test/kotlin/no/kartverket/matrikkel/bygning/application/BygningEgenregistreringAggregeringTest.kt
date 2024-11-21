@@ -18,8 +18,10 @@ import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
+import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 import java.time.Instant
 import java.util.*
@@ -106,7 +108,10 @@ class BygningEgenregistreringAggregeringTest {
                             etasjeRegistreringer = listOf(
                                 EtasjeBruksarealRegistrering(
                                     bruksareal = 125.0,
-                                    etasjeBetegnelse = Etasjebetegnelse.of("H01"),
+                                    etasjeBetegnelse = Etasjebetegnelse.of(
+                                        etasjenummer = Etasjenummer.of(1),
+                                        etasjeplanKode = EtasjeplanKode.Hovedetasje,
+                                    ),
                                 ),
                             ),
                         ),
@@ -126,7 +131,10 @@ class BygningEgenregistreringAggregeringTest {
                         prop(BruksenhetEtasje::bruksareal).isNotNull().all {
                             prop(Bruksareal::data).isEqualTo(125.0)
                         }
-                        prop(BruksenhetEtasje::etasjeBetegnelse).isEqualTo(Etasjebetegnelse.of("H01"))
+                        prop(BruksenhetEtasje::etasjeBetegnelse).all {
+                            prop(Etasjebetegnelse::etasjenummer).isEqualTo(Etasjenummer.of(1))
+                            prop(Etasjebetegnelse::etasjeplanKode).isEqualTo(EtasjeplanKode.Hovedetasje)
+                        }
                     }
                 }
                 prop(Bruksenhet::totalBruksareal).all {

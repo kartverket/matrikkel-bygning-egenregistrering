@@ -2,7 +2,6 @@ package no.kartverket.matrikkel.bygning.application.models
 
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
-import kotlin.text.slice
 
 data class BygningEtasje(val etasjeBetegnelse: Etasjebetegnelse, val etasjeId: Long)
 
@@ -10,20 +9,20 @@ data class BruksenhetEtasje(val etasjeBetegnelse: Etasjebetegnelse, val bruksare
 
 @ConsistentCopyVisibility
 @Serializable
-data class Etasjenummer private constructor(val teller: Int) {
+data class Etasjenummer private constructor(val loepenummer: Int) {
     companion object {
-        fun of(teller: Int): Etasjenummer {
+        fun of(loepenummer: Int): Etasjenummer {
             // TODO Ta opp med fag: Trenger dette egentlig være en begrensning? Hva om Norge i 2050 får en bygning som har 101 hovedetasjer?
-            if (teller > 99 || teller <= 0) {
-                throw IllegalArgumentException("Ugylding etasjenummer: $teller")
+            if (loepenummer > 99 || loepenummer <= 0) {
+                throw IllegalArgumentException("Ugyldig etasjenummer: $loepenummer")
             }
 
-            return Etasjenummer(teller)
+            return Etasjenummer(loepenummer)
         }
     }
 
     override fun toString(): String {
-        return teller.toString().padStart(2, '0')
+        return loepenummer.toString().padStart(2, '0')
     }
 }
 
@@ -40,9 +39,9 @@ data class Etasjebetegnelse private constructor(
 
         return if (etasjeplanKode == annenEtasjebetegnelse.etasjeplanKode) {
             if (etasjeplanKoderOekende.contains(etasjeplanKode)) {
-                etasjenummer.teller > annenEtasjebetegnelse.etasjenummer.teller
+                etasjenummer.loepenummer > annenEtasjebetegnelse.etasjenummer.loepenummer
             } else {
-                etasjenummer.teller < annenEtasjebetegnelse.etasjenummer.teller
+                etasjenummer.loepenummer < annenEtasjebetegnelse.etasjenummer.loepenummer
             }
         } else {
             when (etasjeplanKode) {
@@ -56,31 +55,15 @@ data class Etasjebetegnelse private constructor(
     }
 
     companion object {
-        fun of(etasjeBetegnelse: String): Etasjebetegnelse {
-            if (etasjeBetegnelse.length == 3) {
-                val etasjeplanKode = EtasjeplanKode.of(etasjeBetegnelse.slice(0..0))
-                val etasjenummer = etasjeBetegnelse.slice(1..2).toIntOrNull()
-
-                if (etasjenummer != null) {
-                    return of(
-                        etasjenummer = etasjenummer,
-                        etasjeplanKode = etasjeplanKode,
-                    )
-                }
-            }
-
-            throw IllegalArgumentException("Ugyldig etasjebetegnelse: $etasjeBetegnelse")
-        }
-
-        fun of(etasjenummer: Int, etasjeplanKode: EtasjeplanKode): Etasjebetegnelse {
+        fun of(etasjenummer: Etasjenummer, etasjeplanKode: EtasjeplanKode): Etasjebetegnelse {
             return Etasjebetegnelse(
                 etasjeplanKode = etasjeplanKode,
-                etasjenummer = Etasjenummer.of(etasjenummer),
+                etasjenummer = etasjenummer,
             )
         }
     }
 
     override fun toString(): String {
-        return "${etasjeplanKode}${etasjenummer}"
+        return "${etasjeplanKode}${etasjenummer.loepenummer}"
     }
 }
