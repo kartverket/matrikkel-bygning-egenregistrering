@@ -25,7 +25,7 @@ internal fun EgenregistreringRequest.Companion.validEgenregistrering() = Egenreg
         BruksenhetRegistreringRequest(
             bruksenhetId = 1L,
             bruksarealRegistrering = BruksarealRegistreringRequest(
-                totalBruksareal = 125.0,
+                totaltBruksareal = 125.0,
                 etasjeRegistreringer = null
             ),
             byggeaarRegistrering = ByggeaarRegistreringRequest(2010),

@@ -69,7 +69,7 @@ class EgenregistreringValidator {
         private fun validateBruksarealRegistreringerHasSingleRegistreringType(egenregistrering: Egenregistrering): ValidationError? {
             val invalidBruksarealRegistreringer = egenregistrering.bygningRegistrering.bruksenhetRegistreringer
                 .filter { it.bruksarealRegistrering != null }
-                .filter { it.bruksarealRegistrering?.totalBruksareal != null && it.bruksarealRegistrering.etasjeRegistreringer != null }
+                .filter { it.bruksarealRegistrering?.totaltBruksareal != null && it.bruksarealRegistrering.etasjeRegistreringer != null }
                 .map { it.bruksenhetId }
 
             if (invalidBruksarealRegistreringer.isNotEmpty()) {

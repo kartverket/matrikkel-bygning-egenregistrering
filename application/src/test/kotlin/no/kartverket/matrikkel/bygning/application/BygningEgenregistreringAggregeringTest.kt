@@ -31,7 +31,7 @@ class BygningEgenregistreringAggregeringTest {
     private val defaultBruksenhet = Bruksenhet(
         bruksenhetId = 1L,
         bygningId = 1L,
-        totalBruksareal = Multikilde(),
+        totaltBruksareal = Multikilde(),
         energikilder = Multikilde(),
         oppvarminger = Multikilde(),
         etasjer = Multikilde(),
@@ -51,7 +51,7 @@ class BygningEgenregistreringAggregeringTest {
     private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
         bruksenhetId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
-            totalBruksareal = 50.0,
+            totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
         ),
         byggeaarRegistrering = null,
@@ -82,7 +82,7 @@ class BygningEgenregistreringAggregeringTest {
                 bruksenhetRegistreringer = listOf(
                     defaultBruksenhetRegistrering.copy(
                         bruksarealRegistrering = BruksarealRegistrering(
-                            totalBruksareal = 150.0,
+                            totaltBruksareal = 150.0,
                             etasjeRegistreringer = null,
                         ),
                     ),
@@ -92,7 +92,7 @@ class BygningEgenregistreringAggregeringTest {
 
         val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
 
-        assertThat(aggregatedBygning.bruksenheter.single().totalBruksareal.egenregistrert?.data).isEqualTo(150.0)
+        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data).isEqualTo(150.0)
     }
 
     @Test
@@ -104,7 +104,7 @@ class BygningEgenregistreringAggregeringTest {
                 bruksenhetRegistreringer = listOf(
                     defaultBruksenhetRegistrering.copy(
                         bruksarealRegistrering = BruksarealRegistrering(
-                            totalBruksareal = null,
+                            totaltBruksareal = null,
                             etasjeRegistreringer = listOf(
                                 EtasjeBruksarealRegistrering(
                                     bruksareal = 125.0,
@@ -122,7 +122,7 @@ class BygningEgenregistreringAggregeringTest {
 
         val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
 
-        assertThat(aggregatedBygning.bruksenheter.single().totalBruksareal.egenregistrert).isNull()
+        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert).isNull()
 
         assertThat(aggregatedBygning).all {
             prop(Bygning::bruksenheter).index(0).all {
@@ -137,7 +137,7 @@ class BygningEgenregistreringAggregeringTest {
                         }
                     }
                 }
-                prop(Bruksenhet::totalBruksareal).all {
+                prop(Bruksenhet::totaltBruksareal).all {
                     prop(Multikilde<Bruksareal>::egenregistrert).isNull()
                 }
             }

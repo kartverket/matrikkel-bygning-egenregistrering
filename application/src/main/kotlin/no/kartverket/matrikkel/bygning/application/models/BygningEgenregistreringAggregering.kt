@@ -36,7 +36,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                 )
             }
         },
-        totalBruksareal = this.aggregateTotalBruksareal(bruksenhetRegistrering.bruksarealRegistrering, metadata),
+        totaltBruksareal = this.aggregateTotaltBruksareal(bruksenhetRegistrering.bruksarealRegistrering, metadata),
         vannforsyning = this.vannforsyning.aggregate {
             bruksenhetRegistrering.vannforsyningRegistrering?.let {
                 Vannforsyning(
@@ -78,7 +78,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
 }
 
 private fun Bruksenhet.isEgenregistrertBruksarealRegistreringPresent(): Boolean =
-    this.etasjer.egenregistrert != null || this.totalBruksareal.egenregistrert != null
+    this.etasjer.egenregistrert != null || this.totaltBruksareal.egenregistrert != null
 
 
 private fun Bruksenhet.aggregateEtasjer(
@@ -101,16 +101,16 @@ private fun Bruksenhet.aggregateEtasjer(
     )
 }
 
-private fun Bruksenhet.aggregateTotalBruksareal(
+private fun Bruksenhet.aggregateTotaltBruksareal(
     bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
 ): Multikilde<Bruksareal> {
-    if (this.isEgenregistrertBruksarealRegistreringPresent() || bruksarealRegistrering?.totalBruksareal == null) {
-        return this.totalBruksareal
+    if (this.isEgenregistrertBruksarealRegistreringPresent() || bruksarealRegistrering?.totaltBruksareal == null) {
+        return this.totaltBruksareal
     }
 
-    return this.totalBruksareal.copy(
+    return this.totaltBruksareal.copy(
         egenregistrert = Bruksareal(
-            data = bruksarealRegistrering.totalBruksareal,
+            data = bruksarealRegistrering.totaltBruksareal,
             metadata = metadata,
         ),
     )

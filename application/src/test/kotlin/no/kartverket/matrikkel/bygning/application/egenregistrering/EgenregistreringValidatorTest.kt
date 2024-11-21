@@ -111,7 +111,7 @@ class EgenregistreringValidatorTest {
                         BruksenhetRegistrering(
                             bruksenhetId = 1L,
                             bruksarealRegistrering = BruksarealRegistrering(
-                                totalBruksareal = 125.0,
+                                totaltBruksareal = 125.0,
                                 etasjeRegistreringer = listOf(
                                     EtasjeBruksarealRegistrering(
                                         bruksareal = 125.0,

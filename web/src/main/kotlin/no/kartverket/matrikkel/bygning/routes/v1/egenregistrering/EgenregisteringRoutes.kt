@@ -32,7 +32,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                 BruksenhetRegistreringRequest(
                                     bruksenhetId = 1L,
                                     bruksarealRegistrering = BruksarealRegistreringRequest(
-                                        totalBruksareal = null,
+                                        totaltBruksareal = null,
                                         etasjeRegistreringer = listOf(
                                             EtasjeBruksarealRegistreringRequest(
                                                 bruksareal = 50.0,

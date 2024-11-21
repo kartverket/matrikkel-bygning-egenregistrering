@@ -39,7 +39,7 @@ data class Bruksenhet(
     val bygningId: Long,
     val etasjer: Multikilde<List<BruksenhetEtasje>> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
-    val totalBruksareal: Multikilde<Bruksareal> = Multikilde(),
+    val totaltBruksareal: Multikilde<Bruksareal> = Multikilde(),
     val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
     val oppvarminger: Multikilde<List<Oppvarming>> = Multikilde(),
     val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),

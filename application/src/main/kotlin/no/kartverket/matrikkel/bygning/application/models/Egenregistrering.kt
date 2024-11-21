@@ -16,7 +16,7 @@ data class ByggeaarRegistrering(
 
 @Serializable
 data class BruksarealRegistrering(
-    val totalBruksareal: Double?,
+    val totaltBruksareal: Double?,
     val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?
 )
 

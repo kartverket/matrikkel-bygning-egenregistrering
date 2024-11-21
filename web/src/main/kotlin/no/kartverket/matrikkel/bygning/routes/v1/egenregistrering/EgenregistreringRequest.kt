@@ -53,12 +53,14 @@ data class EtasjeBetegnelseRequest(
 
 @Serializable
 data class EtasjeBruksarealRegistreringRequest(
-    val bruksareal: Double?, val etasjebetegnelse: EtasjeBetegnelseRequest
+    val bruksareal: Double?,
+    val etasjebetegnelse: EtasjeBetegnelseRequest
 )
 
 @Serializable
 data class BruksarealRegistreringRequest(
-    val totalBruksareal: Double?, val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?
+    val totaltBruksareal: Double?,
+    val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?
 )
 
 @Serializable
@@ -96,7 +98,7 @@ fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistre
         bruksenhetId = bruksenhetId,
         bruksarealRegistrering = bruksarealRegistrering?.let {
             BruksarealRegistrering(
-                totalBruksareal = it.totalBruksareal,
+                totaltBruksareal = it.totaltBruksareal,
                 etasjeRegistreringer = it.etasjeRegistreringer?.map {
                     it.toEtasjeBruksarealRegistrering()
                 },

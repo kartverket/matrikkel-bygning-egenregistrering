@@ -78,7 +78,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             assertThat(bygning).all {
                 prop(BygningResponse::bruksenheter).index(0).all {
                     prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
-                    prop(BruksenhetResponse::totalBruksareal).isNotNull().all {
+                    prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
                         prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
                             prop(BruksarealResponse::data).isEqualTo(125.0)
                             prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
@@ -123,7 +123,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
                 prop(BygningResponse::bruksenheter).index(1).all {
                     prop(BruksenhetResponse::bruksenhetId).isEqualTo(2L)
-                    prop(BruksenhetResponse::totalBruksareal).isNull()
+                    prop(BruksenhetResponse::totaltBruksareal).isNull()
                     prop(BruksenhetResponse::energikilder).isNull()
                     prop(BruksenhetResponse::oppvarminger).isNull()
                 }
@@ -152,7 +152,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         assertThat(bruksenhet).all {
             prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
 
-            prop(BruksenhetResponse::totalBruksareal).isNotNull().all {
+            prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
                 prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
                     prop(BruksarealResponse::data).isEqualTo(125.0)
                     prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
@@ -196,7 +196,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                             BruksenhetRegistreringRequest(
                                 bruksenhetId = 1L,
                                 bruksarealRegistrering = BruksarealRegistreringRequest(
-                                    totalBruksareal = 40.0,
+                                    totaltBruksareal = 40.0,
                                     etasjeRegistreringer = null,
                                 ),
                                 byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008),
@@ -225,7 +225,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                             prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
-                    prop(BruksenhetResponse::totalBruksareal).isNotNull().all {
+                    prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
                         prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
                             prop(BruksarealResponse::data).isEqualTo(40.0)
                             prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
@@ -234,7 +234,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 }
                 withBruksenhetId(2L).all {
                     prop(BruksenhetResponse::byggeaar).isNull()
-                    prop(BruksenhetResponse::totalBruksareal).isNull()
+                    prop(BruksenhetResponse::totaltBruksareal).isNull()
                 }
             }
         }
@@ -263,7 +263,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             assertThat(bygning).all {
                 prop(BygningResponse::bruksareal).isNotNull().prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNull()
                 prop(BygningResponse::bruksenheter).withBruksenhetId(1L)
-                    .prop(BruksenhetResponse::totalBruksareal).isNotNull().all {
+                    .prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
                         prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
                             prop(BruksarealResponse::metadata).all {
                                 prop(RegisterMetadataResponse::registrertAv).isEqualTo("31129956715")

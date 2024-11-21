@@ -115,7 +115,7 @@ internal class MatrikkelBygningClient(
                             bruksenhetId = it.id.value,
                             bygningId = it.byggId.value,
                             // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
-                            totalBruksareal = Multikilde(
+                            totaltBruksareal = Multikilde(
                                 autoritativ = Bruksareal(
                                     it.bruksareal,
                                     bruksenhetsmetadata,
