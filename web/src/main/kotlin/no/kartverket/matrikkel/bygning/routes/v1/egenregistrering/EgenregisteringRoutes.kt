@@ -1,6 +1,9 @@
 package no.kartverket.matrikkel.bygning.routes.v1.egenregistrering
 
-import com.github.michaelbull.result.fold
+import com.github.michaelbull.result.andThen
+import com.github.michaelbull.result.mapBoth
+import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.runCatching
 import io.github.smiley4.ktorswaggerui.dsl.routing.post
 import io.ktor.http.*
 import io.ktor.server.request.*
@@ -8,8 +11,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.routes.common.ErrorResponse
-import no.kartverket.matrikkel.bygning.routes.common.toErrorDetailResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
 
 fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
     post(
@@ -27,7 +31,25 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                             bruksenhetRegistreringer = listOf(
                                 BruksenhetRegistreringRequest(
                                     bruksenhetId = 1L,
-                                    bruksarealRegistrering = null,
+                                    bruksarealRegistrering = BruksarealRegistreringRequest(
+                                        totaltBruksareal = null,
+                                        etasjeRegistreringer = listOf(
+                                            EtasjeBruksarealRegistreringRequest(
+                                                bruksareal = 50.0,
+                                                etasjebetegnelse = EtasjeBetegnelseRequest(
+                                                    etasjeplanKode = "H",
+                                                    etasjenummer = 1,
+                                                ),
+                                            ),
+                                            EtasjeBruksarealRegistreringRequest(
+                                                bruksareal = 30.0,
+                                                etasjebetegnelse = EtasjeBetegnelseRequest(
+                                                    etasjeplanKode = "H",
+                                                    etasjenummer = 2,
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                     byggeaarRegistrering = null,
                                     energikildeRegistrering = EnergikildeRegistreringRequest(
                                         energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
@@ -57,20 +79,22 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
             }
         },
     ) {
+        // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
         val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
-        val egenregistrering = egenregistreringRequest.toEgenregistrering()
+        val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering() }
+            .mapError(::exceptionToDomainError)
+            .andThen { egenregistreringService.addEgenregistrering(it) }
+            .mapBoth(
+                success = { HttpStatusCode.Created to null },
+                failure = ::domainErrorToResponse,
+            )
 
-        egenregistreringService.addEgenregistrering(egenregistrering).fold(
-            success = { call.respond(HttpStatusCode.Created) },
-            failure = {
-                call.respond(
-                    status = HttpStatusCode.BadRequest,
-                    ErrorResponse.ValidationError(
-                        details = listOf(it.toErrorDetailResponse()),
-                    ),
-                )
-            },
-        )
+        if (body != null) {
+            call.respond(status)
+        } else {
+            call.respond(status, body)
+        }
     }
+
 }

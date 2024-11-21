@@ -1,11 +1,11 @@
 package no.kartverket.matrikkel.bygning.application.models
 
 import kotlinx.serialization.Serializable
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import java.time.Instant
 import java.util.*
 
@@ -16,7 +16,14 @@ data class ByggeaarRegistrering(
 
 @Serializable
 data class BruksarealRegistrering(
+    val totaltBruksareal: Double?,
+    val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?
+)
+
+@Serializable
+data class EtasjeBruksarealRegistrering(
     val bruksareal: Double?,
+    val etasjebetegnelse: Etasjebetegnelse
 )
 
 @Serializable

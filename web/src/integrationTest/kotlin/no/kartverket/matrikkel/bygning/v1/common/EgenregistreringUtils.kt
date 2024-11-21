@@ -24,7 +24,10 @@ internal fun EgenregistreringRequest.Companion.validEgenregistrering() = Egenreg
     bruksenhetRegistreringer = listOf(
         BruksenhetRegistreringRequest(
             bruksenhetId = 1L,
-            bruksarealRegistrering = BruksarealRegistreringRequest(125.0),
+            bruksarealRegistrering = BruksarealRegistreringRequest(
+                totaltBruksareal = 125.0,
+                etasjeRegistreringer = null
+            ),
             byggeaarRegistrering = ByggeaarRegistreringRequest(2010),
             vannforsyningRegistrering = VannforsyningRegistreringRequest(
                 VannforsyningKode.OffentligVannverk,

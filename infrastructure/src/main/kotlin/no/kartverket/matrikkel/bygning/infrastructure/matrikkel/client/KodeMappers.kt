@@ -2,10 +2,12 @@ package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client
 
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.AvlopsKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.EnergikildeKodeId
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.EtasjeplanKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.OppvarmingsKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.VannforsyningsKodeId
 
@@ -33,7 +35,7 @@ fun mapAvloep(kodeId: AvlopsKodeId): AvlopKode? = when (kodeId.value) {
     1L -> AvlopKode.OffentligKloakk
     2L -> AvlopKode.PrivatKloakk
     3L -> AvlopKode.IngenKloakk
-    else -> throw RuntimeException("Ukjent avløpsskode: ${kodeId.value}")
+    else -> throw RuntimeException("Ukjent avløpskode: ${kodeId.value}")
 }
 
 fun mapVannforsyning(kodeId: VannforsyningsKodeId): VannforsyningKode? = when (kodeId.value) {
@@ -43,4 +45,13 @@ fun mapVannforsyning(kodeId: VannforsyningsKodeId): VannforsyningKode? = when (k
     3L -> VannforsyningKode.AnnenPrivatInnlagtVann
     4L -> VannforsyningKode.AnnenPrivatIkkeInnlagtVann
     else -> throw RuntimeException("Ukjent vannforsyningskode: ${kodeId.value}")
+}
+
+fun mapEtasjeplanKode(kodeId: EtasjeplanKodeId): EtasjeplanKode = when (kodeId.value) {
+    0L -> EtasjeplanKode.IkkeOppgitt
+    1L -> EtasjeplanKode.Hovedetasje
+    2L -> EtasjeplanKode.Kjelleretasje
+    3L -> EtasjeplanKode.Loftetasje
+    4L -> EtasjeplanKode.Underetasje
+    else -> throw RuntimeException("Ukjent etasjeplankode: ${kodeId.value}")
 }

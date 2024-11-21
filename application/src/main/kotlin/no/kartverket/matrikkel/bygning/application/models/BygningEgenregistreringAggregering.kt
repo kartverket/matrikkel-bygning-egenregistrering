@@ -36,14 +36,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                 )
             }
         },
-        bruksareal = this.bruksareal.aggregate {
-            bruksenhetRegistrering.bruksarealRegistrering?.let {
-                Bruksareal(
-                    data = it.bruksareal,
-                    metadata = metadata,
-                )
-            }
-        },
+        totaltBruksareal = this.aggregateTotaltBruksareal(bruksenhetRegistrering.bruksarealRegistrering, metadata),
         vannforsyning = this.vannforsyning.aggregate {
             bruksenhetRegistrering.vannforsyningRegistrering?.let {
                 Vannforsyning(
@@ -80,9 +73,48 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                 }
             }
         },
+        etasjer = aggregateEtasjer(bruksenhetRegistrering.bruksarealRegistrering, metadata),
     )
 }
 
+private fun Bruksenhet.isEgenregistrertBruksarealRegistreringPresent(): Boolean =
+    this.etasjer.egenregistrert != null || this.totaltBruksareal.egenregistrert != null
+
+
+private fun Bruksenhet.aggregateEtasjer(
+    bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
+): Multikilde<List<BruksenhetEtasje>> {
+    if (this.isEgenregistrertBruksarealRegistreringPresent() || bruksarealRegistrering?.etasjeRegistreringer == null) {
+        return this.etasjer
+    }
+
+    return this.etasjer.copy(
+        egenregistrert = bruksarealRegistrering.etasjeRegistreringer.map {
+            BruksenhetEtasje(
+                etasjebetegnelse = it.etasjebetegnelse,
+                bruksareal = Bruksareal(
+                    data = it.bruksareal,
+                    metadata = metadata,
+                ),
+            )
+        },
+    )
+}
+
+private fun Bruksenhet.aggregateTotaltBruksareal(
+    bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
+): Multikilde<Bruksareal> {
+    if (this.isEgenregistrertBruksarealRegistreringPresent() || bruksarealRegistrering?.totaltBruksareal == null) {
+        return this.totaltBruksareal
+    }
+
+    return this.totaltBruksareal.copy(
+        egenregistrert = Bruksareal(
+            data = bruksarealRegistrering.totaltBruksareal,
+            metadata = metadata,
+        ),
+    )
+}
 
 fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): Bruksenhet {
     return egenregistreringer.fold(this) { bruksenhetAggregate, egenregistrering ->

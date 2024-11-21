@@ -36,7 +36,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
     fun `lagring av 1 egenregistrering skal kun returnere 1 egenregistrering`() {
         egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering)
 
-        val bygningRegistreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L).value
+        val bygningRegistreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L)
 
         assertThat(bygningRegistreringer).hasSize(1)
 
@@ -57,7 +57,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
         egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering)
         egenregistreringRepository.saveEgenregistrering(laterRegistrering)
 
-        val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L).value
+        val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L)
 
         assertThat(registreringer).index(0).all {
             prop(Egenregistrering::id).isEqualTo(laterRegistrering.id)
@@ -69,7 +69,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
 
     @Test
     fun `henting av registreringer skal gi tom liste hvis bygningen ikke har registreringer`() {
-        val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L).value
+        val registreringer = egenregistreringRepository.getAllEgenregistreringerForBygning(1L)
 
         assertThat(registreringer).isEmpty()
     }

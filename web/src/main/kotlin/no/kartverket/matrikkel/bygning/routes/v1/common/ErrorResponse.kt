@@ -1,9 +1,30 @@
-package no.kartverket.matrikkel.bygning.routes.common
+package no.kartverket.matrikkel.bygning.routes.v1.common
 
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
+import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
+import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
+import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
+import no.kartverket.matrikkel.bygning.application.models.error.MultipleValidationError
+import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import org.slf4j.MDC
+
+// Gjør at man kan chaine direkte videre.
+// Ulempen er at vi mapper og vet om "domene"-feil ytterst i web-laget
+// Kan kanskje være hensiktsmessig å ha custom exception-typer
+fun exceptionToDomainError(e: Throwable): DomainError = when (e) {
+    is IllegalArgumentException -> ValidationError(e.message ?: "Ugyldig request")
+    else -> ValidationError(e.message ?: "Ugyldig request")
+}
+
+fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorResponse> = when (error) {
+    // TODO: Meldingen kan beskrives her og domainerror kan inneholde f.eks. id el.l.
+    is BygningNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
+    is BruksenhetNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
+    is ValidationError -> HttpStatusCode.BadRequest to ErrorResponse.BadRequestError(description = error.message)
+    is MultipleValidationError -> HttpStatusCode.BadRequest to ErrorResponse.ValidationError(details = error.errors.map { ErrorDetailResponse(detail = it.message) })
+}
 
 @Serializable
 data class ErrorDetailResponse(

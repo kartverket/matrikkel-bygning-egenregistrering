@@ -9,18 +9,22 @@ import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.BygningEtasje
 import no.kartverket.matrikkel.bygning.application.models.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
+import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.application.models.Vannforsyning
-import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
+import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
+import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBygning
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.bygningId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.toInstant
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import org.slf4j.Logger
@@ -32,7 +36,7 @@ internal class MatrikkelBygningClient(
 ) : BygningClient {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
-    override fun getBygningById(id: Long): Result<Bygning, ErrorDetail> {
+    override fun getBygningById(id: Long): Result<Bygning, DomainError> {
         val bygningId: BygningId = bygningId(id)
 
         try {
@@ -111,11 +115,20 @@ internal class MatrikkelBygningClient(
                             bruksenhetId = it.id.value,
                             bygningId = it.byggId.value,
                             // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
-                            bruksareal = Multikilde(
+                            totaltBruksareal = Multikilde(
                                 autoritativ = Bruksareal(
                                     it.bruksareal,
                                     bruksenhetsmetadata,
                                 ),
+                            ),
+                        )
+                    },
+                    etasjer = bygning.etasjer.item.mapNotNull { etasje ->
+                        BygningEtasje(
+                            etasjeId = etasje.id,
+                            etasjebetegnelse = Etasjebetegnelse.of(
+                                etasjenummer = Etasjenummer.of(etasje.etasjenummer),
+                                etasjeplanKode = mapEtasjeplanKode(etasje.etasjeplanKodeId),
                             ),
                         )
                     },
@@ -124,14 +137,14 @@ internal class MatrikkelBygningClient(
         } catch (exception: ServiceException) {
             log.warn("Noe gikk galt under henting av bygning med id {}", bygningId.value, exception)
             return Err(
-                ErrorDetail(
-                    detail = "Bygning med ID ${bygningId.value} finnes ikke i matrikkelen",
+                BygningNotFound(
+                    message = "Bygning med ID ${bygningId.value} finnes ikke i matrikkelen",
                 ),
             )
         }
     }
 
-    override fun getBygningByBygningsnummer(bygningsnummer: Long): Result<Bygning, ErrorDetail> {
+    override fun getBygningByBygningsnummer(bygningsnummer: Long): Result<Bygning, DomainError> {
         try {
             val bygningId = matrikkelApi.bygningService().findBygning(bygningsnummer, matrikkelApi.matrikkelContext)
 
@@ -139,9 +152,9 @@ internal class MatrikkelBygningClient(
         } catch (exception: ServiceException) {
             log.warn("Noe gikk galt under henting av bygning med bygningsnummer {}", bygningsnummer, exception)
             return Err(
-                ErrorDetail(
-                    detail = "Bygning med nummer $bygningsnummer finnes ikke i matrikkelen",
-                )
+                BygningNotFound(
+                    message = "Bygning med nummer $bygningsnummer finnes ikke i matrikkelen",
+                ),
             )
         }
     }

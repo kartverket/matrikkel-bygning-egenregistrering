@@ -99,7 +99,7 @@ class MatrikkelBygningClientTest {
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetId).isEqualTo(2L)
                 prop(Bruksenhet::bygningId).isEqualTo(1L)
-                prop(Bruksenhet::bruksareal).erAutoritativIkkeEgenregistrert {
+                prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
                     prop(Bruksareal::data).isEqualTo(0.0)
                     prop(Bruksareal::metadata).isMatrikkelfoertBruksenhetstidspunkt()
@@ -133,6 +133,7 @@ class MatrikkelBygningClientTest {
                 etasjedata.bruksarealTotalt = 150.0
                 etasjer(
                     etasje {
+                        id = 1L
                         etasjeplanKodeId = MatrikkelEtasjeplanKode.Hovedetasje()
                         etasjenummer = 1
                         bruksarealTotalt = 150.0
@@ -197,7 +198,7 @@ class MatrikkelBygningClientTest {
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetId).isEqualTo(2L)
                 prop(Bruksenhet::bygningId).isEqualTo(1L)
-                prop(Bruksenhet::bruksareal).erAutoritativIkkeEgenregistrert {
+                prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     prop(Bruksareal::data).isEqualTo(140.0)
                     prop(Bruksareal::metadata).isMatrikkelfoertBruksenhetstidspunkt()
                 }

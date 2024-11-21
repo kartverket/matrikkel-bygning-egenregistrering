@@ -9,6 +9,7 @@ import java.time.Instant
 data class Bygning(
     val bygningId: Long,
     val bygningsnummer: Long,
+    val etasjer: List<BygningEtasje>,
     val bruksenheter: List<Bruksenhet>,
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val bruksareal: Multikilde<Bruksareal> = Multikilde(),
@@ -23,8 +24,7 @@ data class Multikilde<T : Any>(val autoritativ: T? = null, val egenregistrert: T
 }
 
 data class RegisterMetadata(
-    val registreringstidspunkt: Instant,
-    val registrertAv: RegistreringAktoer
+    val registreringstidspunkt: Instant, val registrertAv: RegistreringAktoer
 )
 
 data class Bruksareal(val data: Double?, val metadata: RegisterMetadata)
@@ -37,8 +37,9 @@ data class Oppvarming(val data: OppvarmingKode, val metadata: RegisterMetadata)
 data class Bruksenhet(
     val bruksenhetId: Long,
     val bygningId: Long,
+    val etasjer: Multikilde<List<BruksenhetEtasje>> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
-    val bruksareal: Multikilde<Bruksareal> = Multikilde(),
+    val totaltBruksareal: Multikilde<Bruksareal> = Multikilde(),
     val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
     val oppvarminger: Multikilde<List<Oppvarming>> = Multikilde(),
     val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
