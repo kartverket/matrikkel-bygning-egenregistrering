@@ -115,7 +115,7 @@ class EgenregistreringValidatorTest {
                                 etasjeRegistreringer = listOf(
                                     EtasjeBruksarealRegistrering(
                                         bruksareal = 125.0,
-                                        etasjeBetegnelse = Etasjebetegnelse.of(
+                                        etasjebetegnelse = Etasjebetegnelse.of(
                                             etasjeplanKode = EtasjeplanKode.Hovedetasje,
                                             etasjenummer = Etasjenummer.of(1),
                                         ),

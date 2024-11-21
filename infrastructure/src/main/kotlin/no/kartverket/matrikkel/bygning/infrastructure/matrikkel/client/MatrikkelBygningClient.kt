@@ -126,7 +126,7 @@ internal class MatrikkelBygningClient(
                     etasjer = bygning.etasjer.item.mapNotNull { etasje ->
                         BygningEtasje(
                             etasjeId = etasje.id,
-                            etasjeBetegnelse = Etasjebetegnelse.of(
+                            etasjebetegnelse = Etasjebetegnelse.of(
                                 etasjenummer = Etasjenummer.of(etasje.etasjenummer),
                                 etasjeplanKode = mapEtasjeplanKode(etasje.etasjeplanKodeId),
                             ),

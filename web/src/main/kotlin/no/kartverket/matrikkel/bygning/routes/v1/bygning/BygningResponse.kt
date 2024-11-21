@@ -153,7 +153,7 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
 )
 
 private fun BruksenhetEtasje.toBruksenhetEtasjeResponse(): BruksenhetEtasjeResponse = BruksenhetEtasjeResponse(
-    etasjebetegnelse = this.etasjeBetegnelse.toString(),
+    etasjebetegnelse = this.etasjebetegnelse.toString(),
     bruksareal = this.bruksareal?.toBruksarealResponse(),
 )
 

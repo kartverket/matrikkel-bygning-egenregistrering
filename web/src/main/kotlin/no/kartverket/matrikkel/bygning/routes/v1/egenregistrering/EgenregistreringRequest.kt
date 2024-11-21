@@ -86,7 +86,7 @@ data class OppvarmingRegistreringRequest(
 fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
     return EtasjeBruksarealRegistrering(
         bruksareal = this.bruksareal,
-        etasjeBetegnelse = Etasjebetegnelse.of(
+        etasjebetegnelse = Etasjebetegnelse.of(
             etasjenummer = Etasjenummer.of(this.etasjebetegnelse.etasjenummer),
             etasjeplanKode = EtasjeplanKode.of(this.etasjebetegnelse.etasjeplanKode),
         ),

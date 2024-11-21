@@ -91,7 +91,7 @@ private fun Bruksenhet.aggregateEtasjer(
     return this.etasjer.copy(
         egenregistrert = bruksarealRegistrering.etasjeRegistreringer.map {
             BruksenhetEtasje(
-                etasjeBetegnelse = it.etasjeBetegnelse,
+                etasjebetegnelse = it.etasjebetegnelse,
                 bruksareal = Bruksareal(
                     data = it.bruksareal,
                     metadata = metadata,

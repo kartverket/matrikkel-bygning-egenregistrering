@@ -108,7 +108,7 @@ class BygningEgenregistreringAggregeringTest {
                             etasjeRegistreringer = listOf(
                                 EtasjeBruksarealRegistrering(
                                     bruksareal = 125.0,
-                                    etasjeBetegnelse = Etasjebetegnelse.of(
+                                    etasjebetegnelse = Etasjebetegnelse.of(
                                         etasjenummer = Etasjenummer.of(1),
                                         etasjeplanKode = EtasjeplanKode.Hovedetasje,
                                     ),
@@ -131,7 +131,7 @@ class BygningEgenregistreringAggregeringTest {
                         prop(BruksenhetEtasje::bruksareal).isNotNull().all {
                             prop(Bruksareal::data).isEqualTo(125.0)
                         }
-                        prop(BruksenhetEtasje::etasjeBetegnelse).all {
+                        prop(BruksenhetEtasje::etasjebetegnelse).all {
                             prop(Etasjebetegnelse::etasjenummer).isEqualTo(Etasjenummer.of(1))
                             prop(Etasjebetegnelse::etasjeplanKode).isEqualTo(EtasjeplanKode.Hovedetasje)
                         }
