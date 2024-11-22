@@ -44,6 +44,7 @@ internal class LocalBygningClient : BygningClient {
                     metadata = RegisterMetadata(
                         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
                         registrertAv = Signatur("norola"),
+                        kildemateriale = null
                     ),
                 ),
             ),

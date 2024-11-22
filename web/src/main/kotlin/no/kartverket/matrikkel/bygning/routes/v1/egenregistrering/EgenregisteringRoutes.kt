@@ -11,6 +11,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
@@ -50,9 +51,13 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                             ),
                                         ),
                                     ),
-                                    byggeaarRegistrering = null,
+                                    ByggeaarRegistreringRequest(
+                                        byggeaar = 2021,
+                                        kildemateriale = KildematerialeKode.Selvrapportert
+                                    ),
                                     energikildeRegistrering = EnergikildeRegistreringRequest(
                                         energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
+                                        kildemateriale = KildematerialeKode.Selvrapportert
                                     ),
                                     oppvarmingRegistrering = null,
                                     vannforsyningRegistrering = null,

@@ -14,6 +14,7 @@ import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.serializers.InstantSerializer
@@ -76,8 +77,10 @@ data class BruksenhetSimpleResponse(
 
 @Serializable
 data class RegisterMetadataResponse(
-    @Serializable(with = InstantSerializer::class) val registreringstidspunkt: Instant,
+    @Serializable(with = InstantSerializer::class)
+    val registreringstidspunkt: Instant,
     val registrertAv: String,
+    val kildemateriale: KildematerialeKode? = null
 )
 
 @Serializable
@@ -102,6 +105,7 @@ data class OppvarmingResponse(val data: OppvarmingKode?, val metadata: RegisterM
 fun RegisterMetadata.toRegisterMetadataResponse() = RegisterMetadataResponse(
     registreringstidspunkt = this.registreringstidspunkt,
     registrertAv = this.registrertAv.value,
+    kildemateriale = this.kildemateriale
 )
 
 

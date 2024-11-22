@@ -19,6 +19,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import java.time.Instant
 import java.util.*
 import kotlin.collections.map
@@ -37,12 +38,15 @@ data class BruksenhetRegistreringRequest(
 
 @Serializable
 data class EgenregistreringRequest(
-    val bygningId: Long, val eier: String, val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
+    val bygningId: Long,
+    val eier: String,
+    val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
 
 @Serializable
 data class ByggeaarRegistreringRequest(
     val byggeaar: Int?,
+    val kildemateriale: KildematerialeKode?,
 )
 
 @Serializable
@@ -54,8 +58,8 @@ data class EtasjeBetegnelseRequest(
 @Serializable
 data class EtasjeBruksarealRegistreringRequest(
     val bruksareal: Double?,
-    val etasjebetegnelse: EtasjeBetegnelseRequest
-)
+    val etasjebetegnelse: EtasjeBetegnelseRequest,
+    )
 
 @Serializable
 data class BruksarealRegistreringRequest(
@@ -66,21 +70,25 @@ data class BruksarealRegistreringRequest(
 @Serializable
 data class VannforsyningRegistreringRequest(
     val vannforsyning: VannforsyningKode?,
-)
+    val kildemateriale: KildematerialeKode?,
+    )
 
 @Serializable
 data class AvlopRegistreringRequest(
     val avlop: AvlopKode?,
-)
+    val kildemateriale: KildematerialeKode?,
+    )
 
 @Serializable
 data class EnergikildeRegistreringRequest(
     val energikilder: List<EnergikildeKode>?,
+    val kildemateriale: KildematerialeKode?,
 )
 
 @Serializable
 data class OppvarmingRegistreringRequest(
     val oppvarminger: List<OppvarmingKode>?,
+    val kildemateriale: KildematerialeKode?,
 )
 
 fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
@@ -107,26 +115,31 @@ fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistre
         byggeaarRegistrering = byggeaarRegistrering?.let {
             ByggeaarRegistrering(
                 byggeaar = it.byggeaar,
+                kildemateriale = it.kildemateriale
             )
         },
         vannforsyningRegistrering = vannforsyningRegistrering?.let {
             VannforsyningRegistrering(
                 vannforsyning = it.vannforsyning,
+                kildemateriale = it.kildemateriale
             )
         },
         avlopRegistrering = avlopRegistrering?.let {
             AvlopRegistrering(
                 avlop = it.avlop,
+                kildemateriale = it.kildemateriale
             )
         },
         energikildeRegistrering = energikildeRegistrering?.let {
             EnergikildeRegistrering(
                 energikilder = it.energikilder,
+                kildemateriale = it.kildemateriale
             )
         },
         oppvarmingRegistrering = oppvarmingRegistrering?.let {
             OppvarmingRegistrering(
                 oppvarminger = it.oppvarminger,
+                kildemateriale = it.kildemateriale
             )
         },
     )

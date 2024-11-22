@@ -2,6 +2,7 @@ package no.kartverket.matrikkel.bygning.application.models
 
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
@@ -24,7 +25,9 @@ data class Multikilde<T : Any>(val autoritativ: T? = null, val egenregistrert: T
 }
 
 data class RegisterMetadata(
-    val registreringstidspunkt: Instant, val registrertAv: RegistreringAktoer
+    val registreringstidspunkt: Instant,
+    val registrertAv: RegistreringAktoer,
+    val kildemateriale: KildematerialeKode? = null
 )
 
 data class Bruksareal(val data: Double?, val metadata: RegisterMetadata)

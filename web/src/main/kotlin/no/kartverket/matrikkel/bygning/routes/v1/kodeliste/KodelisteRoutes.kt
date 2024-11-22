@@ -8,6 +8,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.IKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import kotlin.reflect.KClass
@@ -31,7 +32,8 @@ fun Route.kodelisteRouting() {
                 vannforsyningKoder = VannforsyningKode::class.toKodeList(),
                 avlopKoder = AvlopKode::class.toKodeList(),
                 oppvarmingKoder = OppvarmingKode::class.toKodeList(),
-            ),
+                kildematerialeKoder = KildematerialeKode::class.toKodeList(),
+                ),
         )
     }
 
@@ -39,6 +41,7 @@ fun Route.kodelisteRouting() {
     kodelisteRoute("oppvarming", OppvarmingKode::class)
     kodelisteRoute("energikilde", EnergikildeKode::class)
     kodelisteRoute("vannforsyning", VannforsyningKode::class)
+    kodelisteRoute("kildemateriale", KildematerialeKode::class)
     kodelisteRoute("etasjeplan", EtasjeplanKode::class)
 }
 

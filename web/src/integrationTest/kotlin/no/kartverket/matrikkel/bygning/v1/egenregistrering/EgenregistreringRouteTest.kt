@@ -17,6 +17,7 @@ import io.ktor.server.testing.testApplication
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.AvlopKodeResponse
@@ -75,6 +76,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
             val now = Instant.now()
 
+
             assertThat(bygning).all {
                 prop(BygningResponse::bruksenheter).index(0).all {
                     prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
@@ -88,7 +90,10 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                     prop(BruksenhetResponse::byggeaar).isNotNull().all {
                         prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
                             prop(ByggeaarResponse::data).isEqualTo(2010)
-                            prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                            prop(ByggeaarResponse::metadata).all {
+                                hasRegistreringstidspunktWithinThreshold(now)
+                                prop(RegisterMetadataResponse::kildemateriale).isEqualTo(KildematerialeKode.Selvrapportert)
+                            }
                         }
                     }
 
@@ -199,7 +204,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                                     totaltBruksareal = 40.0,
                                     etasjeRegistreringer = null,
                                 ),
-                                byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008),
+                                byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008, kildemateriale = KildematerialeKode.AnnenDokumentasjon),
                                 vannforsyningRegistrering = null,
                                 avlopRegistrering = null,
                                 energikildeRegistrering = null,

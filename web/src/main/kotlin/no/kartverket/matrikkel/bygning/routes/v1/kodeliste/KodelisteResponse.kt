@@ -2,6 +2,7 @@ package no.kartverket.matrikkel.bygning.routes.v1.kodeliste
 
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.kodelister.IKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import kotlin.reflect.KClass
 
 @Serializable
@@ -10,6 +11,7 @@ data class KodelisterResponse(
     val avlopKoder: List<Kode>,
     val energikildeKoder: List<Kode>,
     val oppvarmingKoder: List<Kode>,
+    val kildematerialeKoder: List<Kode>
 )
 
 @Serializable
