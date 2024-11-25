@@ -28,52 +28,66 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
     )
 
     return this.copy(
-        byggeaar = this.byggeaar.aggregate {
-            bruksenhetRegistrering.byggeaarRegistrering?.let {
-                Byggeaar(
-                    data = it.byggeaar,
+        byggeaar = this.byggeaar.aggregate(bruksenhetRegistrering.byggeaarRegistrering) {
+            Byggeaar(
+                data = it.byggeaar,
+                metadata = metadata,
+            )
+        },
+        totaltBruksareal = this.totaltBruksareal.aggregate(bruksenhetRegistrering.bruksarealRegistrering?.totaltBruksareal) {
+            if (this.isEgenregistrertBruksarealRegistreringPresent()) {
+                return@aggregate null
+            }
+
+            Bruksareal(
+                it,
+                metadata = metadata,
+            )
+        },
+        vannforsyning = this.vannforsyning.aggregate(bruksenhetRegistrering.vannforsyningRegistrering) {
+            Vannforsyning(
+                data = it.vannforsyning,
+                metadata = metadata,
+            )
+        },
+        avlop = this.avlop.aggregate(bruksenhetRegistrering.avlopRegistrering) {
+            Avlop(
+                data = it.avlop,
+                metadata = metadata,
+            )
+        },
+        energikilder = this.energikilder.aggregate(bruksenhetRegistrering.energikildeRegistrering) {
+            it.energikilder?.map { registrertKilde ->
+                Energikilde(
+                    data = registrertKilde,
                     metadata = metadata,
                 )
             }
         },
-        totaltBruksareal = this.aggregateTotaltBruksareal(bruksenhetRegistrering.bruksarealRegistrering, metadata),
-        vannforsyning = this.vannforsyning.aggregate {
-            bruksenhetRegistrering.vannforsyningRegistrering?.let {
-                Vannforsyning(
-                    data = it.vannforsyning,
+        oppvarminger = this.oppvarminger.aggregate(bruksenhetRegistrering.oppvarmingRegistrering) {
+            it.oppvarminger?.map { registrertOppvarming ->
+                Oppvarming(
+                    data = registrertOppvarming,
                     metadata = metadata,
                 )
             }
         },
-        avlop = this.avlop.aggregate {
-            bruksenhetRegistrering.avlopRegistrering?.let {
-                Avlop(
-                    data = it.avlop,
-                    metadata = metadata,
-                )
+
+        etasjer = this.etasjer.aggregate(bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer) {
+            if (this.isEgenregistrertBruksarealRegistreringPresent()) {
+                return@aggregate null
             }
-        },
-        energikilder = this.energikilder.aggregate {
-            bruksenhetRegistrering.energikildeRegistrering?.let {
-                it.energikilder?.map { registrertKilde ->
-                    Energikilde(
-                        data = registrertKilde,
+
+            it.map {
+                BruksenhetEtasje(
+                    etasjebetegnelse = it.etasjebetegnelse,
+                    bruksareal = Bruksareal(
+                        data = it.bruksareal,
                         metadata = metadata,
-                    )
-                }
+                    ),
+                )
             }
         },
-        oppvarminger = this.oppvarminger.aggregate {
-            bruksenhetRegistrering.oppvarmingRegistrering?.let {
-                it.oppvarminger?.map { registrertOppvarming ->
-                    Oppvarming(
-                        data = registrertOppvarming,
-                        metadata = metadata,
-                    )
-                }
-            }
-        },
-        etasjer = aggregateEtasjer(bruksenhetRegistrering.bruksarealRegistrering, metadata),
     )
 }
 
@@ -81,46 +95,17 @@ private fun Bruksenhet.isEgenregistrertBruksarealRegistreringPresent(): Boolean 
     this.etasjer.egenregistrert != null || this.totaltBruksareal.egenregistrert != null
 
 
-private fun Bruksenhet.aggregateEtasjer(
-    bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
-): Multikilde<List<BruksenhetEtasje>> {
-    if (this.isEgenregistrertBruksarealRegistreringPresent() || bruksarealRegistrering?.etasjeRegistreringer == null) {
-        return this.etasjer
-    }
-
-    return this.etasjer.copy(
-        egenregistrert = bruksarealRegistrering.etasjeRegistreringer.map {
-            BruksenhetEtasje(
-                etasjebetegnelse = it.etasjebetegnelse,
-                bruksareal = Bruksareal(
-                    data = it.bruksareal,
-                    metadata = metadata,
-                ),
-            )
-        },
-    )
-}
-
-private fun Bruksenhet.aggregateTotaltBruksareal(
-    bruksarealRegistrering: BruksarealRegistrering?, metadata: RegisterMetadata
-): Multikilde<Bruksareal> {
-    if (this.isEgenregistrertBruksarealRegistreringPresent() || bruksarealRegistrering?.totaltBruksareal == null) {
-        return this.totaltBruksareal
-    }
-
-    return this.totaltBruksareal.copy(
-        egenregistrert = Bruksareal(
-            data = bruksarealRegistrering.totaltBruksareal,
-            metadata = metadata,
-        ),
-    )
-}
-
 fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): Bruksenhet {
     return egenregistreringer.fold(this) { bruksenhetAggregate, egenregistrering ->
         bruksenhetAggregate.applyEgenregistrering(egenregistrering)
     }
 }
 
-private fun <T : Any> Multikilde<T>.aggregate(mapper: () -> T?): Multikilde<T> =
-    takeIf { it.egenregistrert != null } ?: withEgenregistrert(mapper())
+
+private fun <T : Any, V : Any> Multikilde<T>.aggregate(registrering: V?, mapper: (V) -> T?): Multikilde<T> {
+    if (this.egenregistrert != null || registrering == null) {
+        return this
+    }
+
+    return withEgenregistrert(mapper(registrering))
+}

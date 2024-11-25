@@ -96,7 +96,7 @@ class BygningEgenregistreringAggregeringTest {
     }
 
     @Test
-    fun `bruksarealregistrering skal sette nyeste av etasje og total bruksareal`() {
+    fun `bruksarealregistrering skal sette etasje hvis etasje er nyere enn total bruksareal`() {
         val laterRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
@@ -139,6 +139,50 @@ class BygningEgenregistreringAggregeringTest {
                 }
                 prop(Bruksenhet::totaltBruksareal).all {
                     prop(Multikilde<Bruksareal>::egenregistrert).isNull()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `bruksarealregistrering skal sette total hvis total er nyere enn etasje bruksareal`() {
+        val firstRegistrering = defaultEgenregistrering.copy(
+            id = UUID.randomUUID(),
+            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.minusSeconds(60),
+            bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
+                bruksenhetRegistreringer = listOf(
+                    defaultBruksenhetRegistrering.copy(
+                        bruksarealRegistrering = BruksarealRegistrering(
+                            totaltBruksareal = null,
+                            etasjeRegistreringer = listOf(
+                                EtasjeBruksarealRegistrering(
+                                    bruksareal = 125.0,
+                                    etasjebetegnelse = Etasjebetegnelse.of(
+                                        etasjenummer = Etasjenummer.of(1),
+                                        etasjeplanKode = EtasjeplanKode.Hovedetasje,
+                                    ),
+                                ),
+                            ),
+                        ),
+
+                    ),
+                ),
+            ),
+        )
+
+        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(defaultEgenregistrering, firstRegistrering))
+
+        assertThat(aggregatedBygning.bruksenheter.single().etasjer.egenregistrert).isNull()
+
+        assertThat(aggregatedBygning).all {
+            prop(Bygning::bruksenheter).index(0).all {
+                prop(Bruksenhet::etasjer).all {
+                    prop(Multikilde<List<BruksenhetEtasje>>::egenregistrert).isNull()
+                }
+                prop(Bruksenhet::totaltBruksareal).all {
+                    prop(Multikilde<Bruksareal>::egenregistrert).isNotNull().all {
+                        prop(Bruksareal::data).isEqualTo(50.0)
+                    }
                 }
             }
         }
