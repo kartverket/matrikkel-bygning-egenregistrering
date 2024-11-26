@@ -34,11 +34,10 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                 metadata = metadata,
             )
         },
-        totaltBruksareal = this.totaltBruksareal.aggregate(bruksenhetRegistrering.bruksarealRegistrering?.totaltBruksareal) {
-            if (this.isEgenregistrertBruksarealRegistreringPresent()) {
-                return@aggregate null
-            }
-
+        totaltBruksareal = this.totaltBruksareal.aggregate(
+            registrering = bruksenhetRegistrering.bruksarealRegistrering?.totaltBruksareal,
+            condition = !this.isEgenregistrertBruksarealRegistreringPresent(),
+        ) {
             Bruksareal(
                 it,
                 metadata = metadata,
@@ -73,11 +72,10 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
             }
         },
 
-        etasjer = this.etasjer.aggregate(bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer) {
-            if (this.isEgenregistrertBruksarealRegistreringPresent()) {
-                return@aggregate null
-            }
-
+        etasjer = this.etasjer.aggregate(
+            registrering = bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer,
+            condition = !this.isEgenregistrertBruksarealRegistreringPresent(),
+        ) {
             it.map {
                 BruksenhetEtasje(
                     etasjebetegnelse = it.etasjebetegnelse,
@@ -102,10 +100,10 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
 }
 
 
-private fun <T : Any, V : Any> Multikilde<T>.aggregate(registrering: V?, mapper: (V) -> T?): Multikilde<T> {
+private fun <T : Any, V : Any> Multikilde<T>.aggregate(registrering: V?, condition: Boolean = true, mapper: (V) -> T?): Multikilde<T> {
     if (this.egenregistrert != null || registrering == null) {
         return this
     }
 
-    return withEgenregistrert(mapper(registrering))
+    return withEgenregistrert(if (condition) mapper(registrering) else null)
 }
