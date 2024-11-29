@@ -109,6 +109,7 @@ internal class MatrikkelBygningClient(
                         val bruksenhetsmetadata = RegisterMetadata(
                             it.oppdateringsdato.toInstant(),
                             Signatur(it.oppdatertAv),
+                            kildemateriale = null
                         )
 
                         Bruksenhet(

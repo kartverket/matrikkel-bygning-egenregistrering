@@ -5,6 +5,7 @@ import assertk.assertions.isBetween
 import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.RegisterMetadataResponse
@@ -28,18 +29,22 @@ internal fun EgenregistreringRequest.Companion.validEgenregistrering() = Egenreg
                 totaltBruksareal = 125.0,
                 etasjeRegistreringer = null
             ),
-            byggeaarRegistrering = ByggeaarRegistreringRequest(2010),
+            byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Selvrapportert),
             vannforsyningRegistrering = VannforsyningRegistreringRequest(
                 VannforsyningKode.OffentligVannverk,
+                KildematerialeKode.Salgsoppgave
             ),
             avlopRegistrering = AvlopRegistreringRequest(
                 avlop = AvlopKode.OffentligKloakk,
+                KildematerialeKode.Selvrapportert
             ),
             energikildeRegistrering = EnergikildeRegistreringRequest(
                 listOf(EnergikildeKode.Elektrisitet),
+                KildematerialeKode.Selvrapportert
             ),
             oppvarmingRegistrering = OppvarmingRegistreringRequest(
                 listOf(OppvarmingKode.Elektrisk),
+                KildematerialeKode.Selvrapportert
             ),
         ),
     ),

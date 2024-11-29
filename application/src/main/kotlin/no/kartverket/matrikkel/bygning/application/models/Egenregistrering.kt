@@ -6,12 +6,14 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import java.time.Instant
 import java.util.*
 
 @Serializable
 data class ByggeaarRegistrering(
     val byggeaar: Int?,
+    val kildemateriale: KildematerialeKode?
 )
 
 @Serializable
@@ -29,21 +31,25 @@ data class EtasjeBruksarealRegistrering(
 @Serializable
 data class VannforsyningRegistrering(
     val vannforsyning: VannforsyningKode?,
+    val kildemateriale: KildematerialeKode?
 )
 
 @Serializable
 data class AvlopRegistrering(
     val avlop: AvlopKode?,
+    val kildemateriale: KildematerialeKode?
 )
 
 @Serializable
 data class EnergikildeRegistrering(
     val energikilder: List<EnergikildeKode>?,
+    val kildemateriale: KildematerialeKode?
 )
 
 @Serializable
 data class OppvarmingRegistrering(
     val oppvarminger: List<OppvarmingKode>?,
+    val kildemateriale: KildematerialeKode?
 )
 
 
