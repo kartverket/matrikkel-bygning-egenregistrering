@@ -52,3 +52,6 @@ val resultat = service.hentData()
 Her returnerer `hentData`, `validerData` og `sjekkNoeGreier` alle en Result som blir mappet videre i `andThen` som om
 alt har gått bra, og til slutt "folder" vi over resultatet og lager et sluttresultat avhengig av om alt har gått bra
 eller om noe gikk feil i løpet av chainen.
+
+Vel å merke at vi ikke har gått all in for Result, og holdt dette til i all hovedsak det man kan anse som "service"
+-klasser. Det vil si at vi ikke bruker Result for for eksempel instansiering av domene-klasser og mapping-funksjoner.  
