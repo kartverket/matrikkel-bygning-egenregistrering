@@ -101,9 +101,9 @@ internal class MatrikkelBygningClient(
                     // TODO: Burde vi ha en måte å angi ukjent / ikke oppgitt?
                     bruksenheter = bruksenheter.map {
                         val bruksenhetsmetadata = RegisterMetadata(
-                                it.oppdateringsdato.toInstant(),
-                                Signatur(it.oppdatertAv),
-                                kildemateriale = null,
+                            it.oppdateringsdato.toInstant(),
+                            Signatur(it.oppdatertAv),
+                            kildemateriale = null,
                         )
 
                         Bruksenhet(
