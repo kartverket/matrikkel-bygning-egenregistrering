@@ -1,14 +1,21 @@
 package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import assertk.assertions.prop
+import no.kartverket.matrikkel.bygning.application.models.Byggeaar
+import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.builders.bygning
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.builders.bygningsstatusHistorikk
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.builders.bygningsstatusHistorikkList
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.builders.localDateUtc
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.builders.timestampUtc
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.MatrikkelBygningsstatusKode
+import java.time.Instant
 import kotlin.test.Test
 
 class ByggeaarDeriverTest {
@@ -26,7 +33,15 @@ class ByggeaarDeriverTest {
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).isEqualTo(2009)
+        assertThat(derivedByggeaar).isNotNull().all {
+            prop(Byggeaar::data).isEqualTo(2009)
+            prop(Byggeaar::metadata).all {
+                prop(RegisterMetadata::registrertAv).all{
+                    prop(RegistreringAktoer::value).isEqualTo("MatrikkelBruker")
+                }
+                prop(RegisterMetadata::registreringstidspunkt).isEqualTo(Instant.parse("2009-04-26T00:00:00.000Z"))
+            }
+        }
     }
 
     @Test
@@ -43,7 +58,15 @@ class ByggeaarDeriverTest {
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).isEqualTo(2009)
+        assertThat(derivedByggeaar).isNotNull().all {
+            prop(Byggeaar::data).isEqualTo(2009)
+            prop(Byggeaar::metadata).all {
+                prop(RegisterMetadata::registrertAv).all{
+                    prop(RegistreringAktoer::value).isEqualTo("MatrikkelBruker")
+                }
+                prop(RegisterMetadata::registreringstidspunkt).isEqualTo(Instant.parse("2009-04-26T00:00:00.000Z"))
+            }
+        }
     }
 
     @Test
@@ -95,7 +118,15 @@ class ByggeaarDeriverTest {
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).isEqualTo(2009)
+        assertThat(derivedByggeaar).isNotNull().all {
+            prop(Byggeaar::data).isEqualTo(2009)
+            prop(Byggeaar::metadata).all {
+                prop(RegisterMetadata::registrertAv).all{
+                    prop(RegistreringAktoer::value).isEqualTo("MatrikkelBruker")
+                }
+                prop(RegisterMetadata::registreringstidspunkt).isEqualTo(Instant.parse("2009-04-26T00:00:00.000Z"))
+            }
+        }
     }
 
     @Test

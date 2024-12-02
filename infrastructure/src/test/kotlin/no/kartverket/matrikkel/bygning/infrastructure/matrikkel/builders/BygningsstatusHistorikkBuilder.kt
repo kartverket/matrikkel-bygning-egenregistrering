@@ -7,4 +7,8 @@ fun bygningsstatusHistorikkList(vararg historikker: BygningsstatusHistorikk) = B
     item.addAll(historikker)
 }
 
-fun bygningsstatusHistorikk(scope: BygningsstatusHistorikk.() -> Unit) = BygningsstatusHistorikk().apply(scope)
+fun bygningsstatusHistorikk(scope: BygningsstatusHistorikk.() -> Unit) = BygningsstatusHistorikk()
+    .apply {
+        signatur = "MatrikkelBruker"
+    }
+    .apply(scope)
