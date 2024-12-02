@@ -7,7 +7,6 @@ import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
 import no.kartverket.matrikkel.bygning.application.models.Avlop
 import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningEtasje
 import no.kartverket.matrikkel.bygning.application.models.Energikilde
@@ -54,12 +53,7 @@ internal class MatrikkelBygningClient(
                     bygningId = bygning.id.value,
                     bygningsnummer = bygning.bygningsnummer,
                     byggeaar = Multikilde(
-                        autoritativ = deriveByggeaarForBygning(bygning)?.let {
-                            Byggeaar(
-                                data = it,
-                                metadata = bygningsmetadata,
-                            )
-                        },
+                        autoritativ = deriveByggeaarForBygning(bygning),
                     ),
                     // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                     bruksareal = Multikilde(
@@ -107,9 +101,9 @@ internal class MatrikkelBygningClient(
                     // TODO: Burde vi ha en måte å angi ukjent / ikke oppgitt?
                     bruksenheter = bruksenheter.map {
                         val bruksenhetsmetadata = RegisterMetadata(
-                            it.oppdateringsdato.toInstant(),
-                            Signatur(it.oppdatertAv),
-                            kildemateriale = null
+                                it.oppdateringsdato.toInstant(),
+                                Signatur(it.oppdatertAv),
+                                kildemateriale = null,
                         )
 
                         Bruksenhet(

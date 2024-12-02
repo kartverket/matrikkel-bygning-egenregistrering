@@ -26,7 +26,7 @@ class ByggeaarDeriverTest {
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).isEqualTo(2009)
+        assertThat(derivedByggeaar?.data).isEqualTo(2009)
     }
 
     @Test
@@ -43,7 +43,7 @@ class ByggeaarDeriverTest {
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).isEqualTo(2009)
+        assertThat(derivedByggeaar?.data).isEqualTo(2009)
     }
 
     @Test
@@ -95,7 +95,7 @@ class ByggeaarDeriverTest {
 
         val derivedByggeaar = deriveByggeaarForBygning(bygning)
 
-        assertThat(derivedByggeaar).isEqualTo(2009)
+        assertThat(derivedByggeaar?.data).isEqualTo(2009)
     }
 
     @Test
