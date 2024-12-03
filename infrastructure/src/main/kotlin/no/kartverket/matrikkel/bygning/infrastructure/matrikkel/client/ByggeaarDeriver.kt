@@ -29,7 +29,7 @@ internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Byggeaar? {
         data = derivedByggeaarStatus.dato.toLocalDate().year,
         metadata = RegisterMetadata(
             registreringstidspunkt = derivedByggeaarStatus.registrertDato.toInstant(),
-            registrertAv = Signatur(derivedByggeaarStatus.signatur),
+            registrertAv = Signatur(derivedByggeaarStatus.oppdatertAv),
         ),
     )
 }
