@@ -9,6 +9,6 @@ fun bygningsstatusHistorikkList(vararg historikker: BygningsstatusHistorikk) = B
 
 fun bygningsstatusHistorikk(scope: BygningsstatusHistorikk.() -> Unit) = BygningsstatusHistorikk()
     .apply {
-        signatur = "MatrikkelBruker"
+        oppdatertAv = "MatrikkelBruker"
     }
     .apply(scope)
