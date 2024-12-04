@@ -4,17 +4,23 @@ import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import java.time.Instant
 import java.util.*
+
+// Er HasKildemateriale det beste navnet her?
+sealed interface HasKildemateriale {
+    // Skal den være nullable?
+    val kildemateriale: KildematerialeKode?
+}
 
 @Serializable
 data class ByggeaarRegistrering(
     val byggeaar: Int?,
-    val kildemateriale: KildematerialeKode?
-)
+    override val kildemateriale: KildematerialeKode?
+) : HasKildemateriale
 
 @Serializable
 data class BruksarealRegistrering(
@@ -31,26 +37,26 @@ data class EtasjeBruksarealRegistrering(
 @Serializable
 data class VannforsyningRegistrering(
     val vannforsyning: VannforsyningKode?,
-    val kildemateriale: KildematerialeKode?
-)
+    override val kildemateriale: KildematerialeKode?
+) : HasKildemateriale
 
 @Serializable
 data class AvlopRegistrering(
     val avlop: AvlopKode?,
-    val kildemateriale: KildematerialeKode?
-)
+    override val kildemateriale: KildematerialeKode?
+) : HasKildemateriale
 
 @Serializable
 data class EnergikildeRegistrering(
     val energikilder: List<EnergikildeKode>?,
-    val kildemateriale: KildematerialeKode?
-)
+    override val kildemateriale: KildematerialeKode?
+) : HasKildemateriale
 
 @Serializable
 data class OppvarmingRegistrering(
     val oppvarminger: List<OppvarmingKode>?,
-    val kildemateriale: KildematerialeKode?
-)
+    override val kildemateriale: KildematerialeKode?
+) : HasKildemateriale
 
 
 @Serializable
