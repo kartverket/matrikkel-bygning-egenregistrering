@@ -33,7 +33,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
         byggeaar = this.byggeaar.aggregate(bruksenhetRegistrering.byggeaarRegistrering) {
             Byggeaar(
                 data = it.byggeaar,
-                metadata = metadata.withKildemateriale(it.kildemateriale)
+                metadata = metadata.withKildemateriale(it.kildemateriale),
             )
         },
         totaltBruksareal = this.totaltBruksareal.aggregate(
@@ -42,7 +42,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
         ) {
             Bruksareal(
                 it,
-                metadata = metadata,
+                metadata.withKildemateriale(bruksenhetRegistrering.bruksarealRegistrering?.kildemateriale),
             )
         },
         vannforsyning = this.vannforsyning.aggregate(bruksenhetRegistrering.vannforsyningRegistrering) {
@@ -83,7 +83,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                     etasjebetegnelse = it.etasjebetegnelse,
                     bruksareal = Bruksareal(
                         data = it.bruksareal,
-                        metadata = metadata,
+                        metadata = metadata.withKildemateriale(bruksenhetRegistrering.bruksarealRegistrering?.kildemateriale),
                     ),
                 )
             }

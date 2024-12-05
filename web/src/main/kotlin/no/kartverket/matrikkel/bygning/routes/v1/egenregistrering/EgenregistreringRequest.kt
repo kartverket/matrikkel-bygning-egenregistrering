@@ -64,7 +64,8 @@ data class EtasjeBruksarealRegistreringRequest(
 @Serializable
 data class BruksarealRegistreringRequest(
     val totaltBruksareal: Double?,
-    val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?
+    val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?,
+    val kildemateriale: KildematerialeKode?,
 )
 
 @Serializable
@@ -97,7 +98,7 @@ fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Etasje
         etasjebetegnelse = Etasjebetegnelse.of(
             etasjenummer = Etasjenummer.of(this.etasjebetegnelse.etasjenummer),
             etasjeplanKode = EtasjeplanKode.of(this.etasjebetegnelse.etasjeplanKode),
-        ),
+        )
     )
 }
 
@@ -109,7 +110,7 @@ fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistre
                 totaltBruksareal = it.totaltBruksareal,
                 etasjeRegistreringer = it.etasjeRegistreringer?.map {
                     it.toEtasjeBruksarealRegistrering()
-                },
+                }, kildemateriale = it.kildemateriale
             )
         },
         byggeaarRegistrering = byggeaarRegistrering?.let {

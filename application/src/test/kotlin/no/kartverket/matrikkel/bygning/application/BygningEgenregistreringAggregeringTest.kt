@@ -8,7 +8,6 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
 import assertk.assertions.single
-import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
@@ -28,7 +27,6 @@ import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
-import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -57,6 +55,7 @@ class BygningEgenregistreringAggregeringTest {
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
+            kildemateriale = null,
         ),
         byggeaarRegistrering = null,
         energikildeRegistrering = null,
@@ -81,6 +80,7 @@ class BygningEgenregistreringAggregeringTest {
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
+            kildemateriale = null,
         ),
         byggeaarRegistrering = ByggeaarRegistrering(2010, KildematerialeKode.Selvrapportert),
         energikildeRegistrering = EnergikildeRegistrering(listOf(EnergikildeKode.Gass), KildematerialeKode.Byggesaksdokumenter),
@@ -134,6 +134,7 @@ class BygningEgenregistreringAggregeringTest {
                         bruksarealRegistrering = BruksarealRegistrering(
                             totaltBruksareal = 150.0,
                             etasjeRegistreringer = null,
+                            kildemateriale = null,
                         ),
                     ),
                 ),
@@ -164,6 +165,7 @@ class BygningEgenregistreringAggregeringTest {
                                     ),
                                 ),
                             ),
+                            kildemateriale = null
                         ),
                     ),
                 ),
@@ -213,6 +215,7 @@ class BygningEgenregistreringAggregeringTest {
                                     ),
                                 ),
                             ),
+                            kildemateriale = null
                         ),
 
                     ),

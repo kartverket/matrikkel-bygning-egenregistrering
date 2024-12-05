@@ -87,7 +87,11 @@ class EgenregistreringValidatorTest {
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
                             bruksenhetId = 1L,
-                            bruksarealRegistrering = null,
+                            bruksarealRegistrering = BruksarealRegistrering(
+                                totaltBruksareal = 125.0,
+                                etasjeRegistreringer = null,
+                                kildemateriale = KildematerialeKode.Plantegninger
+                            ),
                             oppvarmingRegistrering = null,
                             byggeaarRegistrering = null,
                             vannforsyningRegistrering = null,
@@ -223,6 +227,7 @@ class EgenregistreringValidatorTest {
                                         ),
                                     ),
                                 ),
+                                kildemateriale = null
                             ),
                             byggeaarRegistrering = null,
                             vannforsyningRegistrering = null,

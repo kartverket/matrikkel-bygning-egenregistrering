@@ -3,6 +3,7 @@ package no.kartverket.matrikkel.bygning.application.egenregistrering
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
@@ -111,12 +112,21 @@ class EgenregistreringValidator {
                 return false
             }
 
-            return egenregistreringFelt.kildemateriale in listOf(
-                KildematerialeKode.Selvrapportert,
-                KildematerialeKode.Salgsoppgave,
-                KildematerialeKode.Byggesaksdokumenter,
-                KildematerialeKode.AnnenDokumentasjon,
-            )
+            return when (egenregistreringFelt) {
+                is BruksarealRegistrering -> egenregistreringFelt.kildemateriale in listOf(
+                    KildematerialeKode.Selvrapportert,
+                    KildematerialeKode.Salgsoppgave,
+                    KildematerialeKode.Byggesaksdokumenter,
+                    KildematerialeKode.AnnenDokumentasjon,
+                    KildematerialeKode.Plantegninger,
+                )
+                else -> egenregistreringFelt.kildemateriale in listOf(
+                    KildematerialeKode.Selvrapportert,
+                    KildematerialeKode.Salgsoppgave,
+                    KildematerialeKode.Byggesaksdokumenter,
+                    KildematerialeKode.AnnenDokumentasjon,
+                )
+            }
         }
     }
 }
