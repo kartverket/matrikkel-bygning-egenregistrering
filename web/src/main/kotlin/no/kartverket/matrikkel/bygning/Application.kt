@@ -24,8 +24,9 @@ import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
 import no.kartverket.matrikkel.bygning.routes.internalRouting
-import no.kartverket.matrikkel.bygning.routes.v1.bygning.bygningRouting
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.egenregistreringRouting
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.eksternRouting
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.bygningRouting
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.egenregistreringRouting
 import no.kartverket.matrikkel.bygning.routes.v1.kodeliste.kodelisteRouting
 
 fun main() {
@@ -72,7 +73,7 @@ fun Application.mainModule() {
             baseUrl = config.propertyOrNull("matrikkel.baseUrl")?.getString() ?: "",
             username = config.propertyOrNull("matrikkel.username")?.getString() ?: "",
             password = config.propertyOrNull("matrikkel.password")?.getString() ?: "",
-        )
+        ),
     )
 
 
@@ -97,6 +98,8 @@ fun Application.mainModule() {
             route("bygninger") {
                 bygningRouting(bygningService)
             }
+
+            eksternRouting(bygningService)
         }
     }
 

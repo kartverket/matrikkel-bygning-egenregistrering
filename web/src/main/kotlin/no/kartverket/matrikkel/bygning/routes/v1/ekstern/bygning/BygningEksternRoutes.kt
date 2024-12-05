@@ -7,9 +7,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
-import no.kartverket.matrikkel.bygning.routes.v1.bygning.BygningResponse
-import no.kartverket.matrikkel.bygning.routes.v1.bygning.toBygningResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningResponse
 
 fun Route.bygningEksternRouting(
     bygningService: BygningService
@@ -40,7 +39,7 @@ fun Route.bygningEksternRouting(
             val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
             val (status, body) = bygningService.getBygning(bygningId).mapBoth(
-                success = { HttpStatusCode.OK to it.toBygningResponse() },
+                success = { HttpStatusCode.OK to it.toBygningEksternResponse() },
                 failure = ::domainErrorToResponse,
             )
 

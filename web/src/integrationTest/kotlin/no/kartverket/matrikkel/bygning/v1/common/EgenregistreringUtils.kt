@@ -8,15 +8,15 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.routes.v1.bygning.RegisterMetadataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.AvlopRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksarealRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksenhetRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.ByggeaarRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EnergikildeRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.OppvarmingRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.VannforsyningRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.AvlopRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikildeRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.OppvarmingRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.VannforsyningRegistreringRequest
 import java.time.Instant
 
 internal fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(

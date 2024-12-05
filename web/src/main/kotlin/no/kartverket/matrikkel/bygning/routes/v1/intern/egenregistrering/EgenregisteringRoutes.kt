@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.egenregistrering
+package no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering
 
 import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.mapBoth
