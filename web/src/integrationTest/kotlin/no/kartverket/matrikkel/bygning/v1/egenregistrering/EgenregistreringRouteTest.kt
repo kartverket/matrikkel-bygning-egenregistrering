@@ -13,7 +13,7 @@ import assertk.assertions.support.appendName
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.server.testing.testApplication
+import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
@@ -203,8 +203,12 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                                 bruksarealRegistrering = BruksarealRegistreringRequest(
                                     totaltBruksareal = 40.0,
                                     etasjeRegistreringer = null,
+                                    kildemateriale = null,
                                 ),
-                                byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008, kildemateriale = KildematerialeKode.AnnenDokumentasjon),
+                                byggeaarRegistrering = ByggeaarRegistreringRequest(
+                                    byggeaar = 2008,
+                                    kildemateriale = KildematerialeKode.AnnenDokumentasjon,
+                                ),
                                 vannforsyningRegistrering = null,
                                 avlopRegistrering = null,
                                 energikildeRegistrering = null,
