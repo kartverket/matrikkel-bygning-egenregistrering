@@ -12,17 +12,16 @@ import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegist
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import java.time.Instant
 import java.util.*
-import kotlin.collections.map
 
 
 @Serializable
@@ -38,9 +37,7 @@ data class BruksenhetRegistreringRequest(
 
 @Serializable
 data class EgenregistreringRequest(
-    val bygningId: Long,
-    val eier: String,
-    val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
+    val bygningId: Long, val eier: String, val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
 
 @Serializable
@@ -59,7 +56,7 @@ data class EtasjeBetegnelseRequest(
 data class EtasjeBruksarealRegistreringRequest(
     val bruksareal: Double?,
     val etasjebetegnelse: EtasjeBetegnelseRequest,
-    )
+)
 
 @Serializable
 data class BruksarealRegistreringRequest(
@@ -72,13 +69,13 @@ data class BruksarealRegistreringRequest(
 data class VannforsyningRegistreringRequest(
     val vannforsyning: VannforsyningKode?,
     val kildemateriale: KildematerialeKode?,
-    )
+)
 
 @Serializable
 data class AvlopRegistreringRequest(
     val avlop: AvlopKode?,
     val kildemateriale: KildematerialeKode?,
-    )
+)
 
 @Serializable
 data class EnergikildeRegistreringRequest(
@@ -98,7 +95,7 @@ fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Etasje
         etasjebetegnelse = Etasjebetegnelse.of(
             etasjenummer = Etasjenummer.of(this.etasjebetegnelse.etasjenummer),
             etasjeplanKode = EtasjeplanKode.of(this.etasjebetegnelse.etasjeplanKode),
-        )
+        ),
     )
 }
 
@@ -110,37 +107,38 @@ fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistre
                 totaltBruksareal = it.totaltBruksareal,
                 etasjeRegistreringer = it.etasjeRegistreringer?.map {
                     it.toEtasjeBruksarealRegistrering()
-                }, kildemateriale = it.kildemateriale
+                },
+                kildemateriale = it.kildemateriale,
             )
         },
         byggeaarRegistrering = byggeaarRegistrering?.let {
             ByggeaarRegistrering(
                 byggeaar = it.byggeaar,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
         vannforsyningRegistrering = vannforsyningRegistrering?.let {
             VannforsyningRegistrering(
                 vannforsyning = it.vannforsyning,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
         avlopRegistrering = avlopRegistrering?.let {
             AvlopRegistrering(
                 avlop = it.avlop,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
         energikildeRegistrering = energikildeRegistrering?.let {
             EnergikildeRegistrering(
                 energikilder = it.energikilder,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
         oppvarmingRegistrering = oppvarmingRegistrering?.let {
             OppvarmingRegistrering(
                 oppvarminger = it.oppvarminger,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
     )

@@ -120,6 +120,7 @@ class EgenregistreringValidator {
                     KildematerialeKode.AnnenDokumentasjon,
                     KildematerialeKode.Plantegninger,
                 )
+
                 else -> egenregistreringFelt.kildemateriale in listOf(
                     KildematerialeKode.Selvrapportert,
                     KildematerialeKode.Salgsoppgave,
