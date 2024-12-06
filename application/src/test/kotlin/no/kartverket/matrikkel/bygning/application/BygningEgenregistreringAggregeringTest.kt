@@ -7,7 +7,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
-import assertk.assertions.single
 import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
@@ -25,7 +24,7 @@ import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -147,57 +146,7 @@ class BygningEgenregistreringAggregeringTest {
     }
 
     @Test
-    fun `bruksarealregistrering skal sette etasje hvis etasje er nyere enn total bruksareal`() {
-        val laterRegistrering = defaultEgenregistrering.copy(
-            id = UUID.randomUUID(),
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
-                bruksenhetRegistreringer = listOf(
-                    defaultBruksenhetRegistrering.copy(
-                        bruksarealRegistrering = BruksarealRegistrering(
-                            totaltBruksareal = null,
-                            etasjeRegistreringer = listOf(
-                                EtasjeBruksarealRegistrering(
-                                    bruksareal = 125.0,
-                                    etasjebetegnelse = Etasjebetegnelse.of(
-                                        etasjenummer = Etasjenummer.of(1),
-                                        etasjeplanKode = EtasjeplanKode.Hovedetasje,
-                                    ),
-                                ),
-                            ),
-                            kildemateriale = null
-                        ),
-                    ),
-                ),
-            ),
-        )
-
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
-
-        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert).isNull()
-
-        assertThat(aggregatedBygning).all {
-            prop(Bygning::bruksenheter).index(0).all {
-                prop(Bruksenhet::etasjer).all {
-                    prop(Multikilde<List<BruksenhetEtasje>>::egenregistrert).isNotNull().single().all {
-                        prop(BruksenhetEtasje::bruksareal).isNotNull().all {
-                            prop(Bruksareal::data).isEqualTo(125.0)
-                        }
-                        prop(BruksenhetEtasje::etasjebetegnelse).all {
-                            prop(Etasjebetegnelse::etasjenummer).isEqualTo(Etasjenummer.of(1))
-                            prop(Etasjebetegnelse::etasjeplanKode).isEqualTo(EtasjeplanKode.Hovedetasje)
-                        }
-                    }
-                }
-                prop(Bruksenhet::totaltBruksareal).all {
-                    prop(Multikilde<Bruksareal>::egenregistrert).isNull()
-                }
-            }
-        }
-    }
-
-    @Test
-    fun `bruksarealregistrering skal sette total hvis total er nyere enn etasje bruksareal`() {
+    fun `bruksarealregistrering skal kun sette total hvis kun total ble registrert nyere enn etasje bruksareal`() {
         val firstRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.minusSeconds(60),
@@ -205,10 +154,10 @@ class BygningEgenregistreringAggregeringTest {
                 bruksenhetRegistreringer = listOf(
                     defaultBruksenhetRegistrering.copy(
                         bruksarealRegistrering = BruksarealRegistrering(
-                            totaltBruksareal = null,
+                            totaltBruksareal = 50.0,
                             etasjeRegistreringer = listOf(
                                 EtasjeBruksarealRegistrering(
-                                    bruksareal = 125.0,
+                                    bruksareal = 50.0,
                                     etasjebetegnelse = Etasjebetegnelse.of(
                                         etasjenummer = Etasjenummer.of(1),
                                         etasjeplanKode = EtasjeplanKode.Hovedetasje,

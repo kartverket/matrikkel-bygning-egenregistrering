@@ -38,7 +38,6 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
         },
         totaltBruksareal = this.totaltBruksareal.aggregate(
             registrering = bruksenhetRegistrering.bruksarealRegistrering?.totaltBruksareal,
-            shouldMapRegistrering = !this.isEgenregistrertBruksarealRegistreringPresent(),
         ) {
             Bruksareal(
                 it,

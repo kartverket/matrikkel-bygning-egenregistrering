@@ -33,7 +33,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                 BruksenhetRegistreringRequest(
                                     bruksenhetId = 1L,
                                     bruksarealRegistrering = BruksarealRegistreringRequest(
-                                        totaltBruksareal = null,
+                                        totaltBruksareal = 80.0,
                                         etasjeRegistreringer = listOf(
                                             EtasjeBruksarealRegistreringRequest(
                                                 bruksareal = 50.0,
@@ -95,7 +95,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 failure = ::domainErrorToResponse,
             )
 
-        if (body != null) {
+        if (body == null) {
             call.respond(status)
         } else {
             call.respond(status, body)

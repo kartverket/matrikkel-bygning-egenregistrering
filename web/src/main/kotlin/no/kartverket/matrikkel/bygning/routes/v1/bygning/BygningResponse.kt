@@ -46,9 +46,15 @@ data class BygningSimpleResponse(
 )
 
 @Serializable
-data class BruksenhetEtasjeResponse(
-    val etasjebetegnelse: String,
+    data class BruksenhetEtasjeResponse(
+    val etasjebetegnelse: EtasjeBetegnelseResponse,
     val bruksareal: BruksarealResponse?,
+)
+
+@Serializable
+data class EtasjeBetegnelseResponse(
+    val etasjeplanKode: String,
+    val etasjenummer: Int,
 )
 
 @Serializable
@@ -105,7 +111,7 @@ data class OppvarmingResponse(val data: OppvarmingKode?, val metadata: RegisterM
 fun RegisterMetadata.toRegisterMetadataResponse() = RegisterMetadataResponse(
     registreringstidspunkt = this.registreringstidspunkt,
     registrertAv = this.registrertAv.value,
-    kildemateriale = this.kildemateriale
+    kildemateriale = this.kildemateriale,
 )
 
 
@@ -157,7 +163,10 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
 )
 
 private fun BruksenhetEtasje.toBruksenhetEtasjeResponse(): BruksenhetEtasjeResponse = BruksenhetEtasjeResponse(
-    etasjebetegnelse = this.etasjebetegnelse.toString(),
+    etasjebetegnelse = EtasjeBetegnelseResponse(
+        etasjeplanKode = etasjebetegnelse.etasjeplanKode.toString(),
+        etasjenummer = etasjebetegnelse.etasjenummer.loepenummer,
+    ),
     bruksareal = this.bruksareal?.toBruksarealResponse(),
 )
 
