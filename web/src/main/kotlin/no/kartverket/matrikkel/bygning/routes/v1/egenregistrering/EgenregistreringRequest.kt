@@ -44,7 +44,7 @@ data class EtasjeBruksarealRegistreringRequest(
 
 @Serializable
 data class BruksarealRegistreringRequest(
-    val totaltBruksareal: Double,
+    val totaltBruksareal: Double?,
     val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?,
     val kildemateriale: KildematerialeKode?,
 )

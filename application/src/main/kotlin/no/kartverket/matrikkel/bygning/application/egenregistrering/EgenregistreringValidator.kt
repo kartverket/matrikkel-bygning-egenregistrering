@@ -65,18 +65,10 @@ class EgenregistreringValidator {
         }
 
         private fun validateBruksarealRegistreringerTotaltAreal(egenregistrering: Egenregistrering): List<ValidationError> {
-            val invalidBruksarealRegistreringer = egenregistrering.bygningRegistrering.bruksenhetRegistreringer.filter {
-                val totaltAreal = it.bruksarealRegistrering?.totaltBruksareal
-
-                val totaltEtasjeAreal = it.bruksarealRegistrering?.etasjeRegistreringer?.sumOf { it.bruksareal ?: 0.0 }
-
-                // Kan kanskje splittes ut at totalt og etasje er satt i en egen filter
-                if (totaltEtasjeAreal != null && totaltAreal != null) {
-                    return@filter totaltAreal != totaltEtasjeAreal
+            val invalidBruksarealRegistreringer = egenregistrering.bygningRegistrering.bruksenhetRegistreringer
+                .filter {
+                    it.bruksarealRegistrering?.isTotaltBruksarealEqualTotaltEtasjeArealIfSet() == false
                 }
-
-                false
-            }
 
             return invalidBruksarealRegistreringer.map { invalidRegistrering ->
                 ValidationError(
