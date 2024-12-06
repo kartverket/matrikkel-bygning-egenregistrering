@@ -25,7 +25,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import kotlin.test.Test
 
 class EgenregistreringValidatorTest {
@@ -55,22 +55,22 @@ class EgenregistreringValidatorTest {
             baseEgenregistrering.copy(
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
-                            BruksenhetRegistrering(
-                                bruksenhetId = 1L,
-                                byggeaarRegistrering = ByggeaarRegistrering(
-                                    1990,
-                                    KildematerialeKode.Plantegninger
-                                ),
-                                bruksarealRegistrering = null,
-                                energikildeRegistrering = null,
-                                oppvarmingRegistrering = null,
-                                vannforsyningRegistrering = null,
-                                avlopRegistrering = null,
-                            )
-                    )
-                )
+                        BruksenhetRegistrering(
+                            bruksenhetId = 1L,
+                            byggeaarRegistrering = ByggeaarRegistrering(
+                                byggeaar = 1990,
+                                kildemateriale = KildematerialeKode.Plantegninger,
+                            ),
+                            bruksarealRegistrering = null,
+                            energikildeRegistrering = null,
+                            oppvarmingRegistrering = null,
+                            vannforsyningRegistrering = null,
+                            avlopRegistrering = null,
+                        ),
+                    ),
+                ),
             ),
-            baseBygning
+            baseBygning,
         )
 
         assertThat(validationResult.isErr).isTrue()
@@ -87,20 +87,24 @@ class EgenregistreringValidatorTest {
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
                             bruksenhetId = 1L,
-                            bruksarealRegistrering = null,
+                            bruksarealRegistrering = BruksarealRegistrering(
+                                totaltBruksareal = 125.0,
+                                etasjeRegistreringer = null,
+                                kildemateriale = KildematerialeKode.Plantegninger,
+                            ),
                             oppvarmingRegistrering = null,
                             byggeaarRegistrering = null,
                             vannforsyningRegistrering = null,
                             energikildeRegistrering = EnergikildeRegistrering(
-                                listOf( EnergikildeKode.AnnenEnergikilde),
-                                KildematerialeKode.Selvrapportert
+                                energikilder = listOf(EnergikildeKode.AnnenEnergikilde),
+                                kildemateriale = KildematerialeKode.Selvrapportert,
                             ),
-                            avlopRegistrering = null
-                        )
-                    )
-                )
+                            avlopRegistrering = null,
+                        ),
+                    ),
+                ),
             ),
-            baseBygning
+            baseBygning,
         )
 
         assertThat(validationResult.isErr).isFalse()
@@ -119,18 +123,18 @@ class EgenregistreringValidatorTest {
                             oppvarmingRegistrering = null,
                             vannforsyningRegistrering = null,
                             byggeaarRegistrering = ByggeaarRegistrering(
-                                1990,
-                                KildematerialeKode.Plantegninger
+                                byggeaar = 1990,
+                                kildemateriale = KildematerialeKode.Plantegninger,
                             ),
                             avlopRegistrering = AvlopRegistrering(
-                                AvlopKode.OffentligKloakk,
-                                KildematerialeKode.Plantegninger
-                            )
-                        )
-                    )
-                )
+                                avlop = AvlopKode.OffentligKloakk,
+                                kildemateriale = KildematerialeKode.Plantegninger,
+                            ),
+                        ),
+                    ),
+                ),
             ),
-            baseBygning
+            baseBygning,
         )
 
         assertThat(validationResult.isErr).isTrue()
@@ -223,6 +227,7 @@ class EgenregistreringValidatorTest {
                                         ),
                                     ),
                                 ),
+                                kildemateriale = null,
                             ),
                             byggeaarRegistrering = null,
                             vannforsyningRegistrering = null,

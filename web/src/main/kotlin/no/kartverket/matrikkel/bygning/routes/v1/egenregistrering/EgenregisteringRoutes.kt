@@ -49,7 +49,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                                     etasjenummer = 2,
                                                 ),
                                             ),
-                                        ),
+                                        ), kildemateriale = KildematerialeKode.Plantegninger
                                     ),
                                     ByggeaarRegistreringRequest(
                                         byggeaar = 2021,

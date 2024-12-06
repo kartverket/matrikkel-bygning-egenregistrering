@@ -25,13 +25,14 @@ data class ByggeaarRegistrering(
 @Serializable
 data class BruksarealRegistrering(
     val totaltBruksareal: Double?,
-    val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?
-)
+    val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?,
+    override val kildemateriale: KildematerialeKode?
+) : HasKildemateriale
 
 @Serializable
 data class EtasjeBruksarealRegistrering(
     val bruksareal: Double?,
-    val etasjebetegnelse: Etasjebetegnelse
+    val etasjebetegnelse: Etasjebetegnelse,
 )
 
 @Serializable
