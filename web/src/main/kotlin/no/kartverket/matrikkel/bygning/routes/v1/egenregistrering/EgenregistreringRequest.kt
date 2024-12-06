@@ -1,25 +1,9 @@
 package no.kartverket.matrikkel.bygning.routes.v1.egenregistrering
 
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
-import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
-import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
-import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
-import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
-import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
-import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
+import no.kartverket.matrikkel.bygning.application.models.*
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
-import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
-import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.*
 import java.time.Instant
 import java.util.*
 
@@ -60,7 +44,7 @@ data class EtasjeBruksarealRegistreringRequest(
 
 @Serializable
 data class BruksarealRegistreringRequest(
-    val totaltBruksareal: Double?,
+    val totaltBruksareal: Double,
     val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?,
     val kildemateriale: KildematerialeKode?,
 )

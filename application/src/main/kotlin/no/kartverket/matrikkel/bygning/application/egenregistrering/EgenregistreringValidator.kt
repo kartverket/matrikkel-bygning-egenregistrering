@@ -18,8 +18,7 @@ class EgenregistreringValidator {
             val errors = listOfNotNull(
                 validateBruksenheterRegistreredOnCorrectBygning(egenregistrering, bygning),
                 validateRepeatedBruksenheter(egenregistrering),
-                validateBruksarealRegistreringerHasSingleRegistreringType(egenregistrering),
-            ) + validateKildemateriale(egenregistrering)
+            ) + validateKildemateriale(egenregistrering) + validateBruksarealRegistreringerTotaltAreal(egenregistrering)
 
             return if (errors.isEmpty()) {
                 Ok(Unit)
@@ -65,22 +64,25 @@ class EgenregistreringValidator {
             return null
         }
 
-        // Dette er ikke helt bestemt ennå, men per nå så skal vi ta på oss støyten for å registrere et totalt bruksareal ut i fra etasjeregistreringer, fremfor at klienter gjør det selv
-        private fun validateBruksarealRegistreringerHasSingleRegistreringType(egenregistrering: Egenregistrering): ValidationError? {
-            val invalidBruksarealRegistreringer =
-                egenregistrering.bygningRegistrering.bruksenhetRegistreringer.filter { it.bruksarealRegistrering != null }
-                    .filter { it.bruksarealRegistrering?.totaltBruksareal != null && it.bruksarealRegistrering.etasjeRegistreringer != null }
-                    .map { it.bruksenhetId }
+        private fun validateBruksarealRegistreringerTotaltAreal(egenregistrering: Egenregistrering): List<ValidationError> {
+            val invalidBruksarealRegistreringer = egenregistrering.bygningRegistrering.bruksenhetRegistreringer.filter {
+                val totaltAreal = it.bruksarealRegistrering?.totaltBruksareal
 
-            if (invalidBruksarealRegistreringer.isNotEmpty()) {
-                return ValidationError(
-                    message = "Bruksenhet${if (invalidBruksarealRegistreringer.size > 1) "er" else ""} med ID [${
-                        invalidBruksarealRegistreringer.joinToString()
-                    }], har både totalt bruksareal og areal per etasje registrert. Kun én av disse kan registreres om gangen",
-                )
+                val totaltEtasjeAreal = it.bruksarealRegistrering?.etasjeRegistreringer?.sumOf { it.bruksareal ?: 0.0 }
+
+                // Kan kanskje splittes ut at totalt og etasje er satt i en egen filter
+                if (totaltEtasjeAreal != null && totaltAreal != null) {
+                    return@filter totaltAreal != totaltEtasjeAreal
+                }
+
+                false
             }
 
-            return null
+            return invalidBruksarealRegistreringer.map { invalidRegistrering ->
+                ValidationError(
+                    message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetId} har registrert totalt bruksareal og areal per etasje, men det totale bruksarealet stemmer ikke overens med totalen av BRA per etasje",
+                )
+            }
         }
 
         private fun validateKildemateriale(egenregistrering: Egenregistrering): List<ValidationError> {
