@@ -20,8 +20,8 @@ class EgenregistreringValidator {
                 validateRepeatedBruksenheter(egenregistrering),
             )
                 .plus(validateKildemateriale(egenregistrering))
-                .plus(validateBruksarealRegistreringerTotaltAreal(egenregistrering))
                 .plus(validateBruksarealRegistreringerHasTotalBruksareal(egenregistrering))
+                .plus(validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering))
 
             return if (errors.isEmpty()) {
                 Ok(Unit)
@@ -67,7 +67,7 @@ class EgenregistreringValidator {
             return null
         }
 
-        private fun validateBruksarealRegistreringerTotaltAreal(egenregistrering: Egenregistrering): List<ValidationError> {
+        private fun validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering: Egenregistrering): List<ValidationError> {
             return egenregistrering.bygningRegistrering.bruksenhetRegistreringer
                 .filter {
                     it.bruksarealRegistrering?.isTotaltBruksarealEqualTotaltEtasjeArealIfSet() == false

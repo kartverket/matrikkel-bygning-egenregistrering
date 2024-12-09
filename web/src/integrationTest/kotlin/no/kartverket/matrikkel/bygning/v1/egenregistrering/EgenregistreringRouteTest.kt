@@ -9,6 +9,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
 import assertk.assertions.single
+import assertk.assertions.size
 import assertk.assertions.support.appendName
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -30,11 +31,13 @@ import no.kartverket.matrikkel.bygning.routes.v1.bygning.MultikildeResponse
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.OppvarmingResponse
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.RegisterMetadataResponse
 import no.kartverket.matrikkel.bygning.routes.v1.bygning.VannforsyningKodeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
+import no.kartverket.matrikkel.bygning.v1.common.invalidEgenregistrering
 import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -279,6 +282,27 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                             }
                         }
                     }
+            }
+        }
+
+    @Test
+    fun `gitt at egenregistrering feiler skal man få en bad request i respons`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+
+            val response = client.post("/v1/egenregistreringer") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                        EgenregistreringRequest.invalidEgenregistrering(),
+                )
+            }
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)
+
+            val body = response.body<ErrorResponse.BadRequestError>()
+
+            assertThat(body).all {
+                prop(ErrorResponse.BadRequestError::details).isNotNull().size().isEqualTo(1)
             }
         }
 

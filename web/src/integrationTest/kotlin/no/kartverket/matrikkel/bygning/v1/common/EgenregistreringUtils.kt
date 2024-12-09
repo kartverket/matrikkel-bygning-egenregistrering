@@ -51,6 +51,22 @@ internal fun EgenregistreringRequest.Companion.validEgenregistrering() = Egenreg
     ),
 )
 
+internal fun EgenregistreringRequest.Companion.invalidEgenregistrering() = EgenregistreringRequest(
+    bygningId = 1L,
+    eier = "31129956715",
+    bruksenhetRegistreringer = listOf(
+        BruksenhetRegistreringRequest(
+            bruksenhetId = 1L,
+            byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Plantegninger),
+            bruksarealRegistrering = null,
+            energikildeRegistrering = null,
+            oppvarmingRegistrering = null,
+            vannforsyningRegistrering = null,
+            avlopRegistrering = null,
+        ),
+    ),
+)
+
 internal fun Assert<RegisterMetadataResponse>.hasRegistreringstidspunktWithinThreshold(now: Instant): () -> Unit {
     return {
         prop(RegisterMetadataResponse::registreringstidspunkt).isBetween(now, now.plusSeconds(1))

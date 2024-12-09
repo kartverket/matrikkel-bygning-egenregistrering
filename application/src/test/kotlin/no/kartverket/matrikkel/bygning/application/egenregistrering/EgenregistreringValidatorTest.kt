@@ -243,7 +243,7 @@ class EgenregistreringValidatorTest {
 
         assertThat(validationResult.isErr).isTrue()
         assertThat(validationResult.error.errors).hasSize(1)
-        assertThat(validationResult.error.errors.first().message).contains("totale bruksarealet stemmer ikke overens")
+        assertThat(validationResult.error.errors.first().message).contains("totalt BRA stemmer ikke overens")
     }
 
     @Test
