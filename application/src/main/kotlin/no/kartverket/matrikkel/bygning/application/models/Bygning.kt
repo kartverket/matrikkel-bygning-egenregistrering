@@ -1,6 +1,10 @@
 package no.kartverket.matrikkel.bygning.application.models
 
+import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
+import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
+import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
@@ -38,12 +42,12 @@ sealed interface Felt<T> {
 
     data class Byggeaar(override val data: Int?, override val metadata: RegisterMetadata) : Felt<Int?>
     data class Vannforsyning(override val data: VannforsyningKode?, override val metadata: RegisterMetadata) : Felt<VannforsyningKode?>
+    data class Bruksareal(override val data: Double?, override val metadata: RegisterMetadata) : Felt<Double?>
+    data class Avlop(override val data: AvlopKode?, override val metadata: RegisterMetadata) : Felt<AvlopKode?>
+    data class Energikilde(override val data: EnergikildeKode, override val metadata: RegisterMetadata) : Felt<EnergikildeKode?>
+    data class Oppvarming(override val data: OppvarmingKode, override val metadata: RegisterMetadata) : Felt<OppvarmingKode?>
 }
 
-data class Bruksareal(val data: Double?, val metadata: RegisterMetadata)
-data class Avlop(val data: AvlopKode?, val metadata: RegisterMetadata)
-data class Energikilde(val data: EnergikildeKode, val metadata: RegisterMetadata)
-data class Oppvarming(val data: OppvarmingKode, val metadata: RegisterMetadata)
 
 data class Bruksenhet(
     val bruksenhetId: Long,
