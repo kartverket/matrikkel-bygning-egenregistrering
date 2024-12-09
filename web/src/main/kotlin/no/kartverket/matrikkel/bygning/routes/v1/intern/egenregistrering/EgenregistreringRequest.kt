@@ -1,28 +1,11 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering
 
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
-import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
-import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
-import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
-import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
-import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
-import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
-import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
-import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.application.models.*
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
+import no.kartverket.matrikkel.bygning.application.models.kodelister.*
 import java.time.Instant
 import java.util.*
-import kotlin.collections.map
 
 
 @Serializable
@@ -38,9 +21,7 @@ data class BruksenhetRegistreringRequest(
 
 @Serializable
 data class EgenregistreringRequest(
-    val bygningId: Long,
-    val eier: String,
-    val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
+    val bygningId: Long, val eier: String, val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
 
 @Serializable
@@ -59,25 +40,26 @@ data class EtasjeBetegnelseRequest(
 data class EtasjeBruksarealRegistreringRequest(
     val bruksareal: Double?,
     val etasjebetegnelse: EtasjeBetegnelseRequest,
-    )
+)
 
 @Serializable
 data class BruksarealRegistreringRequest(
     val totaltBruksareal: Double?,
-    val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?
+    val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?,
+    val kildemateriale: KildematerialeKode?,
 )
 
 @Serializable
 data class VannforsyningRegistreringRequest(
     val vannforsyning: VannforsyningKode?,
     val kildemateriale: KildematerialeKode?,
-    )
+)
 
 @Serializable
 data class AvlopRegistreringRequest(
     val avlop: AvlopKode?,
     val kildemateriale: KildematerialeKode?,
-    )
+)
 
 @Serializable
 data class EnergikildeRegistreringRequest(
@@ -110,36 +92,37 @@ fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistre
                 etasjeRegistreringer = it.etasjeRegistreringer?.map {
                     it.toEtasjeBruksarealRegistrering()
                 },
+                kildemateriale = it.kildemateriale,
             )
         },
         byggeaarRegistrering = byggeaarRegistrering?.let {
             ByggeaarRegistrering(
                 byggeaar = it.byggeaar,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
         vannforsyningRegistrering = vannforsyningRegistrering?.let {
             VannforsyningRegistrering(
                 vannforsyning = it.vannforsyning,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
         avlopRegistrering = avlopRegistrering?.let {
             AvlopRegistrering(
                 avlop = it.avlop,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
         energikildeRegistrering = energikildeRegistrering?.let {
             EnergikildeRegistrering(
                 energikilder = it.energikilder,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
         oppvarmingRegistrering = oppvarmingRegistrering?.let {
             OppvarmingRegistrering(
                 oppvarminger = it.oppvarminger,
-                kildemateriale = it.kildemateriale
+                kildemateriale = it.kildemateriale,
             )
         },
     )

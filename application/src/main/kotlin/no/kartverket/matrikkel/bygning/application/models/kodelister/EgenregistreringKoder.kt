@@ -58,9 +58,9 @@ enum class KildematerialeKode(
     override val presentasjonsnavn: String,
     override val beskrivelse: String
 ) : IKode {
-    Selvrapportert("Selvrapportert", "Når kilden ikke er dokumenterbar. Du velger dette når du selv gjør en vurdering  av hvilken løsning som er riktig. Dette alternative velges når kilden er feks den som opprinnelig oppførte bygningen, står i hyttebok"),
-    Salgsoppgave("Salgsoppgave", "Ved kjøp og salg av eiendom utarbeides flere rapporter og de har hatt ulikt benevnelse. Denne kilden velges hvis du har en salgsrapport, tilstandsrapport, boligsalgsrapport, takstrapport."),
-    Byggesaksdokumenter("Byggesaksdokumenter", "Saksdokumenter fra byggesaken som for eksempel en byggetillatelse (igansettingstillatelse, midlertidig brukstillatelse, ferdisattest)."),
-    Plantegninger("Plantegninger", "Utarbeidet av en profesjonell. Velges hvis det ikke er plantegninger i en byggesak, men utarebeidet i annen sammenheng som feks en seksjoneringssak eller rehabilitering eller andre arbeider som ikke krever søknad og tillatelse etter plan- og bygningsloven."),
-    AnnenDokumentasjon("Annen dokumentasjon", "Når du har dokumentasjon som ikke passer i de andre alternativene, men det er mulig å dokumentere valget ditt, kan dette velges.")
+    Selvrapportert("Selvrapportert", "Du har selv gjort en vurdering av hva som er riktig, men har ikke dokumentasjon."),
+    Salgsoppgave("Salgsoppgave", "Du har sett dette i salgsoppgaven eller en tilhørende rapport (salgsrapport, tilstandsrapport, boligsalgsrapport, takstrapport osv)."),
+    Byggesaksdokumenter("Byggesaksdokumenter", "Du har funnet dette i dokumenter laget i forbindelse med en byggesak, for eksempel tegninger, tillatelser eller ferdigattest."),
+    Plantegninger("Plantegninger", "Hvis du har fått en fagperson til å måle opp og lage nye tegninger til deg."),
+    AnnenDokumentasjon("Annen dokumentasjon", "Hvis du har noe dokumentasjon som ikke passer i de andre alternativene, men det er mulig å dokumentere valget ditt.")
 }

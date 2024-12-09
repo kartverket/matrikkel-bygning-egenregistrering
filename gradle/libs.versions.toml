@@ -1,10 +1,10 @@
 [versions]
-ktorVersion = "3.0.1"
+ktorVersion = "3.0.2"
 kotlinVersion = "2.0.0"
 logbackVersion = "1.5.12"
 logstashVersion = "8.0"
 prometheusVersion = "1.14.1"
-flywayVersion = "11.0.0"
+flywayVersion = "11.0.1"
 postgresVersion = "42.7.4"
 shadowVersion = "8.3.5"
 jaxwsVersion = "4.0.3"

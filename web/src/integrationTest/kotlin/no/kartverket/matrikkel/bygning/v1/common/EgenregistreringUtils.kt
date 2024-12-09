@@ -27,25 +27,42 @@ internal fun EgenregistreringRequest.Companion.validEgenregistrering() = Egenreg
             bruksenhetId = 1L,
             bruksarealRegistrering = BruksarealRegistreringRequest(
                 totaltBruksareal = 125.0,
-                etasjeRegistreringer = null
+                etasjeRegistreringer = null,
+                kildemateriale = null,
             ),
             byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Selvrapportert),
             vannforsyningRegistrering = VannforsyningRegistreringRequest(
                 VannforsyningKode.OffentligVannverk,
-                KildematerialeKode.Salgsoppgave
+                KildematerialeKode.Salgsoppgave,
             ),
             avlopRegistrering = AvlopRegistreringRequest(
                 avlop = AvlopKode.OffentligKloakk,
-                KildematerialeKode.Selvrapportert
+                KildematerialeKode.Selvrapportert,
             ),
             energikildeRegistrering = EnergikildeRegistreringRequest(
                 listOf(EnergikildeKode.Elektrisitet),
-                KildematerialeKode.Selvrapportert
+                KildematerialeKode.Selvrapportert,
             ),
             oppvarmingRegistrering = OppvarmingRegistreringRequest(
                 listOf(OppvarmingKode.Elektrisk),
-                KildematerialeKode.Selvrapportert
+                KildematerialeKode.Selvrapportert,
             ),
+        ),
+    ),
+)
+
+internal fun EgenregistreringRequest.Companion.invalidEgenregistrering() = EgenregistreringRequest(
+    bygningId = 1L,
+    eier = "31129956715",
+    bruksenhetRegistreringer = listOf(
+        BruksenhetRegistreringRequest(
+            bruksenhetId = 1L,
+            byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Plantegninger),
+            bruksarealRegistrering = null,
+            energikildeRegistrering = null,
+            oppvarmingRegistrering = null,
+            vannforsyningRegistrering = null,
+            avlopRegistrering = null,
         ),
     ),
 )

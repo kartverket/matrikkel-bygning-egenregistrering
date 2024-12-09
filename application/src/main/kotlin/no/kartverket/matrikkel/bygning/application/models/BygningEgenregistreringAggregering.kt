@@ -39,16 +39,15 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
         byggeaar = this.byggeaar.aggregate(bruksenhetRegistrering.byggeaarRegistrering) {
             Byggeaar(
                 data = it.byggeaar,
-                metadata = metadata.withKildemateriale(it.kildemateriale)
+                metadata = metadata.withKildemateriale(it.kildemateriale),
             )
         },
         totaltBruksareal = this.totaltBruksareal.aggregate(
             registrering = bruksenhetRegistrering.bruksarealRegistrering?.totaltBruksareal,
-            shouldMapRegistrering = !this.isEgenregistrertBruksarealRegistreringPresent(),
         ) {
             Bruksareal(
                 it,
-                metadata = metadata,
+                metadata.withKildemateriale(bruksenhetRegistrering.bruksarealRegistrering?.kildemateriale),
             )
         },
         vannforsyning = this.vannforsyning.aggregate(bruksenhetRegistrering.vannforsyningRegistrering) {
@@ -89,7 +88,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
                     etasjebetegnelse = it.etasjebetegnelse,
                     bruksareal = Bruksareal(
                         data = it.bruksareal,
-                        metadata = metadata,
+                        metadata = metadata.withKildemateriale(bruksenhetRegistrering.bruksarealRegistrering?.kildemateriale),
                     ),
                 )
             }
@@ -106,7 +105,9 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
     }
 }
 
-private fun <T : Any, V : Any> Multikilde<T>.aggregate(registrering: V?, shouldMapRegistrering: Boolean = true, mapper: (V) -> T?): Multikilde<T> {
+private fun <T : Any, V : Any> Multikilde<T>.aggregate(
+    registrering: V?, shouldMapRegistrering: Boolean = true, mapper: (V) -> T?
+): Multikilde<T> {
     if (this.egenregistrert != null || registrering == null) {
         return this
     }

@@ -9,17 +9,19 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
 import assertk.assertions.single
+import assertk.assertions.size
 import assertk.assertions.support.appendName
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.server.testing.testApplication
+import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksarealResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetResponse
@@ -35,6 +37,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Bruksen
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
+import no.kartverket.matrikkel.bygning.v1.common.invalidEgenregistrering
 import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -203,8 +206,12 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                                 bruksarealRegistrering = BruksarealRegistreringRequest(
                                     totaltBruksareal = 40.0,
                                     etasjeRegistreringer = null,
+                                    kildemateriale = null,
                                 ),
-                                byggeaarRegistrering = ByggeaarRegistreringRequest(byggeaar = 2008, kildemateriale = KildematerialeKode.AnnenDokumentasjon),
+                                byggeaarRegistrering = ByggeaarRegistreringRequest(
+                                    byggeaar = 2008,
+                                    kildemateriale = KildematerialeKode.AnnenDokumentasjon,
+                                ),
                                 vannforsyningRegistrering = null,
                                 avlopRegistrering = null,
                                 energikildeRegistrering = null,
@@ -275,6 +282,27 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                             }
                         }
                     }
+            }
+        }
+
+    @Test
+    fun `gitt at egenregistrering feiler skal man få en bad request i respons`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+
+            val response = client.post("/v1/egenregistreringer") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                        EgenregistreringRequest.invalidEgenregistrering(),
+                )
+            }
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)
+
+            val body = response.body<ErrorResponse.BadRequestError>()
+
+            assertThat(body).all {
+                prop(ErrorResponse.BadRequestError::details).isNotNull().size().isEqualTo(1)
             }
         }
 
