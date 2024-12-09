@@ -48,11 +48,11 @@ class ByggeaarDeriverTest {
     fun `bygning med ferdigattest som er etter terskeldato skal faa byggeaar`() {
         val bygning = bygning {
             bygningsstatusHistorikker = bygningsstatusHistorikkList(
-                    bygningsstatusHistorikk {
-                        bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
-                        registrertDato = timestampUtc(2009, 4, 26)
-                        dato = localDateUtc(2009, 4, 24)
-                    },
+                bygningsstatusHistorikk {
+                    bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
+                    registrertDato = timestampUtc(2009, 4, 26)
+                    dato = localDateUtc(2009, 4, 24)
+                },
             )
         }
 
@@ -73,11 +73,11 @@ class ByggeaarDeriverTest {
     fun `bygning med riktig status som ikke er etter terskeldato skal ikke faa byggeaar`() {
         val bygning = bygning {
             bygningsstatusHistorikker = bygningsstatusHistorikkList(
-                    bygningsstatusHistorikk {
-                        bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
-                        registrertDato = timestampUtc(2009, 4, 25)
-                        dato = localDateUtc(2009, 4, 24)
-                    },
+                bygningsstatusHistorikk {
+                    bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
+                    registrertDato = timestampUtc(2009, 4, 25)
+                    dato = localDateUtc(2009, 4, 24)
+                },
             )
         }
 
@@ -90,11 +90,11 @@ class ByggeaarDeriverTest {
     fun `bygning med feil status som er etter terskeldato skal ikke faa byggeaar`() {
         val bygning = bygning {
             bygningsstatusHistorikker = bygningsstatusHistorikkList(
-                    bygningsstatusHistorikk {
-                        bygningsstatusKodeId = MatrikkelBygningsstatusKode.TattIBruk()
-                        registrertDato = timestampUtc(2009, 4, 26)
-                        dato = localDateUtc(2009, 4, 24)
-                    },
+                bygningsstatusHistorikk {
+                    bygningsstatusKodeId = MatrikkelBygningsstatusKode.TattIBruk()
+                    registrertDato = timestampUtc(2009, 4, 26)
+                    dato = localDateUtc(2009, 4, 24)
+                },
             )
         }
 
@@ -107,12 +107,12 @@ class ByggeaarDeriverTest {
     fun `bygning med flere gyldige statuser skal bruke eldste status for byggeaar`() {
         val bygning = bygning {
             bygningsstatusHistorikker = bygningsstatusHistorikkList(
-                    derivableBygningsstatusHistorikk,
-                    bygningsstatusHistorikk {
-                        bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
-                        registrertDato = timestampUtc(2010, 4, 26)
-                        dato = localDateUtc(2010, 4, 24)
-                    },
+                derivableBygningsstatusHistorikk,
+                bygningsstatusHistorikk {
+                    bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
+                    registrertDato = timestampUtc(2010, 4, 26)
+                    dato = localDateUtc(2010, 4, 24)
+                },
             )
         }
 
@@ -133,11 +133,11 @@ class ByggeaarDeriverTest {
     fun `bygning med registrertdato foer vedtaksdato skal ikke faa byggeaar`() {
         val bygning = bygning {
             bygningsstatusHistorikker = bygningsstatusHistorikkList(
-                    bygningsstatusHistorikk {
-                        bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
-                        registrertDato = timestampUtc(2010, 4, 26)
-                        dato = localDateUtc(2010, 4, 27)
-                    },
+                bygningsstatusHistorikk {
+                    bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
+                    registrertDato = timestampUtc(2010, 4, 26)
+                    dato = localDateUtc(2010, 4, 27)
+                },
             )
         }
 
