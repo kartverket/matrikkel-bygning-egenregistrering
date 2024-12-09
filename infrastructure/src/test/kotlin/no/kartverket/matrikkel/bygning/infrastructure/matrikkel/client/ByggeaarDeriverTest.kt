@@ -6,7 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
-import no.kartverket.matrikkel.bygning.application.models.Byggeaar
+import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.builders.bygning
@@ -36,7 +36,7 @@ class ByggeaarDeriverTest {
         assertThat(derivedByggeaar).isNotNull().all {
             prop(Byggeaar::data).isEqualTo(2009)
             prop(Byggeaar::metadata).all {
-                prop(RegisterMetadata::registrertAv).all{
+                prop(RegisterMetadata::registrertAv).all {
                     prop(RegistreringAktoer::value).isEqualTo("MatrikkelBruker")
                 }
                 prop(RegisterMetadata::registreringstidspunkt).isEqualTo(Instant.parse("2009-04-26T00:00:00.000Z"))
@@ -52,7 +52,7 @@ class ByggeaarDeriverTest {
                     bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
                     registrertDato = timestampUtc(2009, 4, 26)
                     dato = localDateUtc(2009, 4, 24)
-                }
+                },
             )
         }
 
@@ -61,7 +61,7 @@ class ByggeaarDeriverTest {
         assertThat(derivedByggeaar).isNotNull().all {
             prop(Byggeaar::data).isEqualTo(2009)
             prop(Byggeaar::metadata).all {
-                prop(RegisterMetadata::registrertAv).all{
+                prop(RegisterMetadata::registrertAv).all {
                     prop(RegistreringAktoer::value).isEqualTo("MatrikkelBruker")
                 }
                 prop(RegisterMetadata::registreringstidspunkt).isEqualTo(Instant.parse("2009-04-26T00:00:00.000Z"))
@@ -77,7 +77,7 @@ class ByggeaarDeriverTest {
                     bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
                     registrertDato = timestampUtc(2009, 4, 25)
                     dato = localDateUtc(2009, 4, 24)
-                }
+                },
             )
         }
 
@@ -94,7 +94,7 @@ class ByggeaarDeriverTest {
                     bygningsstatusKodeId = MatrikkelBygningsstatusKode.TattIBruk()
                     registrertDato = timestampUtc(2009, 4, 26)
                     dato = localDateUtc(2009, 4, 24)
-                }
+                },
             )
         }
 
@@ -112,7 +112,7 @@ class ByggeaarDeriverTest {
                     bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
                     registrertDato = timestampUtc(2010, 4, 26)
                     dato = localDateUtc(2010, 4, 24)
-                }
+                },
             )
         }
 
@@ -121,7 +121,7 @@ class ByggeaarDeriverTest {
         assertThat(derivedByggeaar).isNotNull().all {
             prop(Byggeaar::data).isEqualTo(2009)
             prop(Byggeaar::metadata).all {
-                prop(RegisterMetadata::registrertAv).all{
+                prop(RegisterMetadata::registrertAv).all {
                     prop(RegistreringAktoer::value).isEqualTo("MatrikkelBruker")
                 }
                 prop(RegisterMetadata::registreringstidspunkt).isEqualTo(Instant.parse("2009-04-26T00:00:00.000Z"))
@@ -137,7 +137,7 @@ class ByggeaarDeriverTest {
                     bygningsstatusKodeId = MatrikkelBygningsstatusKode.FerdigAttest()
                     registrertDato = timestampUtc(2010, 4, 26)
                     dato = localDateUtc(2010, 4, 27)
-                }
+                },
             )
         }
 

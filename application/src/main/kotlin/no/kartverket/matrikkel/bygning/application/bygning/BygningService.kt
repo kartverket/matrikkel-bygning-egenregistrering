@@ -15,9 +15,12 @@ class BygningService(
     private val bygningClient: BygningClient,
     private val egenregistreringService: EgenregistreringService
 ) {
+    fun getBygning(bygningId: Long): Result<Bygning, DomainError> {
+        return bygningClient.getBygningById(bygningId)
+    }
+
     fun getBygningWithEgenregistrertData(bygningId: Long): Result<Bygning, DomainError> {
-        return bygningClient
-            .getBygningById(bygningId)
+        return getBygning(bygningId)
             .map { bygning ->
                 val egenregistreringerForBygning = egenregistreringService
                     .findAllEgenregistreringerForBygning(bygningId)
@@ -27,8 +30,7 @@ class BygningService(
     }
 
     fun getBruksenhetWithEgenregistrertData(bygningId: Long, bruksenhetId: Long): Result<Bruksenhet, DomainError> {
-        return bygningClient
-            .getBygningById(bygningId)
+        return getBygning(bygningId)
             .andThen { bygning ->
                 val egenregistreringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygningId)
 

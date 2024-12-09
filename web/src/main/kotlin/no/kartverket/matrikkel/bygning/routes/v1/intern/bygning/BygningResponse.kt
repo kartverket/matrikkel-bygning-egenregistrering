@@ -1,22 +1,9 @@
-package no.kartverket.matrikkel.bygning.routes.v1.bygning
+package no.kartverket.matrikkel.bygning.routes.v1.intern.bygning
 
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.models.Avlop
-import no.kartverket.matrikkel.bygning.application.models.Bruksareal
-import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetEtasje
-import no.kartverket.matrikkel.bygning.application.models.Byggeaar
-import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.Energikilde
-import no.kartverket.matrikkel.bygning.application.models.Multikilde
-import no.kartverket.matrikkel.bygning.application.models.Oppvarming
-import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
-import no.kartverket.matrikkel.bygning.application.models.Vannforsyning
-import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.application.models.*
+import no.kartverket.matrikkel.bygning.application.models.Felt.*
+import no.kartverket.matrikkel.bygning.application.models.kodelister.*
 import no.kartverket.matrikkel.bygning.serializers.InstantSerializer
 import java.time.Instant
 

@@ -7,12 +7,10 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
-import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetEtasje
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
-import no.kartverket.matrikkel.bygning.application.models.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
@@ -21,6 +19,8 @@ import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrerin
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
+import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
+import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata

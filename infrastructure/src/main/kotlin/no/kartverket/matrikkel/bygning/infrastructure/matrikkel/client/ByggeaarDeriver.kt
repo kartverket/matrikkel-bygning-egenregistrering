@@ -1,6 +1,6 @@
 package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client
 
-import no.kartverket.matrikkel.bygning.application.models.Byggeaar
+import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.MatrikkelBygningsstatusKode
