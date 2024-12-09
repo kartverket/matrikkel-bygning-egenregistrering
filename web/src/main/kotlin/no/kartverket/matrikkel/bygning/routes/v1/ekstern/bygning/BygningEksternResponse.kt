@@ -85,7 +85,7 @@ data class RegisterMetadataEksternResponse(
 
 fun Bygning.toBygningEksternResponse(): BygningEksternResponse = BygningEksternResponse(
     bygningId = bygningId,
-    bygningsnummer = TODO(),
+    bygningsnummer = bygningsnummer,
     bruksenheter = bruksenheter.map {
         it.toBruksenhetEksternResponse()
     },
@@ -108,31 +108,16 @@ private fun <U, T : Felt<U?>, O : FeltEksternResponse<U>?> toFeltEksternResponse
     )
 }
 
-private fun <U, T : Felt<U?>, O : FeltEksternResponse<U>?> toListFeltEksternResponse(
-    feltList: List<T>?,
-    constructor: (U?, RegisterMetadataEksternResponse) -> O,
-): List<O>? {
-
-    return feltList?.mapNotNull { felt ->
-        constructor(
-            felt.data,
-            RegisterMetadataEksternResponse(
-                registreringstidspunkt = felt.metadata.registreringstidspunkt,
-                kildemateriale = felt.metadata.kildemateriale,
-            ),
-        )
-    }
-
-}
-
 private fun Bruksenhet.toBruksenhetEksternResponse(): BruksenhetEksternResponse = BruksenhetEksternResponse(
     bruksenhetId = this.bruksenhetId,
     byggeaar = toFeltEksternResponse(this.byggeaar.egenregistrert, ::ByggeaarEksternResponse),
     totaltBruksareal = toFeltEksternResponse(this.totaltBruksareal.egenregistrert, ::BruksarealEksternResponse),
     vannforsyning = toFeltEksternResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeEksternResponse),
     avlop = toFeltEksternResponse(this.avlop.egenregistrert, ::AvlopKodeEksternResponse),
-    energikilder = toListFeltEksternResponse(this.energikilder.egenregistrert, ::EnergikildeEksternResponse),
-    oppvarminger = this.oppvarminger.egenregistrert?.map { oppvarming ->
-        toFeltEksternResponse(oppvarming, ::OppvarmingEksternResponse) as OppvarmingEksternResponse
+    energikilder = this.energikilder.egenregistrert?.mapNotNull { energikilde ->
+        toFeltEksternResponse(energikilde, ::EnergikildeEksternResponse)
+    },
+    oppvarminger = this.oppvarminger.egenregistrert?.mapNotNull { oppvarming ->
+        toFeltEksternResponse(oppvarming, ::OppvarmingEksternResponse)
     },
 )
