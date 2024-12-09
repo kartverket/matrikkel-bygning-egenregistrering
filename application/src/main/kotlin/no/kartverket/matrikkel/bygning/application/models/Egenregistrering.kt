@@ -27,7 +27,19 @@ data class BruksarealRegistrering(
     val totaltBruksareal: Double?,
     val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?,
     override val kildemateriale: KildematerialeKode?
-) : HasKildemateriale
+) : HasKildemateriale {
+    fun isTotaltBruksarealEqualTotaltEtasjeArealIfSet(): Boolean {
+        if (totaltBruksareal == null || etasjeRegistreringer == null) {
+            return true
+        }
+
+        return totaltBruksareal == totaltEtasjeAreal()
+    }
+
+    fun totaltEtasjeAreal(): Double {
+        return etasjeRegistreringer?.sumOf { it.bruksareal ?: 0.0 } ?: 0.0
+    }
+}
 
 @Serializable
 data class EtasjeBruksarealRegistrering(

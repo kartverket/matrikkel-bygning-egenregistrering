@@ -18,8 +18,10 @@ class EgenregistreringValidator {
             val errors = listOfNotNull(
                 validateBruksenheterRegistreredOnCorrectBygning(egenregistrering, bygning),
                 validateRepeatedBruksenheter(egenregistrering),
-                validateBruksarealRegistreringerHasSingleRegistreringType(egenregistrering),
-            ) + validateKildemateriale(egenregistrering)
+            )
+                .plus(validateKildemateriale(egenregistrering))
+                .plus(validateBruksarealRegistreringerHasTotalBruksareal(egenregistrering))
+                .plus(validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering))
 
             return if (errors.isEmpty()) {
                 Ok(Unit)
@@ -65,23 +67,32 @@ class EgenregistreringValidator {
             return null
         }
 
-        // Dette er ikke helt bestemt ennå, men per nå så skal vi ta på oss støyten for å registrere et totalt bruksareal ut i fra etasjeregistreringer, fremfor at klienter gjør det selv
-        private fun validateBruksarealRegistreringerHasSingleRegistreringType(egenregistrering: Egenregistrering): ValidationError? {
-            val invalidBruksarealRegistreringer =
-                egenregistrering.bygningRegistrering.bruksenhetRegistreringer.filter { it.bruksarealRegistrering != null }
-                    .filter { it.bruksarealRegistrering?.totaltBruksareal != null && it.bruksarealRegistrering.etasjeRegistreringer != null }
-                    .map { it.bruksenhetId }
+        private fun validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering: Egenregistrering): List<ValidationError> {
+            return egenregistrering.bygningRegistrering.bruksenhetRegistreringer
+                .filter {
+                    it.bruksarealRegistrering?.isTotaltBruksarealEqualTotaltEtasjeArealIfSet() == false
+                }
+                .map { invalidRegistrering ->
+                    ValidationError(
+                        message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetId} har registrert totalt BRA og BRA per etasje, men totalt BRA stemmer ikke overens med totalen av BRA per etasje",
+                    )
+                }
 
-            if (invalidBruksarealRegistreringer.isNotEmpty()) {
-                return ValidationError(
-                    message = "Bruksenhet${if (invalidBruksarealRegistreringer.size > 1) "er" else ""} med ID [${
-                        invalidBruksarealRegistreringer.joinToString()
-                    }], har både totalt bruksareal og areal per etasje registrert. Kun én av disse kan registreres om gangen",
-                )
-            }
-
-            return null
         }
+
+        private fun validateBruksarealRegistreringerHasTotalBruksareal(egenregistrering: Egenregistrering): List<ValidationError> {
+            return egenregistrering.bygningRegistrering.bruksenhetRegistreringer
+                .filter {
+                    it.bruksarealRegistrering?.etasjeRegistreringer != null && it.bruksarealRegistrering.totaltBruksareal == null
+                }
+                .map { invalidRegistrering ->
+                    ValidationError(
+                        message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetId} har registrert BRA per etasje, men ikke totalt BRA. Totalt BRA er obligatorisk.",
+                    )
+                }
+
+        }
+
 
         private fun validateKildemateriale(egenregistrering: Egenregistrering): List<ValidationError> {
             return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.flatMap { bruksenhetRegistrering ->
