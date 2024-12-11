@@ -1,6 +1,8 @@
 package no.kartverket.matrikkel.bygning.plugins
 
 import io.github.smiley4.ktorswaggerui.SwaggerUI
+import io.github.smiley4.ktorswaggerui.data.AuthScheme
+import io.github.smiley4.ktorswaggerui.data.AuthType
 import io.ktor.server.application.*
 
 fun Application.configureOpenAPI() {
@@ -11,6 +13,13 @@ fun Application.configureOpenAPI() {
         }
         tags {
             tagGenerator = { url -> listOf(url.getOrNull(1)?.replaceFirstChar(Char::titlecase)) }
+        }
+        security {
+            securityScheme("Maskinporten") {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
         }
     }
 }

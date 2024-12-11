@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.bygning
+package no.kartverket.matrikkel.bygning.routes.v1.intern.bygning
 
 import com.github.michaelbull.result.mapBoth
 import io.github.smiley4.ktorswaggerui.dsl.routing.get

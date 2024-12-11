@@ -3,12 +3,12 @@ package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
-import no.kartverket.matrikkel.bygning.application.models.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import java.time.Instant
