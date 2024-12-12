@@ -26,6 +26,8 @@ ktor-server-call-id = { group = "io.ktor", name = "ktor-server-call-id", version
 ktor-server-metrics-micrometer = { group = "io.ktor", name = "ktor-server-metrics-micrometer", version.ref = "ktorVersion" }
 ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version.ref = "ktorVersion" }
 ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktorVersion" }
+ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref = "ktorVersion" }
+ktor-server-auth-jwt = { group = "io.ktor", name = "ktor-server-auth-jwt", version.ref = "ktorVersion" }
 
 ktor-serialization-kotlinx = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktorVersion" }
 ktor-client-content-negotation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorVersion" }

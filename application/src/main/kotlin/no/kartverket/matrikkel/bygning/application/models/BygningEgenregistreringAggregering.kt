@@ -1,5 +1,11 @@
 package no.kartverket.matrikkel.bygning.application.models
 
+import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
+import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
+import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
+import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
+import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 
 /**
