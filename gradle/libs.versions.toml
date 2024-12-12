@@ -14,7 +14,7 @@ mockkVersion = "1.13.13"
 assertkVersion = "0.28.1"
 norwegianCommonsVersion = "0.16.0"
 kotlinResultVersion = "2.0.0"
-ktorSwaggerUIVersion = "4.0.0"
+ktorSwaggerUIVersion = "4.1.1"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
