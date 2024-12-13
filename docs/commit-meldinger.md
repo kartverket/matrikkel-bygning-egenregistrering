@@ -1,6 +1,6 @@
 ## Retningslinjer for commit-meldinger
 
-Commit-meldinger skal dokumentere endringer som er gjort i koden, slik at det er enkelt å lese loggen i ettertid (git blame) for å forstå hvorfor en endringer gjort.
+Commit-meldinger skal dokumentere endringer som er gjort i koden, slik at det er enkelt å lese loggen i ettertid (git blame) for å forstå hvorfor en endring gjort.
 
 En commit-melding skal være så utfyllende at det er unødvendig å forklare endringen i en pull-request eller JIRA-sak.
 
@@ -13,7 +13,7 @@ Beskriv problemet som endringen skal løse.
 Det er viktig med en blank linje etter tittelen for at ulike 
 git-verktøy skal vise commit-melding korrekt i etterkant.
 
-Fokuser på hvorfor endringene har blitt gjort, og ikke så mye på hvordan 
+Fokuser på hvorfor endringene har blitt gjort, og ikke så mye på hva 
 (koden forklarer i utgangspunktet dette).
 Alt ettersom hvilken endring det er snakk om,
 kan man enten ha en lang eller kort tekst her.
@@ -52,14 +52,14 @@ Dette skal i så fall legges nederst i commit-meldingen slik:
 Hvis du ønsker kan man ha referanser til issue tracker (f.eks. JIRA), 
 eller andre PR-er på slutten.
 
-JIRA: XX-123
+XX-123
 Se også: #234
 ```
 
-### **Commits på brancher**
+### **Commiter på brancher**
 
 Disse retningslinjene er først og fremst tiltenkt hvordan commit-historikken bør se ut på hovedbranchen (`main`)
-Når man jobber på en branch er det ingen krav til hvordan commitene ser ut underveis, men man bør sikre at commit-ene er etter retningslinjene før man merger.
+Når man jobber på en branch er det ingen krav til hvordan commitene ser ut underveis, men man bør sikre at commitene er etter retningslinjene før man merger.
 Dette kan f.eks. gjøres ved å skrive om git-historien på brancher før de merges til `main` for å unngå slike commit-meldinger på hovedbranchen:
 
 ```
@@ -68,7 +68,7 @@ Fikser feilen (nå bør det funke!)
 Glemte en fil
 ```
 
-Husk også at det i flere tilfeller gir mening å dele opp en PR i flere commits, og la alle disse commit-ene bli med på hovedbransjen uten å squashe commits.
+Husk også at det i flere tilfeller gir mening å dele opp en PR i flere commiter, og la alle disse commitene bli med på hovedbranchen uten å squashe.
 
 ### Ressurser
 
