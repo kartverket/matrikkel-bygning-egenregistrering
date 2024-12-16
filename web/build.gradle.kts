@@ -90,9 +90,13 @@ testing {
                 implementation(libs.kotlin.test)
                 implementation(libs.ktor.server.test.host)
                 implementation(libs.ktor.client.content.negotation)
+                implementation(libs.ktor.server.auth)
+                implementation(libs.ktor.server.auth.jwt)
 
                 implementation(libs.assertk)
                 implementation(libs.testcontainers.postgresql)
+
+                implementation(libs.mock.oauth2.server)
             }
         }
     }
