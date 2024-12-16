@@ -61,6 +61,5 @@ enum class KildematerialeKode(
     Selvrapportert("Selvrapportert", "Du har selv gjort en vurdering av hva som er riktig, men har ikke dokumentasjon."),
     Salgsoppgave("Salgsoppgave", "Du har sett dette i salgsoppgaven eller en tilhørende rapport (salgsrapport, tilstandsrapport, boligsalgsrapport, takstrapport osv)."),
     Byggesaksdokumenter("Byggesaksdokumenter", "Du har funnet dette i dokumenter laget i forbindelse med en byggesak, for eksempel tegninger, tillatelser eller ferdigattest."),
-    Plantegninger("Plantegninger", "Hvis du har fått en fagperson til å måle opp og lage nye tegninger til deg."),
     AnnenDokumentasjon("Annen dokumentasjon", "Hvis du har noe dokumentasjon som ikke passer i de andre alternativene, men det er mulig å dokumentere valget ditt.")
 }

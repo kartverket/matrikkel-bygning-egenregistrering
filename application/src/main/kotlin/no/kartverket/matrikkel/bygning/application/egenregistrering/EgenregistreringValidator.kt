@@ -3,14 +3,10 @@ package no.kartverket.matrikkel.bygning.application.egenregistrering
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.application.models.HasKildemateriale
 import no.kartverket.matrikkel.bygning.application.models.error.MultipleValidationError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
-import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 
 class EgenregistreringValidator {
     companion object {
@@ -19,7 +15,6 @@ class EgenregistreringValidator {
                 validateBruksenheterRegistreredOnCorrectBygning(egenregistrering, bygning),
                 validateRepeatedBruksenheter(egenregistrering),
             )
-                .plus(validateKildemateriale(egenregistrering))
                 .plus(validateBruksarealRegistreringerHasTotalBruksareal(egenregistrering))
                 .plus(validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering))
 
@@ -91,54 +86,6 @@ class EgenregistreringValidator {
                     )
                 }
 
-        }
-
-
-        private fun validateKildemateriale(egenregistrering: Egenregistrering): List<ValidationError> {
-            return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.flatMap { bruksenhetRegistrering ->
-                validateKildematerialeForBruksenhetRegistrering(bruksenhetRegistrering)
-            }
-        }
-
-        private fun validateKildematerialeForBruksenhetRegistrering(bruksenhetRegistrering: BruksenhetRegistrering): List<ValidationError> {
-            return listOfNotNull(
-                bruksenhetRegistrering.avlopRegistrering,
-                bruksenhetRegistrering.byggeaarRegistrering,
-                bruksenhetRegistrering.oppvarmingRegistrering,
-                bruksenhetRegistrering.energikildeRegistrering,
-                bruksenhetRegistrering.vannforsyningRegistrering,
-            ).mapNotNull {
-                if (!isValidKildemateriale(it)) {
-                    ValidationError(
-                        message = "${it::class.simpleName} (Bruksenhet ID: ${bruksenhetRegistrering.bruksenhetId}) har feil kildemateriale: ${it.kildemateriale}.",
-                    )
-                } else {
-                    null
-                }
-            }
-        }
-
-        private fun isValidKildemateriale(egenregistreringFelt: HasKildemateriale): Boolean {
-            if (egenregistreringFelt.kildemateriale == null) {
-                return false
-            }
-
-            return when (egenregistreringFelt) {
-                is BruksarealRegistrering -> egenregistreringFelt.kildemateriale in listOf(
-                    KildematerialeKode.Selvrapportert,
-                    KildematerialeKode.Salgsoppgave,
-                    KildematerialeKode.Byggesaksdokumenter,
-                    KildematerialeKode.AnnenDokumentasjon,
-                    KildematerialeKode.Plantegninger,
-                )
-
-                else -> egenregistreringFelt.kildemateriale in listOf(
-                    KildematerialeKode.Selvrapportert,
-                    KildematerialeKode.Salgsoppgave,
-                    KildematerialeKode.Byggesaksdokumenter,
-                    KildematerialeKode.AnnenDokumentasjon,
-                )
-            }
         }
     }
 }
