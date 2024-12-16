@@ -49,15 +49,16 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                                     etasjenummer = 2,
                                                 ),
                                             ),
-                                        ), kildemateriale = KildematerialeKode.Plantegninger
+                                        ),
+                                        kildemateriale = KildematerialeKode.Salgsoppgave,
                                     ),
                                     ByggeaarRegistreringRequest(
                                         byggeaar = 2021,
-                                        kildemateriale = KildematerialeKode.Selvrapportert
+                                        kildemateriale = KildematerialeKode.Selvrapportert,
                                     ),
                                     energikildeRegistrering = EnergikildeRegistreringRequest(
                                         energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
-                                        kildemateriale = KildematerialeKode.Selvrapportert
+                                        kildemateriale = KildematerialeKode.Selvrapportert,
                                     ),
                                     oppvarmingRegistrering = null,
                                     vannforsyningRegistrering = null,

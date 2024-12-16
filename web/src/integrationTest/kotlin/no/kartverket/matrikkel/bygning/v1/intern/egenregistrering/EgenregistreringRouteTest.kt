@@ -37,7 +37,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Bruksen
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
-import no.kartverket.matrikkel.bygning.v1.common.invalidEgenregistrering
+import no.kartverket.matrikkel.bygning.v1.common.ugyldigEgenregistreringMedKunBruksarealPerEtasje
 import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -286,14 +286,14 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         }
 
     @Test
-    fun `gitt at egenregistrering feiler skal man få en bad request i respons`() =
+    fun `gitt at egenregistrering inneholder kun BRA per etasje og ikke totalt BRA skal man få en bad request i respons`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
 
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                        EgenregistreringRequest.invalidEgenregistrering(),
+                        EgenregistreringRequest.ugyldigEgenregistreringMedKunBruksarealPerEtasje(),
                 )
             }
 

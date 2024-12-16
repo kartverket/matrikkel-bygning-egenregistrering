@@ -15,22 +15,16 @@ import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
-import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
-import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 import java.time.Instant
 import java.util.*
@@ -74,17 +68,18 @@ class BygningEgenregistreringAggregeringTest {
         eier = Foedselsnummer("31129956715"),
         bygningRegistrering = defaultBygningRegistrering,
     )
+
     private val bruksenhetRegistreringMedKildematerialeKode = BruksenhetRegistrering(
         bruksenhetId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
-            kildemateriale = null,
+            kildemateriale = KildematerialeKode.AnnenDokumentasjon,
         ),
         byggeaarRegistrering = ByggeaarRegistrering(2010, KildematerialeKode.Selvrapportert),
-        energikildeRegistrering = EnergikildeRegistrering(listOf(EnergikildeKode.Gass), KildematerialeKode.Byggesaksdokumenter),
-        oppvarmingRegistrering = OppvarmingRegistrering(listOf(OppvarmingKode.Sentralvarme), KildematerialeKode.Salgsoppgave),
-        vannforsyningRegistrering = VannforsyningRegistrering(VannforsyningKode.OffentligVannverk, KildematerialeKode.Plantegninger),
+        energikildeRegistrering = null,
+        oppvarmingRegistrering = null,
+        vannforsyningRegistrering = null,
         avlopRegistrering = null,
     )
 
@@ -102,8 +97,7 @@ class BygningEgenregistreringAggregeringTest {
                         ),
                     ),
                 ),
-
-                ),
+            ),
         )
 
         val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
@@ -133,7 +127,7 @@ class BygningEgenregistreringAggregeringTest {
                         bruksarealRegistrering = BruksarealRegistrering(
                             totaltBruksareal = 150.0,
                             etasjeRegistreringer = null,
-                            kildemateriale = null,
+                            kildemateriale = KildematerialeKode.Byggesaksdokumenter,
                         ),
                     ),
                 ),
@@ -142,7 +136,10 @@ class BygningEgenregistreringAggregeringTest {
 
         val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
 
-        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data).isEqualTo(150.0)
+        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data)
+            .isEqualTo(150.0)
+        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.metadata?.kildemateriale)
+            .isEqualTo(KildematerialeKode.Byggesaksdokumenter)
     }
 
     @Test
@@ -164,10 +161,10 @@ class BygningEgenregistreringAggregeringTest {
                                     ),
                                 ),
                             ),
-                            kildemateriale = null
+                            kildemateriale = null,
                         ),
 
-                    ),
+                        ),
                 ),
             ),
         )
