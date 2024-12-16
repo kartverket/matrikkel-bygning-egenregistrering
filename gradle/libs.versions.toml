@@ -15,6 +15,7 @@ assertkVersion = "0.28.1"
 norwegianCommonsVersion = "0.16.0"
 kotlinResultVersion = "2.0.0"
 ktorSwaggerUIVersion = "4.0.0"
+mockOauth2Server = "2.1.10"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -47,6 +48,7 @@ jaxws-tools = { group = "com.sun.xml.ws", name = "jaxws-tools", version.ref = "j
 testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainersVersion" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
 mockk-dsl = { group = "io.mockk", name = "mockk-dsl", version.ref = "mockkVersion" }
+mock-oauth2-server = { group = "no.nav.security", name = "mock-oauth2-server", version.ref = "mockOauth2Server" }
 assertk = { group = "com.willowtreeapps.assertk", name = "assertk", version.ref = "assertkVersion" }
 
 norwegian-commons = { group = "no.bekk.bekkopen", name = "nocommons", version.ref = "norwegianCommonsVersion" }
