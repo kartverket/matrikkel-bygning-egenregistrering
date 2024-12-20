@@ -21,4 +21,4 @@ jobs:
         uses: actions/dependency-review-action@v4.5.0
         with:
           comment-summary-in-pr: true
-          deny-licenses: ""
+          deny-licenses: "AGPL-1.0-only, AGPL-1.0-or-later, AGPL-3.0, AGPL-3.0-or-later"
