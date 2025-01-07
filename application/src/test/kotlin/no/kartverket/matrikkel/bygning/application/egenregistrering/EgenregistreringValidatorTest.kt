@@ -17,6 +17,7 @@ import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import java.time.Instant
 import java.util.*
 import kotlin.test.Test
@@ -36,6 +37,7 @@ class EgenregistreringValidatorTest {
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         eier = Foedselsnummer("31129956715"),
+        prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(
             bygningId = 1L,
             bruksenhetRegistreringer = emptyList(),

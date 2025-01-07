@@ -135,6 +135,7 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
         id = UUID.randomUUID(),
         eier = Foedselsnummer(this.eier),
         registreringstidspunkt = registreringstidspunkt,
+        prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,
             bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
