@@ -23,7 +23,7 @@ fun Application.configureMaskinportenAuthentication(config: AuthenticationConfig
 
             verifier(jwkProvider, config.issuer) {
                 acceptLeeway(3)
-                withClaim("scope", config.requiredScope)
+                withClaim("scope", config.requiredScopes)
             }
             validate { it }
         }
@@ -33,7 +33,7 @@ fun Application.configureMaskinportenAuthentication(config: AuthenticationConfig
 data class AuthenticationConfig(
     val jwksUri: String,
     val issuer: String,
-    val requiredScope: String,
+    val requiredScopes: String,
     private val shouldSkip: Boolean = false,
 ) {
     fun shouldSkipAuthentication(): Boolean {
