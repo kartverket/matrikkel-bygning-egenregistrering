@@ -69,7 +69,7 @@ abstract class TestApplicationWithDb {
                     "matrikkel.useStub" to "true",
                     "maskinporten.issuer" to mockOAuthServer.issuerUrl("testIssuer").toString(),
                     "maskinporten.jwksUri" to mockOAuthServer.jwksUrl("testIssuer").toString(),
-                    "maskinporten.scope" to "kartverket:riktig:scope",
+                    "maskinporten.scopes" to "kartverket:riktig:scope",
                     "maskinporten.shouldSkip" to "false"
                 )
             }

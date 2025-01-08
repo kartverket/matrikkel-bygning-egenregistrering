@@ -20,8 +20,8 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigratio
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
 import no.kartverket.matrikkel.bygning.plugins.AuthenticationConfig
-import no.kartverket.matrikkel.bygning.plugins.configureMaskinportenAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
+import no.kartverket.matrikkel.bygning.plugins.configureMaskinportenAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
@@ -62,7 +62,7 @@ fun Application.mainModule() {
         AuthenticationConfig(
             jwksUri = config.property("maskinporten.jwksUri").getString(),
             issuer = config.property("maskinporten.issuer").getString(),
-            requiredScope = config.property("maskinporten.scope").getString(),
+            requiredScopes = config.property("maskinporten.scopes").getString(),
             shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
         ),
     )
