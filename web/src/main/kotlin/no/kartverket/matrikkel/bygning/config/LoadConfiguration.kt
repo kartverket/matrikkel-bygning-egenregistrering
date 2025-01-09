@@ -24,5 +24,3 @@ private fun configLocation(): String {
         LOCAL -> "application-local.conf"
     }
 }
-
-

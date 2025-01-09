@@ -12,35 +12,50 @@ import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
-fun Application.configureMaskinportenAuthentication(config: AuthenticationConfig) {
+fun Application.configureDigDirAuthentication(config: DigDirAuthenticationConfig) {
     install(Authentication) {
-        jwt("maskinporten") {
-            skipWhen { config.shouldSkipAuthentication() }
-            val jwkProvider = JwkProviderBuilder(URI(config.jwksUri).toURL())
-                .cached(10, 24, TimeUnit.HOURS)
-                .rateLimited(10, 1, TimeUnit.MINUTES)
-                .build()
+        jwtFromConfig(config.maskinporten)
 
-            verifier(jwkProvider, config.issuer) {
-                acceptLeeway(3)
-                withClaim("scope", config.requiredScopes)
+        jwtFromConfig(config.idporten)
+    }
+}
+
+fun AuthenticationConfig.jwtFromConfig(config: JWTAuthenticationConfig) {
+    jwt(config.name) {
+        skipWhen { config.shouldSkipAuthentication() }
+
+        val jwkProvider = JwkProviderBuilder(URI(config.jwksUri).toURL())
+            .cached(10, 24, TimeUnit.HOURS)
+            .rateLimited(10, 1, TimeUnit.MINUTES)
+            .build()
+
+        verifier(jwkProvider, config.issuer) {
+            acceptLeeway(3)
+
+            config.scope?.let { scope ->
+                withClaim("scope", scope)
             }
-            validate { it }
         }
     }
 }
 
-data class AuthenticationConfig(
+data class JWTAuthenticationConfig(
+    val name: String,
     val jwksUri: String,
     val issuer: String,
-    val requiredScopes: String,
+    val scope: String?,
     private val shouldSkip: Boolean = false,
 ) {
     fun shouldSkipAuthentication(): Boolean {
         if (Env.isLocal() && shouldSkip) {
-            log.warn("Maskinporten autentisering er deaktivert. Skal kun brukes lokalt!")
+            log.warn("$name autentisering er deaktivert. Skal kun brukes lokalt!")
             return true
         }
         return false
     }
 }
+
+data class DigDirAuthenticationConfig(
+    val maskinporten: JWTAuthenticationConfig,
+    val idporten: JWTAuthenticationConfig,
+)

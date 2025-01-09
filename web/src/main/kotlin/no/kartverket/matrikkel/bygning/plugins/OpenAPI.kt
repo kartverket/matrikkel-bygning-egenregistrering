@@ -15,7 +15,13 @@ fun Application.configureOpenAPI() {
             tagGenerator = { url -> listOf(url.getOrNull(1)?.replaceFirstChar(Char::titlecase)) }
         }
         security {
-            securityScheme("Maskinporten") {
+            securityScheme("maskinporten") {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+
+            securityScheme("idporten") {
                 type = AuthType.HTTP
                 scheme = AuthScheme.BEARER
                 bearerFormat = "jwt"

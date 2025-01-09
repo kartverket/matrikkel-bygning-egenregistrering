@@ -19,9 +19,10 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.Heal
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
-import no.kartverket.matrikkel.bygning.plugins.AuthenticationConfig
+import no.kartverket.matrikkel.bygning.plugins.DigDirAuthenticationConfig
+import no.kartverket.matrikkel.bygning.plugins.JWTAuthenticationConfig
+import no.kartverket.matrikkel.bygning.plugins.configureDigDirAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
-import no.kartverket.matrikkel.bygning.plugins.configureMaskinportenAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
@@ -58,12 +59,22 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    configureMaskinportenAuthentication(
-        AuthenticationConfig(
-            jwksUri = config.property("maskinporten.jwksUri").getString(),
-            issuer = config.property("maskinporten.issuer").getString(),
-            requiredScopes = config.property("maskinporten.scopes").getString(),
-            shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
+    configureDigDirAuthentication(
+        DigDirAuthenticationConfig(
+            maskinporten = JWTAuthenticationConfig(
+                name = "maskinporten",
+                jwksUri = config.property("maskinporten.jwksUri").getString(),
+                issuer = config.property("maskinporten.issuer").getString(),
+                scope = config.property("maskinporten.scopes").getString(),
+                shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
+            ),
+            idporten = JWTAuthenticationConfig(
+                name = "idporten",
+                jwksUri = config.property("idporten.jwksUri").getString(),
+                issuer = config.property("idporten.issuer").getString(),
+                scope = config.property("idporten.scopes").getString(),
+                shouldSkip = config.propertyOrNull("idporten.shouldSkip")?.getString().toBoolean(),
+            ),
         ),
     )
 
