@@ -33,6 +33,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
     val metadata = RegisterMetadata(
         registreringstidspunkt = egenregistrering.registreringstidspunkt,
         registrertAv = egenregistrering.eier,
+        prosess = egenregistrering.prosess,
     )
 
     return this.copy(

@@ -19,6 +19,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
 import java.util.*
@@ -151,6 +152,7 @@ fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering {
         id = UUID.randomUUID(),
         eier = Foedselsnummer(eier),
         registreringstidspunkt = registreringstidspunkt,
+        prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,
             bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->

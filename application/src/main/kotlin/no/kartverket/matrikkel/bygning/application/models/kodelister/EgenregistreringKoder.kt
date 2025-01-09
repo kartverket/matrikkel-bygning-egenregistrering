@@ -63,3 +63,10 @@ enum class KildematerialeKode(
     Byggesaksdokumenter("Byggesaksdokumenter", "Du har funnet dette i dokumenter laget i forbindelse med en byggesak, for eksempel tegninger, tillatelser eller ferdigattest."),
     AnnenDokumentasjon("Annen dokumentasjon", "Hvis du har noe dokumentasjon som ikke passer i de andre alternativene, men det er mulig å dokumentere valget ditt.")
 }
+
+enum class ProsessKode(
+    override val presentasjonsnavn: String,
+    override val beskrivelse: String
+) : IKode {
+    Egenregistrering("Egenregistrering", "Føringen er en egenregistrering gjort av bruker ved hjelp av Min Eiendom"),
+}
