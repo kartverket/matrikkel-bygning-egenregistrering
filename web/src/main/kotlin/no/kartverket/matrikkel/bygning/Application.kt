@@ -11,6 +11,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
+import no.kartverket.matrikkel.bygning.config.Env.Companion.isMaskinportenDisabled
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
@@ -58,15 +59,16 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    configureMaskinportenAuthentication(
-        AuthenticationConfig(
-            jwksUri = config.property("maskinporten.jwksUri").getString(),
-            issuer = config.property("maskinporten.issuer").getString(),
-            requiredScopes = config.property("maskinporten.scopes").getString(),
-            shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
-        ),
-    )
-
+    if (!isMaskinportenDisabled()) {
+        configureMaskinportenAuthentication(
+            AuthenticationConfig(
+                jwksUri = config.property("maskinporten.jwksUri").getString(),
+                issuer = config.property("maskinporten.issuer").getString(),
+                requiredScopes = config.property("maskinporten.scopes").getString(),
+                shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
+            ),
+        )
+    }
     val dataSource = createDataSource(
         DatabaseConfig(
             databaseUrl = config.property("storage.jdbcURL").getString(),

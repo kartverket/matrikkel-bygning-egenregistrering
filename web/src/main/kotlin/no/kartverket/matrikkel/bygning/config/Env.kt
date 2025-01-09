@@ -12,5 +12,9 @@ enum class Env {
         }
 
         fun isLocal() = current() == LOCAL
+
+        fun isMaskinportenDisabled(): Boolean {
+            return System.getenv("MASKINPORTEN_DISABLED")?.toBoolean() ?: false
+        }
     }
 }
