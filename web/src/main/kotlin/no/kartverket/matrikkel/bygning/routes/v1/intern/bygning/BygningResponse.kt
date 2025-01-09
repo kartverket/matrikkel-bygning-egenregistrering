@@ -73,7 +73,8 @@ data class RegisterMetadataResponse(
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
     val registrertAv: String,
-    val kildemateriale: KildematerialeKode? = null
+    val kildemateriale: KildematerialeKode? = null,
+    val prosess: ProsessKode?
 )
 
 @Serializable
@@ -99,6 +100,7 @@ fun RegisterMetadata.toRegisterMetadataResponse() = RegisterMetadataResponse(
     registreringstidspunkt = this.registreringstidspunkt,
     registrertAv = this.registrertAv.value,
     kildemateriale = this.kildemateriale,
+    prosess = this.prosess
 )
 
 

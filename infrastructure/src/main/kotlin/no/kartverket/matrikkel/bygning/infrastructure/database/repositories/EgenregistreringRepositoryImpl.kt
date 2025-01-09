@@ -5,6 +5,7 @@ import no.kartverket.matrikkel.bygning.application.egenregistrering.Egenregistre
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.infrastructure.database.executeQueryAndMapPreparedStatement
 import no.kartverket.matrikkel.bygning.infrastructure.database.prepareAndExecuteUpdate
 import no.kartverket.matrikkel.bygning.infrastructure.database.withTransaction
@@ -34,6 +35,7 @@ class EgenregistreringRepositoryImpl(private val dataSource: DataSource) : Egenr
                 eier = Foedselsnummer(it.getString("eier")),
                 registreringstidspunkt = it.getTimestamp("registreringstidspunkt").toInstant(),
                 bygningRegistrering = Json.decodeFromString<BygningRegistrering>(it.getString("bygningregistrering")),
+                prosess = ProsessKode.Egenregistrering
             )
         }
     }

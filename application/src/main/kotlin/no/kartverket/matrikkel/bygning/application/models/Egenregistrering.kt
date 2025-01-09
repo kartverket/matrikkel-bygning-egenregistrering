@@ -6,6 +6,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
 import java.util.*
@@ -93,5 +94,6 @@ data class Egenregistrering(
     val id: UUID,
     val eier: Foedselsnummer,
     val registreringstidspunkt: Instant,
+    val prosess: ProsessKode,
     val bygningRegistrering: BygningRegistrering,
 )

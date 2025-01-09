@@ -25,6 +25,7 @@ import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 import java.time.Instant
 import java.util.*
@@ -67,6 +68,7 @@ class BygningEgenregistreringAggregeringTest {
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         eier = Foedselsnummer("31129956715"),
         bygningRegistrering = defaultBygningRegistrering,
+        prosess = ProsessKode.Egenregistrering,
     )
 
     private val bruksenhetRegistreringMedKildematerialeKode = BruksenhetRegistrering(
@@ -117,6 +119,40 @@ class BygningEgenregistreringAggregeringTest {
     }
 
     @Test
+    fun `bruksenhet med en ny egenregistring får prosess fylt`() {
+        val firstRegistrering = defaultEgenregistrering
+
+        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(defaultEgenregistrering, firstRegistrering))
+
+        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.metadata?.prosess)
+            .isEqualTo(ProsessKode.Egenregistrering)
+    }
+
+    @Test
+    fun `bruksenhet med en ny egenregistring får kildemateriale fylt`() {
+        val firstRegistrering = defaultEgenregistrering.copy(
+            id = UUID.randomUUID(),
+            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
+            bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
+                bruksenhetRegistreringer = listOf(
+                    bruksenhetRegistreringMedKildematerialeKode.copy(
+                        byggeaarRegistrering = ByggeaarRegistrering(
+                            byggeaar = 2011,
+                            kildemateriale = KildematerialeKode.Byggesaksdokumenter,
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val aggregatedBygning =
+            defaultBygning.withEgenregistrertData(listOf(firstRegistrering, defaultEgenregistrering))
+
+        assertThat(aggregatedBygning.bruksenheter.single().byggeaar.egenregistrert?.metadata?.kildemateriale)
+            .isEqualTo(KildematerialeKode.Byggesaksdokumenter)
+    }
+
+    @Test
     fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste feltet`() {
         val laterRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
@@ -138,8 +174,6 @@ class BygningEgenregistreringAggregeringTest {
 
         assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data)
             .isEqualTo(150.0)
-        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.metadata?.kildemateriale)
-            .isEqualTo(KildematerialeKode.Byggesaksdokumenter)
     }
 
     @Test

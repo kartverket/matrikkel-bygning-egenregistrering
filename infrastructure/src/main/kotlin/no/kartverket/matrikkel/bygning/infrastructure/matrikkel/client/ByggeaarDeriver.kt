@@ -3,6 +3,7 @@ package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.MatrikkelBygningsstatusKode
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.toInstant
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.toLocalDate
@@ -30,6 +31,7 @@ internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Byggeaar? {
         metadata = RegisterMetadata(
             registreringstidspunkt = derivedByggeaarStatus.registrertDato.toInstant(),
             registrertAv = Signatur(derivedByggeaarStatus.oppdatertAv),
+            prosess = ProsessKode.Egenregistrering
         ),
     )
 }
