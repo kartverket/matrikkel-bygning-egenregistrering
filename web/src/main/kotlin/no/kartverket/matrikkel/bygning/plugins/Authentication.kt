@@ -13,12 +13,14 @@ import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
-fun Application.configureMaskinportenAuthentication(config: ApplicationConfig, isDisabled: Boolean) {
+fun Application.configureMaskinportenAuthentication(config: ApplicationConfig) {
     install(Authentication) {
         jwt("maskinporten") {
-            skipWhen { isDisabled }
+            val shouldSkipMaskinporten = shouldSkipMaskinporten(config)
 
-            if (!isDisabled) {
+            skipWhen { shouldSkipMaskinporten }
+
+            if (!shouldSkipMaskinporten) {
                 val authConfig = AuthenticationConfig(
                     jwksUri = config.property("maskinporten.jwksUri").getString(),
                     issuer = config.property("maskinporten.issuer").getString(),
@@ -42,17 +44,22 @@ fun Application.configureMaskinportenAuthentication(config: ApplicationConfig, i
     }
 }
 
+private fun shouldSkipMaskinporten(config: ApplicationConfig): Boolean {
+    val shouldSkip = if (Env.isLocal()) {
+        config.propertyOrNull("maskinporten.skip")?.getString().toBoolean()
+    } else {
+        Env.isMaskinportenDisabled()
+    }
+
+    if (shouldSkip) {
+        log.warn("Maskinporten autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")
+    }
+
+    return shouldSkip
+}
+
 data class AuthenticationConfig(
     val jwksUri: String,
     val issuer: String,
     val requiredScopes: String,
-    private val shouldSkip: Boolean = false,
-) {
-    fun shouldSkipAuthentication(): Boolean {
-        if (Env.isLocal() && shouldSkip) {
-            log.warn("Maskinporten autentisering er deaktivert. Skal kun brukes lokalt!")
-            return true
-        }
-        return false
-    }
-}
+)
