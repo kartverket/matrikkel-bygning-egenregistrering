@@ -60,8 +60,4 @@ data class JWTAuthenticationConfig(
 data class DigDirAuthenticationConfig(
     val maskinporten: JWTAuthenticationConfig,
     val idporten: JWTAuthenticationConfig,
-) {
-    init {
-
-    }
-}
+)
