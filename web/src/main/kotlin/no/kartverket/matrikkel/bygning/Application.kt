@@ -11,7 +11,6 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
-import no.kartverket.matrikkel.bygning.config.Env.Companion.isMaskinportenDisabled
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
@@ -58,10 +57,7 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    configureMaskinportenAuthentication(
-        config,
-        isMaskinportenDisabled()
-    )
+    configureMaskinportenAuthentication(config)
 
     val dataSource = createDataSource(
         DatabaseConfig(
