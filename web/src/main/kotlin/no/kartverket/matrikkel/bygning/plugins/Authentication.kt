@@ -32,10 +32,12 @@ fun AuthenticationConfig.jwtFromConfig(config: JWTAuthenticationConfig) {
         verifier(jwkProvider, config.issuer) {
             acceptLeeway(3)
 
-            config.scope?.let { scope ->
-                withClaim("scope", scope)
+            config.scopes?.let { scopes ->
+                withClaim("scope", config.scopes)
             }
         }
+
+        validate { it }
     }
 }
 
@@ -43,7 +45,7 @@ data class JWTAuthenticationConfig(
     val name: String,
     val jwksUri: String,
     val issuer: String,
-    val scope: String?,
+    val scopes: String?,
     private val shouldSkip: Boolean = false,
 ) {
     fun shouldSkipAuthentication(): Boolean {
@@ -58,4 +60,8 @@ data class JWTAuthenticationConfig(
 data class DigDirAuthenticationConfig(
     val maskinporten: JWTAuthenticationConfig,
     val idporten: JWTAuthenticationConfig,
-)
+) {
+    init {
+
+    }
+}

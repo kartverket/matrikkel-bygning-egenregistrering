@@ -15,7 +15,7 @@ abstract class TestApplicationWithDb {
     companion object {
         private val postgresSQLContainer = PostgreSQLContainer("postgres:15-alpine")
         @JvmStatic
-        protected lateinit var mockOAuthServer : MockOAuth2Server
+        internal lateinit var mockOAuthServer : MockOAuth2Server
 
         @BeforeAll
         @JvmStatic
@@ -69,8 +69,11 @@ abstract class TestApplicationWithDb {
                     "matrikkel.useStub" to "true",
                     "maskinporten.issuer" to mockOAuthServer.issuerUrl("testIssuer").toString(),
                     "maskinporten.jwksUri" to mockOAuthServer.jwksUrl("testIssuer").toString(),
-                    "maskinporten.scopes" to "kartverket:riktig:scope",
-                    "maskinporten.shouldSkip" to "false"
+                    "maskinporten.scopes" to "kartverk:riktig:scope",
+                    "maskinporten.shouldSkip" to "false",
+                    "idporten.issuer" to mockOAuthServer.issuerUrl("testIssuer").toString(),
+                    "idporten.jwksUri" to mockOAuthServer.jwksUrl("testIssuer").toString(),
+                    "idporten.shouldSkip" to "false"
                 )
             }
         }

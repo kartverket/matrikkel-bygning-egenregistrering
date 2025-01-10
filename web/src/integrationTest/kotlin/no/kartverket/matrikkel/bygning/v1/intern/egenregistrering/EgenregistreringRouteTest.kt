@@ -36,6 +36,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Bruksar
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.v1.common.JWTUtil
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.ugyldigEgenregistreringMedKunBruksarealPerEtasje
 import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
@@ -47,12 +48,16 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     @Test
     fun `gitt at en bygning eksisterer og request er gyldig svarer egenregistrering route ok`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
+        val token = JWTUtil.getDefaultIDPortenJWT()
 
         val response = client.post("/v1/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
             )
+            headers {
+                append("Authorization", "Bearer ${token.serialize()}")
+            }
         }
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -259,9 +264,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistrering().copy(
-                        eier = "31129956715",
-                    ),
+                    EgenregistreringRequest.validEgenregistrering()
                 )
             }
 

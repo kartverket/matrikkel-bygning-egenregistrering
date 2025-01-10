@@ -65,15 +65,15 @@ fun Application.mainModule() {
                 name = "maskinporten",
                 jwksUri = config.property("maskinporten.jwksUri").getString(),
                 issuer = config.property("maskinporten.issuer").getString(),
-                scope = config.property("maskinporten.scopes").getString(),
                 shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
+                scopes = config.property("maskinporten.scopes").getString(),
             ),
             idporten = JWTAuthenticationConfig(
                 name = "idporten",
                 jwksUri = config.property("idporten.jwksUri").getString(),
                 issuer = config.property("idporten.issuer").getString(),
-                scope = config.property("idporten.scopes").getString(),
                 shouldSkip = config.propertyOrNull("idporten.shouldSkip")?.getString().toBoolean(),
+                scopes = null,
             ),
         ),
     )
