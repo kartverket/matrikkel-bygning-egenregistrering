@@ -13,24 +13,6 @@ import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
-fun Application.configureMaskinportenAuthentication(config: AuthenticationConfig, isDisabled: Boolean) {
-    install(Authentication) {
-        jwt("maskinporten") {
-            skipWhen { config.shouldSkipAuthentication() || isDisabled }
-            val jwkProvider = JwkProviderBuilder(URI(config.jwksUri).toURL())
-                .cached(10, 24, TimeUnit.HOURS)
-                .rateLimited(10, 1, TimeUnit.MINUTES)
-                .build()
-
-            verifier(jwkProvider, config.issuer) {
-                acceptLeeway(3)
-                withClaim("scope", config.requiredScopes)
-            }
-            validate { it }
-        }
-    }
-}
-
 fun Application.configureMaskinportenAuthentication(config: ApplicationConfig, isDisabled: Boolean) {
     install(Authentication) {
         jwt("maskinporten") {
