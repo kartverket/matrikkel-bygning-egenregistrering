@@ -20,7 +20,6 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.Heal
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
-import no.kartverket.matrikkel.bygning.plugins.AuthenticationConfig
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
 import no.kartverket.matrikkel.bygning.plugins.configureMaskinportenAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
@@ -59,16 +58,11 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    if (!isMaskinportenDisabled()) {
-        configureMaskinportenAuthentication(
-            AuthenticationConfig(
-                jwksUri = config.property("maskinporten.jwksUri").getString(),
-                issuer = config.property("maskinporten.issuer").getString(),
-                requiredScopes = config.property("maskinporten.scopes").getString(),
-                shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
-            ),
-        )
-    }
+    configureMaskinportenAuthentication(
+        config,
+        isMaskinportenDisabled()
+    )
+
     val dataSource = createDataSource(
         DatabaseConfig(
             databaseUrl = config.property("storage.jdbcURL").getString(),
