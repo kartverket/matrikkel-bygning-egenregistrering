@@ -17,7 +17,6 @@ fun loadConfiguration(environment: ApplicationEnvironment): ApplicationConfig =
             environment.config.withFallback(ApplicationConfig(it))
         }
 
-
 private fun configLocation(): String {
     return when (Env.current()) {
         SKIP -> "application.conf"

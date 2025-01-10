@@ -11,6 +11,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
+import no.kartverket.matrikkel.bygning.config.Env.Companion.isMaskinportenDisabled
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
@@ -59,24 +60,26 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    configureDigDirAuthentication(
-        DigDirAuthenticationConfig(
-            maskinporten = JWTAuthenticationConfig(
-                name = "maskinporten",
-                jwksUri = config.property("maskinporten.jwksUri").getString(),
-                issuer = config.property("maskinporten.issuer").getString(),
-                shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
-                scopes = config.property("maskinporten.scopes").getString(),
+    if (!isMaskinportenDisabled()) {
+        configureDigDirAuthentication(
+            DigDirAuthenticationConfig(
+                maskinporten = JWTAuthenticationConfig(
+                    name = "maskinporten",
+                    jwksUri = config.property("maskinporten.jwksUri").getString(),
+                    issuer = config.property("maskinporten.issuer").getString(),
+                    shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
+                    scopes = config.property("maskinporten.scopes").getString(),
+                ),
+                idporten = JWTAuthenticationConfig(
+                    name = "idporten",
+                    jwksUri = config.property("idporten.jwksUri").getString(),
+                    issuer = config.property("idporten.issuer").getString(),
+                    shouldSkip = config.propertyOrNull("idporten.shouldSkip")?.getString().toBoolean(),
+                    scopes = null,
+                ),
             ),
-            idporten = JWTAuthenticationConfig(
-                name = "idporten",
-                jwksUri = config.property("idporten.jwksUri").getString(),
-                issuer = config.property("idporten.issuer").getString(),
-                shouldSkip = config.propertyOrNull("idporten.shouldSkip")?.getString().toBoolean(),
-                scopes = null,
-            ),
-        ),
-    )
+        )
+    }
 
     val dataSource = createDataSource(
         DatabaseConfig(
