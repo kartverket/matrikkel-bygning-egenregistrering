@@ -4,7 +4,7 @@ import com.auth0.jwk.JwkProviderBuilder
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import no.kartverket.matrikkel.bygning.config.Env
+import io.ktor.server.config.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -12,35 +12,49 @@ import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
-fun Application.configureMaskinportenAuthentication(config: AuthenticationConfig) {
+fun Application.configureMaskinportenAuthentication(config: ApplicationConfig) {
     install(Authentication) {
         jwt("maskinporten") {
-            skipWhen { config.shouldSkipAuthentication() }
-            val jwkProvider = JwkProviderBuilder(URI(config.jwksUri).toURL())
-                .cached(10, 24, TimeUnit.HOURS)
-                .rateLimited(10, 1, TimeUnit.MINUTES)
-                .build()
+            val shouldDisableMaskinporten = shouldDisableMaskinporten(config)
 
-            verifier(jwkProvider, config.issuer) {
-                acceptLeeway(3)
-                withClaim("scope", config.requiredScopes)
+            skipWhen { shouldDisableMaskinporten }
+
+            if (!shouldDisableMaskinporten) {
+                val authConfig = AuthenticationConfig(
+                    jwksUri = config.property("maskinporten.jwksUri").getString(),
+                    issuer = config.property("maskinporten.issuer").getString(),
+                    requiredScopes = config.property("maskinporten.scopes").getString(),
+                )
+
+                val jwkProvider = JwkProviderBuilder(URI(authConfig.jwksUri).toURL())
+                    .cached(10, 24, TimeUnit.HOURS)
+                    .rateLimited(10, 1, TimeUnit.MINUTES)
+                    .build()
+
+                verifier(jwkProvider, authConfig.issuer) {
+                    acceptLeeway(3)
+                    withClaim("scope", authConfig.requiredScopes)
+                }
+
+                validate { it }
+
             }
-            validate { it }
         }
     }
+}
+
+private fun shouldDisableMaskinporten(config: ApplicationConfig): Boolean {
+    val shouldDisable = config.propertyOrNull("maskinporten.disabled")?.getString().toBoolean()
+
+    if (shouldDisable) {
+        log.warn("Maskinporten autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")
+    }
+
+    return shouldDisable
 }
 
 data class AuthenticationConfig(
     val jwksUri: String,
     val issuer: String,
     val requiredScopes: String,
-    private val shouldSkip: Boolean = false,
-) {
-    fun shouldSkipAuthentication(): Boolean {
-        if (Env.isLocal() && shouldSkip) {
-            log.warn("Maskinporten autentisering er deaktivert. Skal kun brukes lokalt!")
-            return true
-        }
-        return false
-    }
-}
+)

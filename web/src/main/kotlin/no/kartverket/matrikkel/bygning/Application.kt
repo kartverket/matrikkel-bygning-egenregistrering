@@ -11,7 +11,6 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
-import no.kartverket.matrikkel.bygning.config.Env.Companion.isMaskinportenDisabled
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
@@ -20,7 +19,6 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.Heal
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
-import no.kartverket.matrikkel.bygning.plugins.AuthenticationConfig
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
 import no.kartverket.matrikkel.bygning.plugins.configureMaskinportenAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
@@ -59,16 +57,8 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    if (!isMaskinportenDisabled()) {
-        configureMaskinportenAuthentication(
-            AuthenticationConfig(
-                jwksUri = config.property("maskinporten.jwksUri").getString(),
-                issuer = config.property("maskinporten.issuer").getString(),
-                requiredScopes = config.property("maskinporten.scopes").getString(),
-                shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
-            ),
-        )
-    }
+    configureMaskinportenAuthentication(config)
+
     val dataSource = createDataSource(
         DatabaseConfig(
             databaseUrl = config.property("storage.jdbcURL").getString(),
