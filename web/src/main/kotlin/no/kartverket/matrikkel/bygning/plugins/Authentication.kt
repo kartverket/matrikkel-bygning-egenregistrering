@@ -5,7 +5,6 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
-import no.kartverket.matrikkel.bygning.config.Env
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -16,11 +15,11 @@ private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 fun Application.configureMaskinportenAuthentication(config: ApplicationConfig) {
     install(Authentication) {
         jwt("maskinporten") {
-            val shouldSkipMaskinporten = shouldSkipMaskinporten(config)
+            val shouldDisableMaskinporten = shouldDisableMaskinporten(config)
 
-            skipWhen { shouldSkipMaskinporten }
+            skipWhen { shouldDisableMaskinporten }
 
-            if (!shouldSkipMaskinporten) {
+            if (!shouldDisableMaskinporten) {
                 val authConfig = AuthenticationConfig(
                     jwksUri = config.property("maskinporten.jwksUri").getString(),
                     issuer = config.property("maskinporten.issuer").getString(),
@@ -44,12 +43,8 @@ fun Application.configureMaskinportenAuthentication(config: ApplicationConfig) {
     }
 }
 
-private fun shouldSkipMaskinporten(config: ApplicationConfig): Boolean {
-    val shouldSkip = if (Env.isLocal()) {
-        config.propertyOrNull("maskinporten.skip")?.getString().toBoolean()
-    } else {
-        Env.isMaskinportenDisabled()
-    }
+private fun shouldDisableMaskinporten(config: ApplicationConfig): Boolean {
+    val shouldSkip = config.propertyOrNull("maskinporten.disabled")?.getString().toBoolean()
 
     if (shouldSkip) {
         log.warn("Maskinporten autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")
