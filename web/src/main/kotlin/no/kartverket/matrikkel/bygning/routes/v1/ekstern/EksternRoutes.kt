@@ -14,6 +14,7 @@ fun Route.eksternRouting(
         route(
             "/ekstern",
             {
+                specId = "ekstern"
                 response {
                     code(HttpStatusCode.Unauthorized) {
                         description = "Manglende eller ugyldig token"
