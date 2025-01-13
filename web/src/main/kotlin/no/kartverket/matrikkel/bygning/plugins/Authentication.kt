@@ -44,13 +44,13 @@ fun Application.configureMaskinportenAuthentication(config: ApplicationConfig) {
 }
 
 private fun shouldDisableMaskinporten(config: ApplicationConfig): Boolean {
-    val shouldSkip = config.propertyOrNull("maskinporten.disabled")?.getString().toBoolean()
+    val shouldDisable = config.propertyOrNull("maskinporten.disabled")?.getString().toBoolean()
 
-    if (shouldSkip) {
+    if (shouldDisable) {
         log.warn("Maskinporten autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")
     }
 
-    return shouldSkip
+    return shouldDisable
 }
 
 data class AuthenticationConfig(
