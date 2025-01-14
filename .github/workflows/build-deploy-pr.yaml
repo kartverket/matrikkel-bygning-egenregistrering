@@ -1,0 +1,47 @@
+name: Build, test and deploy a PR to dev
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  registry: ghcr.io
+  image_name: ${{ github.repository }}
+
+jobs:
+  build:
+    name: Build, test and push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: ./.github/actions/setup-java
+      - name: Run build and integration tests
+        run: ./gradlew build integrationTest
+      - name: Build and push docker
+        id: docker
+        uses: ./.github/actions/build-push-docker
+        with:
+            image_tag: ${{ github.ref_name }}
+    outputs:
+      image_name: ${{ steps.docker.outputs.image_name }}
+      image_digest: ${{ steps.docker.outputs.image_digest }}
+
+  deploy:
+    needs: [ build ]
+    name: Deploy to dev
+    uses: kartverket/bygning-github-workflows/.github/workflows/update-app-version.yaml@main
+    permissions:
+      id-token: write
+    with:
+      application_name: bygning-backend
+      image_name: ${{ needs.build.outputs.image_name }}
+      image_digest: ${{ needs.build.outputs.image_digest }}
+      image_tag: ${{ github.ref_name }}
+      env: dev
+      namespace: matrikkelbygning-dev
+      cluster: atkv3
+      allow_unsafe_deploy: true
