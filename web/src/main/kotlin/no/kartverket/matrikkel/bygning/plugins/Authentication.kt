@@ -4,7 +4,8 @@ import com.auth0.jwk.JwkProviderBuilder
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import no.kartverket.matrikkel.bygning.config.Env
+import io.ktor.server.config.*
+import io.ktor.util.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -12,52 +13,53 @@ import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
-fun Application.configureDigDirAuthentication(config: DigDirAuthenticationConfig) {
-    install(Authentication) {
-        jwtFromConfig(config.maskinporten)
 
-        jwtFromConfig(config.idporten)
+fun Application.configureAuthentication(config: ApplicationConfig) {
+    install(Authentication) {
+        jwtFromConfig("maskinporten", config)
+
+        jwtFromConfig("idporten", config)
     }
 }
 
-fun AuthenticationConfig.jwtFromConfig(config: JWTAuthenticationConfig) {
-    jwt(config.name) {
-        skipWhen { config.shouldSkipAuthentication() }
+fun AuthenticationConfig.jwtFromConfig(name: String, appConfig: ApplicationConfig) {
+    jwt(name) {
+        val isDisabled = appConfig.property("${name}.disabled").getString().toBoolean()
 
-        val jwkProvider = JwkProviderBuilder(URI(config.jwksUri).toURL())
-            .cached(10, 24, TimeUnit.HOURS)
-            .rateLimited(10, 1, TimeUnit.MINUTES)
-            .build()
-
-        verifier(jwkProvider, config.issuer) {
-            acceptLeeway(3)
-
-            config.scopes?.let { scopes ->
-                withClaim("scope", config.scopes)
-            }
+        if (isDisabled) {
+            log.warn("${name.toUpperCasePreservingASCIIRules()} autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")
         }
 
-        validate { it }
+        skipWhen { isDisabled }
+
+        if (!isDisabled) {
+            val authConfig = JWTAuthenticationConfig(
+                jwksUri = appConfig.property("$name.jwksUri").getString(),
+                issuer = appConfig.property("$name.issuer").getString(),
+                // Vi vil jo egentlig ikke at scopes skal kunne være null for maskinporten. Hardkode at maskinporten ikke skal ha nullable scope?
+                scopes = appConfig.propertyOrNull("$name.scopes")?.getString(),
+            )
+
+            val jwkProvider = JwkProviderBuilder(URI(authConfig.jwksUri).toURL())
+                .cached(10, 24, TimeUnit.HOURS)
+                .rateLimited(10, 1, TimeUnit.MINUTES)
+                .build()
+
+            verifier(jwkProvider, authConfig.issuer) {
+                acceptLeeway(3)
+
+                authConfig.scopes?.let { scopes ->
+                    withClaim("scope", authConfig.scopes)
+                }
+            }
+
+            validate { it }
+        }
     }
 }
 
 data class JWTAuthenticationConfig(
-    val name: String,
     val jwksUri: String,
     val issuer: String,
     val scopes: String?,
-    private val shouldSkip: Boolean = false,
-) {
-    fun shouldSkipAuthentication(): Boolean {
-        if (Env.isLocal() && shouldSkip) {
-            log.warn("$name autentisering er deaktivert. Skal kun brukes lokalt!")
-            return true
-        }
-        return false
-    }
-}
-
-data class DigDirAuthenticationConfig(
-    val maskinporten: JWTAuthenticationConfig,
-    val idporten: JWTAuthenticationConfig,
 )

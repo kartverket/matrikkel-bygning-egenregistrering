@@ -70,10 +70,10 @@ abstract class TestApplicationWithDb {
                     "maskinporten.issuer" to mockOAuthServer.issuerUrl("testIssuer").toString(),
                     "maskinporten.jwksUri" to mockOAuthServer.jwksUrl("testIssuer").toString(),
                     "maskinporten.scopes" to "kartverk:riktig:scope",
-                    "maskinporten.shouldSkip" to "false",
+                    "maskinporten.disabled" to "false",
                     "idporten.issuer" to mockOAuthServer.issuerUrl("testIssuer").toString(),
                     "idporten.jwksUri" to mockOAuthServer.jwksUrl("testIssuer").toString(),
-                    "idporten.shouldSkip" to "false"
+                    "idporten.disabled" to "false"
                 )
             }
         }

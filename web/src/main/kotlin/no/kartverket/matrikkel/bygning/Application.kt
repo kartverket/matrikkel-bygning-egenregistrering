@@ -1,5 +1,6 @@
 package no.kartverket.matrikkel.bygning
 
+import io.github.smiley4.ktorswaggerui.dsl.routing.route
 import io.github.smiley4.ktorswaggerui.routing.openApiSpec
 import io.github.smiley4.ktorswaggerui.routing.swaggerUI
 import io.ktor.server.application.*
@@ -11,7 +12,6 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
-import no.kartverket.matrikkel.bygning.config.Env.Companion.isMaskinportenDisabled
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
@@ -20,18 +20,14 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.Heal
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
-import no.kartverket.matrikkel.bygning.plugins.DigDirAuthenticationConfig
-import no.kartverket.matrikkel.bygning.plugins.JWTAuthenticationConfig
-import no.kartverket.matrikkel.bygning.plugins.configureDigDirAuthentication
+import no.kartverket.matrikkel.bygning.plugins.configureAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
 import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.eksternRouting
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.bygningRouting
-import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.egenregistreringRouting
-import no.kartverket.matrikkel.bygning.routes.v1.kodeliste.kodelisteRouting
+import no.kartverket.matrikkel.bygning.routes.v1.intern.internRouting
 
 fun main() {
     val internalPort = System.getenv("INTERNAL_PORT")?.toIntOrNull() ?: 8081
@@ -60,26 +56,7 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    if (!isMaskinportenDisabled()) {
-        configureDigDirAuthentication(
-            DigDirAuthenticationConfig(
-                maskinporten = JWTAuthenticationConfig(
-                    name = "maskinporten",
-                    jwksUri = config.property("maskinporten.jwksUri").getString(),
-                    issuer = config.property("maskinporten.issuer").getString(),
-                    shouldSkip = config.propertyOrNull("maskinporten.shouldSkip")?.getString().toBoolean(),
-                    scopes = config.property("maskinporten.scopes").getString(),
-                ),
-                idporten = JWTAuthenticationConfig(
-                    name = "idporten",
-                    jwksUri = config.property("idporten.jwksUri").getString(),
-                    issuer = config.property("idporten.issuer").getString(),
-                    shouldSkip = config.propertyOrNull("idporten.shouldSkip")?.getString().toBoolean(),
-                    scopes = null,
-                ),
-            ),
-        )
-    }
+    configureAuthentication(config)
 
     val dataSource = createDataSource(
         DatabaseConfig(
@@ -105,28 +82,31 @@ fun Application.mainModule() {
     val bygningService = BygningService(bygningClient, egenregistreringService)
 
     routing {
+        // Routes for interne endepunkter.
         route("api.json") {
-            openApiSpec()
+            openApiSpec("intern")
         }
         route("swagger-ui") {
             swaggerUI("/api.json")
         }
-
         route("v1") {
-            route("kodelister") {
-                kodelisteRouting()
-            }
-            route("egenregistreringer") {
-                egenregistreringRouting(egenregistreringService)
-            }
-            route("bygninger") {
-                bygningRouting(bygningService)
-            }
+            internRouting(egenregistreringService, bygningService)
+        }
 
-            eksternRouting(bygningService)
+        // Routes for eksterne endepunkter.
+        route("ekstern") {
+            route("api.json"){
+                openApiSpec("ekstern")
+            }
+            route("swagger-ui"){
+                swaggerUI("/ekstern/api.json")
+            }
+        }
+        route("v1"){
+                eksternRouting(bygningService)
+
         }
     }
-
     runFlywayMigrations(dataSource)
 }
 

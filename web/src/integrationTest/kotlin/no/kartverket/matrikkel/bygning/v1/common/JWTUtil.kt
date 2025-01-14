@@ -4,9 +4,9 @@ import no.kartverket.matrikkel.bygning.TestApplicationWithDb.Companion.mockOAuth
 
 class JWTUtil {
     companion object {
-        private val DEFAULT_SUBJECT = "123456789"
-        private val DEFAULT_ISSUER = "testIssuer"
-        private val DEFAULT_ORG = "123456789"
+        private const val DEFAULT_SUBJECT = "123456789"
+        private const val DEFAULT_ISSUER = "testIssuer"
+        private const val DEFAULT_ORG = "123456789"
 
         fun getJWTWithScope(scope: String) = mockOAuthServer.issueToken(
             issuerId = DEFAULT_ISSUER,

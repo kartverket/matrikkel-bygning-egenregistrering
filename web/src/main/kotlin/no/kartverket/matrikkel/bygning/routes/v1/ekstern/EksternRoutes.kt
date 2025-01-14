@@ -14,6 +14,7 @@ fun Route.eksternRouting(
         route(
             "/ekstern",
             {
+                specId = "ekstern"
                 securitySchemeNames = listOf("maskinporten")
                 response {
                     code(HttpStatusCode.Unauthorized) {
