@@ -1,7 +1,7 @@
 package no.kartverket.matrikkel.bygning.routes.v1.kodeliste
 
 import io.github.smiley4.ktorswaggerui.dsl.routing.get
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
@@ -33,7 +33,7 @@ fun Route.kodelisteRouting() {
                 avlopKoder = AvlopKode::class.toKodeList(),
                 oppvarmingKoder = OppvarmingKode::class.toKodeList(),
                 kildematerialeKoder = KildematerialeKode::class.toKodeList(),
-                ),
+            ),
         )
     }
 

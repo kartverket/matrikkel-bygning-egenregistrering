@@ -8,7 +8,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningResponse
 
 fun Route.bygningEksternRouting(
     bygningService: BygningService
@@ -25,7 +24,7 @@ fun Route.bygningEksternRouting(
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BygningResponse> {
+                        body<BygningEksternResponse> {
                             description = "Bygningen med tilhørende bruksenheter"
                         }
                         description = "Bygningen finnes og ble hentet"
