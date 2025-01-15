@@ -23,7 +23,7 @@ jobs:
         run: ./gradlew build integrationTest
       - name: Build and push docker
         id: docker
-        uses: ./.github/actions/build-push-docker
+        uses: ./.github/actions/build-push-docker-pr
         with:
             image_tag: ${{ github.ref_name }}
     outputs:
