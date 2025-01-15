@@ -19,7 +19,6 @@ import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBygning
@@ -106,7 +105,7 @@ internal class MatrikkelBygningClient(
                             it.oppdateringsdato.toInstant(),
                             Signatur(it.oppdatertAv),
                             kildemateriale = null,
-                            prosess = ProsessKode.Egenregistrering,
+                            prosess = null,
                         )
 
                         Bruksenhet(
