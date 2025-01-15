@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
+import io.ktor.util.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -12,49 +13,53 @@ import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
-fun Application.configureMaskinportenAuthentication(config: ApplicationConfig) {
+
+fun Application.configureAuthentication(config: ApplicationConfig) {
     install(Authentication) {
-        jwt("maskinporten") {
-            val shouldDisableMaskinporten = shouldDisableMaskinporten(config)
+        jwtFromConfig("maskinporten", config)
 
-            skipWhen { shouldDisableMaskinporten }
+        jwtFromConfig("idporten", config)
+    }
+}
 
-            if (!shouldDisableMaskinporten) {
-                val authConfig = AuthenticationConfig(
-                    jwksUri = config.property("maskinporten.jwksUri").getString(),
-                    issuer = config.property("maskinporten.issuer").getString(),
-                    requiredScopes = config.property("maskinporten.scopes").getString(),
-                )
+fun AuthenticationConfig.jwtFromConfig(name: String, appConfig: ApplicationConfig) {
+    jwt(name) {
+        val isDisabled = appConfig.property("${name}.disabled").getString().toBoolean()
 
-                val jwkProvider = JwkProviderBuilder(URI(authConfig.jwksUri).toURL())
-                    .cached(10, 24, TimeUnit.HOURS)
-                    .rateLimited(10, 1, TimeUnit.MINUTES)
-                    .build()
+        if (isDisabled) {
+            log.warn("${name.toUpperCasePreservingASCIIRules()} autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")
+        }
 
-                verifier(jwkProvider, authConfig.issuer) {
-                    acceptLeeway(3)
-                    withClaim("scope", authConfig.requiredScopes)
+        skipWhen { isDisabled }
+
+        if (!isDisabled) {
+            val authConfig = JWTAuthenticationConfig(
+                jwksUri = appConfig.property("$name.jwksUri").getString(),
+                issuer = appConfig.property("$name.issuer").getString(),
+                // Vi vil jo egentlig ikke at scopes skal kunne være null for maskinporten. Hardkode at maskinporten ikke skal ha nullable scope?
+                scopes = appConfig.propertyOrNull("$name.scopes")?.getString(),
+            )
+
+            val jwkProvider = JwkProviderBuilder(URI(authConfig.jwksUri).toURL())
+                .cached(10, 24, TimeUnit.HOURS)
+                .rateLimited(10, 1, TimeUnit.MINUTES)
+                .build()
+
+            verifier(jwkProvider, authConfig.issuer) {
+                acceptLeeway(3)
+
+                authConfig.scopes?.let { scopes ->
+                    withClaim("scope", authConfig.scopes)
                 }
-
-                validate { it }
-
             }
+
+            validate { it }
         }
     }
 }
 
-private fun shouldDisableMaskinporten(config: ApplicationConfig): Boolean {
-    val shouldDisable = config.propertyOrNull("maskinporten.disabled")?.getString().toBoolean()
-
-    if (shouldDisable) {
-        log.warn("Maskinporten autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")
-    }
-
-    return shouldDisable
-}
-
-data class AuthenticationConfig(
+data class JWTAuthenticationConfig(
     val jwksUri: String,
     val issuer: String,
-    val requiredScopes: String,
+    val scopes: String?,
 )
