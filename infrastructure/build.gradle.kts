@@ -9,7 +9,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":matrikkel-api"))
     api(project(":application"))
 
     implementation(libs.logback.classic)
@@ -22,6 +21,9 @@ dependencies {
 
     // Serialization
     implementation(libs.ktor.serialization.kotlinx)
+
+    // Matrikkel
+    implementation(libs.kartverket.ws.client)
 }
 
 tasks.withType<Test> {
