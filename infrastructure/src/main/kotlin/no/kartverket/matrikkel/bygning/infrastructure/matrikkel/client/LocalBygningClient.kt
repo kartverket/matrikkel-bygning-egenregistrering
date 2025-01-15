@@ -11,7 +11,6 @@ import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import java.time.Instant
 
 internal class LocalBygningClient : BygningClient {
@@ -46,7 +45,7 @@ internal class LocalBygningClient : BygningClient {
                         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
                         registrertAv = Signatur("norola"),
                         kildemateriale = null,
-                        prosess = ProsessKode.Egenregistrering
+                        prosess = null
                     ),
                 ),
             ),
