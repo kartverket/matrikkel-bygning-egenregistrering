@@ -39,3 +39,4 @@ out/
 .java-version
 
 .env
+.DS_Store

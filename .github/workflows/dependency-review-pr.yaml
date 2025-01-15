@@ -17,6 +17,8 @@ jobs:
         uses: ./.github/actions/setup-java
       - name: Dependency submission
         uses: gradle/actions/dependency-submission@v4
+        env:
+          KV_PACKAGES_PAT: ${{ secrets.KV_PACKAGES_PAT }}
       - name: Dependency review
         uses: actions/dependency-review-action@v4.5.0
         with:
