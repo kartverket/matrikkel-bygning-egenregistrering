@@ -95,15 +95,15 @@ fun Application.mainModule() {
 
         // Routes for eksterne endepunkter.
         route("ekstern") {
-            route("api.json"){
+            route("api.json") {
                 openApiSpec("ekstern")
             }
-            route("swagger-ui"){
+            route("swagger-ui") {
                 swaggerUI("/ekstern/api.json")
             }
         }
-        route("v1"){
-                eksternRouting(bygningService)
+        route("v1") {
+            eksternRouting(bygningService)
 
         }
     }
