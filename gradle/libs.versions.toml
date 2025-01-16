@@ -14,7 +14,8 @@ mockkVersion = "1.13.16"
 assertkVersion = "0.28.1"
 norwegianCommonsVersion = "0.16.0"
 kotlinResultVersion = "2.0.1"
-ktorSwaggerUIVersion = "4.0.0"
+ktorSwaggerUIVersion = "4.1.5"
+smileySchemaKeneratorVersion = "1.6.3"
 mockOauth2Server = "2.1.10"
 
 [libraries]
@@ -55,7 +56,10 @@ norwegian-commons = { group = "no.bekk.bekkopen", name = "nocommons", version.re
 
 kotlin-result = { group = "com.michael-bull.kotlin-result", name = "kotlin-result", version.ref = "kotlinResultVersion" }
 
-ktor-swagger-ui = {group = "io.github.smiley4", name = "ktor-swagger-ui", version.ref = "ktorSwaggerUIVersion"}
+ktor-swagger-ui = { group = "io.github.smiley4", name = "ktor-swagger-ui", version.ref = "ktorSwaggerUIVersion" }
+schema-kenerator-core = { group = "io.github.smiley4", name = "schema-kenerator-core", version.ref = "smileySchemaKeneratorVersion" }
+schema-kenerator-reflection = { group = "io.github.smiley4", name = "schema-kenerator-reflection", version.ref = "smileySchemaKeneratorVersion" }
+schema-kenerator-swagger = { group = "io.github.smiley4", name = "schema-kenerator-swagger", version.ref = "smileySchemaKeneratorVersion" }
 
 [plugins]
 kotlin-jvm = { id = "jvm", version.ref = "kotlinVersion" }

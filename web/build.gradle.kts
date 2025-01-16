@@ -39,7 +39,10 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx)
 
     // OpenAPI / Swagger
-    implementation (libs.ktor.swagger.ui)
+    implementation(libs.ktor.swagger.ui)
+    implementation(libs.schema.kenerator.core)
+    implementation(libs.schema.kenerator.reflection)
+    implementation(libs.schema.kenerator.swagger)
 }
 
 application {
