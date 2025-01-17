@@ -16,7 +16,7 @@ norwegianCommonsVersion = "0.16.0"
 kotlinResultVersion = "2.0.1"
 ktorSwaggerUIVersion = "4.0.0"
 mockOauth2Server = "2.1.10"
-wsClientVersion = "4.18.1.0"
+matrikkelWsClientVersion = "4.18.1.0"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -34,7 +34,7 @@ ktor-server-auth-jwt = { group = "io.ktor", name = "ktor-server-auth-jwt", versi
 ktor-serialization-kotlinx = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktorVersion" }
 ktor-client-content-negotation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorVersion" }
 
-kartverket-ws-client = { group = "no.kartverket.matrikkelapi-v1", name = "matrikkelapi-v1-wsclient", version.ref = "wsClientVersion" }
+matrikkelapi-ws-client = { group = "no.kartverket.matrikkelapi-v1", name = "matrikkelapi-v1-wsclient", version.ref = "matrikkelWsClientVersion" }
 
 hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikariVersion" }
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flywayVersion" }

@@ -23,7 +23,7 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx)
 
     // Matrikkel
-    implementation(libs.kartverket.ws.client)
+    implementation(libs.matrikkelapi.ws.client)
 }
 
 tasks.withType<Test> {
