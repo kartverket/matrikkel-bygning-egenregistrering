@@ -2,15 +2,12 @@ package no.kartverket.matrikkel.bygning.plugins
 
 
 import com.auth0.jwk.JwkProviderBuilder
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
 import io.ktor.util.*
 import no.kartverket.matrikkel.bygning.config.Env
-import no.kartverket.matrikkel.bygning.plugins.MockJWTAuthenticationProvider.Companion.authenticate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -19,60 +16,22 @@ import java.util.concurrent.TimeUnit
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
 
-class MockJWTAuthenticationProvider(
-    config: Configuration
-) : AuthenticationProvider(config) {
-
-    private val mockConfig = config
-
-    class Configuration internal constructor(name: String) : Config(name) {
-        internal var onAuthenticate: (suspend (AuthenticationContext) -> Unit)? = null
-    }
-
+class MockJWTAuthenticationProvider(config: MockJWTConfig) : AuthenticationProvider(config) {
     override suspend fun onAuthenticate(context: AuthenticationContext) {
-        mockConfig.onAuthenticate?.invoke(context)
-    }
-
-    companion object {
-        fun Configuration.authenticate(block: suspend (AuthenticationContext) -> Unit) {
-            onAuthenticate = block
-        }
+        context.principal(Principal("31129956715"))
     }
 }
 
-fun AuthenticationConfig.mockJwt(
-    name: String,
-    configure: MockJWTAuthenticationProvider.Configuration.() -> Unit
-) {
-    val provider = MockJWTAuthenticationProvider.Configuration(name).apply(configure)
-    register(MockJWTAuthenticationProvider(provider))
-}
+data class Principal(val pid: String)
 
+class MockJWTConfig(name: String) : AuthenticationProvider.Config(name)
 
 fun Application.configureAuthentication(config: ApplicationConfig) {
     install(Authentication) {
         jwtFromConfig("maskinporten", config)
 
         if (Env.isLocal()) {
-            mockJwt("idporten") {
-                authenticate { context ->
-                    val algorithm = Algorithm.HMAC256("secret")
-
-                    val verifier = JWT.require(algorithm)
-                        .withIssuer("local")
-                        .build();
-
-                    val jwt = JWT.create()
-                        .withIssuer("local")
-                        .withClaim("pid", "31129956715")
-                        .sign(algorithm)
-
-                    val test = verifier.verify(jwt)
-
-                    val mockPrincipal = JWTPrincipal(payload = test)
-                    context.principal(mockPrincipal)
-                }
-            }
+            register(MockJWTAuthenticationProvider(MockJWTConfig("idporten")))
         } else {
             jwtFromConfig("idporten", config)
         }
@@ -112,7 +71,7 @@ fun AuthenticationConfig.jwtFromConfig(name: String, appConfig: ApplicationConfi
             }
 
             validate { it ->
-                JWTPrincipal(it.payload)
+                Principal(it.payload.getClaim("pid").asString())
             }
         }
     }

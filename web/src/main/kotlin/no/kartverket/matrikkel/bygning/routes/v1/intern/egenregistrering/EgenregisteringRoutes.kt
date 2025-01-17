@@ -7,13 +7,13 @@ import com.github.michaelbull.result.runCatching
 import io.github.smiley4.ktorswaggerui.dsl.routing.post
 import io.ktor.http.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.plugins.Principal
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
@@ -88,10 +88,10 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 }
             },
         ) {
-            val principal = call.principal<JWTPrincipal>()
+            val principal = call.principal<Principal>()
 
             // Hvordan håndtere at vi lokalt ikke har en principal eller payload?
-            val eierFnr = principal?.payload?.getClaim("pid")?.asString() ?: "31129956715"
+            val eierFnr = principal!!.pid
 
             // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
             val egenregistreringRequest = call.receive<EgenregistreringRequest>()
