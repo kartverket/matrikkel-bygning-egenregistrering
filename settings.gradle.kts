@@ -15,9 +15,12 @@ dependencyResolutionManagement {
                 ?: throw InvalidUserDataException("missing 'KV_PACKAGES_PAT' property")
             val tokenString = token as String
 
-            credentials {
-                username = "x-access-token" // Dummy username
-                password = tokenString
+            credentials(HttpHeaderCredentials::class) {
+                name = "Authorization"
+                value = "Bearer $tokenString"
+            }
+            authentication {
+                create("header", HttpHeaderAuthentication::class)
             }
         }
     }
