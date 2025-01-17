@@ -13,7 +13,7 @@ import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.plugins.Principal
+import no.kartverket.matrikkel.bygning.plugins.DigDirJWTPrincipal
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
@@ -88,10 +88,9 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 }
             },
         ) {
-            val principal = call.principal<Principal>()
+            val principal = call.principal<DigDirJWTPrincipal>()
 
-            // Hvordan håndtere at vi lokalt ikke har en principal eller payload?
-            val eierFnr = principal!!.pid
+            val eierFnr = principal!!.id
 
             // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
             val egenregistreringRequest = call.receive<EgenregistreringRequest>()
