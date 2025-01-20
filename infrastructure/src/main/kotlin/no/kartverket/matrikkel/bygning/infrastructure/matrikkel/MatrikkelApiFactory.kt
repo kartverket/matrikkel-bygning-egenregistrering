@@ -16,7 +16,6 @@ fun createBygningClient(
         log.warn("Bruker stub for matrikkel APIet. Bør kun brukes lokalt!")
         return LocalBygningClient()
     }
-
     return MatrikkelBygningClient(
         MatrikkelApi(
             URI(config.baseUrl),
