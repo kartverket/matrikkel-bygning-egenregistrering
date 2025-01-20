@@ -15,7 +15,7 @@ abstract class TestApplicationWithDb {
     companion object {
         private val postgresSQLContainer = PostgreSQLContainer("postgres:15-alpine")
         @JvmStatic
-        internal lateinit var mockOAuthServer : MockOAuth2Server
+        protected lateinit var mockOAuthServer : MockOAuth2Server
 
         @BeforeAll
         @JvmStatic

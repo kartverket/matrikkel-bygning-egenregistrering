@@ -36,7 +36,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Bruksar
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.v1.common.JWTUtil
+import no.kartverket.matrikkel.bygning.v1.common.JWTUtil.Companion.getDefaultIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.ugyldigEgenregistreringMedKunBruksarealPerEtasje
 import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
@@ -48,7 +48,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     @Test
     fun `gitt at en bygning eksisterer og request er gyldig svarer egenregistrering route ok`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
-        val token = JWTUtil.getDefaultIDPortenJWT()
+        val token = mockOAuthServer.getDefaultIDPortenJWT()
 
         val response = client.post("/v1/egenregistreringer") {
             contentType(ContentType.Application.Json)
@@ -67,7 +67,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     fun `gitt en gyldig egenregistrering paa bygning og bruksenhet kan bygningen hentes ut med de egenregistrerte dataene`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
-            val token = JWTUtil.getDefaultIDPortenJWT()
+            val token = mockOAuthServer.getDefaultIDPortenJWT()
 
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
@@ -150,7 +150,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     @Test
     fun `gitt en gyldig egenregistrering paa bruksenhet kan bruksenheten hentes ut med de egenregistrerte dataene`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
-        val token = JWTUtil.getDefaultIDPortenJWT()
+        val token = mockOAuthServer.getDefaultIDPortenJWT()
 
         val response = client.post("/v1/egenregistreringer") {
             contentType(ContentType.Application.Json)
@@ -200,7 +200,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     fun `gitt to gyldige egenregistreringer paa bygning og bruksenhet returneres dataene med den nyeste registreringen`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
-            val token = JWTUtil.getDefaultIDPortenJWT()
+            val token = mockOAuthServer.getDefaultIDPortenJWT()
 
             val egenregistrering1 = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
@@ -275,7 +275,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     fun `gitt at egenregistrering sender info om hvem har registrert blir dette lagret og sendt ut igjen`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
-            val token = JWTUtil.getDefaultIDPortenJWT()
+            val token = mockOAuthServer.getDefaultIDPortenJWT()
 
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
@@ -311,7 +311,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     fun `gitt at egenregistrering inneholder kun BRA per etasje og ikke totalt BRA skal man få en bad request i respons`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
-            val token = JWTUtil.getDefaultIDPortenJWT()
+            val token = mockOAuthServer.getDefaultIDPortenJWT()
 
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)

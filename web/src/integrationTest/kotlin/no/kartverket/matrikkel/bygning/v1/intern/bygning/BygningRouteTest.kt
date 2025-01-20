@@ -28,7 +28,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.EnergikildeRespo
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.v1.common.JWTUtil
+import no.kartverket.matrikkel.bygning.v1.common.JWTUtil.Companion.getDefaultIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
 import org.junit.jupiter.api.Test
@@ -81,7 +81,7 @@ class BygningRouteTest : TestApplicationWithDb() {
     @Test
     fun `gitt at en bygning eksisterer med noe egenregistrert data feltene vaere satt`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
-        val token = JWTUtil.getDefaultIDPortenJWT()
+        val token = mockOAuthServer.getDefaultIDPortenJWT()
 
         client.post("/v1/egenregistreringer") {
             contentType(ContentType.Application.Json)
