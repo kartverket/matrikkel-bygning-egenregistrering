@@ -11,15 +11,14 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.bygning.BygningEksternResponse
-import no.kartverket.matrikkel.bygning.v1.common.JWTUtil.Companion.getDefaultMaskinportenJWT
-import no.kartverket.matrikkel.bygning.v1.common.JWTUtil.Companion.getJWTWithScope
+import no.kartverket.matrikkel.bygning.v1.common.JWTUtil.Companion.issueMaskinportenJWT
 import org.junit.jupiter.api.Test
 
 class BygningEksternTest : TestApplicationWithDb() {
     @Test
     fun `gitt en gyldig token med riktig scope skal tilgang gis`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
-        val token = mockOAuthServer.getDefaultMaskinportenJWT()
+        val token = mockOAuthServer.issueMaskinportenJWT()
 
         val response = client.get("/v1/ekstern/bygninger/1") {
             headers {
@@ -37,7 +36,7 @@ class BygningEksternTest : TestApplicationWithDb() {
     @Test
     fun `gitt et token med feil scope skal tilgang nektes`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
-        val token = mockOAuthServer.getJWTWithScope("feil:scope")
+        val token = mockOAuthServer.issueMaskinportenJWT("feil:scope")
 
         val response = client.get("/v1/ekstern/bygninger/1") {
             headers {

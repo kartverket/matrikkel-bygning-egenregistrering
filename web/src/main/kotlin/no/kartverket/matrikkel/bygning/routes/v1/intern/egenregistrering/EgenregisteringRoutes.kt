@@ -13,18 +13,19 @@ import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.plugins.DigDirJWTPrincipal
+import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.Principal
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
 
 fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
-    authenticate("idporten") {
+    authenticate(IDPORTEN_PROVIDER_NAME) {
         post(
             {
                 summary = "Legg til en egenregistrering på en bygning"
                 description = "Legger til en egenregistrering på en bygning og tilhørende bruksenheter, hvis noen"
-                securitySchemeNames = listOf("idporten")
+                securitySchemeNames = listOf(IDPORTEN_PROVIDER_NAME)
                 request {
                     body<EgenregistreringRequest> {
                         required = true
@@ -88,7 +89,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 }
             },
         ) {
-            val principal = call.principal<DigDirJWTPrincipal>()
+            val principal = call.principal<Principal>()
 
             val eierFnr = principal!!.id
 

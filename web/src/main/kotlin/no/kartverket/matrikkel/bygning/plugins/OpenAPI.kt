@@ -5,6 +5,8 @@ import io.github.smiley4.ktorswaggerui.data.AuthScheme
 import io.github.smiley4.ktorswaggerui.data.AuthType
 import io.github.smiley4.ktorswaggerui.dsl.config.PluginConfigDsl
 import io.ktor.server.application.*
+import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
 
 object OpenApiSpecIds {
     const val INTERN = "intern"
@@ -36,13 +38,13 @@ private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, vers
             tagGenerator = { url -> listOf(url.getOrNull(1)?.replaceFirstChar(Char::titlecase)) }
         }
         security {
-            securityScheme("maskinporten") {
+            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
                 type = AuthType.HTTP
                 scheme = AuthScheme.BEARER
                 bearerFormat = "jwt"
             }
 
-            securityScheme("idporten") {
+            securityScheme(IDPORTEN_PROVIDER_NAME) {
                 type = AuthType.HTTP
                 scheme = AuthScheme.BEARER
                 bearerFormat = "jwt"

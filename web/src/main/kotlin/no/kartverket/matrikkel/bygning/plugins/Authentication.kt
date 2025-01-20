@@ -9,6 +9,9 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
 import io.ktor.util.*
 import no.kartverket.matrikkel.bygning.config.Env
+import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.VALID_FNR_LOCAL
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -16,9 +19,15 @@ import java.util.concurrent.TimeUnit
 
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
+object AuthenticationConstants {
+    const val IDPORTEN_PROVIDER_NAME = "idporten"
+    const val MASKINPORTEN_PROVIDER_NAME = "maskinporten"
+    const val VALID_FNR_LOCAL = "31129956715"
+}
+
 fun Application.configureAuthentication(config: ApplicationConfig) {
     install(Authentication) {
-        jwt("maskinporten") {
+        jwt(MASKINPORTEN_PROVIDER_NAME) {
             val isDisabled = isProviderDisabled(config, name!!)
 
             skipWhen { isDisabled }
@@ -35,9 +44,7 @@ fun Application.configureAuthentication(config: ApplicationConfig) {
                     withClaim("scope", authConfig.scopes)
                 }
 
-                validate { it ->
-                    DigDirJWTPrincipal(it.payload.getClaim("orgno").asString())
-                }
+                validate { Principal(it.payload.getClaim("orgno").asString()) }
             }
         }
 
@@ -46,7 +53,7 @@ fun Application.configureAuthentication(config: ApplicationConfig) {
 
 }
 
-data class DigDirJWTPrincipal(
+data class Principal(
     /**
      * Representerer PID/FNr for enkeltpersoner i tokens fra ID-porten,
      * og OrgNr i tokens fra Maskinporten
@@ -58,7 +65,7 @@ class MockJWTConfig(name: String) : AuthenticationProvider.Config(name)
 
 class MockJWTAuthenticationProvider(config: MockJWTConfig) : AuthenticationProvider(config) {
     override suspend fun onAuthenticate(context: AuthenticationContext) {
-        context.principal(DigDirJWTPrincipal("31129956715"))
+        context.principal(Principal(VALID_FNR_LOCAL))
     }
 }
 
@@ -75,35 +82,29 @@ data class JWTAuthenticationConfig(
 }
 
 private fun AuthenticationConfig.jwtIdporten(config: ApplicationConfig) {
-    val providerName = "idporten"
+    val providerName = IDPORTEN_PROVIDER_NAME
 
     val isDisabled = isProviderDisabled(config, providerName)
 
     if (Env.isLocal() && isDisabled) {
         register(
             MockJWTAuthenticationProvider(
-                MockJWTConfig("idporten"),
+                MockJWTConfig(IDPORTEN_PROVIDER_NAME),
             ),
         )
     } else {
-        jwt("idporten") {
-            skipWhen { isDisabled }
+        jwt(IDPORTEN_PROVIDER_NAME) {
+            val authConfig = JWTAuthenticationConfig(
+                jwksUri = config.property("$name.jwksUri").getString(),
+                issuer = config.property("$name.issuer").getString(),
+                scopes = null,
+            )
 
-            if (!isDisabled) {
-                val authConfig = JWTAuthenticationConfig(
-                    jwksUri = config.property("$name.jwksUri").getString(),
-                    issuer = config.property("$name.issuer").getString(),
-                    scopes = null,
-                )
-
-                verifier(authConfig.jwkProvider, authConfig.issuer) {
-                    acceptLeeway(3)
-                }
-
-                validate { it ->
-                    DigDirJWTPrincipal(it.payload.getClaim("pid").asString())
-                }
+            verifier(authConfig.jwkProvider, authConfig.issuer) {
+                acceptLeeway(3)
             }
+
+            validate { Principal(it.payload.getClaim("pid").asString()) }
         }
     }
 }
