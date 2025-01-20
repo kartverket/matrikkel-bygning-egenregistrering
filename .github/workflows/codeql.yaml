@@ -35,6 +35,8 @@ jobs:
 
       - name: Build
         run: ./gradlew build -x test -x intTest --info
+        env:
+          KV_PACKAGES_PAT: ${{ secrets.KV_PACKAGES_PAT }}
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
