@@ -2,7 +2,7 @@ package no.kartverket.matrikkel.bygning.v1.common
 
 import no.nav.security.mock.oauth2.MockOAuth2Server
 
-class JWTUtil() {
+class MockOAuth2ServerExtensions() {
     companion object {
         private const val DEFAULT_SUBJECT = "123456789"
         private const val DEFAULT_ISSUER = "testIssuer"

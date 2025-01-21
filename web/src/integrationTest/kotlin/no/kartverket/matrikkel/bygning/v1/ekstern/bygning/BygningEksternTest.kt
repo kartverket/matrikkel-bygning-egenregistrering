@@ -11,7 +11,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.bygning.BygningEksternResponse
-import no.kartverket.matrikkel.bygning.v1.common.JWTUtil.Companion.issueMaskinportenJWT
+import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueMaskinportenJWT
 import org.junit.jupiter.api.Test
 
 class BygningEksternTest : TestApplicationWithDb() {

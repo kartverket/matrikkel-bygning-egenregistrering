@@ -25,35 +25,7 @@ object AuthenticationConstants {
     const val VALID_FNR_LOCAL = "31129956715"
 }
 
-fun Application.configureAuthentication(config: ApplicationConfig) {
-    install(Authentication) {
-        jwt(MASKINPORTEN_PROVIDER_NAME) {
-            val isDisabled = isProviderDisabled(config, name!!)
-
-            skipWhen { isDisabled }
-
-            if (!isDisabled) {
-                val authConfig = JWTAuthenticationConfig(
-                    jwksUri = config.property("$name.jwksUri").getString(),
-                    issuer = config.property("$name.issuer").getString(),
-                    scopes = config.property("$name.scopes").getString(),
-                )
-
-                verifier(authConfig.jwkProvider, authConfig.issuer) {
-                    acceptLeeway(3)
-                    withClaim("scope", authConfig.scopes)
-                }
-
-                validate { Principal(it.payload.getClaim("orgno").asString()) }
-            }
-        }
-
-        jwtIdporten(config)
-    }
-
-}
-
-data class Principal(
+data class DigDirPrincipal(
     /**
      * Representerer PID/FNr for enkeltpersoner i tokens fra ID-porten,
      * og OrgNr i tokens fra Maskinporten
@@ -65,7 +37,7 @@ class MockJWTConfig(name: String) : AuthenticationProvider.Config(name)
 
 class MockJWTAuthenticationProvider(config: MockJWTConfig) : AuthenticationProvider(config) {
     override suspend fun onAuthenticate(context: AuthenticationContext) {
-        context.principal(Principal(VALID_FNR_LOCAL))
+        context.principal(DigDirPrincipal(VALID_FNR_LOCAL))
     }
 }
 
@@ -81,12 +53,44 @@ data class JWTAuthenticationConfig(
             .build()
 }
 
-private fun AuthenticationConfig.jwtIdporten(config: ApplicationConfig) {
-    val providerName = IDPORTEN_PROVIDER_NAME
+fun Application.configureAuthentication(config: ApplicationConfig) {
+    install(Authentication) {
+        jwtMaskinporten(config)
 
-    val isDisabled = isProviderDisabled(config, providerName)
+        jwtIDPorten(config)
+    }
+}
 
-    if (Env.isLocal() && isDisabled) {
+private fun AuthenticationConfig.jwtMaskinporten(config: ApplicationConfig) {
+    jwt(MASKINPORTEN_PROVIDER_NAME) {
+        val isDisabled = isProviderDisabled(config, MASKINPORTEN_PROVIDER_NAME)
+
+        skipWhen { isDisabled }
+
+        if (!isDisabled) {
+            val authConfig = JWTAuthenticationConfig(
+                jwksUri = config.property("$name.jwksUri").getString(),
+                issuer = config.property("$name.issuer").getString(),
+                scopes = config.property("$name.scopes").getString(),
+            )
+
+            verifier(authConfig.jwkProvider, authConfig.issuer) {
+                acceptLeeway(3)
+                withClaim("scope", authConfig.scopes)
+            }
+
+            validate { DigDirPrincipal(it.payload.getClaim("orgno").asString()) }
+        } else {
+            warnDisabledProvider(MASKINPORTEN_PROVIDER_NAME)
+        }
+    }
+}
+
+
+private fun AuthenticationConfig.jwtIDPorten(config: ApplicationConfig) {
+    if (Env.isLocal() && isProviderDisabled(config, IDPORTEN_PROVIDER_NAME)) {
+        warnDisabledProvider(IDPORTEN_PROVIDER_NAME)
+
         register(
             MockJWTAuthenticationProvider(
                 MockJWTConfig(IDPORTEN_PROVIDER_NAME),
@@ -104,17 +108,14 @@ private fun AuthenticationConfig.jwtIdporten(config: ApplicationConfig) {
                 acceptLeeway(3)
             }
 
-            validate { Principal(it.payload.getClaim("pid").asString()) }
+            validate { DigDirPrincipal(it.payload.getClaim("pid").asString()) }
         }
     }
 }
 
-private fun isProviderDisabled(config: ApplicationConfig, name: String): Boolean {
-    val isDisabled = config.property("${name}.disabled").getString().toBoolean()
+private fun isProviderDisabled(config: ApplicationConfig, name: String): Boolean =
+    config.property("${name}.disabled").getString().toBoolean()
 
-    if (isDisabled) {
-        log.warn("${name.toUpperCasePreservingASCIIRules()} autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")
-    }
 
-    return isDisabled
-}
+private fun warnDisabledProvider(name: String) =
+    log.warn("${name.toUpperCasePreservingASCIIRules()} autentisering er deaktivert! Forsikre deg om at dette ikke skjer utenfor lokale eller utviklingsmiljøer")

@@ -14,7 +14,8 @@ import no.kartverket.matrikkel.bygning.application.egenregistrering.Egenregistre
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.Principal
+import no.kartverket.matrikkel.bygning.plugins.DigDirPrincipal
+import no.kartverket.matrikkel.bygning.routes.principalOrThrow
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
@@ -89,9 +90,9 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 }
             },
         ) {
-            val principal = call.principal<Principal>()
+            val principal = call.principalOrThrow<DigDirPrincipal>()
 
-            val eierFnr = principal!!.id
+            val eierFnr = principal.id
 
             // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
             val egenregistreringRequest = call.receive<EgenregistreringRequest>()

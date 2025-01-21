@@ -28,7 +28,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.EnergikildeRespo
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.v1.common.JWTUtil.Companion.issueIDPortenJWT
+import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
 import org.junit.jupiter.api.Test
