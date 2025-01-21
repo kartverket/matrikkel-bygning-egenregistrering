@@ -87,6 +87,9 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                         body<ErrorResponse.InternalServerError>()
                         description = "Noe gikk galt på server"
                     }
+                    code(HttpStatusCode.Unauthorized) {
+                        description = "Manglende eller ugyldig token"
+                    }
                 }
             },
         ) {
