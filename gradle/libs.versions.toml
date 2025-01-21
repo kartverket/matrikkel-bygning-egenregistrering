@@ -4,7 +4,7 @@ kotlinVersion = "2.0.0"
 logbackVersion = "1.5.16"
 logstashVersion = "8.0"
 prometheusVersion = "1.14.3"
-flywayVersion = "11.1.1"
+flywayVersion = "11.2.0"
 postgresVersion = "42.7.5"
 shadowVersion = "8.3.5"
 jaxwsVersion = "4.0.3"
@@ -14,8 +14,10 @@ mockkVersion = "1.13.16"
 assertkVersion = "0.28.1"
 norwegianCommonsVersion = "0.16.0"
 kotlinResultVersion = "2.0.1"
-ktorSwaggerUIVersion = "4.0.0"
+ktorSwaggerUIVersion = "4.1.5"
+smileySchemaKeneratorVersion = "1.6.3"
 mockOauth2Server = "2.1.10"
+matrikkelWsClientVersion = "4.18.1.0"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -32,6 +34,8 @@ ktor-server-auth-jwt = { group = "io.ktor", name = "ktor-server-auth-jwt", versi
 
 ktor-serialization-kotlinx = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktorVersion" }
 ktor-client-content-negotation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorVersion" }
+
+matrikkelapi-ws-client = { group = "no.kartverket.matrikkelapi-v1", name = "matrikkelapi-v1-wsclient", version.ref = "matrikkelWsClientVersion" }
 
 hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikariVersion" }
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flywayVersion" }
@@ -55,7 +59,10 @@ norwegian-commons = { group = "no.bekk.bekkopen", name = "nocommons", version.re
 
 kotlin-result = { group = "com.michael-bull.kotlin-result", name = "kotlin-result", version.ref = "kotlinResultVersion" }
 
-ktor-swagger-ui = {group = "io.github.smiley4", name = "ktor-swagger-ui", version.ref = "ktorSwaggerUIVersion"}
+ktor-swagger-ui = { group = "io.github.smiley4", name = "ktor-swagger-ui", version.ref = "ktorSwaggerUIVersion" }
+schema-kenerator-core = { group = "io.github.smiley4", name = "schema-kenerator-core", version.ref = "smileySchemaKeneratorVersion" }
+schema-kenerator-reflection = { group = "io.github.smiley4", name = "schema-kenerator-reflection", version.ref = "smileySchemaKeneratorVersion" }
+schema-kenerator-swagger = { group = "io.github.smiley4", name = "schema-kenerator-swagger", version.ref = "smileySchemaKeneratorVersion" }
 
 [plugins]
 kotlin-jvm = { id = "jvm", version.ref = "kotlinVersion" }

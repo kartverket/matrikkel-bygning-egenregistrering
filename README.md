@@ -10,6 +10,16 @@ fyll ut README med informasjon om dette.
 
 Prosjektet er bygd og kjørt med `temurin-21` JRE og IntelliJ default Kotlin SDK.
 
+### Tilgang til Github packages 
+Prosjektet benytter felles bibliotker fra Kartverket via Github Packages. For å få tilgang til å laste inn disse lokalt via gradle må du: 
+1. Opprette et Personal Access Token (PAT) på GitHub, med tilgangen `read:packages`. Les hvordan du oppretter en PAT [her](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic). Tokenet må autoriseres med SSO. 
+2. Legg til tokenet i din lokale gradle.properties fil (**ikke** i repoet). For eksempel i .gradle-mappen på brukeren din:
+```
+KV_PACKAGES_PAT=<KV_PACKAGES_PAT>
+```
+
+
+
 
 ### TLDR
 Vil du kjøre alt av applikasjon og database med Docker, gjør følgende:
