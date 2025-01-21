@@ -24,6 +24,9 @@ dependencies {
 
     // Matrikkel
     implementation(libs.matrikkelapi.ws.client)
+    runtimeOnly(libs.jaxws.rt) {
+        exclude(group = "org.eclipse.angus") // Ekskluderer angus email
+    }
 }
 
 tasks.withType<Test> {

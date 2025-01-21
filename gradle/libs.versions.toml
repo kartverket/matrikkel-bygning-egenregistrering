@@ -47,11 +47,9 @@ logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.
 postgres = { group = "org.postgresql", name = "postgresql", version.ref = "postgresVersion" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlinVersion" }
 jaxws-rt = { group = "com.sun.xml.ws", name = "jaxws-rt", version.ref = "jaxwsVersion" }
-jaxws-tools = { group = "com.sun.xml.ws", name = "jaxws-tools", version.ref = "jaxwsVersion" }
 
 testcontainers-postgresql = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainersVersion" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
-mockk-dsl = { group = "io.mockk", name = "mockk-dsl", version.ref = "mockkVersion" }
 mock-oauth2-server = { group = "no.nav.security", name = "mock-oauth2-server", version.ref = "mockOauth2Server" }
 assertk = { group = "com.willowtreeapps.assertk", name = "assertk", version.ref = "assertkVersion" }
 
