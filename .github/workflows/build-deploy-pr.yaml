@@ -21,6 +21,8 @@ jobs:
         uses: ./.github/actions/setup-java
       - name: Run build and integration tests
         run: ./gradlew build integrationTest
+        env:
+          KV_PACKAGES_PAT: ${{ secrets.KV_PACKAGES_PAT }}
       - name: Build and push docker
         id: docker
         uses: ./.github/actions/build-push-docker-pr
