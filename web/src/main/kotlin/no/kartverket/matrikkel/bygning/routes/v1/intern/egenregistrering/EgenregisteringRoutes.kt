@@ -95,12 +95,10 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
         ) {
             val principal = call.principalOrThrow<DigDirPrincipal>()
 
-            val eierFnr = principal.id
-
             // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
             val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
-            val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering(eierFnr) }
+            val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering(eier = principal.id) }
                 .mapError(::exceptionToDomainError)
                 .andThen { egenregistreringService.addEgenregistrering(it) }
                 .mapBoth(
