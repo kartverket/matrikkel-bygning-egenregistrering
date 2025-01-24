@@ -20,14 +20,14 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.Heal
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
+import no.kartverket.matrikkel.bygning.plugins.configureAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
-import no.kartverket.matrikkel.bygning.plugins.configureMaskinportenAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
-import no.kartverket.matrikkel.bygning.routes.v1.intern.internRouting
 import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.eksternRouting
+import no.kartverket.matrikkel.bygning.routes.v1.intern.internRouting
 
 fun main() {
     val internalPort = System.getenv("INTERNAL_PORT")?.toIntOrNull() ?: 8081
@@ -56,7 +56,7 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    configureMaskinportenAuthentication(config)
+    configureAuthentication(config)
 
     val dataSource = createDataSource(
         DatabaseConfig(
@@ -95,15 +95,15 @@ fun Application.mainModule() {
 
         // Routes for eksterne endepunkter.
         route("ekstern") {
-            route("api.json"){
+            route("api.json") {
                 openApiSpec("ekstern")
             }
-            route("swagger-ui"){
+            route("swagger-ui") {
                 swaggerUI("/ekstern/api.json")
             }
         }
-        route("v1"){
-                eksternRouting(bygningService)
+        route("v1") {
+            eksternRouting(bygningService)
 
         }
     }

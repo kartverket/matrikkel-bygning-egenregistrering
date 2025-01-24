@@ -23,7 +23,6 @@ import java.time.Instant
 
 internal fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
     bygningId = 1L,
-    eier = "31129956715",
     bruksenhetRegistreringer = listOf(
         BruksenhetRegistreringRequest(
             bruksenhetId = 1L,
@@ -55,7 +54,6 @@ internal fun EgenregistreringRequest.Companion.validEgenregistrering() = Egenreg
 
 internal fun EgenregistreringRequest.Companion.ugyldigEgenregistreringMedKunBruksarealPerEtasje() = EgenregistreringRequest(
     bygningId = 1L,
-    eier = "31129956715",
     bruksenhetRegistreringer = listOf(
         BruksenhetRegistreringRequest(
             bruksenhetId = 1L,

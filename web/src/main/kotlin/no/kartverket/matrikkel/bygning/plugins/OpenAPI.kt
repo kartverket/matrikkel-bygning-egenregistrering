@@ -19,6 +19,8 @@ import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.ktor.server.application.*
+import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
 import java.time.Instant
 
 object OpenApiSpecIds {
@@ -71,7 +73,13 @@ private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, vers
             tagGenerator = { url -> listOf(url.getOrNull(1)?.replaceFirstChar(Char::titlecase)) }
         }
         security {
-            securityScheme("Maskinporten") {
+            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+
+            securityScheme(IDPORTEN_PROVIDER_NAME) {
                 type = AuthType.HTTP
                 scheme = AuthScheme.BEARER
                 bearerFormat = "jwt"

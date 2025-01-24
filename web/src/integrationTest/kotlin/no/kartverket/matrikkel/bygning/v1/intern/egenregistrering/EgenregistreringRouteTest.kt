@@ -36,6 +36,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Bruksar
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.ugyldigEgenregistreringMedKunBruksarealPerEtasje
 import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
@@ -47,12 +48,16 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     @Test
     fun `gitt at en bygning eksisterer og request er gyldig svarer egenregistrering route ok`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
+        val token = mockOAuthServer.issueIDPortenJWT()
 
         val response = client.post("/v1/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
             )
+            headers {
+                append("Authorization", "Bearer ${token.serialize()}")
+            }
         }
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -62,12 +67,16 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     fun `gitt en gyldig egenregistrering paa bygning og bruksenhet kan bygningen hentes ut med de egenregistrerte dataene`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
+            val token = mockOAuthServer.issueIDPortenJWT()
 
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.validEgenregistrering(),
                 )
+                headers {
+                    append("Authorization", "Bearer ${token.serialize()}")
+                }
             }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -141,12 +150,16 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     @Test
     fun `gitt en gyldig egenregistrering paa bruksenhet kan bruksenheten hentes ut med de egenregistrerte dataene`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
+        val token = mockOAuthServer.issueIDPortenJWT()
 
         val response = client.post("/v1/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
             )
+            headers {
+                append("Authorization", "Bearer ${token.serialize()}")
+            }
         }
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -187,12 +200,16 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     fun `gitt to gyldige egenregistreringer paa bygning og bruksenhet returneres dataene med den nyeste registreringen`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
+            val token = mockOAuthServer.issueIDPortenJWT()
 
             val egenregistrering1 = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.validEgenregistrering(),
                 )
+                headers {
+                    append("Authorization", "Bearer ${token.serialize()}")
+                }
             }
             assertThat(egenregistrering1.status).isEqualTo(HttpStatusCode.Created)
 
@@ -220,6 +237,9 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                         ),
                     ),
                 )
+                headers {
+                    append("Authorization", "Bearer ${token.serialize()}")
+                }
             }
             assertThat(egenregistrering2.status).isEqualTo(HttpStatusCode.Created)
 
@@ -255,14 +275,16 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     fun `gitt at egenregistrering sender info om hvem har registrert blir dette lagret og sendt ut igjen`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
+            val token = mockOAuthServer.issueIDPortenJWT()
 
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistrering().copy(
-                        eier = "31129956715",
-                    ),
+                        EgenregistreringRequest.validEgenregistrering(),
                 )
+                headers {
+                    append("Authorization", "Bearer ${token.serialize()}")
+                }
             }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -289,12 +311,16 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
     fun `gitt at egenregistrering inneholder kun BRA per etasje og ikke totalt BRA skal man få en bad request i respons`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
+            val token = mockOAuthServer.issueIDPortenJWT()
 
             val response = client.post("/v1/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                        EgenregistreringRequest.ugyldigEgenregistreringMedKunBruksarealPerEtasje(),
+                    EgenregistreringRequest.ugyldigEgenregistreringMedKunBruksarealPerEtasje(),
                 )
+                headers {
+                    append("Authorization", "Bearer ${token.serialize()}")
+                }
             }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)
@@ -304,6 +330,21 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             assertThat(body).all {
                 prop(ErrorResponse.BadRequestError::details).isNotNull().size().isEqualTo(1)
             }
+        }
+
+    @Test
+    fun `gitt manglende idporten token skal man ikke få lov til å kalle endepunktet`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+
+            val response = client.post("/v1/egenregistreringer") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    EgenregistreringRequest.validEgenregistrering(),
+                )
+            }
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.Unauthorized)
         }
 
     private fun Assert<List<BruksenhetResponse>>.withBruksenhetId(bruksenhetId: Long) =
