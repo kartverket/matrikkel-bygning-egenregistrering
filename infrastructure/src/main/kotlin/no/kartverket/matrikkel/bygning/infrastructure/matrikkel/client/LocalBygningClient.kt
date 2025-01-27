@@ -13,7 +13,7 @@ import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import java.time.Instant
 
-internal class LocalBygningClient : BygningClient {
+class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
             bruksenhetId = 1L,
