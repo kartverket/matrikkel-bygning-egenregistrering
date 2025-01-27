@@ -12,15 +12,18 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
+import no.kartverket.matrikkel.bygning.config.Env
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HealthRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
-import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
-import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
-import no.kartverket.matrikkel.bygning.plugins.configureAuthentication
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client.LocalBygningClient
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client.MatrikkelBygningClient
+import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
+import no.kartverket.matrikkel.bygning.plugins.authentication.configureAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
@@ -28,6 +31,7 @@ import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
 import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.eksternRouting
 import no.kartverket.matrikkel.bygning.routes.v1.intern.internRouting
+import java.net.URI
 
 fun main() {
     val internalPort = System.getenv("INTERNAL_PORT")?.toIntOrNull() ?: 8081
@@ -66,25 +70,29 @@ fun Application.mainModule() {
         ),
     )
 
+    val bygningClient =
+        if (Env.isLocal() && config.property("matrikkel.useStub").getString().toBoolean()) {
+            log.warn("Bruker stub for matrikkel APIet. Skal kun brukes lokalt!")
+            LocalBygningClient()
+        } else {
+            MatrikkelBygningClient(
+                MatrikkelApi(
+                    URI(config.property("matrikkel.baseUrl").getString()),
+                ).withAuth(
+                    config.property("matrikkel.username").getString(),
+                    config.property("matrikkel.password").getString(),
+                ),
+            )
+        }
+
     val egenregistreringRepository = EgenregistreringRepositoryImpl(dataSource)
-
-    val bygningClient = createBygningClient(
-        MatrikkelApiConfig(
-            useStub = config.property("matrikkel.useStub").getString().toBoolean(),
-            baseUrl = config.propertyOrNull("matrikkel.baseUrl")?.getString() ?: "",
-            username = config.propertyOrNull("matrikkel.username")?.getString() ?: "",
-            password = config.propertyOrNull("matrikkel.password")?.getString() ?: "",
-        ),
-    )
-
-
     val egenregistreringService = EgenregistreringService(bygningClient, egenregistreringRepository)
     val bygningService = BygningService(bygningClient, egenregistreringService)
 
     routing {
         // Routes for interne endepunkter.
         route("api.json") {
-            openApiSpec("intern")
+            openApiSpec(OpenApiSpecIds.INTERN)
         }
         route("swagger-ui") {
             swaggerUI("/api.json")
@@ -96,7 +104,7 @@ fun Application.mainModule() {
         // Routes for eksterne endepunkter.
         route("ekstern") {
             route("api.json") {
-                openApiSpec("ekstern")
+                openApiSpec(OpenApiSpecIds.EKSTERN)
             }
             route("swagger-ui") {
                 swaggerUI("/ekstern/api.json")

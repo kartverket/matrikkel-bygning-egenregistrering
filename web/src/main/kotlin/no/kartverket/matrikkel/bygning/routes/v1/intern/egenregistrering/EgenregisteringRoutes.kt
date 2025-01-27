@@ -13,8 +13,8 @@ import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.DigDirPrincipal
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.authentication.DigDirPrincipal
 import no.kartverket.matrikkel.bygning.routes.principalOrThrow
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse

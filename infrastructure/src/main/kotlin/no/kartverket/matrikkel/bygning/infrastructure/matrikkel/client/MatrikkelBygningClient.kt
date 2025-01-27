@@ -30,7 +30,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
-internal class MatrikkelBygningClient(
+class MatrikkelBygningClient(
     private val matrikkelApi: MatrikkelApi.WithAuth
 ) : BygningClient {
     private val log: Logger = LoggerFactory.getLogger(javaClass)

@@ -19,8 +19,8 @@ import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.ktor.server.application.*
-import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
 import java.time.Instant
 
 object OpenApiSpecIds {
