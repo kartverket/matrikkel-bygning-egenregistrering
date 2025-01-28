@@ -2,6 +2,7 @@ package no.kartverket.matrikkel.bygning.application.models
 
 import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
+import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
@@ -64,35 +65,31 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
             )
         },
         energikilder = this.energikilder.aggregate(bruksenhetRegistrering.energikildeRegistrering) {
-            it.energikilder?.map { registrertKilde ->
-                Energikilde(
-                    data = registrertKilde,
-                    metadata = metadata.withKildemateriale(it.kildemateriale),
-                )
-            }
+            Energikilde(
+                data = it.energikilder,
+                metadata = metadata.withKildemateriale(it.kildemateriale),
+            )
         },
         oppvarminger = this.oppvarminger.aggregate(bruksenhetRegistrering.oppvarmingRegistrering) {
-            it.oppvarminger?.map { registrertOppvarming ->
-                Oppvarming(
-                    data = registrertOppvarming,
-                    metadata = metadata.withKildemateriale(it.kildemateriale),
-                )
-            }
+            Oppvarming(
+                data = it.oppvarminger,
+                metadata = metadata.withKildemateriale(it.kildemateriale),
+            )
         },
 
         etasjer = this.etasjer.aggregate(
             registrering = bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer,
             shouldMapRegistrering = !this.isEgenregistrertBruksarealRegistreringPresent(),
-        ) {
-            it.map {
-                BruksenhetEtasje(
-                    etasjebetegnelse = it.etasjebetegnelse,
-                    bruksareal = Bruksareal(
-                        data = it.bruksareal,
-                        metadata = metadata.withKildemateriale(bruksenhetRegistrering.bruksarealRegistrering?.kildemateriale),
-                    ),
-                )
-            }
+        ) { etasjeBruksarealRegistreringer ->
+            BruksenhetEtasjer(
+                data = etasjeBruksarealRegistreringer.map {
+                    BruksenhetEtasje(
+                        etasjebetegnelse = it.etasjebetegnelse,
+                        bruksareal = it.bruksareal,
+                    )
+                },
+                metadata = metadata.withKildemateriale(bruksenhetRegistrering.bruksarealRegistrering?.kildemateriale),
+            )
         },
     )
 }

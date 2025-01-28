@@ -29,7 +29,7 @@ internal fun EgenregistreringRequest.Companion.validEgenregistrering() = Egenreg
             bruksarealRegistrering = BruksarealRegistreringRequest(
                 totaltBruksareal = 125.0,
                 etasjeRegistreringer = null,
-                kildemateriale = null,
+                kildemateriale = KildematerialeKode.Salgsoppgave,
             ),
             byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Selvrapportert),
             vannforsyningRegistrering = VannforsyningRegistreringRequest(
@@ -59,7 +59,7 @@ internal fun EgenregistreringRequest.Companion.ugyldigEgenregistreringMedKunBruk
             bruksenhetId = 1L,
             byggeaarRegistrering = null,
             bruksarealRegistrering = BruksarealRegistreringRequest(
-                totaltBruksareal = null,
+                totaltBruksareal = 50.0,
                 etasjeRegistreringer = listOf(
                     EtasjeBruksarealRegistreringRequest(
                         bruksareal = 125.0,

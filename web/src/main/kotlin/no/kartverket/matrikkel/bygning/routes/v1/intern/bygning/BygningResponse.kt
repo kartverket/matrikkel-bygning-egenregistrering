@@ -20,8 +20,8 @@ data class BygningResponse(
     val bruksareal: MultikildeResponse<BruksarealResponse>?,
     val vannforsyning: MultikildeResponse<VannforsyningKodeResponse>?,
     val avlop: MultikildeResponse<AvlopKodeResponse>?,
-    val energikilder: MultikildeResponse<List<EnergikildeResponse>>?,
-    val oppvarming: MultikildeResponse<List<OppvarmingResponse>>?,
+    val energikilder: MultikildeResponse<EnergikildeResponse>?,
+    val oppvarming: MultikildeResponse<OppvarmingResponse>?,
     val bruksenheter: List<BruksenhetResponse>,
 )
 
@@ -33,9 +33,15 @@ data class BygningSimpleResponse(
 )
 
 @Serializable
-    data class BruksenhetEtasjeResponse(
+data class BruksenhetEtasjerResponse(
+    val data: List<BruksenhetEtasjeResponse>,
+    val metadata: RegisterMetadataResponse
+)
+
+@Serializable
+data class BruksenhetEtasjeResponse(
     val etasjebetegnelse: EtasjeBetegnelseResponse,
-    val bruksareal: BruksarealResponse?,
+    val bruksareal: Double,
 )
 
 @Serializable
@@ -47,25 +53,25 @@ data class EtasjeBetegnelseResponse(
 @Serializable
 data class BruksenhetResponse(
     val bruksenhetId: Long,
-    val etasjer: MultikildeResponse<List<BruksenhetEtasjeResponse>>?,
+    val etasjer: MultikildeResponse<BruksenhetEtasjerResponse>?,
     val byggeaar: MultikildeResponse<ByggeaarResponse>?,
     val totaltBruksareal: MultikildeResponse<BruksarealResponse>?,
     val vannforsyning: MultikildeResponse<VannforsyningKodeResponse>?,
     val avlop: MultikildeResponse<AvlopKodeResponse>?,
-    val energikilder: MultikildeResponse<List<EnergikildeResponse>>?,
-    val oppvarminger: MultikildeResponse<List<OppvarmingResponse>>?,
+    val energikilder: MultikildeResponse<EnergikildeResponse>?,
+    val oppvarminger: MultikildeResponse<OppvarmingResponse>?,
 )
 
 @Serializable
 data class BruksenhetSimpleResponse(
     val bruksenhetId: Long,
-    val etasjer: List<BruksenhetEtasjeResponse>?,
+    val etasjer: BruksenhetEtasjerResponse?,
     val byggeaar: ByggeaarResponse?,
     val totaltBruksareal: BruksarealResponse?,
     val vannforsyning: VannforsyningKodeResponse?,
     val avlop: AvlopKodeResponse?,
-    val energikilder: List<EnergikildeResponse>?,
-    val oppvarminger: List<OppvarmingResponse>?,
+    val energikilder: EnergikildeResponse?,
+    val oppvarminger: OppvarmingResponse?,
 )
 
 @Serializable
@@ -73,27 +79,27 @@ data class RegisterMetadataResponse(
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
     val registrertAv: String,
-    val kildemateriale: KildematerialeKode? = null,
+    val kildemateriale: KildematerialeKode?,
     val prosess: ProsessKode?
 )
 
 @Serializable
-data class ByggeaarResponse(val data: Int?, val metadata: RegisterMetadataResponse)
+data class ByggeaarResponse(val data: Int, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class BruksarealResponse(val data: Double?, val metadata: RegisterMetadataResponse)
+data class BruksarealResponse(val data: Double, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class VannforsyningKodeResponse(val data: VannforsyningKode?, val metadata: RegisterMetadataResponse)
+data class VannforsyningKodeResponse(val data: VannforsyningKode, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class AvlopKodeResponse(val data: AvlopKode?, val metadata: RegisterMetadataResponse)
+data class AvlopKodeResponse(val data: AvlopKode, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class EnergikildeResponse(val data: EnergikildeKode?, val metadata: RegisterMetadataResponse)
+data class EnergikildeResponse(val data: List<EnergikildeKode>, val metadata: RegisterMetadataResponse)
 
 @Serializable
-data class OppvarmingResponse(val data: OppvarmingKode?, val metadata: RegisterMetadataResponse)
+data class OppvarmingResponse(val data: List<OppvarmingKode>, val metadata: RegisterMetadataResponse)
 
 
 fun RegisterMetadata.toRegisterMetadataResponse() = RegisterMetadataResponse(
@@ -119,8 +125,8 @@ fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
     bruksenheter = this.bruksenheter.map(Bruksenhet::toBruksenhetResponse),
     vannforsyning = this.vannforsyning.toMultikildeResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeResponse(Avlop::toAvlopKodeResponse),
-    energikilder = this.energikilder.toMultikildeResponse { map(Energikilde::toEnergikildeResponse) },
-    oppvarming = this.oppvarminger.toMultikildeResponse { map(Oppvarming::toOppvarmingResponse) },
+    energikilder = this.energikilder.toMultikildeResponse(Energikilde::toEnergikildeResponse),
+    oppvarming = this.oppvarminger.toMultikildeResponse(Oppvarming::toOppvarmingResponse),
 )
 
 fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
@@ -132,10 +138,10 @@ fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleRespon
 fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
     bruksenhetId = this.bruksenhetId.value,
     byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
-    etasjer = this.etasjer.toMultikildeResponse { map(BruksenhetEtasje::toBruksenhetEtasjeResponse) },
+    etasjer = this.etasjer.toMultikildeResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
     totaltBruksareal = this.totaltBruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
-    energikilder = this.energikilder.toMultikildeResponse { map(Energikilde::toEnergikildeResponse) },
-    oppvarminger = this.oppvarminger.toMultikildeResponse { map(Oppvarming::toOppvarmingResponse) },
+    energikilder = this.energikilder.toMultikildeResponse(Energikilde::toEnergikildeResponse),
+    oppvarminger = this.oppvarminger.toMultikildeResponse(Oppvarming::toOppvarmingResponse),
     vannforsyning = this.vannforsyning.toMultikildeResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeResponse(Avlop::toAvlopKodeResponse),
 )
@@ -143,48 +149,53 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
 fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
     bruksenhetId = this.bruksenhetId.value,
     byggeaar = this.byggeaar.egenregistrert?.toByggeaarResponse(),
-    etasjer = this.etasjer.egenregistrert?.map { it.toBruksenhetEtasjeResponse() },
+    etasjer = this.etasjer.egenregistrert?.toBruksenhetEtasjeResponse(),
     totaltBruksareal = this.totaltBruksareal.egenregistrert?.toBruksarealResponse(),
     vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
     avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
-    energikilder = this.energikilder.egenregistrert?.map { it.toEnergikildeResponse() },
-    oppvarminger = this.oppvarminger.egenregistrert?.map { it.toOppvarmingResponse() },
+    energikilder = this.energikilder.egenregistrert?.toEnergikildeResponse(),
+    oppvarminger = this.oppvarminger.egenregistrert?.toOppvarmingResponse(),
 )
 
-private fun BruksenhetEtasje.toBruksenhetEtasjeResponse(): BruksenhetEtasjeResponse = BruksenhetEtasjeResponse(
-    etasjebetegnelse = EtasjeBetegnelseResponse(
-        etasjeplanKode = etasjebetegnelse.etasjeplanKode.toString(),
-        etasjenummer = etasjebetegnelse.etasjenummer.loepenummer,
-    ),
-    bruksareal = this.bruksareal?.toBruksarealResponse(),
+private fun BruksenhetEtasjer.toBruksenhetEtasjeResponse(): BruksenhetEtasjerResponse = BruksenhetEtasjerResponse(
+    data = this.data.map {
+        BruksenhetEtasjeResponse(
+            bruksareal = it.bruksareal,
+            etasjebetegnelse = EtasjeBetegnelseResponse(
+                etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
+                etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer
+            )
+        )
+    },
+    metadata = this.metadata.toRegisterMetadataResponse()
 )
 
 private fun Byggeaar.toByggeaarResponse(): ByggeaarResponse = ByggeaarResponse(
     data = this.data,
-    metadata = metadata.toRegisterMetadataResponse(),
+    metadata = this.metadata.toRegisterMetadataResponse(),
 )
 
 private fun Bruksareal.toBruksarealResponse(): BruksarealResponse = BruksarealResponse(
     data = this.data,
-    metadata = metadata.toRegisterMetadataResponse(),
+    metadata = this.metadata.toRegisterMetadataResponse(),
 )
 
 private fun Vannforsyning.toVannforsyningResponse(): VannforsyningKodeResponse = VannforsyningKodeResponse(
     data = this.data,
-    metadata = metadata.toRegisterMetadataResponse(),
+    metadata = this.metadata.toRegisterMetadataResponse(),
 )
 
 private fun Avlop.toAvlopKodeResponse(): AvlopKodeResponse = AvlopKodeResponse(
     data = this.data,
-    metadata = metadata.toRegisterMetadataResponse(),
+    metadata = this.metadata.toRegisterMetadataResponse(),
 )
 
 private fun Energikilde.toEnergikildeResponse() = EnergikildeResponse(
     data = this.data,
-    metadata = metadata.toRegisterMetadataResponse(),
+    metadata = this.metadata.toRegisterMetadataResponse(),
 )
 
 private fun Oppvarming.toOppvarmingResponse() = OppvarmingResponse(
     data = this.data,
-    metadata = metadata.toRegisterMetadataResponse(),
+    metadata = this.metadata.toRegisterMetadataResponse(),
 )

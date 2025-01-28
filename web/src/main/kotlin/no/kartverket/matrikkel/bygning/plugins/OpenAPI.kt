@@ -14,9 +14,11 @@ import io.github.smiley4.schemakenerator.core.handleNameAnnotation
 import io.github.smiley4.schemakenerator.reflection.collectSubTypes
 import io.github.smiley4.schemakenerator.reflection.processReflection
 import io.github.smiley4.schemakenerator.swagger.compileReferencingRoot
+import io.github.smiley4.schemakenerator.swagger.customizeProperties
 import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.github.smiley4.schemakenerator.swagger.generateSwaggerSchema
 import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
+import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.ktor.server.application.*
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
@@ -60,7 +62,15 @@ private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, vers
                     .connectSubTypes()
                     .handleNameAnnotation()
                     .generateSwaggerSchema()
+                    // Setter nullable properties til ikke nullable i Swagger skjemaet
+                    // Gjør at vi unngår oneOf(null, type) i generert Swagger skjema.
+                    .customizeProperties { propertyData, propertySchema ->
+                        if (propertyData.nullable) {
+                            propertySchema.nullable = false
+                        }
+                    }
                     .handleCoreAnnotations()
+                    .handleSchemaAnnotations()
                     .withTitle(TitleType.SIMPLE)
                     .compileReferencingRoot()
             }

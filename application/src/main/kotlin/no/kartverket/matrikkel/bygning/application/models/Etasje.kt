@@ -1,12 +1,11 @@
 package no.kartverket.matrikkel.bygning.application.models
 
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 
 data class BygningEtasje(val etasjebetegnelse: Etasjebetegnelse, val etasjeId: Long)
 
-data class BruksenhetEtasje(val etasjebetegnelse: Etasjebetegnelse, val bruksareal: Bruksareal?)
+data class BruksenhetEtasje(val etasjebetegnelse: Etasjebetegnelse, val bruksareal: Double)
 
 @ConsistentCopyVisibility
 @Serializable

@@ -2,13 +2,13 @@ package no.kartverket.matrikkel.bygning.v1.intern.bygning
 
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.containsExactly
 import assertk.assertions.hasSize
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
-import assertk.assertions.single
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -117,12 +117,12 @@ class BygningRouteTest : TestApplicationWithDb() {
                     prop(AvlopKodeResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
                     prop(AvlopKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
-                prop(BruksenhetSimpleResponse::oppvarminger).isNotNull().single().all {
-                    prop(OppvarmingResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                prop(BruksenhetSimpleResponse::oppvarminger).isNotNull().all {
+                    prop(OppvarmingResponse::data).containsExactly(OppvarmingKode.Elektrisk)
                     prop(OppvarmingResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
-                prop(BruksenhetSimpleResponse::energikilder).isNotNull().single().all {
-                    prop(EnergikildeResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                prop(BruksenhetSimpleResponse::energikilder).isNotNull().all {
+                    prop(EnergikildeResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
                     prop(EnergikildeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }

@@ -9,7 +9,6 @@ import assertk.assertions.isNull
 import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetEtasje
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
@@ -21,6 +20,7 @@ import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegist
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
+import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
@@ -51,7 +51,7 @@ class BygningEgenregistreringAggregeringTest {
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
-            kildemateriale = null,
+            kildemateriale = KildematerialeKode.Salgsoppgave,
         ),
         byggeaarRegistrering = null,
         energikildeRegistrering = null,
@@ -197,7 +197,7 @@ class BygningEgenregistreringAggregeringTest {
                                     ),
                                 ),
                             ),
-                            kildemateriale = null,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
                         ),
 
                         ),
@@ -212,7 +212,7 @@ class BygningEgenregistreringAggregeringTest {
         assertThat(aggregatedBygning).all {
             prop(Bygning::bruksenheter).index(0).all {
                 prop(Bruksenhet::etasjer).all {
-                    prop(Multikilde<List<BruksenhetEtasje>>::egenregistrert).isNull()
+                    prop(Multikilde<BruksenhetEtasjer>::egenregistrert).isNull()
                 }
                 prop(Bruksenhet::totaltBruksareal).all {
                     prop(Multikilde<Bruksareal>::egenregistrert).isNotNull().all {

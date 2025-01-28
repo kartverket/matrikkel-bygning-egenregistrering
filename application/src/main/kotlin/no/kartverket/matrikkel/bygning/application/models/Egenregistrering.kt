@@ -11,26 +11,24 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Vannforsyni
 import java.time.Instant
 import java.util.*
 
-// Er HasKildemateriale det beste navnet her?
 sealed interface HasKildemateriale {
-    // Skal den være nullable?
-    val kildemateriale: KildematerialeKode?
+    val kildemateriale: KildematerialeKode
 }
 
 @Serializable
 data class ByggeaarRegistrering(
-    val byggeaar: Int?,
-    override val kildemateriale: KildematerialeKode?
+    val byggeaar: Int,
+    override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
 @Serializable
 data class BruksarealRegistrering(
-    val totaltBruksareal: Double?,
+    val totaltBruksareal: Double,
     val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?,
-    override val kildemateriale: KildematerialeKode?
+    override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale {
     fun isTotaltBruksarealEqualTotaltEtasjeArealIfSet(): Boolean {
-        if (totaltBruksareal == null || etasjeRegistreringer == null) {
+        if (etasjeRegistreringer == null) {
             return true
         }
 
@@ -38,38 +36,38 @@ data class BruksarealRegistrering(
     }
 
     fun totaltEtasjeAreal(): Double {
-        return etasjeRegistreringer?.sumOf { it.bruksareal ?: 0.0 } ?: 0.0
+        return etasjeRegistreringer?.sumOf { it.bruksareal } ?: 0.0
     }
 }
 
 @Serializable
 data class EtasjeBruksarealRegistrering(
-    val bruksareal: Double?,
+    val bruksareal: Double,
     val etasjebetegnelse: Etasjebetegnelse,
 )
 
 @Serializable
 data class VannforsyningRegistrering(
-    val vannforsyning: VannforsyningKode?,
-    override val kildemateriale: KildematerialeKode?
+    val vannforsyning: VannforsyningKode,
+    override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
 @Serializable
 data class AvlopRegistrering(
-    val avlop: AvlopKode?,
-    override val kildemateriale: KildematerialeKode?
+    val avlop: AvlopKode,
+    override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
 @Serializable
 data class EnergikildeRegistrering(
-    val energikilder: List<EnergikildeKode>?,
-    override val kildemateriale: KildematerialeKode?
+    val energikilder: List<EnergikildeKode>,
+    override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
 @Serializable
 data class OppvarmingRegistrering(
-    val oppvarminger: List<OppvarmingKode>?,
-    override val kildemateriale: KildematerialeKode?
+    val oppvarminger: List<OppvarmingKode>,
+    override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
 

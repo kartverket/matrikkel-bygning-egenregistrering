@@ -16,7 +16,6 @@ data class BygningEksternResponse(
     val bruksenheter: List<BruksenhetEksternResponse>,
 )
 
-
 @Serializable
 data class BruksenhetEksternResponse(
     val bruksenhetId: Long,
@@ -24,54 +23,49 @@ data class BruksenhetEksternResponse(
     val totaltBruksareal: BruksarealEksternResponse?,
     val vannforsyning: VannforsyningKodeEksternResponse?,
     val avlop: AvlopKodeEksternResponse?,
-    val energikilder: List<EnergikildeEksternResponse>?,
-    val oppvarminger: List<OppvarmingEksternResponse>?,
+    val energikilder: EnergikildeEksternResponse?,
+    val oppvarminger: OppvarmingEksternResponse?,
 )
 
 sealed interface FeltEksternResponse<T> {
-    val data: T?
+    val data: T
     val metadata: RegisterMetadataEksternResponse
 
     @Serializable
     data class ByggeaarEksternResponse(
-        override val data: Int?,
+        override val data: Int,
         override val metadata: RegisterMetadataEksternResponse
-    ) :
-        FeltEksternResponse<Int?>
+    ) : FeltEksternResponse<Int>
 
     @Serializable
     data class BruksarealEksternResponse(
-        override val data: Double?,
+        override val data: Double,
         override val metadata: RegisterMetadataEksternResponse
-    ) :
-        FeltEksternResponse<Double?>
+    ) : FeltEksternResponse<Double>
 
     @Serializable
     data class VannforsyningKodeEksternResponse(
-        override val data: VannforsyningKode?,
+        override val data: VannforsyningKode,
         override val metadata: RegisterMetadataEksternResponse
-    ) : FeltEksternResponse<VannforsyningKode?>
+    ) : FeltEksternResponse<VannforsyningKode>
 
     @Serializable
     data class AvlopKodeEksternResponse(
-        override val data: AvlopKode?,
+        override val data: AvlopKode,
         override val metadata: RegisterMetadataEksternResponse
-    ) :
-        FeltEksternResponse<AvlopKode?>
+    ) : FeltEksternResponse<AvlopKode>
 
     @Serializable
     data class EnergikildeEksternResponse(
-        override val data: EnergikildeKode?,
+        override val data: List<EnergikildeKode>,
         override val metadata: RegisterMetadataEksternResponse
-    ) :
-        FeltEksternResponse<EnergikildeKode?>
+    ) : FeltEksternResponse<List<EnergikildeKode>>
 
     @Serializable
     data class OppvarmingEksternResponse(
-        override val data: OppvarmingKode?,
+        override val data: List<OppvarmingKode>,
         override val metadata: RegisterMetadataEksternResponse
-    ) :
-        FeltEksternResponse<OppvarmingKode>
+    ) : FeltEksternResponse<List<OppvarmingKode>>
 }
 
 
@@ -91,9 +85,9 @@ fun Bygning.toBygningEksternResponse(): BygningEksternResponse = BygningEksternR
     },
 )
 
-private fun <U, T : Felt<U?>, O : FeltEksternResponse<U>?> toFeltEksternResponse(
+private fun <U, T : Felt<U>, O : FeltEksternResponse<U>?> toFeltEksternResponse(
     felt: T?,
-    constructor: (U?, RegisterMetadataEksternResponse) -> O,
+    constructor: (U, RegisterMetadataEksternResponse) -> O,
 ): O? {
     if (felt == null) {
         return null
@@ -114,10 +108,6 @@ private fun Bruksenhet.toBruksenhetEksternResponse(): BruksenhetEksternResponse 
     totaltBruksareal = toFeltEksternResponse(this.totaltBruksareal.egenregistrert, ::BruksarealEksternResponse),
     vannforsyning = toFeltEksternResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeEksternResponse),
     avlop = toFeltEksternResponse(this.avlop.egenregistrert, ::AvlopKodeEksternResponse),
-    energikilder = this.energikilder.egenregistrert?.mapNotNull { energikilde ->
-        toFeltEksternResponse(energikilde, ::EnergikildeEksternResponse)
-    },
-    oppvarminger = this.oppvarminger.egenregistrert?.mapNotNull { oppvarming ->
-        toFeltEksternResponse(oppvarming, ::OppvarmingEksternResponse)
-    },
+    energikilder = toFeltEksternResponse(this.energikilder.egenregistrert, ::EnergikildeEksternResponse),
+    oppvarminger = toFeltEksternResponse(this.oppvarminger.egenregistrert, ::OppvarmingEksternResponse)
 )

@@ -12,7 +12,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import java.util.*
 
-@OptIn(ExperimentalSerializationApi::class)
 fun Application.configureHTTP() {
     install(ContentNegotiation) {
         json(
