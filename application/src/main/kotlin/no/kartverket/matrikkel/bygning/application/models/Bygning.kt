@@ -22,7 +22,7 @@ import java.util.*
 data class Bygning(
     @Serializable(with = UUIDSerializer::class)
     val id: UUID,
-    val bygningId: Long,
+    val bygningBubbleId: Long,
     val bygningsnummer: Long,
     val etasjer: List<BygningEtasje>,
     val bruksenheter: List<Bruksenhet>,
@@ -71,7 +71,7 @@ sealed interface Felt<T> {
 data class Bruksenhet(
     @Serializable(with = UUIDSerializer::class)
     val id: UUID,
-    val bruksenhetId: Long,
+    val bruksenhetBubbleId: Long,
     @Serializable(with = UUIDSerializer::class)
     val bygningId: UUID,
     val etasjer: Multikilde<List<BruksenhetEtasje>> = Multikilde(),

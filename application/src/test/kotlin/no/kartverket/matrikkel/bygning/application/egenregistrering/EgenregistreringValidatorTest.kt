@@ -23,11 +23,16 @@ import java.util.*
 import kotlin.test.Test
 
 class EgenregistreringValidatorTest {
+    val bygningId: UUID = UUID.fromString("00000000-0000-0000-0000-000000000001")
     private val baseBygning = Bygning(
-        bygningId = 1L, bygningsnummer = 100L,
+        id = bygningId,
+        bygningBubbleId = 1L, bygningsnummer = 100L,
         bruksenheter = listOf(
             Bruksenhet(
-                bruksenhetId = 1L, bygningId = 1L, etasjer = Multikilde(),
+                id = UUID.fromString("00000000-0000-0000-0001-000000000001"),
+                bruksenhetBubbleId = 1L,
+                bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+                etasjer = Multikilde(),
             ),
         ),
         etasjer = emptyList(),
@@ -51,7 +56,7 @@ class EgenregistreringValidatorTest {
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
-                            bruksenhetId = 1L,
+                            bruksenhetBubbleId = 1L,
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
@@ -60,7 +65,7 @@ class EgenregistreringValidatorTest {
                             avlopRegistrering = null,
                         ),
                         BruksenhetRegistrering(
-                            bruksenhetId = 1L,
+                            bruksenhetBubbleId = 1L,
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
@@ -86,7 +91,7 @@ class EgenregistreringValidatorTest {
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
-                            bruksenhetId = 3L,
+                            bruksenhetBubbleId = 3L,
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
@@ -112,7 +117,7 @@ class EgenregistreringValidatorTest {
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
-                            bruksenhetId = 1L,
+                            bruksenhetBubbleId = 1L,
                             bruksarealRegistrering = BruksarealRegistrering(
                                 totaltBruksareal = 50.0,
                                 etasjeRegistreringer = listOf(
@@ -150,7 +155,7 @@ class EgenregistreringValidatorTest {
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
-                            bruksenhetId = 1L,
+                            bruksenhetBubbleId = 1L,
                             bruksarealRegistrering = BruksarealRegistrering(
                                 totaltBruksareal = null,
                                 etasjeRegistreringer = listOf(

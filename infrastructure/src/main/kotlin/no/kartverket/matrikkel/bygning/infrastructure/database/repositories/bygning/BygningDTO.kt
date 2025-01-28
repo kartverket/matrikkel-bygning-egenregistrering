@@ -6,7 +6,7 @@ import java.time.Instant
 
 internal fun Bruksenhet.toDTO() = BruksenhetDTO(
     id = id,
-    bruksenhetId = bruksenhetId,
+    bruksenhetId = bruksenhetBubbleId,
     bygningId = bygningId,
     // Kanskje ikke beste stedet å lage registreringstidspunktet?
     registreringstidspunkt = Instant.now(),

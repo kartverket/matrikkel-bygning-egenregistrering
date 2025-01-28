@@ -15,7 +15,6 @@ class BygningService(
         return bygningClient.getBygningById(bygningId).map { bygning ->
             bygning.copy(
                 bruksenheter = bygning.bruksenheter.map { bruksenhet ->
-                    // TODO Batchoperasjon
                     bygningRepository.getBruksenhetById(bruksenhet.id) ?: bruksenhet
                 },
             )
@@ -23,16 +22,13 @@ class BygningService(
     }
 
     fun createBruksenhetSnapshotsOfEgenregistrering(bygning: Bygning, egenregistrering: Egenregistrering) {
-        val bruksenheterRegistrert = egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistrering ->
+        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
             val bruksenhetInBygning =
-                bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetId == bruksenhetRegistrering.bruksenhetId }
+                bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetBubbleId == bruksenhetRegistrering.bruksenhetBubbleId }
 
-            bruksenhetInBygning?.withEgenregistrertData(listOf(egenregistrering))
-        }
-
-        bruksenheterRegistrert.forEach { bruksenhet ->
-            // TODO Nå lagrer man én og én bruksenhet i databasen, kan det være hensiktsmessig å lagre alle samtidig?
-            bygningRepository.saveBruksenhet(bruksenhet)
+            bruksenhetInBygning?.withEgenregistrertData(egenregistrering)?.let { bruksenhet ->
+                bygningRepository.saveBruksenhet(bruksenhet)
+            }
         }
     }
 }

@@ -85,7 +85,7 @@ class MatrikkelBygningClientTest {
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-12T00:00:00.00Z"))
 
         assertThat(bygning.value, "bygning").all {
-            prop(Bygning::bygningId).isEqualTo(1L)
+            prop(Bygning::bygningBubbleId).isEqualTo(1L)
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
                 // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
@@ -97,7 +97,7 @@ class MatrikkelBygningClientTest {
             prop(Bygning::energikilder).isEmpty()
             prop(Bygning::oppvarminger).isEmpty()
             prop(Bygning::bruksenheter).single().all {
-                prop(Bruksenhet::bruksenhetId).isEqualTo(2L)
+                prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(2L)
                 prop(Bruksenhet::bygningId).isEqualTo(1L)
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
@@ -163,7 +163,7 @@ class MatrikkelBygningClientTest {
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-13T00:00:00.00Z"))
 
         assertThat(bygning.value, "bygning").isNotNull().all {
-            prop(Bygning::bygningId).isEqualTo(1L)
+            prop(Bygning::bygningBubbleId).isEqualTo(1L)
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
                 prop(Bruksareal::data).isEqualTo(150.0)
@@ -196,7 +196,7 @@ class MatrikkelBygningClientTest {
                 }
             }
             prop(Bygning::bruksenheter).single().all {
-                prop(Bruksenhet::bruksenhetId).isEqualTo(2L)
+                prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(2L)
                 prop(Bruksenhet::bygningId).isEqualTo(1L)
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     prop(Bruksareal::data).isEqualTo(140.0)

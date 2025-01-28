@@ -18,22 +18,22 @@ internal class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
-            bruksenhetId = 1L,
+            bruksenhetBubbleId = 1L,
             bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
-            bruksenhetId = 2L,
+            bruksenhetBubbleId = 2L,
             bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000003"),
-            bruksenhetId = 3L,
+            bruksenhetBubbleId = 3L,
             bygningId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
         ),
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000004"),
-            bruksenhetId = 4L,
+            bruksenhetBubbleId = 4L,
             bygningId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
         ),
     )
@@ -41,7 +41,7 @@ internal class LocalBygningClient : BygningClient {
     private val bygninger: List<Bygning> = listOf(
         Bygning(
             id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
-            bygningId = 1L,
+            bygningBubbleId = 1L,
             bygningsnummer = 100L,
             bruksenheter = bruksenheter.subList(0, 2),
             bruksareal = Multikilde(
@@ -58,7 +58,7 @@ internal class LocalBygningClient : BygningClient {
             etasjer = emptyList(),
         ),
         Bygning(
-            bygningId = 2L,
+            bygningBubbleId = 2L,
             bygningsnummer = 200L,
             id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
             bruksenheter = bruksenheter.subList(2, 4),
@@ -68,7 +68,7 @@ internal class LocalBygningClient : BygningClient {
 
     override fun getBygningById(id: Long): Result<Bygning, DomainError> {
         return bygninger
-            .find { it.bygningId == id }
+            .find { it.bygningBubbleId == id }
             .toResultOr {
                 BygningNotFound(message = "Bygning med ID $id finnes ikke i matrikkelen")
             }

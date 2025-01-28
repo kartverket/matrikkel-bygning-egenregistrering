@@ -32,20 +32,24 @@ import java.util.*
 import kotlin.test.Test
 
 class BygningEgenregistreringAggregeringTest {
+    private val bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001")
+
     private val defaultBruksenhet = Bruksenhet(
-        bruksenhetId = 1L,
-        bygningId = 1L,
+        id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+        bruksenhetBubbleId = 1L,
+        bygningId = bygningId,
     )
 
     private val defaultBygning = Bygning(
-        bygningId = 1L,
+        id = bygningId,
+        bygningBubbleId = 1L,
         bygningsnummer = 100,
         bruksenheter = listOf(defaultBruksenhet),
         etasjer = emptyList(),
     )
 
     private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
-        bruksenhetId = 1L,
+        bruksenhetBubbleId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
@@ -72,7 +76,7 @@ class BygningEgenregistreringAggregeringTest {
     )
 
     private val bruksenhetRegistreringMedKildematerialeKode = BruksenhetRegistrering(
-        bruksenhetId = 1L,
+        bruksenhetBubbleId = 1L,
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,

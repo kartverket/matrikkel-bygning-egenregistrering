@@ -16,14 +16,8 @@ class EgenregistreringService(
             .andThen { bygning ->
                 EgenregistreringValidator.validateEgenregistrering(egenregistrering, bygning).map { bygning }
             }
-            // Er det snålt å mappe her når vi bare ønsker å returnere unit? Burde vi returnere noe annet?
             .map { bygning ->
-                // TODO Transaksjon på hele greia?
-
-                // TODO Lagrer bare hele egenregistreringen nå, skal det være noe mer? Noe mindre?
                 egenregistreringRepository.saveEgenregistrering(egenregistrering)
-
-                // TODO Navngivning
                 bygningService.createBruksenhetSnapshotsOfEgenregistrering(bygning, egenregistrering)
             }
     }

@@ -29,7 +29,6 @@ data class BruksenhetDTO(
     val bruksenhetData: Bruksenhet,
 )
 
-
 class BygningRepositoryImpl(private val dataSource: DataSource) : BygningRepository {
     override fun saveBruksenhet(bruksenhet: Bruksenhet) {
         val bruksenhetToSave = bruksenhet.toDTO()
@@ -96,7 +95,7 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
 
             Bruksenhet(
                 id = bruksenhetDTO.id,
-                bruksenhetId = bruksenhetDTO.bruksenhetId,
+                bruksenhetBubbleId = bruksenhetDTO.bruksenhetId,
                 bygningId = bruksenhetDTO.bygningId,
                 etasjer = bruksenhetDTO.bruksenhetData.etasjer,
                 byggeaar = bruksenhetDTO.bruksenhetData.byggeaar,

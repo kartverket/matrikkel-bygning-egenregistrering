@@ -53,7 +53,7 @@ internal class MatrikkelBygningClient(
             return Ok(
                 Bygning(
                     id = UUID.fromString(bygning.uuid.toString()),
-                    bygningId = bygning.id.value,
+                    bygningBubbleId = bygning.id.value,
                     bygningsnummer = bygning.bygningsnummer,
                     byggeaar = Multikilde(
                         autoritativ = deriveByggeaarForBygning(bygning),
@@ -112,7 +112,7 @@ internal class MatrikkelBygningClient(
 
                         Bruksenhet(
                             id = UUID.fromString(it.uuid.toString()),
-                            bruksenhetId = it.id.value,
+                            bruksenhetBubbleId = it.id.value,
                             bygningId = UUID.fromString(bygning.uuid.toString()),
                             // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                             totaltBruksareal = Multikilde(

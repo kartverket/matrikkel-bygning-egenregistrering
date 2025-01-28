@@ -25,7 +25,7 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
 
 private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Bruksenhet {
     val bruksenhetRegistrering =
-        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetId == this.bruksenhetId }
+        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetBubbleId == this.bruksenhetBubbleId }
     if (bruksenhetRegistrering == null) {
         return this
     }
@@ -104,6 +104,10 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
     return egenregistreringer.fold(this) { bruksenhetAggregate, egenregistrering ->
         bruksenhetAggregate.applyEgenregistrering(egenregistrering)
     }
+}
+
+fun Bruksenhet.withEgenregistrertData(egenregistrering: Egenregistrering): Bruksenhet {
+    return this.withEgenregistrertData(listOf(egenregistrering))
 }
 
 private fun <T : Any, V : Any> Multikilde<T>.aggregate(

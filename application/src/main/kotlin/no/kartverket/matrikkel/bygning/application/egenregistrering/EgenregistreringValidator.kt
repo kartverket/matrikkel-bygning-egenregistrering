@@ -29,10 +29,10 @@ class EgenregistreringValidator {
             egenregistrering: Egenregistrering, bygning: Bygning
         ): ValidationError? {
             val invalidBruksenheter = egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistering ->
-                val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
+                val bruksenhet = bygning.bruksenheter.find { it.bruksenhetBubbleId == bruksenhetRegistering.bruksenhetBubbleId }
 
                 if (bruksenhet == null) {
-                    bruksenhetRegistering.bruksenhetId
+                    bruksenhetRegistering.bruksenhetBubbleId
                 } else {
                     null
                 }
@@ -40,7 +40,7 @@ class EgenregistreringValidator {
 
             if (invalidBruksenheter.isNotEmpty()) {
                 return ValidationError(
-                    message = "Bruksenhet${if (invalidBruksenheter.size > 1) "er" else ""} med ID ${invalidBruksenheter.joinToString()} finnes ikke i bygning med ID ${bygning.bygningId}",
+                    message = "Bruksenhet${if (invalidBruksenheter.size > 1) "er" else ""} med ID ${invalidBruksenheter.joinToString()} finnes ikke i bygning med ID ${bygning.bygningBubbleId}",
                 )
             }
 
@@ -49,7 +49,7 @@ class EgenregistreringValidator {
 
         private fun validateRepeatedBruksenheter(egenregistrering: Egenregistrering): ValidationError? {
             val repeatedBruksenheter =
-                egenregistrering.bygningRegistrering.bruksenhetRegistreringer.groupBy { it.bruksenhetId }.filter { it.value.size > 1 }
+                egenregistrering.bygningRegistrering.bruksenhetRegistreringer.groupBy { it.bruksenhetBubbleId }.filter { it.value.size > 1 }
                     .map { it.key }
 
 
@@ -69,7 +69,7 @@ class EgenregistreringValidator {
                 }
                 .map { invalidRegistrering ->
                     ValidationError(
-                        message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetId} har registrert totalt BRA og BRA per etasje, men totalt BRA stemmer ikke overens med totalen av BRA per etasje",
+                        message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetBubbleId} har registrert totalt BRA og BRA per etasje, men totalt BRA stemmer ikke overens med totalen av BRA per etasje",
                     )
                 }
 
@@ -82,7 +82,7 @@ class EgenregistreringValidator {
                 }
                 .map { invalidRegistrering ->
                     ValidationError(
-                        message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetId} har registrert BRA per etasje, men ikke totalt BRA. Totalt BRA er obligatorisk.",
+                        message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetBubbleId} har registrert BRA per etasje, men ikke totalt BRA. Totalt BRA er obligatorisk.",
                     )
                 }
 
