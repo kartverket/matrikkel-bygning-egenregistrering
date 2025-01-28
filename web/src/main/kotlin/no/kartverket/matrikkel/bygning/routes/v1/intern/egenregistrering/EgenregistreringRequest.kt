@@ -102,7 +102,7 @@ fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Etasje
 
 fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
     return BruksenhetRegistrering(
-        bruksenhetId = bruksenhetId,
+        bruksenhetBubbleId = bruksenhetId,
         bruksarealRegistrering = bruksarealRegistrering?.let {
             BruksarealRegistrering(
                 totaltBruksareal = it.totaltBruksareal,

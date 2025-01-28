@@ -81,7 +81,7 @@ data class BygningRegistrering(
 
 @Serializable
 data class BruksenhetRegistrering(
-    val bruksenhetId: Long,
+    val bruksenhetBubbleId: Long,
     val bruksarealRegistrering: BruksarealRegistrering?,
     val byggeaarRegistrering: ByggeaarRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,
