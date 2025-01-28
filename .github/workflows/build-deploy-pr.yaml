@@ -19,10 +19,16 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Java
         uses: ./.github/actions/setup-java
+      - name: Setup Octo STS
+        uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f
+        id: octo-sts
+        with:
+          scope: kartverket/matrikkelapi-v1-wsclient
+          identity: bygning
       - name: Run build and integration tests
         run: ./gradlew build integrationTest
         env:
-          KV_PACKAGES_PAT: ${{ secrets.KV_PACKAGES_PAT }}
+          KV_PACKAGES_PAT: ${{ steps.octo-sts.outputs.token }}
       - name: Build and push docker
         id: docker
         uses: ./.github/actions/build-push-docker-pr
