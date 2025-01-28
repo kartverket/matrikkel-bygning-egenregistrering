@@ -3,12 +3,12 @@ package no.kartverket.matrikkel.bygning.v1.intern.egenregistrering
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.containsExactly
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
-import assertk.assertions.single
 import assertk.assertions.size
 import assertk.assertions.support.appendName
 import io.ktor.client.call.*
@@ -124,15 +124,15 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                     }
 
                     prop(BruksenhetResponse::energikilder).isNotNull().all {
-                        prop(MultikildeResponse<List<EnergikildeResponse>>::egenregistrert).isNotNull().single().all {
-                            prop(EnergikildeResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                        prop(MultikildeResponse<EnergikildeResponse>::egenregistrert).isNotNull().all {
+                            prop(EnergikildeResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
                             prop(EnergikildeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
                     prop(BruksenhetResponse::oppvarminger).isNotNull().all {
-                        prop(MultikildeResponse<List<OppvarmingResponse>>::egenregistrert).isNotNull().single().all {
-                            prop(OppvarmingResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                        prop(MultikildeResponse<OppvarmingResponse>::egenregistrert).isNotNull().all {
+                            prop(OppvarmingResponse::data).containsExactly(OppvarmingKode.Elektrisk)
                             prop(OppvarmingResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
@@ -181,15 +181,15 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             }
 
             prop(BruksenhetResponse::energikilder).isNotNull().all {
-                prop(MultikildeResponse<List<EnergikildeResponse>>::egenregistrert).isNotNull().single().all {
-                    prop(EnergikildeResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                prop(MultikildeResponse<EnergikildeResponse>::egenregistrert).isNotNull().all {
+                    prop(EnergikildeResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
                     prop(EnergikildeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
 
             prop(BruksenhetResponse::oppvarminger).isNotNull().all {
-                prop(MultikildeResponse<List<OppvarmingResponse>>::egenregistrert).isNotNull().single().all {
-                    prop(OppvarmingResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                prop(MultikildeResponse<OppvarmingResponse>::egenregistrert).isNotNull().all {
+                    prop(OppvarmingResponse::data).containsExactly(OppvarmingKode.Elektrisk)
                     prop(OppvarmingResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
@@ -223,7 +223,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                                 bruksarealRegistrering = BruksarealRegistreringRequest(
                                     totaltBruksareal = 40.0,
                                     etasjeRegistreringer = null,
-                                    kildemateriale = null,
+                                    kildemateriale = KildematerialeKode.Salgsoppgave,
                                 ),
                                 byggeaarRegistrering = ByggeaarRegistreringRequest(
                                     byggeaar = 2008,
@@ -308,7 +308,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         }
 
     @Test
-    fun `gitt at egenregistrering inneholder kun BRA per etasje og ikke totalt BRA skal man få en bad request i respons`() =
+    fun `gitt at egenregistrering inneholder differanse mellom etasje BRA summert og total BRA kal man få en bad request`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
             val token = mockOAuthServer.issueIDPortenJWT()

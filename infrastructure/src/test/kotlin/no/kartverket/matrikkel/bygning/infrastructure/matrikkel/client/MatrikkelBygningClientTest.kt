@@ -3,9 +3,7 @@ package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.each
-import assertk.assertions.exactly
-import assertk.assertions.hasSize
+import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.prop
@@ -180,22 +178,12 @@ class MatrikkelBygningClientTest {
                 prop(Vannforsyning::metadata).isMatrikkelfoertBygningstidspunkt()
             }
             prop(Bygning::energikilder).erAutoritativIkkeEgenregistrert {
-                hasSize(2)
-                exactly(1) {
-                    it.prop(Energikilde::data).isEqualTo(EnergikildeKode.Elektrisitet)
-                }
-                exactly(1) {
-                    it.prop(Energikilde::data).isEqualTo(EnergikildeKode.Varmepumpe)
-                }
-                each {
-                    it.prop(Energikilde::metadata).isMatrikkelfoertBygningstidspunkt()
-                }
+                prop(Energikilde::data).containsExactly(EnergikildeKode.Elektrisitet, EnergikildeKode.Varmepumpe)
+                prop(Energikilde::metadata).isMatrikkelfoertBygningstidspunkt()
             }
             prop(Bygning::oppvarminger).erAutoritativIkkeEgenregistrert {
-                single().all {
-                    prop(Oppvarming::data).isEqualTo(OppvarmingKode.Elektrisk)
-                    prop(Oppvarming::metadata).isMatrikkelfoertBygningstidspunkt()
-                }
+                prop(Oppvarming::data).containsExactly(OppvarmingKode.Elektrisk)
+                prop(Oppvarming::metadata).isMatrikkelfoertBygningstidspunkt()
             }
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetId).isEqualTo(BruksenhetId(2L))

@@ -38,13 +38,14 @@ data class BruksenhetRegistreringRequest(
 
 @Serializable
 data class EgenregistreringRequest(
-    val bygningId: Long, val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
+    val bygningId: Long,
+    val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>
 )
 
 @Serializable
 data class ByggeaarRegistreringRequest(
-    val byggeaar: Int?,
-    val kildemateriale: KildematerialeKode?,
+    val byggeaar: Int,
+    val kildemateriale: KildematerialeKode,
 )
 
 @Serializable
@@ -55,39 +56,39 @@ data class EtasjeBetegnelseRequest(
 
 @Serializable
 data class EtasjeBruksarealRegistreringRequest(
-    val bruksareal: Double?,
+    val bruksareal: Double,
     val etasjebetegnelse: EtasjeBetegnelseRequest,
 )
 
 @Serializable
 data class BruksarealRegistreringRequest(
-    val totaltBruksareal: Double?,
+    val totaltBruksareal: Double,
     val etasjeRegistreringer: List<EtasjeBruksarealRegistreringRequest>?,
-    val kildemateriale: KildematerialeKode?,
+    val kildemateriale: KildematerialeKode,
 )
 
 @Serializable
 data class VannforsyningRegistreringRequest(
-    val vannforsyning: VannforsyningKode?,
-    val kildemateriale: KildematerialeKode?,
+    val vannforsyning: VannforsyningKode,
+    val kildemateriale: KildematerialeKode,
 )
 
 @Serializable
 data class AvlopRegistreringRequest(
-    val avlop: AvlopKode?,
-    val kildemateriale: KildematerialeKode?,
+    val avlop: AvlopKode,
+    val kildemateriale: KildematerialeKode,
 )
 
 @Serializable
 data class EnergikildeRegistreringRequest(
-    val energikilder: List<EnergikildeKode>?,
-    val kildemateriale: KildematerialeKode?,
+    val energikilder: List<EnergikildeKode>,
+    val kildemateriale: KildematerialeKode,
 )
 
 @Serializable
 data class OppvarmingRegistreringRequest(
-    val oppvarminger: List<OppvarmingKode>?,
-    val kildemateriale: KildematerialeKode?,
+    val oppvarminger: List<OppvarmingKode>,
+    val kildemateriale: KildematerialeKode,
 )
 
 fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
@@ -103,13 +104,13 @@ fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Etasje
 fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
     return BruksenhetRegistrering(
         bruksenhetId = bruksenhetId,
-        bruksarealRegistrering = bruksarealRegistrering?.let {
+        bruksarealRegistrering = bruksarealRegistrering?.let { bruksarealRegistrering ->
             BruksarealRegistrering(
-                totaltBruksareal = it.totaltBruksareal,
-                etasjeRegistreringer = it.etasjeRegistreringer?.map {
+                totaltBruksareal = bruksarealRegistrering.totaltBruksareal,
+                etasjeRegistreringer = bruksarealRegistrering.etasjeRegistreringer?.map {
                     it.toEtasjeBruksarealRegistrering()
                 },
-                kildemateriale = it.kildemateriale,
+                kildemateriale = bruksarealRegistrering.kildemateriale,
             )
         },
         byggeaarRegistrering = byggeaarRegistrering?.let {
@@ -155,9 +156,9 @@ fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering {
         prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,
-            bruksenhetRegistreringer = this.bruksenhetRegistreringer?.map { bruksenhetRegistrering ->
+            bruksenhetRegistreringer = this.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
                 bruksenhetRegistrering.toBruksenhetRegistrering()
-            } ?: emptyList(),
+            },
         ),
     )
 }

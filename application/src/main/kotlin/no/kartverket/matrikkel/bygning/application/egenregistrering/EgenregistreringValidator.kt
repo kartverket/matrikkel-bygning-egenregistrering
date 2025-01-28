@@ -15,7 +15,6 @@ class EgenregistreringValidator {
                 validateBruksenheterRegistreredOnCorrectBygning(egenregistrering, bygning),
                 validateRepeatedBruksenheter(egenregistrering),
             )
-                .plus(validateBruksarealRegistreringerHasTotalBruksareal(egenregistrering))
                 .plus(validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering))
 
             return if (errors.isEmpty()) {
@@ -69,19 +68,6 @@ class EgenregistreringValidator {
                 .map { invalidRegistrering ->
                     ValidationError(
                         message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetId} har registrert totalt BRA og BRA per etasje, men totalt BRA stemmer ikke overens med totalen av BRA per etasje",
-                    )
-                }
-
-        }
-
-        private fun validateBruksarealRegistreringerHasTotalBruksareal(egenregistrering: Egenregistrering): List<ValidationError> {
-            return egenregistrering.bygningRegistrering.bruksenhetRegistreringer
-                .filter {
-                    it.bruksarealRegistrering?.etasjeRegistreringer != null && it.bruksarealRegistrering.totaltBruksareal == null
-                }
-                .map { invalidRegistrering ->
-                    ValidationError(
-                        message = "Bruksenhet med ID ${invalidRegistrering.bruksenhetId} har registrert BRA per etasje, men ikke totalt BRA. Totalt BRA er obligatorisk.",
                     )
                 }
 

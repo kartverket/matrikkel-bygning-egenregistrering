@@ -85,21 +85,17 @@ class MatrikkelBygningClient(
                     ),
                     // TODO: Skal tom liste i matrikkelen tolkes som "vet ikke" eller "ingen"?
                     energikilder = Multikilde(
-                        autoritativ = bygning.energikildeKodeIds.item.map {
-                            Energikilde(
-                                mapEnergikilde(it),
-                                bygningsmetadata,
-                            )
-                        }.ifEmpty { null }, // Tolker som "vet ikke"
+                        autoritativ = Energikilde(
+                            data = bygning.energikildeKodeIds.item.map { mapEnergikilde(it) },
+                            metadata = bygningsmetadata,
+                        ).takeUnless { bygning.energikildeKodeIds.item.isEmpty() }, // Tolker som "vet ikke"
                     ),
                     // TODO: Skal tom liste i matrikkelen tolkes som "vet ikke" eller "ingen"?
                     oppvarminger = Multikilde(
-                        autoritativ = bygning.oppvarmingsKodeIds.item.map {
-                            Oppvarming(
-                                mapOppvarming(it),
-                                bygningsmetadata,
-                            )
-                        }.ifEmpty { null }, // Tolker som "vet ikke"
+                        autoritativ = Oppvarming(
+                            data = bygning.oppvarmingsKodeIds.item.map { mapOppvarming(it) },
+                            metadata = bygningsmetadata,
+                        ).takeUnless { bygning.oppvarmingsKodeIds.item.isEmpty() } // Tolker som "vet ikke"
                     ),
                     // TODO: Burde vi ha en måte å angi ukjent / ikke oppgitt?
                     bruksenheter = bruksenheter.map {

@@ -144,42 +144,4 @@ class EgenregistreringValidatorTest {
         assertThat(validationResult.error.errors).hasSize(1)
         assertThat(validationResult.error.errors.first().message).contains("totalt BRA stemmer ikke overens")
     }
-
-    @Test
-    fun `egenregistrering med registrert etasje BRA men ikke totalt skal feile`() {
-        val validationResult = EgenregistreringValidator.validateEgenregistrering(
-            egenregistrering = baseEgenregistrering.copy(
-                bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
-                    bruksenhetRegistreringer = listOf(
-                        BruksenhetRegistrering(
-                            bruksenhetId = 1L,
-                            bruksarealRegistrering = BruksarealRegistrering(
-                                totaltBruksareal = null,
-                                etasjeRegistreringer = listOf(
-                                    EtasjeBruksarealRegistrering(
-                                        bruksareal = 55.0,
-                                        etasjebetegnelse = Etasjebetegnelse.of(
-                                            etasjenummer = Etasjenummer.of(1),
-                                            etasjeplanKode = EtasjeplanKode.Kjelleretasje,
-                                        ),
-                                    ),
-                                ),
-                                kildemateriale = KildematerialeKode.Selvrapportert,
-                            ),
-                            energikildeRegistrering = null,
-                            oppvarmingRegistrering = null,
-                            byggeaarRegistrering = null,
-                            vannforsyningRegistrering = null,
-                            avlopRegistrering = null,
-                        ),
-                    ),
-                ),
-            ),
-            bygning = baseBygning,
-        )
-
-        assertThat(validationResult.isErr).isTrue()
-        assertThat(validationResult.error.errors).hasSize(1)
-        assertThat(validationResult.error.errors.first().message).contains("Totalt BRA er obligatorisk")
-    }
 }
