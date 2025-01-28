@@ -66,11 +66,11 @@ internal class LocalBygningClient : BygningClient {
         ),
     )
 
-    override fun getBygningById(id: Long): Result<Bygning, DomainError> {
+    override fun getBygningByBubbleId(bygningBubbleId: Long): Result<Bygning, DomainError> {
         return bygninger
-            .find { it.bygningBubbleId == id }
+            .find { it.bygningBubbleId == bygningBubbleId }
             .toResultOr {
-                BygningNotFound(message = "Bygning med ID $id finnes ikke i matrikkelen")
+                BygningNotFound(message = "Bygning med ID $bygningBubbleId finnes ikke i matrikkelen")
             }
     }
 

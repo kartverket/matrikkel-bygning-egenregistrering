@@ -36,8 +36,8 @@ internal class MatrikkelBygningClient(
 ) : BygningClient {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
-    override fun getBygningById(id: Long): Result<Bygning, DomainError> {
-        val bygningId: BygningId = bygningId(id)
+    override fun getBygningByBubbleId(bygningBubbleId: Long): Result<Bygning, DomainError> {
+        val bygningId: BygningId = bygningId(bygningBubbleId)
 
         try {
             val bygning = matrikkelApi.storeService().getBygning(bygningId, matrikkelApi.matrikkelContext)
@@ -148,7 +148,7 @@ internal class MatrikkelBygningClient(
         try {
             val bygningId = matrikkelApi.bygningService().findBygning(bygningsnummer, matrikkelApi.matrikkelContext)
 
-            return getBygningById(bygningId.value)
+            return getBygningByBubbleId(bygningId.value)
         } catch (exception: ServiceException) {
             log.warn("Noe gikk galt under henting av bygning med bygningsnummer {}", bygningsnummer, exception)
             return Err(

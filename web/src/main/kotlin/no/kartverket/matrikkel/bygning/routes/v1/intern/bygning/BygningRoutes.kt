@@ -38,7 +38,7 @@ fun Route.bygningRouting(
         ) {
             val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-            val (status, body) = bygningService.getBygningById(bygningId = bygningId)
+            val (status, body) = bygningService.getBygningByBubbleId(bygningBubbleId = bygningId)
                 .mapBoth(
                     success = { HttpStatusCode.OK to it.toBygningResponse() },
                     failure = ::domainErrorToResponse,
@@ -71,13 +71,14 @@ fun Route.bygningRouting(
                 },
             ) {
                 val bygningId = call.parameters.getOrFail("bygningId").toLong()
-//
-//                val (status, code) = bygningService.getBygningWithEgenregistrertData(bygningId).mapBoth(
-//                    success = { (HttpStatusCode.OK to it.toBygningSimpleResponseFromEgenregistrertData()) },
-//                    failure = ::domainErrorToResponse,
-//                )
-//
-//                call.respond(status, code)
+
+                val (status, body) = bygningService.getBygningByBubbleId(bygningBubbleId = bygningId)
+                    .mapBoth(
+                        success = { HttpStatusCode.OK to it.toBygningSimpleResponseFromEgenregistrertData() },
+                        failure = ::domainErrorToResponse,
+                    )
+
+                call.respond(status, body)
             }
         }
 
@@ -111,12 +112,12 @@ fun Route.bygningRouting(
                     val bygningId = call.parameters.getOrFail("bygningId").toLong()
                     val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
-//                    val (status, body) = bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).mapBoth(
-//                        success = { HttpStatusCode.OK to it.toBruksenhetResponse() },
-//                        failure = ::domainErrorToResponse,
-//                    )
-//
-//                    call.respond(status, body)
+                    val (status, body) = bygningService.getBruksenhetByBubbleId(bygningId, bruksenhetId).mapBoth(
+                        success = { HttpStatusCode.OK to it.toBruksenhetResponse() },
+                        failure = ::domainErrorToResponse,
+                    )
+
+                    call.respond(status, body)
                 }
 
                 route("egenregistrert") {
@@ -148,12 +149,12 @@ fun Route.bygningRouting(
                         val bygningId = call.parameters.getOrFail("bygningId").toLong()
                         val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
-//                        val (status, body) = bygningService.getBruksenhetWithEgenregistrertData(bygningId, bruksenhetId).mapBoth(
-//                            success = { HttpStatusCode.OK to it.toBruksenhetSimpleResponseFromEgenregistrertData() },
-//                            failure = ::domainErrorToResponse,
-//                        )
-//
-//                        call.respond(status, body)
+                        val (status, body) = bygningService.getBruksenhetByBubbleId(bygningId, bruksenhetId).mapBoth(
+                            success = { HttpStatusCode.OK to it.toBruksenhetSimpleResponseFromEgenregistrertData() },
+                            failure = ::domainErrorToResponse,
+                        )
+
+                        call.respond(status, body)
                     }
                 }
             }

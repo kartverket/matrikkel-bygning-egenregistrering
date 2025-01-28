@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.application.bygning.BygningRepository
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.serializers.InstantSerializer
 import no.kartverket.matrikkel.bygning.application.serializers.UUIDSerializer
 import no.kartverket.matrikkel.bygning.infrastructure.database.executeQueryAndMapPreparedStatement
@@ -21,7 +20,7 @@ import javax.sql.DataSource
 data class BruksenhetDTO(
     @Serializable(with = UUIDSerializer::class)
     val id: UUID,
-    val bruksenhetId: Long,
+    val bruksenhetBubbleId: Long,
     @Serializable(with = UUIDSerializer::class)
     val bygningId: UUID,
     @Serializable(with = InstantSerializer::class)
@@ -37,7 +36,7 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
             connection.prepareAndExecuteUpdate(
                 """
                     INSERT INTO bygning.bruksenhet
-                    (id, bruksenhetId, bygningId, registreringstidspunkt, data)
+                    (id, bruksenhetBubbleId, bygningId, registreringstidspunkt, data)
                     VALUES (?, ?, ?, ?, ?)
                 """.trimIndent(),
             ) {
@@ -48,7 +47,7 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
                         this.value = bruksenhetToSave.id.toString()
                     },
                 )
-                it.setLong(2, bruksenhetToSave.bruksenhetId)
+                it.setLong(2, bruksenhetToSave.bruksenhetBubbleId)
                 it.setObject(
                     3,
                     PGobject().apply {
@@ -66,10 +65,6 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
                 )
             }
         }
-    }
-
-    override fun getBygningById(bygningId: UUID): Bygning? {
-        TODO("Not yet implemented")
     }
 
     override fun getBruksenhetById(id: UUID): Bruksenhet? {
@@ -95,7 +90,7 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
 
             Bruksenhet(
                 id = bruksenhetDTO.id,
-                bruksenhetBubbleId = bruksenhetDTO.bruksenhetId,
+                bruksenhetBubbleId = bruksenhetDTO.bruksenhetBubbleId,
                 bygningId = bruksenhetDTO.bygningId,
                 etasjer = bruksenhetDTO.bruksenhetData.etasjer,
                 byggeaar = bruksenhetDTO.bruksenhetData.byggeaar,

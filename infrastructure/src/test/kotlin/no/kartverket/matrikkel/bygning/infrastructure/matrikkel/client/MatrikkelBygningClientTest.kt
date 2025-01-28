@@ -79,7 +79,7 @@ class MatrikkelBygningClientTest {
         }
 
         val client = MatrikkelBygningClient(mockApi)
-        val bygning = client.getBygningById(1L)
+        val bygning = client.getBygningByBubbleId(1L)
 
         val isMatrikkelfoertBygningstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-13T00:00:00.00Z"))
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-12T00:00:00.00Z"))
@@ -157,7 +157,7 @@ class MatrikkelBygningClientTest {
         }
 
         val client = MatrikkelBygningClient(mockApi)
-        val bygning = client.getBygningById(1L)
+        val bygning = client.getBygningByBubbleId(1L)
 
         val isMatrikkelfoertBygningstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-12T00:00:00.00Z"))
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-13T00:00:00.00Z"))
