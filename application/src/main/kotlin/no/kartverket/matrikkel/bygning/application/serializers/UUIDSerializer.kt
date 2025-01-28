@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.serializers
+package no.kartverket.matrikkel.bygning.application.serializers
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

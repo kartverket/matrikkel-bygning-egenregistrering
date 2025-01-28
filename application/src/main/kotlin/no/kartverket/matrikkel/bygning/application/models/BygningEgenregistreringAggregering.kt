@@ -109,7 +109,7 @@ fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>
 private fun <T : Any, V : Any> Multikilde<T>.aggregate(
     registrering: V?, shouldMapRegistrering: Boolean = true, mapper: (V) -> T?
 ): Multikilde<T> {
-    if (this.egenregistrert != null || registrering == null) {
+    if (registrering == null) {
         return this
     }
 

@@ -1,9 +1,26 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering
 
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.models.*
+import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
+import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
+import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
+import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
+import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
+import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
+import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
+import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
+import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
-import no.kartverket.matrikkel.bygning.application.models.kodelister.*
+import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
+import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
 import java.util.*
 
@@ -128,13 +145,11 @@ fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistre
     )
 }
 
-fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
-    val registreringstidspunkt = Instant.now()
-
-    return Egenregistrering(
+fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering =
+    Egenregistrering(
         id = UUID.randomUUID(),
         eier = Foedselsnummer(this.eier),
-        registreringstidspunkt = registreringstidspunkt,
+        registreringstidspunkt = Instant.now(),
         prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(
             bygningId = this.bygningId,
@@ -143,4 +158,3 @@ fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering {
             } ?: emptyList(),
         ),
     )
-}

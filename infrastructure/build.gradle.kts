@@ -5,6 +5,8 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization").version(libs.versions.kotlinVersion)
+
     `jvm-test-suite`
 }
 

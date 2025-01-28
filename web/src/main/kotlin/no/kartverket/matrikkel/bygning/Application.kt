@@ -17,6 +17,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HealthRepositoryImpl
+import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygning.BygningRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.createBygningClient
@@ -25,9 +26,9 @@ import no.kartverket.matrikkel.bygning.plugins.configureMaskinportenAuthenticati
 import no.kartverket.matrikkel.bygning.plugins.configureMonitoring
 import no.kartverket.matrikkel.bygning.plugins.configureOpenAPI
 import no.kartverket.matrikkel.bygning.plugins.configureStatusPages
-import no.kartverket.matrikkel.bygning.routes.v1.intern.internRouting
 import no.kartverket.matrikkel.bygning.routes.internalRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.eksternRouting
+import no.kartverket.matrikkel.bygning.routes.v1.intern.internRouting
 
 fun main() {
     val internalPort = System.getenv("INTERNAL_PORT")?.toIntOrNull() ?: 8081
@@ -67,6 +68,7 @@ fun Application.mainModule() {
     )
 
     val egenregistreringRepository = EgenregistreringRepositoryImpl(dataSource)
+    val bygningRepository = BygningRepositoryImpl(dataSource)
 
     val bygningClient = createBygningClient(
         MatrikkelApiConfig(
@@ -77,9 +79,15 @@ fun Application.mainModule() {
         ),
     )
 
+    val bygningService = BygningService(
+        bygningClient = bygningClient,
+        bygningRepository = bygningRepository,
+    )
 
-    val egenregistreringService = EgenregistreringService(bygningClient, egenregistreringRepository)
-    val bygningService = BygningService(bygningClient, egenregistreringService)
+    val egenregistreringService = EgenregistreringService(
+        bygningService = bygningService,
+        egenregistreringRepository = egenregistreringRepository,
+    )
 
     routing {
         // Routes for interne endepunkter.
@@ -95,15 +103,15 @@ fun Application.mainModule() {
 
         // Routes for eksterne endepunkter.
         route("ekstern") {
-            route("api.json"){
+            route("api.json") {
                 openApiSpec("ekstern")
             }
-            route("swagger-ui"){
+            route("swagger-ui") {
                 swaggerUI("/ekstern/api.json")
             }
         }
-        route("v1"){
-                eksternRouting(bygningService)
+        route("v1") {
+            eksternRouting(bygningService)
 
         }
     }

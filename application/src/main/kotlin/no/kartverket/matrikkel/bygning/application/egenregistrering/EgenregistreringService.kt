@@ -2,27 +2,29 @@ package no.kartverket.matrikkel.bygning.application.egenregistrering
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.andThen
-import com.github.michaelbull.result.onSuccess
-import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
+import com.github.michaelbull.result.map
+import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 
 class EgenregistreringService(
-    private val bygningClient: BygningClient,
+    private val bygningService: BygningService,
     private val egenregistreringRepository: EgenregistreringRepository,
 ) {
     fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, DomainError> {
-        return bygningClient
-            .getBygningById(egenregistrering.bygningRegistrering.bygningId)
-            .andThen {
-                EgenregistreringValidator.validateEgenregistrering(egenregistrering, it)
+        return bygningService.getBygningById(egenregistrering.bygningRegistrering.bygningId)
+            .andThen { bygning ->
+                EgenregistreringValidator.validateEgenregistrering(egenregistrering, bygning).map { bygning }
             }
-            .onSuccess {
-                egenregistreringRepository.saveEgenregistrering(egenregistrering)
-            }
-    }
+            // Er det snålt å mappe her når vi bare ønsker å returnere unit? Burde vi returnere noe annet?
+            .map { bygning ->
+                // TODO Transaksjon på hele greia?
 
-    fun findAllEgenregistreringerForBygning(bygningId: Long): List<Egenregistrering> {
-        return egenregistreringRepository.getAllEgenregistreringerForBygning(bygningId)
+                // TODO Lagrer bare hele egenregistreringen nå, skal det være noe mer? Noe mindre?
+                egenregistreringRepository.saveEgenregistrering(egenregistrering)
+
+                // TODO Navngivning
+                bygningService.createBruksenhetSnapshotsOfEgenregistrering(bygning, egenregistrering)
+            }
     }
 }

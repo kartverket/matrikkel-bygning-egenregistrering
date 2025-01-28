@@ -12,29 +12,35 @@ import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Sig
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import java.time.Instant
+import java.util.*
 
 internal class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
+            id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
             bruksenhetId = 1L,
-            bygningId = 1L,
+            bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
+            id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
             bruksenhetId = 2L,
-            bygningId = 1L,
+            bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
+            id = UUID.fromString("00000000-0000-0000-0000-000000000003"),
             bruksenhetId = 3L,
-            bygningId = 2L,
+            bygningId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
         ),
         Bruksenhet(
+            id = UUID.fromString("00000000-0000-0000-0000-000000000004"),
             bruksenhetId = 4L,
-            bygningId = 2L,
+            bygningId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
         ),
     )
 
     private val bygninger: List<Bygning> = listOf(
         Bygning(
+            id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
             bygningId = 1L,
             bygningsnummer = 100L,
             bruksenheter = bruksenheter.subList(0, 2),
@@ -45,7 +51,7 @@ internal class LocalBygningClient : BygningClient {
                         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
                         registrertAv = Signatur("norola"),
                         kildemateriale = null,
-                        prosess = null
+                        prosess = null,
                     ),
                 ),
             ),
@@ -54,6 +60,7 @@ internal class LocalBygningClient : BygningClient {
         Bygning(
             bygningId = 2L,
             bygningsnummer = 200L,
+            id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
             bruksenheter = bruksenheter.subList(2, 4),
             etasjer = emptyList(),
         ),

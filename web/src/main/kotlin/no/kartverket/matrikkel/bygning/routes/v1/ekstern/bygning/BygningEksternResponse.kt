@@ -6,7 +6,7 @@ import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Felt
 import no.kartverket.matrikkel.bygning.application.models.kodelister.*
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.bygning.FeltEksternResponse.*
-import no.kartverket.matrikkel.bygning.serializers.InstantSerializer
+import no.kartverket.matrikkel.bygning.application.serializers.InstantSerializer
 import java.time.Instant
 
 @Serializable

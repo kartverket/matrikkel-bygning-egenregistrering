@@ -28,6 +28,7 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.*
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
 internal class MatrikkelBygningClient(
@@ -51,6 +52,7 @@ internal class MatrikkelBygningClient(
 
             return Ok(
                 Bygning(
+                    id = UUID.fromString(bygning.uuid.toString()),
                     bygningId = bygning.id.value,
                     bygningsnummer = bygning.bygningsnummer,
                     byggeaar = Multikilde(
@@ -109,8 +111,9 @@ internal class MatrikkelBygningClient(
                         )
 
                         Bruksenhet(
+                            id = UUID.fromString(it.uuid.toString()),
                             bruksenhetId = it.id.value,
-                            bygningId = it.byggId.value,
+                            bygningId = UUID.fromString(bygning.uuid.toString()),
                             // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                             totaltBruksareal = Multikilde(
                                 autoritativ = Bruksareal(
