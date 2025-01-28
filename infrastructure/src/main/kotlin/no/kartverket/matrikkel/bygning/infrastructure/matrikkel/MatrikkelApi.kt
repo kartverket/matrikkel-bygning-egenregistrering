@@ -10,6 +10,7 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.kommune.KommuneServic
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.kommune.KommuneServiceWS
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.StoreService
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.StoreServiceWS
+import org.slf4j.MDC
 import java.net.URI
 
 data class MatrikkelApiConfig(
@@ -51,6 +52,11 @@ class MatrikkelApi(private val baseUrl: URI) {
     private inner class WithAuthImpl(private val authenticator: Authenticator) : WithAuth {
         private fun BindingProvider.configure(endpointPath: String) {
             requestContext[BindingProvider.ENDPOINT_ADDRESS_PROPERTY] = baseUrl.resolve(endpointPath).toString()
+            MDC.get("request_id")?.let {
+                (requestContext.computeIfAbsent(MessageContext.HTTP_REQUEST_HEADERS) { HashMap<String, MutableList<String>>() } as HashMap<String, MutableList<String>>)
+                    .computeIfAbsent("X-Request-ID") { ArrayList<String>() }
+                    .add(it)
+            }
             authenticator(requestContext)
         }
 
