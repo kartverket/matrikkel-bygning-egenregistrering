@@ -47,3 +47,4 @@ jobs:
       namespace: matrikkelbygning-dev
       cluster: atkv3
       allow_unsafe_deploy: true
+      identity: bygning
