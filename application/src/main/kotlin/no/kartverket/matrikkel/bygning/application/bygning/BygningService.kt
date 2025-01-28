@@ -35,7 +35,7 @@ class BygningService(
                 val egenregistreringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygningId)
 
                 bygning.bruksenheter
-                    .find { it.bruksenhetId == bruksenhetId }
+                    .find { it.bruksenhetId.value == bruksenhetId }
                     ?.withEgenregistrertData(egenregistreringerForBygning)
                     .toResultOr {
                         BruksenhetNotFound(message = "Bruksenhet finnes ikke på bygningen")

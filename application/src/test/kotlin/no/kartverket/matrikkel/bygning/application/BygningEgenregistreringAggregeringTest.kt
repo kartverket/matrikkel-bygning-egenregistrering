@@ -10,9 +10,11 @@ import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetEtasje
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.BygningId
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
@@ -33,12 +35,12 @@ import kotlin.test.Test
 
 class BygningEgenregistreringAggregeringTest {
     private val defaultBruksenhet = Bruksenhet(
-        bruksenhetId = 1L,
-        bygningId = 1L,
+        bruksenhetId = BruksenhetId(1L),
+        bygningId = BygningId(1L),
     )
 
     private val defaultBygning = Bygning(
-        bygningId = 1L,
+        bygningId = BygningId(1L),
         bygningsnummer = 100,
         bruksenheter = listOf(defaultBruksenhet),
         etasjer = emptyList(),
