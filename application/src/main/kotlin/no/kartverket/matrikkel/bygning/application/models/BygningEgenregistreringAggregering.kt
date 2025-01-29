@@ -13,14 +13,28 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Kildemateri
  * men ikke nødvendigvis andre steder?
  */
 
-fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): Bygning {
-    return egenregistreringer.fold(this) { bygningAggregate, egenregistrering ->
-        bygningAggregate.copy(
-            bruksenheter = bygningAggregate.bruksenheter.map {
-                it.applyEgenregistrering(egenregistrering)
-            },
-        )
-    }
+fun Bygning.applyEgenregistreringer(egenregistreringer: List<Egenregistrering>): Bygning {
+    return egenregistreringer
+        .sortedBy { it.registreringstidspunkt }
+        .fold(this) { bygningAggregate, egenregistrering ->
+            bygningAggregate.copy(
+                bruksenheter = bygningAggregate.bruksenheter.map {
+                    it.applyEgenregistrering(egenregistrering)
+                },
+            )
+        }
+}
+
+fun Bruksenhet.applyEgenregistreringer(egenregistreringer: List<Egenregistrering>): Bruksenhet {
+    return egenregistreringer
+        .sortedBy { it.registreringstidspunkt }
+        .fold(this) { bruksenhetAggregate, egenregistrering ->
+            bruksenhetAggregate.applyEgenregistrering(egenregistrering)
+        }
+}
+
+fun Bruksenhet.applyEgenregistreringer(egenregistrering: Egenregistrering): Bruksenhet {
+    return this.applyEgenregistreringer(listOf(egenregistrering))
 }
 
 private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Bruksenhet {
@@ -82,7 +96,7 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
 
         etasjer = this.etasjer.aggregate(
             registrering = bruksenhetRegistrering.bruksarealRegistrering?.etasjeRegistreringer,
-            shouldMapRegistrering = !this.isEgenregistrertBruksarealRegistreringPresent(),
+            shouldRemove = !bruksenhetRegistrering.bruksarealRegistrering.isBothEtasjeAndTotalRegistrert(),
         ) {
             it.map {
                 BruksenhetEtasje(
@@ -97,27 +111,21 @@ private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering)
     )
 }
 
-private fun Bruksenhet.isEgenregistrertBruksarealRegistreringPresent(): Boolean =
-    this.etasjer.egenregistrert != null || this.totaltBruksareal.egenregistrert != null
-
-fun Bruksenhet.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): Bruksenhet {
-    return egenregistreringer.fold(this) { bruksenhetAggregate, egenregistrering ->
-        bruksenhetAggregate.applyEgenregistrering(egenregistrering)
-    }
-}
-
-fun Bruksenhet.withEgenregistrertData(egenregistrering: Egenregistrering): Bruksenhet {
-    return this.withEgenregistrertData(listOf(egenregistrering))
-}
+private fun BruksarealRegistrering?.isBothEtasjeAndTotalRegistrert(): Boolean =
+    this?.totaltBruksareal != null && etasjeRegistreringer?.isNotEmpty() == true
 
 private fun <T : Any, V : Any> Multikilde<T>.aggregate(
-    registrering: V?, shouldMapRegistrering: Boolean = true, mapper: (V) -> T?
+    registrering: V?, shouldRemove: Boolean = false, mapper: (V) -> T?
 ): Multikilde<T> {
+    if (shouldRemove) {
+        return withEgenregistrert(null)
+    }
+
     if (registrering == null) {
         return this
     }
 
-    return withEgenregistrert(if (shouldMapRegistrering) mapper(registrering) else null)
+    return withEgenregistrert(mapper(registrering))
 }
 
 private fun RegisterMetadata.withKildemateriale(kildemateriale: KildematerialeKode?): RegisterMetadata {

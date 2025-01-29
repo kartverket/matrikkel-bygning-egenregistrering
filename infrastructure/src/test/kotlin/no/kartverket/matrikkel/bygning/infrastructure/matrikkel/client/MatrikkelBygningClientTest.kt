@@ -47,6 +47,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.matchers.isEmpty
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.matchers.matchId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.matchers.matchIds
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.MatrikkelContext
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.UUID
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.StoreService
 import java.time.Instant
 import kotlin.test.Test
@@ -56,9 +57,18 @@ class MatrikkelBygningClientTest {
     fun `mapping takler minimalt utfylt bygning`() {
         val mockStoreService = mockk<StoreService> {
             val bygningId = bygningId(1L)
+            val bygningUUID = UUID().apply {
+                uuid = "00000000-0000-0000-0000-000000000001"
+                navnerom = "uuid"
+            }
             val bruksenhetId = bruksenhetId(2L)
+            val bruksenhetUUID = UUID().apply {
+                uuid = "00000000-0000-0000-0001-000000000001"
+                navnerom = "uuid"
+            }
             every { getObject(matchId(bygningId), any()) } returns bygning {
                 id = bygningId
+                uuid = bygningUUID
                 bygningsnummer = 1000L
                 oppdateringsdato = timestampUtc(2024, 9, 13)
                 oppdatertAv = "TestAnsatt"
@@ -67,6 +77,7 @@ class MatrikkelBygningClientTest {
             every { getObjects(matchIds(bruksenhetId), any()) } returns matrikkelBubbleObjectList(
                 bruksenhet {
                     id = bruksenhetId
+                    uuid = bruksenhetUUID
                     byggId = bygningId
                     oppdateringsdato = timestampUtc(2024, 9, 12)
                     oppdatertAv = "TestAnsatt"
@@ -98,7 +109,7 @@ class MatrikkelBygningClientTest {
             prop(Bygning::oppvarminger).isEmpty()
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(2L)
-                prop(Bruksenhet::bygningId).isEqualTo(1L)
+                prop(Bruksenhet::bygningId).isEqualTo(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"))
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
                     prop(Bruksareal::data).isEqualTo(0.0)
@@ -115,9 +126,18 @@ class MatrikkelBygningClientTest {
         // Bygningen er ikke fullt utfylt for det som enda ikke blir brukt
         val mockStoreService = mockk<StoreService> {
             val bygningId = bygningId(1L)
+            val bygningUUID = UUID().apply {
+                uuid = "00000000-0000-0000-0000-000000000001"
+                navnerom = "uuid"
+            }
             val bruksenhetId = bruksenhetId(2L)
+            val bruksenhetUUID = UUID().apply {
+                uuid = "00000000-0000-0000-0001-000000000001"
+                navnerom = "uuid"
+            }
             every { getObject(matchId(bygningId), any()) } returns bygning {
                 id = bygningId
+                uuid = bygningUUID
                 bygningsnummer = 1000L
                 oppdateringsdato = timestampUtc(2024, 9, 12)
                 oppdatertAv = "TestAnsatt"
@@ -144,6 +164,7 @@ class MatrikkelBygningClientTest {
             every { getObjects(matchIds(bruksenhetId), any()) } returns matrikkelBubbleObjectList(
                 bruksenhet {
                     id = bruksenhetId
+                    uuid = bruksenhetUUID
                     byggId = bygningId
                     oppdateringsdato = timestampUtc(2024, 9, 13)
                     oppdatertAv = "TestAnsatt"
@@ -197,7 +218,7 @@ class MatrikkelBygningClientTest {
             }
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(2L)
-                prop(Bruksenhet::bygningId).isEqualTo(1L)
+                prop(Bruksenhet::bygningId).isEqualTo(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"))
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     prop(Bruksareal::data).isEqualTo(140.0)
                     prop(Bruksareal::metadata).isMatrikkelfoertBruksenhetstidspunkt()

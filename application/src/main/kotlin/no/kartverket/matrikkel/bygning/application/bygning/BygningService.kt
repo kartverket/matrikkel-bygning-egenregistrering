@@ -9,7 +9,7 @@ import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
+import no.kartverket.matrikkel.bygning.application.models.applyEgenregistreringer
 
 class BygningService(
     private val bygningClient: BygningClient,
@@ -44,7 +44,7 @@ class BygningService(
             val bruksenhetInBygning =
                 bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetBubbleId == bruksenhetRegistrering.bruksenhetBubbleId }
 
-            bruksenhetInBygning?.withEgenregistrertData(egenregistrering)?.let { bruksenhet ->
+            bruksenhetInBygning?.applyEgenregistreringer(egenregistrering)?.let { bruksenhet ->
                 bygningRepository.saveBruksenhet(bruksenhet)
             }
         }

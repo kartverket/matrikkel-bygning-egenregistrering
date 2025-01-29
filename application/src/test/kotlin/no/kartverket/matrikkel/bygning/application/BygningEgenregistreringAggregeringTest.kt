@@ -23,10 +23,10 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
+import no.kartverket.matrikkel.bygning.application.models.applyEgenregistreringer
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
-import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 import java.time.Instant
 import java.util.*
 import kotlin.test.Test
@@ -106,7 +106,7 @@ class BygningEgenregistreringAggregeringTest {
             ),
         )
 
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
 
         assertThat(aggregatedBygning).all {
             prop(Bygning::bruksenheter).index(0).all {
@@ -126,7 +126,7 @@ class BygningEgenregistreringAggregeringTest {
     fun `bruksenhet med en ny egenregistring får prosess fylt`() {
         val firstRegistrering = defaultEgenregistrering
 
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(defaultEgenregistrering, firstRegistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(defaultEgenregistrering, firstRegistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.metadata?.prosess)
             .isEqualTo(ProsessKode.Egenregistrering)
@@ -150,7 +150,7 @@ class BygningEgenregistreringAggregeringTest {
         )
 
         val aggregatedBygning =
-            defaultBygning.withEgenregistrertData(listOf(firstRegistrering, defaultEgenregistrering))
+            defaultBygning.applyEgenregistreringer(listOf(firstRegistrering, defaultEgenregistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().byggeaar.egenregistrert?.metadata?.kildemateriale)
             .isEqualTo(KildematerialeKode.Byggesaksdokumenter)
@@ -174,7 +174,7 @@ class BygningEgenregistreringAggregeringTest {
             ),
         )
 
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data)
             .isEqualTo(150.0)
@@ -201,13 +201,12 @@ class BygningEgenregistreringAggregeringTest {
                             ),
                             kildemateriale = null,
                         ),
-
-                        ),
+                    ),
                 ),
             ),
         )
 
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(defaultEgenregistrering, firstRegistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(defaultEgenregistrering, firstRegistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().etasjer.egenregistrert).isNull()
 
@@ -227,7 +226,7 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `registrering med tom liste paa listeregistering skal ikke sette felt paa bruksenhet`() {
-        val bruksenhet = defaultBruksenhet.withEgenregistrertData(listOf(defaultEgenregistrering))
+        val bruksenhet = defaultBruksenhet.applyEgenregistreringer(listOf(defaultEgenregistrering))
 
         assertThat(bruksenhet.oppvarminger).isEmpty()
         assertThat(bruksenhet.energikilder).isEmpty()
