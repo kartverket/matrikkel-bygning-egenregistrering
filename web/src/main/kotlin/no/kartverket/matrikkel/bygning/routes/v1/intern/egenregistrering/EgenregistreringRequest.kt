@@ -38,7 +38,7 @@ data class BruksenhetRegistreringRequest(
 
 @Serializable
 data class EgenregistreringRequest(
-    val bygningId: Long, val eier: String, val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
+    val bygningId: Long, val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>?
 )
 
 @Serializable
@@ -145,10 +145,10 @@ fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistre
     )
 }
 
-fun EgenregistreringRequest.toEgenregistrering(): Egenregistrering =
+fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
     Egenregistrering(
         id = UUID.randomUUID(),
-        eier = Foedselsnummer(this.eier),
+        eier = Foedselsnummer(eier),
         registreringstidspunkt = Instant.now(),
         prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(

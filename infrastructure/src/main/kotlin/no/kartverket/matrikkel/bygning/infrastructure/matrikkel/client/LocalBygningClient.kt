@@ -14,7 +14,7 @@ import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import java.time.Instant
 import java.util.*
 
-internal class LocalBygningClient : BygningClient {
+class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000001"),

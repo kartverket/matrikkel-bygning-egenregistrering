@@ -5,16 +5,19 @@ import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
+import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.bygning.bygningEksternRouting
 
 fun Route.eksternRouting(
     bygningService: BygningService,
 ) {
-    authenticate("maskinporten") {
+    authenticate(MASKINPORTEN_PROVIDER_NAME) {
         route(
             "/ekstern",
             {
-                specId = "ekstern"
+                specId = OpenApiSpecIds.EKSTERN
+                securitySchemeNames = listOf(MASKINPORTEN_PROVIDER_NAME)
                 response {
                     code(HttpStatusCode.Unauthorized) {
                         description = "Manglende eller ugyldig token"
