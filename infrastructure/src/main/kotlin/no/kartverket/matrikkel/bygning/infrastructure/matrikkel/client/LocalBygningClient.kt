@@ -4,7 +4,9 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.BygningId
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
@@ -18,22 +20,22 @@ class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
-            bruksenhetBubbleId = 1L,
+            bruksenhetBubbleId = BruksenhetId(1L),
             bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
-            bruksenhetBubbleId = 2L,
+            bruksenhetBubbleId = BruksenhetId(2L),
             bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000003"),
-            bruksenhetBubbleId = 3L,
+            bruksenhetBubbleId = BruksenhetId(3L),
             bygningId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
         ),
         Bruksenhet(
             id = UUID.fromString("00000000-0000-0000-0000-000000000004"),
-            bruksenhetBubbleId = 4L,
+            bruksenhetBubbleId = BruksenhetId(4L),
             bygningId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
         ),
     )
@@ -41,7 +43,7 @@ class LocalBygningClient : BygningClient {
     private val bygninger: List<Bygning> = listOf(
         Bygning(
             id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
-            bygningBubbleId = 1L,
+            bygningBubbleId = BygningId(1L),
             bygningsnummer = 100L,
             bruksenheter = bruksenheter.subList(0, 2),
             bruksareal = Multikilde(
@@ -58,7 +60,7 @@ class LocalBygningClient : BygningClient {
             etasjer = emptyList(),
         ),
         Bygning(
-            bygningBubbleId = 2L,
+            bygningBubbleId = BygningId(2L),
             bygningsnummer = 200L,
             id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
             bruksenheter = bruksenheter.subList(2, 4),
@@ -68,7 +70,7 @@ class LocalBygningClient : BygningClient {
 
     override fun getBygningByBubbleId(bygningBubbleId: Long): Result<Bygning, DomainError> {
         return bygninger
-            .find { it.bygningBubbleId == bygningBubbleId }
+            .find { it.bygningBubbleId.value == bygningBubbleId }
             .toResultOr {
                 BygningNotFound(message = "Bygning med ID $bygningBubbleId finnes ikke i matrikkelen")
             }

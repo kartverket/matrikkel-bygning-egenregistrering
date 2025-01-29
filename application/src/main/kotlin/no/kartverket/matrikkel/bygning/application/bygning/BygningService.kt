@@ -29,7 +29,7 @@ class BygningService(
         return bygningClient.getBygningByBubbleId(bygningBubbleId)
             .andThen { bygning ->
                 bygning.bruksenheter
-                    .firstOrNull { bruksenhet -> bruksenhet.bruksenhetBubbleId == bruksenhetBubbleId }
+                    .firstOrNull { bruksenhet -> bruksenhet.bruksenhetBubbleId.value == bruksenhetBubbleId }
                     .toResultOr {
                         BruksenhetNotFound("Fant ikke bruksenhet med id $bruksenhetBubbleId i bygning med id $bygningBubbleId")
                     }
@@ -42,7 +42,7 @@ class BygningService(
     fun createBruksenhetSnapshotsOfEgenregistrering(bygning: Bygning, egenregistrering: Egenregistrering) {
         egenregistrering.bygningRegistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
             val bruksenhetInBygning =
-                bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetBubbleId == bruksenhetRegistrering.bruksenhetBubbleId }
+                bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetBubbleId.value == bruksenhetRegistrering.bruksenhetBubbleId }
 
             bruksenhetInBygning?.applyEgenregistreringer(egenregistrering)?.let { bruksenhet ->
                 bygningRepository.saveBruksenhet(bruksenhet)
