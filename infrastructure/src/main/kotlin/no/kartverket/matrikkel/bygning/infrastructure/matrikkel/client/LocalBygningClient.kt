@@ -4,7 +4,9 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.BygningId
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
@@ -16,26 +18,26 @@ import java.time.Instant
 class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
-            bruksenhetId = 1L,
-            bygningId = 1L,
+            bruksenhetId = BruksenhetId(1L),
+            bygningId = BygningId(1L),
         ),
         Bruksenhet(
-            bruksenhetId = 2L,
-            bygningId = 1L,
+            bruksenhetId = BruksenhetId(2L),
+            bygningId = BygningId(1L),
         ),
         Bruksenhet(
-            bruksenhetId = 3L,
-            bygningId = 2L,
+            bruksenhetId = BruksenhetId(3L),
+            bygningId = BygningId(2L),
         ),
         Bruksenhet(
-            bruksenhetId = 4L,
-            bygningId = 2L,
+            bruksenhetId = BruksenhetId(4L),
+            bygningId = BygningId(2L),
         ),
     )
 
     private val bygninger: List<Bygning> = listOf(
         Bygning(
-            bygningId = 1L,
+            bygningId = BygningId(1L),
             bygningsnummer = 100L,
             bruksenheter = bruksenheter.subList(0, 2),
             bruksareal = Multikilde(
@@ -52,7 +54,7 @@ class LocalBygningClient : BygningClient {
             etasjer = emptyList(),
         ),
         Bygning(
-            bygningId = 2L,
+            bygningId = BygningId(2L),
             bygningsnummer = 200L,
             bruksenheter = bruksenheter.subList(2, 4),
             etasjer = emptyList(),
@@ -61,7 +63,7 @@ class LocalBygningClient : BygningClient {
 
     override fun getBygningById(id: Long): Result<Bygning, DomainError> {
         return bygninger
-            .find { it.bygningId == id }
+            .find { it.bygningId.value == id }
             .toResultOr {
                 BygningNotFound(message = "Bygning med ID $id finnes ikke i matrikkelen")
             }

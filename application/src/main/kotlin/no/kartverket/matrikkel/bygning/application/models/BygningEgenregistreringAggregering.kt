@@ -25,7 +25,7 @@ fun Bygning.withEgenregistrertData(egenregistreringer: List<Egenregistrering>): 
 
 private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Bruksenhet {
     val bruksenhetRegistrering =
-        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetId == this.bruksenhetId }
+        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetId == this.bruksenhetId.value }
     if (bruksenhetRegistrering == null) {
         return this
     }

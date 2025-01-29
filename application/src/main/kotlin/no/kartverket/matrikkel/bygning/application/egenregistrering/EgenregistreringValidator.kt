@@ -29,8 +29,7 @@ class EgenregistreringValidator {
             egenregistrering: Egenregistrering, bygning: Bygning
         ): ValidationError? {
             val invalidBruksenheter = egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistering ->
-                val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId == bruksenhetRegistering.bruksenhetId }
-
+                val bruksenhet = bygning.bruksenheter.find { it.bruksenhetId.value == bruksenhetRegistering.bruksenhetId }
                 if (bruksenhet == null) {
                     bruksenhetRegistering.bruksenhetId
                 } else {

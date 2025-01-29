@@ -112,7 +112,7 @@ fun <T : Any, R : Any> Multikilde<T>.toMultikildeResponse(mapper: T.() -> R): Mu
 }
 
 fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
-    bygningId = this.bygningId,
+    bygningId = this.bygningId.value,
     bygningsnummer = this.bygningsnummer,
     byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
     bruksareal = this.bruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
@@ -124,13 +124,13 @@ fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
 )
 
 fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
-    bygningId = this.bygningId,
+    bygningId = this.bygningId.value,
     bygningsnummer = this.bygningsnummer,
     bruksenheter = this.bruksenheter.map { it.toBruksenhetSimpleResponseFromEgenregistrertData() },
 )
 
 fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
-    bruksenhetId = this.bruksenhetId,
+    bruksenhetId = this.bruksenhetId.value,
     byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
     etasjer = this.etasjer.toMultikildeResponse { map(BruksenhetEtasje::toBruksenhetEtasjeResponse) },
     totaltBruksareal = this.totaltBruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
@@ -141,7 +141,7 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
 )
 
 fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
-    bruksenhetId = this.bruksenhetId,
+    bruksenhetId = this.bruksenhetId.value,
     byggeaar = this.byggeaar.egenregistrert?.toByggeaarResponse(),
     etasjer = this.etasjer.egenregistrert?.map { it.toBruksenhetEtasjeResponse() },
     totaltBruksareal = this.totaltBruksareal.egenregistrert?.toBruksarealResponse(),

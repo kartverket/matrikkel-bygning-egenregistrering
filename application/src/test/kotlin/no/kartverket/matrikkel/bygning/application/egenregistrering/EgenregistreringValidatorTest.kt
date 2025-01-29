@@ -6,8 +6,10 @@ import assertk.assertions.hasSize
 import assertk.assertions.isTrue
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.BygningId
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
@@ -24,10 +26,10 @@ import kotlin.test.Test
 
 class EgenregistreringValidatorTest {
     private val baseBygning = Bygning(
-        bygningId = 1L, bygningsnummer = 100L,
+        bygningId = BygningId(1L), bygningsnummer = 100L,
         bruksenheter = listOf(
             Bruksenhet(
-                bruksenhetId = 1L, bygningId = 1L, etasjer = Multikilde(),
+                bruksenhetId = BruksenhetId(1L), bygningId = BygningId(1L), etasjer = Multikilde(),
             ),
         ),
         etasjer = emptyList(),

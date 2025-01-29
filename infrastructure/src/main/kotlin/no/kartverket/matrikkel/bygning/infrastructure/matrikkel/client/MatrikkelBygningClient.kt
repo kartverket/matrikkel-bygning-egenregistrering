@@ -5,8 +5,10 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningEtasje
+import no.kartverket.matrikkel.bygning.application.models.BygningId
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
@@ -24,7 +26,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBygning
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.bygningId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.toInstant
-import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId as MatrikkelBygningId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -36,7 +38,7 @@ class MatrikkelBygningClient(
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     override fun getBygningById(id: Long): Result<Bygning, DomainError> {
-        val bygningId: BygningId = bygningId(id)
+        val bygningId: MatrikkelBygningId = bygningId(id)
 
         try {
             val bygning = matrikkelApi.storeService().getBygning(bygningId, matrikkelApi.matrikkelContext)
@@ -51,7 +53,7 @@ class MatrikkelBygningClient(
 
             return Ok(
                 Bygning(
-                    bygningId = bygning.id.value,
+                    bygningId = BygningId(bygning.id.value),
                     bygningsnummer = bygning.bygningsnummer,
                     byggeaar = Multikilde(
                         autoritativ = deriveByggeaarForBygning(bygning),
@@ -109,8 +111,8 @@ class MatrikkelBygningClient(
                         )
 
                         Bruksenhet(
-                            bruksenhetId = it.id.value,
-                            bygningId = it.byggId.value,
+                            bruksenhetId = BruksenhetId(it.id.value),
+                            bygningId = BygningId(it.byggId.value),
                             // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                             totaltBruksareal = Multikilde(
                                 autoritativ = Bruksareal(

@@ -14,7 +14,9 @@ import io.mockk.checkUnnecessaryStub
 import io.mockk.every
 import io.mockk.mockk
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.BygningId
 import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
@@ -85,7 +87,7 @@ class MatrikkelBygningClientTest {
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-12T00:00:00.00Z"))
 
         assertThat(bygning.value, "bygning").all {
-            prop(Bygning::bygningId).isEqualTo(1L)
+            prop(Bygning::bygningId).isEqualTo(BygningId(1L))
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
                 // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
@@ -97,8 +99,8 @@ class MatrikkelBygningClientTest {
             prop(Bygning::energikilder).isEmpty()
             prop(Bygning::oppvarminger).isEmpty()
             prop(Bygning::bruksenheter).single().all {
-                prop(Bruksenhet::bruksenhetId).isEqualTo(2L)
-                prop(Bruksenhet::bygningId).isEqualTo(1L)
+                prop(Bruksenhet::bruksenhetId).isEqualTo(BruksenhetId(2L))
+                prop(Bruksenhet::bygningId).isEqualTo(BygningId(1L))
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
                     prop(Bruksareal::data).isEqualTo(0.0)
@@ -163,7 +165,7 @@ class MatrikkelBygningClientTest {
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-13T00:00:00.00Z"))
 
         assertThat(bygning.value, "bygning").isNotNull().all {
-            prop(Bygning::bygningId).isEqualTo(1L)
+            prop(Bygning::bygningId).isEqualTo(BygningId(1L))
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
                 prop(Bruksareal::data).isEqualTo(150.0)
@@ -196,8 +198,8 @@ class MatrikkelBygningClientTest {
                 }
             }
             prop(Bygning::bruksenheter).single().all {
-                prop(Bruksenhet::bruksenhetId).isEqualTo(2L)
-                prop(Bruksenhet::bygningId).isEqualTo(1L)
+                prop(Bruksenhet::bruksenhetId).isEqualTo(BruksenhetId(2L))
+                prop(Bruksenhet::bygningId).isEqualTo(BygningId(1L))
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     prop(Bruksareal::data).isEqualTo(140.0)
                     prop(Bruksareal::metadata).isMatrikkelfoertBruksenhetstidspunkt()

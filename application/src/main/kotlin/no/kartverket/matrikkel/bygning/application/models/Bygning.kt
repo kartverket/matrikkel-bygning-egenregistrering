@@ -15,7 +15,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Vannforsyni
 import java.time.Instant
 
 data class Bygning(
-    val bygningId: Long,
+    val bygningId: BygningId,
     val bygningsnummer: Long,
     val etasjer: List<BygningEtasje>,
     val bruksenheter: List<Bruksenhet>,
@@ -52,8 +52,8 @@ sealed interface Felt<T> {
 
 
 data class Bruksenhet(
-    val bruksenhetId: Long,
-    val bygningId: Long,
+    val bruksenhetId: BruksenhetId,
+    val bygningId: BygningId,
     val etasjer: Multikilde<List<BruksenhetEtasje>> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val totaltBruksareal: Multikilde<Bruksareal> = Multikilde(),
