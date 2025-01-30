@@ -2,7 +2,9 @@ package no.kartverket.matrikkel.bygning.repositories
 
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Felt
@@ -46,7 +48,7 @@ class BygningRepositoryTest : TestWithDb() {
     fun `lagret bruksenhet skal kunne hentes ut igjen`() {
         bygningRepository.saveBruksenhet(defaultBruksenhet)
 
-        val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value)
+        val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
 
 
         assertThat(retrievedBruksenhet).isNotNull().all {
@@ -84,7 +86,7 @@ class BygningRepositoryTest : TestWithDb() {
             ),
         ))
 
-        val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value)
+        val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
 
 
         assertThat(retrievedBruksenhet).isNotNull().all {
@@ -103,6 +105,39 @@ class BygningRepositoryTest : TestWithDb() {
                 }
             }
         }
+    }
+
+    @Test
+    fun `henting av bruksenehet basert på tidspunkt returnerer korrekt verdi`() {
+        val byggeaar = 1998
+
+        bygningRepository.saveBruksenhet(defaultBruksenhet)
+        bygningRepository.saveBruksenhet(defaultBruksenhet.copy(
+            byggeaar = Multikilde(
+                egenregistrert = Felt.Byggeaar(
+                    data = byggeaar,
+                    metadata = RegisterMetadata(
+                        registreringstidspunkt = Instant.now(),
+                        registrertAv = Foedselsnummer("31129956715"),
+                        kildemateriale = KildematerialeKode.Salgsoppgave,
+                        prosess = ProsessKode.Egenregistrering,
+
+                    )
+                )
+            )
+        ))
+
+        val currentBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
+        assertThat(currentBruksenhet).isNotNull().all {
+            prop(Bruksenhet::byggeaar).all {
+                prop(Multikilde<Felt.Byggeaar>::egenregistrert).isNotNull().all {
+                    prop(Felt.Byggeaar::data).isEqualTo(byggeaar)
+                }
+            }
+        }
+
+        val beforeAnyRegistrations = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.parse("2020-01-01T12:00:00.00Z"))
+        assertThat(beforeAnyRegistrations).isNull()
     }
 
     // Aner ikke om dette er en vettug måte å gjøre dette på? Vi må ha en måte å ha en tom db mellom tester, hvert fall

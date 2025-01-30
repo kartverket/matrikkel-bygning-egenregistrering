@@ -9,6 +9,9 @@ import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
+import java.time.Instant
+import java.time.LocalDate
+import java.time.format.DateTimeParseException
 
 fun Route.bygningRouting(
     bygningService: BygningService
@@ -80,6 +83,25 @@ fun Route.bygningRouting(
 
                 call.respond(status, body)
             }
+
+            get("arkiv") {
+                // TODO: swagger
+                val bygningId = call.parameters.getOrFail("bygningId").toLong()
+                val datoQuery = call.request.queryParameters["dato"]
+
+                val dato = try {
+                    datoQuery?.let { Instant.parse(it) } ?: Instant.now()
+                } catch (e: DateTimeParseException) {
+                    throw IllegalArgumentException("Ugyldig dato format: $e")
+                }
+
+                val (status, body) = bygningService.getBygningByBubbleId(bygningBubbleId = bygningId, fremTilDato = dato).mapBoth(
+                    success = { HttpStatusCode.OK to it.toBygningSimpleResponseFromEgenregistrertData() },
+                    failure = ::domainErrorToResponse,
+                )
+
+                call.respond(status, body)
+            }
         }
 
         route("bruksenheter") {
@@ -112,7 +134,7 @@ fun Route.bygningRouting(
                     val bygningId = call.parameters.getOrFail("bygningId").toLong()
                     val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
-                    val (status, body) = bygningService.getBruksenhetByBubbleId(bygningId, bruksenhetId).mapBoth(
+                    val (status, body) = bygningService.getBruksenhetByBubbleId(bygningBubbleId = bygningId, bruksenhetBubbleId = bruksenhetId).mapBoth(
                         success = { HttpStatusCode.OK to it.toBruksenhetResponse() },
                         failure = ::domainErrorToResponse,
                     )
@@ -149,7 +171,27 @@ fun Route.bygningRouting(
                         val bygningId = call.parameters.getOrFail("bygningId").toLong()
                         val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
-                        val (status, body) = bygningService.getBruksenhetByBubbleId(bygningId, bruksenhetId).mapBoth(
+                        val (status, body) = bygningService.getBruksenhetByBubbleId(bygningBubbleId = bygningId, bruksenhetBubbleId = bruksenhetId).mapBoth(
+                            success = { HttpStatusCode.OK to it.toBruksenhetSimpleResponseFromEgenregistrertData() },
+                            failure = ::domainErrorToResponse,
+                        )
+
+                        call.respond(status, body)
+                    }
+
+                    get("arkiv") {
+                        // TODO: swagger
+                        val bygningId = call.parameters.getOrFail("bygningId").toLong()
+                        val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
+
+                        val datoQuery = call.request.queryParameters["dato"]
+                        val dato = try {
+                            datoQuery?.let { Instant.parse(it) } ?: Instant.now()
+                        } catch (e: DateTimeParseException) {
+                            throw IllegalArgumentException("Ugyldig dato format: $e")
+                        }
+
+                        val (status, body) = bygningService.getBruksenhetByBubbleId(bygningBubbleId = bygningId, bruksenhetBubbleId = bruksenhetId, fremTilDato = dato ).mapBoth(
                             success = { HttpStatusCode.OK to it.toBruksenhetSimpleResponseFromEgenregistrertData() },
                             failure = ::domainErrorToResponse,
                         )

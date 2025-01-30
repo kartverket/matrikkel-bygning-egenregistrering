@@ -128,6 +128,14 @@ class BygningRouteTest : TestApplicationWithDb() {
             }
         }
     }
+
+    @Test
+    fun `gitt et ugyldig dato query parameter svarer bygning bad request`() = testApplication {
+        val client = mainModuleWithDatabaseEnvironmentAndClient()
+
+        val response = client.get("/v1/bygninger/1/egenregistrert/arkiv?dato=UGYLDIG_DATO")
+        assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)
+    }
 }
 
 
