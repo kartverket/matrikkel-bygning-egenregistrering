@@ -5,10 +5,8 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.BygningEtasje
-import no.kartverket.matrikkel.bygning.application.models.BygningId
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
@@ -21,6 +19,10 @@ import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBygning
@@ -29,7 +31,6 @@ import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.toInstant
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId as MatrikkelBygningId
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
@@ -54,8 +55,8 @@ class MatrikkelBygningClient(
 
             return Ok(
                 Bygning(
-                    id = UUID.fromString(bygning.uuid.uuid),
-                    bygningBubbleId = BygningId(bygning.id.value),
+                    id = BygningId(bygning.uuid.uuid),
+                    bygningBubbleId = BygningBubbleId(bygning.id.value),
                     bygningsnummer = bygning.bygningsnummer,
                     byggeaar = Multikilde(
                         autoritativ = deriveByggeaarForBygning(bygning),
@@ -113,9 +114,9 @@ class MatrikkelBygningClient(
                         )
 
                         Bruksenhet(
-                            id = UUID.fromString(it.uuid.uuid),
-                            bruksenhetBubbleId = BruksenhetId(it.id.value),
-                            bygningId = UUID.fromString(bygning.uuid.uuid),
+                            id = BruksenhetId(it.uuid.uuid),
+                            bruksenhetBubbleId = BruksenhetBubbleId(it.id.value),
+                            bygningId = BygningId(bygning.uuid.uuid),
                             // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                             totaltBruksareal = Multikilde(
                                 autoritativ = Bruksareal(

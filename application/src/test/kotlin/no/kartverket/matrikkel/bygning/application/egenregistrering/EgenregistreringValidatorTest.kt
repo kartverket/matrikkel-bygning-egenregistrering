@@ -6,10 +6,10 @@ import assertk.assertions.hasSize
 import assertk.assertions.isTrue
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
@@ -28,11 +28,11 @@ class EgenregistreringValidatorTest {
     val bygningId: UUID = UUID.fromString("00000000-0000-0000-0000-000000000001")
     private val baseBygning = Bygning(
         id = bygningId,
-        bygningBubbleId = BygningId(1L), bygningsnummer = 100L,
+        bygningBubbleId = BygningBubbleId(1L), bygningsnummer = 100L,
         bruksenheter = listOf(
             Bruksenhet(
                 id = UUID.fromString("00000000-0000-0000-0001-000000000001"),
-                bruksenhetBubbleId = BruksenhetId(1L),
+                bruksenhetBubbleId = BruksenhetBubbleId(1L),
                 bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
                 etasjer = Multikilde(),
             ),

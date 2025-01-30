@@ -7,6 +7,10 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -14,15 +18,12 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.application.serializers.InstantSerializer
-import no.kartverket.matrikkel.bygning.application.serializers.UUIDSerializer
 import java.time.Instant
-import java.util.*
 
 @Serializable
 data class Bygning(
-    @Serializable(with = UUIDSerializer::class)
-    val id: UUID,
-    val bygningBubbleId: BygningId,
+    val id: BygningId,
+    val bygningBubbleId: BygningBubbleId,
     val bygningsnummer: Long,
     val etasjer: List<BygningEtasje>,
     val bruksenheter: List<Bruksenhet>,
@@ -69,11 +70,9 @@ sealed interface Felt<T> {
 
 @Serializable
 data class Bruksenhet(
-    @Serializable(with = UUIDSerializer::class)
-    val id: UUID,
-    val bruksenhetBubbleId: BruksenhetId,
-    @Serializable(with = UUIDSerializer::class)
-    val bygningId: UUID,
+    val id: BruksenhetId,
+    val bruksenhetBubbleId: BruksenhetBubbleId,
+    val bygningId: BygningId,
     val etasjer: Multikilde<List<BruksenhetEtasje>> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val totaltBruksareal: Multikilde<Bruksareal> = Multikilde(),
