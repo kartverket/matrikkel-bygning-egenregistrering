@@ -1,6 +1,7 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %X{request_id} %-5level %logger{36} - %msg%n</pattern>
             <provider class="net.logstash.logback.composite.loggingevent.ArgumentsJsonProvider"/>
         </encoder>
     </appender>

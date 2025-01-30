@@ -42,6 +42,6 @@ fun Application.configureHTTP() {
             call.request.path().startsWith("/v1")
         }
 
-        callIdMdc("call-id")
+        callIdMdc("request_id")
     }
 }
