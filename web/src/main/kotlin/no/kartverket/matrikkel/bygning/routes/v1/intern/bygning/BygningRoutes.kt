@@ -112,7 +112,10 @@ fun Route.bygningRouting(
                     val bygningId = call.parameters.getOrFail("bygningId").toLong()
                     val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
-                    val (status, body) = bygningService.getBruksenhetByBubbleId(bygningId, bruksenhetId).mapBoth(
+                    val (status, body) = bygningService.getBruksenhetByBubbleId(
+                        bygningBubbleId = bygningId,
+                        bruksenhetBubbleId = bruksenhetId,
+                    ).mapBoth(
                         success = { HttpStatusCode.OK to it.toBruksenhetResponse() },
                         failure = ::domainErrorToResponse,
                     )
@@ -149,7 +152,10 @@ fun Route.bygningRouting(
                         val bygningId = call.parameters.getOrFail("bygningId").toLong()
                         val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
 
-                        val (status, body) = bygningService.getBruksenhetByBubbleId(bygningId, bruksenhetId).mapBoth(
+                        val (status, body) = bygningService.getBruksenhetByBubbleId(
+                            bygningBubbleId = bygningId,
+                            bruksenhetBubbleId = bruksenhetId,
+                        ).mapBoth(
                             success = { HttpStatusCode.OK to it.toBruksenhetSimpleResponseFromEgenregistrertData() },
                             failure = ::domainErrorToResponse,
                         )
