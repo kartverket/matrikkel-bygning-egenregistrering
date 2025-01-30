@@ -23,7 +23,13 @@ fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorRespons
     is BygningNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
     is BruksenhetNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
     is ValidationError -> HttpStatusCode.BadRequest to ErrorResponse.BadRequestError(description = error.message)
-    is MultipleValidationError -> HttpStatusCode.BadRequest to ErrorResponse.ValidationError(details = error.errors.map { ErrorDetailResponse(detail = it.message) })
+    is MultipleValidationError -> HttpStatusCode.BadRequest to ErrorResponse.ValidationError(
+        details = error.errors.map {
+            ErrorDetailResponse(
+                detail = it.message,
+            )
+        },
+    )
 }
 
 @Serializable
@@ -84,5 +90,5 @@ fun ErrorDetail.toErrorDetailResponse(): ErrorDetailResponse {
 }
 
 fun resolveCallID(): String {
-    return MDC.get("call-id") ?: ""
+    return MDC.get("request_id") ?: ""
 }
