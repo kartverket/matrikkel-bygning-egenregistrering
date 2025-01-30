@@ -6,10 +6,8 @@ import assertk.assertions.hasSize
 import assertk.assertions.isTrue
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
@@ -17,6 +15,10 @@ import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
@@ -25,15 +27,16 @@ import java.util.*
 import kotlin.test.Test
 
 class EgenregistreringValidatorTest {
-    val bygningId: UUID = UUID.fromString("00000000-0000-0000-0000-000000000001")
+    val bygningId = BygningId("00000000-0000-0000-0000-000000000001")
+
     private val baseBygning = Bygning(
         id = bygningId,
         bygningBubbleId = BygningBubbleId(1L), bygningsnummer = 100L,
         bruksenheter = listOf(
             Bruksenhet(
-                id = UUID.fromString("00000000-0000-0000-0001-000000000001"),
+                id = BruksenhetId("00000000-0000-0000-0001-000000000001"),
                 bruksenhetBubbleId = BruksenhetBubbleId(1L),
-                bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+                bygningId = bygningId,
                 etasjer = Multikilde(),
             ),
         ),
@@ -46,7 +49,7 @@ class EgenregistreringValidatorTest {
         eier = Foedselsnummer("31129956715"),
         prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(
-            bygningId = 1L,
+            bygningBubbleId = BygningBubbleId(1L),
             bruksenhetRegistreringer = emptyList(),
         ),
     )
@@ -58,7 +61,7 @@ class EgenregistreringValidatorTest {
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
-                            bruksenhetBubbleId = 1L,
+                            bruksenhetBubbleId = BruksenhetBubbleId(1L),
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
@@ -67,7 +70,7 @@ class EgenregistreringValidatorTest {
                             avlopRegistrering = null,
                         ),
                         BruksenhetRegistrering(
-                            bruksenhetBubbleId = 1L,
+                            bruksenhetBubbleId = BruksenhetBubbleId(1L),
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
@@ -93,7 +96,7 @@ class EgenregistreringValidatorTest {
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
-                            bruksenhetBubbleId = 3L,
+                            bruksenhetBubbleId = BruksenhetBubbleId(3L),
                             bruksarealRegistrering = null,
                             energikildeRegistrering = null,
                             oppvarmingRegistrering = null,
@@ -119,7 +122,7 @@ class EgenregistreringValidatorTest {
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
-                            bruksenhetBubbleId = 1L,
+                            bruksenhetBubbleId = BruksenhetBubbleId(1L),
                             bruksarealRegistrering = BruksarealRegistrering(
                                 totaltBruksareal = 50.0,
                                 etasjeRegistreringer = listOf(
@@ -157,7 +160,7 @@ class EgenregistreringValidatorTest {
                 bygningRegistrering = baseEgenregistrering.bygningRegistrering.copy(
                     bruksenhetRegistreringer = listOf(
                         BruksenhetRegistrering(
-                            bruksenhetBubbleId = 1L,
+                            bruksenhetBubbleId = BruksenhetBubbleId(1L),
                             bruksarealRegistrering = BruksarealRegistrering(
                                 totaltBruksareal = null,
                                 etasjeRegistreringer = listOf(

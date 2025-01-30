@@ -4,45 +4,46 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import java.time.Instant
-import java.util.*
 
 class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
         Bruksenhet(
-            id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+            id = BruksenhetId("00000000-0000-0000-0000-000000000001"),
             bruksenhetBubbleId = BruksenhetBubbleId(1L),
-            bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+            bygningId = BygningId("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
-            id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+            id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
             bruksenhetBubbleId = BruksenhetBubbleId(2L),
-            bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+            bygningId = BygningId("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
-            id = UUID.fromString("00000000-0000-0000-0000-000000000003"),
+            id = BruksenhetId("00000000-0000-0000-0000-000000000003"),
             bruksenhetBubbleId = BruksenhetBubbleId(3L),
-            bygningId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+            bygningId = BygningId("00000000-0000-0000-0000-000000000002"),
         ),
         Bruksenhet(
-            id = UUID.fromString("00000000-0000-0000-0000-000000000004"),
+            id = BruksenhetId("00000000-0000-0000-0000-000000000004"),
             bruksenhetBubbleId = BruksenhetBubbleId(4L),
-            bygningId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+            bygningId = BygningId("00000000-0000-0000-0000-000000000002"),
         ),
     )
 
     private val bygninger: List<Bygning> = listOf(
         Bygning(
-            id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+            id = BygningId("00000000-0000-0000-0000-000000000001"),
             bygningBubbleId = BygningBubbleId(1L),
             bygningsnummer = 100L,
             bruksenheter = bruksenheter.subList(0, 2),
@@ -62,7 +63,7 @@ class LocalBygningClient : BygningClient {
         Bygning(
             bygningBubbleId = BygningBubbleId(2L),
             bygningsnummer = 200L,
-            id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+            id = BygningId("00000000-0000-0000-0000-000000000002"),
             bruksenheter = bruksenheter.subList(2, 4),
             etasjer = emptyList(),
         ),

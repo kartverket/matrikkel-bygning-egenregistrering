@@ -12,7 +12,7 @@ class EgenregistreringService(
     private val egenregistreringRepository: EgenregistreringRepository,
 ) {
     fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, DomainError> {
-        return bygningService.getBygningByBubbleId(egenregistrering.bygningRegistrering.bygningId)
+        return bygningService.getBygningByBubbleId(egenregistrering.bygningRegistrering.bygningBubbleId.value)
             .andThen { bygning ->
                 EgenregistreringValidator.validateEgenregistrering(egenregistrering, bygning).map { bygning }
             }

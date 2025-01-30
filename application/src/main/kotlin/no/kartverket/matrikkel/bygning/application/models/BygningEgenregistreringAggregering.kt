@@ -39,7 +39,7 @@ fun Bruksenhet.applyEgenregistreringer(egenregistrering: Egenregistrering): Bruk
 
 private fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Bruksenhet {
     val bruksenhetRegistrering =
-        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetBubbleId == this.bruksenhetBubbleId.value }
+        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetBubbleId == this.bruksenhetBubbleId }
     if (bruksenhetRegistrering == null) {
         return this
     }

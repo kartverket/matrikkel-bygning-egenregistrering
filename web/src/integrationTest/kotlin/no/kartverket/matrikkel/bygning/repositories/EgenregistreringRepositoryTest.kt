@@ -1,16 +1,9 @@
 package no.kartverket.matrikkel.bygning.repositories
 
-import assertk.all
-import assertk.assertThat
-import assertk.assertions.hasSize
-import assertk.assertions.index
-import assertk.assertions.isEmpty
-import assertk.assertions.isEqualTo
-import assertk.assertions.prop
-import assertk.assertions.single
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +15,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
     private val egenregistreringRepository = EgenregistreringRepositoryImpl(dataSource)
 
     private val defaultBygningRegistrering = BygningRegistrering(
-        bygningId = 1L,
+        bygningBubbleId = BygningBubbleId(1L),
         bruksenhetRegistreringer = emptyList()
     )
 

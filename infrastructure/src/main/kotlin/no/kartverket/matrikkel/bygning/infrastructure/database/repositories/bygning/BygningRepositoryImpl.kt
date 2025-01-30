@@ -4,6 +4,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.kartverket.matrikkel.bygning.application.bygning.BygningRepository
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.serializers.InstantSerializer
 import no.kartverket.matrikkel.bygning.application.serializers.UUIDSerializer
 import no.kartverket.matrikkel.bygning.infrastructure.database.executeQueryAndMapPreparedStatement
@@ -89,9 +92,9 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
             val bruksenhetDTO = Json.decodeFromString<BruksenhetDTO>(it.getString("data"))
 
             Bruksenhet(
-                id = bruksenhetDTO.id,
-                bruksenhetBubbleId = bruksenhetDTO.bruksenhetBubbleId,
-                bygningId = bruksenhetDTO.bygningId,
+                id = BruksenhetId(bruksenhetDTO.id),
+                bruksenhetBubbleId = BruksenhetBubbleId(bruksenhetDTO.bruksenhetBubbleId),
+                bygningId = BygningId(bruksenhetDTO.bygningId),
                 etasjer = bruksenhetDTO.bruksenhetData.etasjer,
                 byggeaar = bruksenhetDTO.bruksenhetData.byggeaar,
                 totaltBruksareal = bruksenhetDTO.bruksenhetData.totaltBruksareal,

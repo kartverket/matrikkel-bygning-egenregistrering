@@ -10,11 +10,9 @@ import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetEtasje
-import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
@@ -26,6 +24,10 @@ import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.applyEgenregistreringer
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
@@ -34,10 +36,10 @@ import java.util.*
 import kotlin.test.Test
 
 class BygningEgenregistreringAggregeringTest {
-    private val bygningId = UUID.fromString("00000000-0000-0000-0000-000000000001")
+    private val bygningId = BygningId("00000000-0000-0000-0000-000000000001")
 
     private val defaultBruksenhet = Bruksenhet(
-        id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+        id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
         bruksenhetBubbleId = BruksenhetBubbleId(1L),
         bygningId = bygningId,
     )
@@ -51,7 +53,7 @@ class BygningEgenregistreringAggregeringTest {
     )
 
     private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
-        bruksenhetBubbleId = 1L,
+        bruksenhetBubbleId = BruksenhetBubbleId(1L),
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
@@ -65,7 +67,7 @@ class BygningEgenregistreringAggregeringTest {
     )
 
     private val defaultBygningRegistrering = BygningRegistrering(
-        bygningId = 1L,
+        bygningBubbleId = BygningBubbleId(1L),
         bruksenhetRegistreringer = listOf(defaultBruksenhetRegistrering),
     )
 
@@ -78,7 +80,7 @@ class BygningEgenregistreringAggregeringTest {
     )
 
     private val bruksenhetRegistreringMedKildematerialeKode = BruksenhetRegistrering(
-        bruksenhetBubbleId = 1L,
+        bruksenhetBubbleId = BruksenhetBubbleId(1L),
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,

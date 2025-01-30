@@ -2,6 +2,8 @@ package no.kartverket.matrikkel.bygning.application.models
 
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -75,13 +77,13 @@ data class OppvarmingRegistrering(
 
 @Serializable
 data class BygningRegistrering(
-    val bygningId: Long,
+    val bygningBubbleId: BygningBubbleId,
     val bruksenhetRegistreringer: List<BruksenhetRegistrering>
 )
 
 @Serializable
 data class BruksenhetRegistrering(
-    val bruksenhetBubbleId: Long,
+    val bruksenhetBubbleId: BruksenhetBubbleId,
     val bruksarealRegistrering: BruksarealRegistrering?,
     val byggeaarRegistrering: ByggeaarRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,
