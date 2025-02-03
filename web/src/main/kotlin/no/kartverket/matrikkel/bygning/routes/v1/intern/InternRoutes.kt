@@ -1,7 +1,8 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern
 
-import io.ktor.server.routing.Route
+import RateLimitService
 import io.github.smiley4.ktorswaggerui.dsl.routing.route
+import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
@@ -11,7 +12,8 @@ import no.kartverket.matrikkel.bygning.routes.v1.kodeliste.kodelisteRouting
 
 fun Route.internRouting(
     egenregistreringService: EgenregistreringService,
-    bygningService: BygningService
+    bygningService: BygningService,
+    rateLimitService: RateLimitService
 ) {
     route(
         "/",
@@ -23,7 +25,7 @@ fun Route.internRouting(
             kodelisteRouting()
         }
         route("egenregistreringer") {
-            egenregistreringRouting(egenregistreringService)
+            egenregistreringRouting(egenregistreringService,rateLimitService)
         }
         route("bygninger") {
             bygningRouting(bygningService)

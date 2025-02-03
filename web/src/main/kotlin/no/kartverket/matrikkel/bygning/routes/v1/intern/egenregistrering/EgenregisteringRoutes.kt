@@ -1,5 +1,6 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering
 
+import RateLimitService
 import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.mapBoth
 import com.github.michaelbull.result.mapError
@@ -7,6 +8,7 @@ import com.github.michaelbull.result.runCatching
 import io.github.smiley4.ktorswaggerui.dsl.routing.post
 import io.ktor.http.*
 import io.ktor.server.auth.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -20,7 +22,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
 
-fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
+fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService, rateLimitService: RateLimitService) {
     authenticate(IDPORTEN_PROVIDER_NAME) {
         post(
             {
@@ -93,7 +95,13 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 }
             },
         ) {
+            val ip = call.request.origin.remoteHost
             val principal = call.principalOrThrow<DigDirPrincipal>()
+            val userId = principal.id
+
+            if (!rateLimitService.limitRequests(call)) {
+                return@post call.respond(HttpStatusCode.TooManyRequests, "Rate limit exceeded for IP: $ip, $userId")
+            }
 
             // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
             val egenregistreringRequest = call.receive<EgenregistreringRequest>()

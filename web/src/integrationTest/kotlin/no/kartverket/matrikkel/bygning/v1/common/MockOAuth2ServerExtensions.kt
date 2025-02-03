@@ -14,6 +14,7 @@ class MockOAuth2ServerExtensions {
                     "ID" to "0192:123456789"
                 ),
                 "scope" to scope,
+                "jti" to "gus",
             ),
         )
 

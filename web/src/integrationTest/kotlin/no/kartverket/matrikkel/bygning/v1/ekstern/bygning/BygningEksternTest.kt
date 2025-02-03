@@ -16,6 +16,20 @@ import org.junit.jupiter.api.Test
 
 class BygningEksternTest : TestApplicationWithDb() {
     @Test
+    fun `rate limit test`() = testApplication {
+        val client = mainModuleWithDatabaseEnvironmentAndClient()
+        val token = mockOAuthServer.issueMaskinportenJWT()
+
+        val response = client.get("/v1/redistest") {
+            headers {
+                append("Authorization", "Bearer ${token.serialize()}")
+            }
+        }
+
+        assertThat(response.status).isEqualTo(HttpStatusCode.TooManyRequests)
+    }
+
+    @Test
     fun `gitt en gyldig token med riktig scope skal tilgang gis`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
         val token = mockOAuthServer.issueMaskinportenJWT()

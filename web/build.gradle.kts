@@ -23,6 +23,9 @@ dependencies {
     implementation(libs.ktor.server.auth.jwt)
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.status.pages)
+    implementation(libs.ktor.server.rate.limit)
+
+    implementation("org.redisson:redisson:3.22.0")
 
     // Monitoring
     implementation(libs.ktor.server.call.logging)
