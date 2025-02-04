@@ -15,16 +15,20 @@ import java.time.Instant
 fun Route.bygningRouting(
     bygningService: BygningService
 ) {
-    route("{bygningId}") {
+    route(
+        "{bygningId}",
+        {
+            request {
+                pathParameter<String>("bygningId") {
+                    required = true
+                }
+            }
+        },
+    ) {
         get(
             {
                 summary = "Henter en bygning"
                 description = "Henter en bygning med tilhørende bruksenheter"
-                request {
-                    pathParameter<String>("bygningId") {
-                        required = true
-                    }
-                }
                 response {
                     code(HttpStatusCode.OK) {
                         body<BygningResponse> {
@@ -49,27 +53,26 @@ fun Route.bygningRouting(
             call.respond(status, body)
         }
 
-        route("egenregistrert") {
+        route(
+            "egenregistrert",
+            {
+                response {
+                    code(HttpStatusCode.OK) {
+                        body<BygningSimpleResponse> {
+                            description = "Bygning med én datakilde - kun egenregistrerte data"
+                        }
+                        description = "Bygningen finnes og ble hentet"
+                    }
+                    code(HttpStatusCode.NotFound) {
+                        description = "Fant ikke bygning med gitt bygningId"
+                    }
+                }
+            },
+        ) {
             get(
                 {
                     summary = "Hent egenregistrert data for en bygning"
                     description = "Hent egenregistrert data for en bygning med tilhørende bruksenheter"
-                    request {
-                        pathParameter<String>("bygningId") {
-                            required = true
-                        }
-                    }
-                    response {
-                        code(HttpStatusCode.OK) {
-                            body<BygningSimpleResponse> {
-                                description = "Bygning med én datakilde - kun egenregistrerte data"
-                            }
-                            description = "Bygningen finnes og ble hentet"
-                        }
-                        code(HttpStatusCode.NotFound) {
-                            description = "Fant ikke bygning med gitt bygningId"
-                        }
-                    }
                 },
             ) {
                 val bygningId = call.parameters.getOrFail("bygningId").toLong()
@@ -90,23 +93,11 @@ fun Route.bygningRouting(
                     description =
                         "Henter tidligere versjon av egenregistrert data for en bygning basert på informasjonsgrunnlaget ved gitt registreringstidspunkt"
                     request {
-                        pathParameter<String>("bygningId") {
-                            required = true
-                        }
                         queryParameter<Instant>("registreringstidspunkt") {
                             required = true
                         }
                     }
                     response {
-                        code(HttpStatusCode.OK) {
-                            body<BygningSimpleResponse> {
-                                description = "Bygning med én datakilde - kun egenregistrerte data"
-                            }
-                            description = "Bygningen finnes og ble hentet"
-                        }
-                        code(HttpStatusCode.NotFound) {
-                            description = "Fant ikke bygning med gitt bygningId"
-                        }
                         code(HttpStatusCode.BadRequest) {
                             description = "Forespørselen inneholder ugyldige parametere. Kontroller at alle felt er korrekt formatert."
                         }
@@ -131,19 +122,20 @@ fun Route.bygningRouting(
         }
 
         route("bruksenheter") {
-            route("{bruksenhetId}") {
+            route(
+                "{bruksenhetId}",
+                {
+                    request {
+                        pathParameter<String>("bruksenhetId") {
+                            required = true
+                        }
+                    }
+                },
+            ) {
                 get(
                     {
                         summary = "Hent en bruksenhet"
                         description = "Hent en bruksenhet"
-                        request {
-                            pathParameter<String>("bygningId") {
-                                required = true
-                            }
-                            pathParameter<String>("bruksenhetId") {
-                                required = true
-                            }
-                        }
                         response {
                             code(HttpStatusCode.OK) {
                                 body<BruksenhetResponse> {
@@ -171,30 +163,26 @@ fun Route.bygningRouting(
                     call.respond(status, body)
                 }
 
-                route("egenregistrert") {
+                route(
+                    "egenregistrert",
+                    {
+                        response {
+                            code(HttpStatusCode.OK) {
+                                body<BruksenhetSimpleResponse> {
+                                    description = "Bruksenhet med én datakilde - kun egenregistrerte data"
+                                }
+                                description = "Bruksenheten finnes og ble hentet"
+                            }
+                            code(HttpStatusCode.NotFound) {
+                                description = "Fant ikke bruksenhet med gitt bruksenhetId for gitt bygningId"
+                            }
+                        }
+                    },
+                ) {
                     get(
                         {
                             summary = "Hent egenregistrert data for en bruksenhet"
                             description = "Hent egenregistrert data en bruksenhet"
-                            request {
-                                pathParameter<String>("bygningId") {
-                                    required = true
-                                }
-                                pathParameter<String>("bruksenhetId") {
-                                    required = true
-                                }
-                            }
-                            response {
-                                code(HttpStatusCode.OK) {
-                                    body<BruksenhetSimpleResponse> {
-                                        description = "Bruksenhet med én datakilde - kun egenregistrerte data"
-                                    }
-                                    description = "Bruksenheten finnes og ble hentet"
-                                }
-                                code(HttpStatusCode.NotFound) {
-                                    description = "Fant ikke bruksenhet med gitt bruksenhetId for gitt bygningId"
-                                }
-                            }
                         },
                     ) {
                         val bygningId = call.parameters.getOrFail("bygningId").toLong()
@@ -218,27 +206,12 @@ fun Route.bygningRouting(
                             description =
                                 "Henter tidligere versjon av egenregistrert data for en bruksenhet basert på informasjonsgrunnlaget ved gitt registreringstidspunkt"
                             request {
-                                pathParameter<String>("bygningId") {
-                                    required = true
-                                }
-                                pathParameter<String>("bruksenhetId") {
-                                    required = true
-                                }
                                 queryParameter<Instant>("date") {
                                     required = true
                                     description = "Default verdi: ${Instant.now()}"
                                 }
                             }
                             response {
-                                code(HttpStatusCode.OK) {
-                                    body<BygningSimpleResponse> {
-                                        description = "Bruksenhet med én datakilde - kun egenregistrerte data"
-                                    }
-                                    description = "Bruksenhet finnes og ble hentet"
-                                }
-                                code(HttpStatusCode.NotFound) {
-                                    description = "Fant ikke bruksenhet med gitt bygningId"
-                                }
                                 code(HttpStatusCode.BadRequest) {
                                     description =
                                         "Forespørselen inneholder ugyldige parametere. Kontroller at alle felt er korrekt formatert."
