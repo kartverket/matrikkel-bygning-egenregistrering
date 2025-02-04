@@ -231,7 +231,7 @@ fun Route.bygningRouting(
                             }
                             response {
                                 code(HttpStatusCode.OK) {
-                                    body<BygningSimpleResponse> {
+                                    body<BruksenhetSimpleResponse> {
                                         description = "Bruksenhet med én datakilde - kun egenregistrerte data"
                                     }
                                     description = "Bruksenhet finnes og ble hentet"
