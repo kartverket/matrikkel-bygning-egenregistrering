@@ -70,7 +70,7 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
         }
     }
 
-    override fun getBruksenhetById(id: UUID, fremTilDato: Instant): Bruksenhet? {
+    override fun getBruksenhetById(bruksenhetId: UUID, registreringstidspunkt: Instant): Bruksenhet? {
         return dataSource.executeQueryAndMapPreparedStatement(
             """
                 SELECT data
@@ -85,10 +85,10 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
                     1,
                     PGobject().apply {
                         this.type = "uuid"
-                        this.value = id.toString()
+                        this.value = bruksenhetId.toString()
                     },
                 )
-                it.setObject(2, Timestamp.from(fremTilDato))
+                it.setObject(2, Timestamp.from(registreringstidspunkt))
             },
         ) {
             val bruksenhetDTO = Json.decodeFromString<BruksenhetDTO>(it.getString("data"))

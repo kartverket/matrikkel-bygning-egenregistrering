@@ -7,5 +7,5 @@ import java.util.*
 interface BygningRepository {
     fun saveBruksenhet(bruksenhet: Bruksenhet)
 
-    fun getBruksenhetById(bruksenhetId: UUID, fremTilDato: Instant): Bruksenhet?
+    fun getBruksenhetById(bruksenhetId: UUID, registreringstidspunkt: Instant): Bruksenhet?
 }
