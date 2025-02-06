@@ -37,7 +37,7 @@ fun Route.bygningEksternRouting(
         ) {
             val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-            val (status, body) = bygningService.getBygningWithEgenregistrertData(bygningId).mapBoth(
+            val (status, body) = bygningService.getBygningByBubbleId(bygningId).mapBoth(
                 success = { HttpStatusCode.OK to it.toBygningEksternResponse() },
                 failure = ::domainErrorToResponse,
             )
@@ -46,3 +46,4 @@ fun Route.bygningEksternRouting(
         }
     }
 }
+

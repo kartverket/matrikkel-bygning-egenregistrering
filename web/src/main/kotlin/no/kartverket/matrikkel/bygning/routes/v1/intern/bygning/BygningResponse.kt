@@ -1,9 +1,23 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern.bygning
 
 import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.models.*
-import no.kartverket.matrikkel.bygning.application.models.Felt.*
-import no.kartverket.matrikkel.bygning.application.models.kodelister.*
+import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
+import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
+import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
+import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
+import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
+import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
+import no.kartverket.matrikkel.bygning.application.models.Multikilde
+import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
+import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.serializers.InstantSerializer
 import java.time.Instant
 
@@ -118,7 +132,7 @@ fun <T : Any, R : Any> Multikilde<T>.toMultikildeResponse(mapper: T.() -> R): Mu
 }
 
 fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
-    bygningId = this.bygningId.value,
+    bygningId = this.bygningBubbleId.value,
     bygningsnummer = this.bygningsnummer,
     byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
     bruksareal = this.bruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
@@ -130,13 +144,13 @@ fun Bygning.toBygningResponse(): BygningResponse = BygningResponse(
 )
 
 fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
-    bygningId = this.bygningId.value,
+    bygningId = this.bygningBubbleId.value,
     bygningsnummer = this.bygningsnummer,
     bruksenheter = this.bruksenheter.map { it.toBruksenhetSimpleResponseFromEgenregistrertData() },
 )
 
 fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
-    bruksenhetId = this.bruksenhetId.value,
+    bruksenhetId = this.bruksenhetBubbleId.value,
     byggeaar = this.byggeaar.toMultikildeResponse(Byggeaar::toByggeaarResponse),
     etasjer = this.etasjer.toMultikildeResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
     totaltBruksareal = this.totaltBruksareal.toMultikildeResponse(Bruksareal::toBruksarealResponse),
@@ -147,7 +161,7 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
 )
 
 fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
-    bruksenhetId = this.bruksenhetId.value,
+    bruksenhetId = this.bruksenhetBubbleId.value,
     byggeaar = this.byggeaar.egenregistrert?.toByggeaarResponse(),
     etasjer = this.etasjer.egenregistrert?.toBruksenhetEtasjeResponse(),
     totaltBruksareal = this.totaltBruksareal.egenregistrert?.toBruksarealResponse(),

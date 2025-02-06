@@ -6,6 +6,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Statement
+import java.util.*
 import javax.sql.DataSource
 
 private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
@@ -17,6 +18,13 @@ inline fun <T> Statement.executeQuery(sql: String, block: (ResultSet) -> T) = ex
 
 inline fun <T> Connection.prepareStatement(sql: String, block: (PreparedStatement) -> T) = prepareStatement(sql).use(block)
 inline fun <T> PreparedStatement.executeQuery(block: (ResultSet) -> T) = executeQuery().use(block)
+
+fun PreparedStatement.setUUID(parameterIndex: Int, uuid: UUID) {
+    setObject(
+        parameterIndex,
+        uuid
+    )
+}
 
 fun <T> DataSource.withTransaction(block: (Connection) -> T): T {
     connection.use { connection ->

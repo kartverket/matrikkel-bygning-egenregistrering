@@ -78,7 +78,7 @@ data class RegisterMetadataEksternResponse(
 
 
 fun Bygning.toBygningEksternResponse(): BygningEksternResponse = BygningEksternResponse(
-    bygningId = bygningId.value,
+    bygningId = bygningBubbleId.value,
     bygningsnummer = bygningsnummer,
     bruksenheter = bruksenheter.map {
         it.toBruksenhetEksternResponse()
@@ -103,7 +103,7 @@ private fun <U, T : Felt<U>, O : FeltEksternResponse<U>?> toFeltEksternResponse(
 }
 
 private fun Bruksenhet.toBruksenhetEksternResponse(): BruksenhetEksternResponse = BruksenhetEksternResponse(
-    bruksenhetId = this.bruksenhetId.value,
+    bruksenhetId = this.bruksenhetBubbleId.value,
     byggeaar = toFeltEksternResponse(this.byggeaar.egenregistrert, ::ByggeaarEksternResponse),
     totaltBruksareal = toFeltEksternResponse(this.totaltBruksareal.egenregistrert, ::BruksarealEksternResponse),
     vannforsyning = toFeltEksternResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeEksternResponse),

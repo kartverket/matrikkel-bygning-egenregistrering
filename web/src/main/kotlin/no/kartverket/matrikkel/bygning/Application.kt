@@ -18,6 +18,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HealthRepositoryImpl
+import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygning.BygningRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client.LocalBygningClient
@@ -86,8 +87,17 @@ fun Application.mainModule() {
         }
 
     val egenregistreringRepository = EgenregistreringRepositoryImpl(dataSource)
-    val egenregistreringService = EgenregistreringService(bygningClient, egenregistreringRepository)
-    val bygningService = BygningService(bygningClient, egenregistreringService)
+    val bygningRepository = BygningRepositoryImpl(dataSource)
+
+    val bygningService = BygningService(
+        bygningClient = bygningClient,
+        bygningRepository = bygningRepository,
+    )
+
+    val egenregistreringService = EgenregistreringService(
+        bygningService = bygningService,
+        egenregistreringRepository = egenregistreringRepository,
+    )
 
     routing {
         // Routes for interne endepunkter.

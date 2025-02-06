@@ -5,6 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 
 plugins {
     kotlin("jvm")
+
     `jvm-test-suite`
 }
 
@@ -20,7 +21,7 @@ dependencies {
     implementation(libs.hikari)
 
     // Serialization
-    implementation(libs.ktor.serialization.kotlinx)
+    implementation(libs.fasterxml.jackson.kotlin)
 
     // Matrikkel
     implementation(libs.matrikkelapi.ws.client)

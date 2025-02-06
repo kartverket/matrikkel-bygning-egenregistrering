@@ -9,11 +9,9 @@ import assertk.assertions.isNull
 import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.BygningId
 import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
@@ -25,29 +23,37 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
+import no.kartverket.matrikkel.bygning.application.models.applyEgenregistreringer
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
-import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 import java.time.Instant
 import java.util.*
 import kotlin.test.Test
 
 class BygningEgenregistreringAggregeringTest {
+    private val bygningId = BygningId("00000000-0000-0000-0000-000000000001")
+
     private val defaultBruksenhet = Bruksenhet(
-        bruksenhetId = BruksenhetId(1L),
-        bygningId = BygningId(1L),
+        id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
+        bruksenhetBubbleId = BruksenhetBubbleId(1L),
+        bygningId = bygningId,
     )
 
     private val defaultBygning = Bygning(
-        bygningId = BygningId(1L),
+        id = bygningId,
+        bygningBubbleId = BygningBubbleId(1L),
         bygningsnummer = 100,
         bruksenheter = listOf(defaultBruksenhet),
         etasjer = emptyList(),
     )
 
     private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
-        bruksenhetId = 1L,
+        bruksenhetBubbleId = BruksenhetBubbleId(1L),
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
@@ -61,7 +67,7 @@ class BygningEgenregistreringAggregeringTest {
     )
 
     private val defaultBygningRegistrering = BygningRegistrering(
-        bygningId = 1L,
+        bygningBubbleId = BygningBubbleId(1L),
         bruksenhetRegistreringer = listOf(defaultBruksenhetRegistrering),
     )
 
@@ -74,7 +80,7 @@ class BygningEgenregistreringAggregeringTest {
     )
 
     private val bruksenhetRegistreringMedKildematerialeKode = BruksenhetRegistrering(
-        bruksenhetId = 1L,
+        bruksenhetBubbleId = BruksenhetBubbleId(1L),
         bruksarealRegistrering = BruksarealRegistrering(
             totaltBruksareal = 50.0,
             etasjeRegistreringer = null,
@@ -104,7 +110,7 @@ class BygningEgenregistreringAggregeringTest {
             ),
         )
 
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
 
         assertThat(aggregatedBygning).all {
             prop(Bygning::bruksenheter).index(0).all {
@@ -124,7 +130,7 @@ class BygningEgenregistreringAggregeringTest {
     fun `bruksenhet med en ny egenregistring får prosess fylt`() {
         val firstRegistrering = defaultEgenregistrering
 
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(defaultEgenregistrering, firstRegistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(defaultEgenregistrering, firstRegistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.metadata?.prosess)
             .isEqualTo(ProsessKode.Egenregistrering)
@@ -148,7 +154,7 @@ class BygningEgenregistreringAggregeringTest {
         )
 
         val aggregatedBygning =
-            defaultBygning.withEgenregistrertData(listOf(firstRegistrering, defaultEgenregistrering))
+            defaultBygning.applyEgenregistreringer(listOf(firstRegistrering, defaultEgenregistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().byggeaar.egenregistrert?.metadata?.kildemateriale)
             .isEqualTo(KildematerialeKode.Byggesaksdokumenter)
@@ -172,7 +178,7 @@ class BygningEgenregistreringAggregeringTest {
             ),
         )
 
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(laterRegistrering, defaultEgenregistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data)
             .isEqualTo(150.0)
@@ -199,13 +205,12 @@ class BygningEgenregistreringAggregeringTest {
                             ),
                             kildemateriale = KildematerialeKode.Salgsoppgave,
                         ),
-
-                        ),
+                    ),
                 ),
             ),
         )
 
-        val aggregatedBygning = defaultBygning.withEgenregistrertData(listOf(defaultEgenregistrering, firstRegistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(defaultEgenregistrering, firstRegistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().etasjer.egenregistrert).isNull()
 
@@ -225,7 +230,7 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `registrering med tom liste paa listeregistering skal ikke sette felt paa bruksenhet`() {
-        val bruksenhet = defaultBruksenhet.withEgenregistrertData(listOf(defaultEgenregistrering))
+        val bruksenhet = defaultBruksenhet.applyEgenregistreringer(listOf(defaultEgenregistrering))
 
         assertThat(bruksenhet.oppvarminger).isEmpty()
         assertThat(bruksenhet.energikilder).isEmpty()

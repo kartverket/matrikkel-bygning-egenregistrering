@@ -7,6 +7,10 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -16,7 +20,8 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Vannforsyni
 import java.time.Instant
 
 data class Bygning(
-    val bygningId: BygningId,
+    val id: BygningId,
+    val bygningBubbleId: BygningBubbleId,
     val bygningsnummer: Long,
     val etasjer: List<BygningEtasje>,
     val bruksenheter: List<Bruksenhet>,
@@ -52,9 +57,9 @@ sealed interface Felt<T> {
     data class Oppvarming(override val data: List<OppvarmingKode>, override val metadata: RegisterMetadata) : Felt<List<OppvarmingKode>>
 }
 
-
 data class Bruksenhet(
-    val bruksenhetId: BruksenhetId,
+    val id: BruksenhetId,
+    val bruksenhetBubbleId: BruksenhetBubbleId,
     val bygningId: BygningId,
     val etasjer: Multikilde<BruksenhetEtasjer> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
@@ -64,3 +69,4 @@ data class Bruksenhet(
     val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
     val avlop: Multikilde<Avlop> = Multikilde(),
 )
+
