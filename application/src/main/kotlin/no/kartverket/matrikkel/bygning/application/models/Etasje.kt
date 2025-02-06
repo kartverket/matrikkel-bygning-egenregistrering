@@ -1,14 +1,11 @@
 package no.kartverket.matrikkel.bygning.application.models
 
-import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 
 data class BygningEtasje(val etasjebetegnelse: Etasjebetegnelse, val etasjeId: Long)
 
 data class BruksenhetEtasje(val etasjebetegnelse: Etasjebetegnelse, val bruksareal: Double)
 
-@ConsistentCopyVisibility
-@Serializable
 data class Etasjenummer private constructor(val loepenummer: Int) {
     companion object {
         fun of(loepenummer: Int): Etasjenummer {
@@ -26,8 +23,6 @@ data class Etasjenummer private constructor(val loepenummer: Int) {
     }
 }
 
-@ConsistentCopyVisibility
-@Serializable
 data class Etasjebetegnelse private constructor(
     val etasjeplanKode: EtasjeplanKode,
     val etasjenummer: Etasjenummer,

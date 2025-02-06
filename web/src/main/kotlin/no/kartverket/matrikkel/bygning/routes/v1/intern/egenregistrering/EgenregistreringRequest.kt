@@ -14,6 +14,8 @@ import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -103,7 +105,7 @@ fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Etasje
 
 fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
     return BruksenhetRegistrering(
-        bruksenhetId = bruksenhetId,
+        bruksenhetBubbleId = BruksenhetBubbleId(bruksenhetId),
         bruksarealRegistrering = bruksarealRegistrering?.let { bruksarealRegistrering ->
             BruksarealRegistrering(
                 totaltBruksareal = bruksarealRegistrering.totaltBruksareal,
@@ -146,19 +148,16 @@ fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistre
     )
 }
 
-fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering {
-    val registreringstidspunkt = Instant.now()
-
-    return Egenregistrering(
+fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
+    Egenregistrering(
         id = UUID.randomUUID(),
         eier = Foedselsnummer(eier),
-        registreringstidspunkt = registreringstidspunkt,
+        registreringstidspunkt = Instant.now(),
         prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(
-            bygningId = this.bygningId,
+            bygningBubbleId = BygningBubbleId(this.bygningId),
             bruksenhetRegistreringer = this.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
                 bruksenhetRegistrering.toBruksenhetRegistrering()
             },
         ),
     )
-}

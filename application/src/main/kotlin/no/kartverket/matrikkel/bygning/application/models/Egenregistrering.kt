@@ -1,7 +1,8 @@
 package no.kartverket.matrikkel.bygning.application.models
 
-import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
+import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -15,13 +16,11 @@ sealed interface HasKildemateriale {
     val kildemateriale: KildematerialeKode
 }
 
-@Serializable
 data class ByggeaarRegistrering(
     val byggeaar: Int,
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
-@Serializable
 data class BruksarealRegistrering(
     val totaltBruksareal: Double,
     val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?,
@@ -40,46 +39,39 @@ data class BruksarealRegistrering(
     }
 }
 
-@Serializable
 data class EtasjeBruksarealRegistrering(
     val bruksareal: Double,
     val etasjebetegnelse: Etasjebetegnelse,
 )
 
-@Serializable
 data class VannforsyningRegistrering(
     val vannforsyning: VannforsyningKode,
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
-@Serializable
 data class AvlopRegistrering(
     val avlop: AvlopKode,
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
-@Serializable
 data class EnergikildeRegistrering(
     val energikilder: List<EnergikildeKode>,
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
-@Serializable
 data class OppvarmingRegistrering(
     val oppvarminger: List<OppvarmingKode>,
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
 
-@Serializable
 data class BygningRegistrering(
-    val bygningId: Long,
+    val bygningBubbleId: BygningBubbleId,
     val bruksenhetRegistreringer: List<BruksenhetRegistrering>
 )
 
-@Serializable
 data class BruksenhetRegistrering(
-    val bruksenhetId: Long,
+    val bruksenhetBubbleId: BruksenhetBubbleId,
     val bruksarealRegistrering: BruksarealRegistrering?,
     val byggeaarRegistrering: ByggeaarRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,

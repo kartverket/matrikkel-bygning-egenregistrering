@@ -4,43 +4,48 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.map
 import com.github.michaelbull.result.toResultOr
-import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.applyEgenregistrering
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.withEgenregistrertData
 
 class BygningService(
     private val bygningClient: BygningClient,
-    private val egenregistreringService: EgenregistreringService
+    private val bygningRepository: BygningRepository,
 ) {
-    fun getBygning(bygningId: Long): Result<Bygning, DomainError> {
-        return bygningClient.getBygningById(bygningId)
+    fun getBygningByBubbleId(bygningBubbleId: Long): Result<Bygning, DomainError> {
+        return bygningClient.getBygningByBubbleId(bygningBubbleId).map { bygning ->
+            bygning.copy(
+                bruksenheter = bygning.bruksenheter.map { bruksenhet ->
+                    bygningRepository.getBruksenhetById(bruksenhet.id.value) ?: bruksenhet
+                },
+            )
+        }
     }
 
-    fun getBygningWithEgenregistrertData(bygningId: Long): Result<Bygning, DomainError> {
-        return getBygning(bygningId)
-            .map { bygning ->
-                val egenregistreringerForBygning = egenregistreringService
-                    .findAllEgenregistreringerForBygning(bygningId)
-
-                bygning.withEgenregistrertData(egenregistreringerForBygning)
-            }
-    }
-
-    fun getBruksenhetWithEgenregistrertData(bygningId: Long, bruksenhetId: Long): Result<Bruksenhet, DomainError> {
-        return getBygning(bygningId)
+    fun getBruksenhetByBubbleId(bygningBubbleId: Long, bruksenhetBubbleId: Long): Result<Bruksenhet, DomainError> {
+        return bygningClient.getBygningByBubbleId(bygningBubbleId)
             .andThen { bygning ->
-                val egenregistreringerForBygning = egenregistreringService.findAllEgenregistreringerForBygning(bygningId)
-
                 bygning.bruksenheter
-                    .find { it.bruksenhetId.value == bruksenhetId }
-                    ?.withEgenregistrertData(egenregistreringerForBygning)
+                    .firstOrNull { bruksenhet -> bruksenhet.bruksenhetBubbleId.value == bruksenhetBubbleId }
                     .toResultOr {
-                        BruksenhetNotFound(message = "Bruksenhet finnes ikke på bygningen")
+                        BruksenhetNotFound("Fant ikke bruksenhet med id $bruksenhetBubbleId i bygning med id $bygningBubbleId")
                     }
-
             }
+            .map { bruksenhet ->
+                bygningRepository.getBruksenhetById(bruksenhet.id.value) ?: bruksenhet
+            }
+    }
+
+    fun createBruksenhetSnapshotsOfEgenregistrering(bygning: Bygning, egenregistrering: Egenregistrering) {
+        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
+            bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetBubbleId == bruksenhetRegistrering.bruksenhetBubbleId }
+                ?.applyEgenregistrering(egenregistrering)
+                ?.let { bruksenhet ->
+                    bygningRepository.saveBruksenhet(bruksenhet)
+                }
+        }
     }
 }

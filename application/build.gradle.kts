@@ -5,7 +5,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization").version(libs.versions.kotlinVersion)
 
     `jvm-test-suite`
 }
@@ -15,8 +14,7 @@ dependencies {
     api(libs.kotlin.result)
 
     // Serialization
-    // TODO: Bør helst ikke måtte ligge i application (skyldes lagring i databasen)
-    implementation(libs.ktor.serialization.kotlinx)
+    implementation(libs.fasterxml.jackson.kotlin)
 
     // Norwegian Commons
     implementation(libs.norwegian.commons)
