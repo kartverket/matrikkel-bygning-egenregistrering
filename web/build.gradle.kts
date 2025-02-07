@@ -97,7 +97,11 @@ testing {
                 implementation(libs.ktor.server.auth.jwt)
 
                 implementation(libs.assertk)
+
                 implementation(libs.testcontainers.postgresql)
+                implementation(libs.kotli.query) {
+                    exclude(group = "joda-time")
+                }
 
                 implementation(libs.mock.oauth2.server)
             }

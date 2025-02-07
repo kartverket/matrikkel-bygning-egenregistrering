@@ -3,40 +3,40 @@ package no.kartverket.matrikkel.bygning.infrastructure.database.repositories
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import kotliquery.TransactionalSession
+import kotliquery.queryOf
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringRepository
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.infrastructure.database.prepareAndExecuteUpdate
-import no.kartverket.matrikkel.bygning.infrastructure.database.setUUID
-import no.kartverket.matrikkel.bygning.infrastructure.database.withTransaction
+import org.intellij.lang.annotations.Language
 import org.postgresql.util.PGobject
-import java.sql.Timestamp
-import javax.sql.DataSource
 
-class EgenregistreringRepositoryImpl(private val dataSource: DataSource) : EgenregistreringRepository {
+class EgenregistreringRepositoryImpl : EgenregistreringRepository {
+
     private val objectMapper = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-    override fun saveEgenregistrering(egenregistrering: Egenregistrering) {
-        return dataSource.withTransaction { connection ->
-            connection.prepareAndExecuteUpdate(
-                """
+    override fun saveEgenregistrering(egenregistrering: Egenregistrering, tx: TransactionalSession) {
+        @Language("PostgreSQL")
+        val sql = """
                    INSERT INTO bygning.egenregistrering
                    (id, registreringstidspunkt, eier, registrering)
-                   VALUES (?, ?, ?, ?)
-                """.trimIndent(),
-            ) {
-                it.setUUID(1, egenregistrering.id)
-                it.setTimestamp(2, Timestamp.from(egenregistrering.registreringstidspunkt))
-                it.setString(3, egenregistrering.eier.value)
-                it.setObject(
-                    4,
-                    PGobject().apply {
+                   VALUES (:id, :registreringstidspunkt, :eier, :registrering)
+                """
+
+        tx.run(
+            queryOf(
+                sql,
+                mapOf(
+                    "id" to egenregistrering.id,
+                    "registreringstidspunkt" to egenregistrering.registreringstidspunkt,
+                    "eier" to egenregistrering.eier.value,
+                    "registrering" to PGobject().apply {
                         this.type = "jsonb"
                         this.value = objectMapper.writeValueAsString(egenregistrering.bygningRegistrering)
-                    },
+                    }
                 )
-            }
-        }
+            ).asUpdate
+        )
     }
 }

@@ -46,7 +46,10 @@ class BygningRepositoryTest : TestWithDb() {
 
     @Test
     fun `lagret bruksenhet skal kunne hentes ut igjen`() {
-        bygningRepository.saveBruksenhet(defaultBruksenhet)
+        bygningRepository.saveBruksenheter(
+            bruksenheter = listOf(defaultBruksenhet),
+            tx = session
+        )
 
         val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
 
@@ -71,23 +74,30 @@ class BygningRepositoryTest : TestWithDb() {
 
     @Test
     fun `lagring av bruksenhet med ny data skal kun hente nyeste versjon`() {
-        bygningRepository.saveBruksenhet(defaultBruksenhet)
-        bygningRepository.saveBruksenhet(defaultBruksenhet.copy(
-            avlop = Multikilde(
-                egenregistrert = Felt.Avlop(
-                    data = AvlopKode.PrivatKloakk,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = Instant.now(),
-                        registrertAv = Foedselsnummer("31129956715"),
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        prosess = ProsessKode.Egenregistrering,
+        bygningRepository.saveBruksenheter(
+            bruksenheter = listOf(defaultBruksenhet),
+            tx = session
+        )
+        bygningRepository.saveBruksenheter(
+            bruksenheter = listOf(
+                defaultBruksenhet.copy(
+                    avlop = Multikilde(
+                        egenregistrert = Felt.Avlop(
+                            data = AvlopKode.PrivatKloakk,
+                            metadata = RegisterMetadata(
+                                registreringstidspunkt = Instant.now(),
+                                registrertAv = Foedselsnummer("31129956715"),
+                                kildemateriale = KildematerialeKode.Salgsoppgave,
+                                prosess = ProsessKode.Egenregistrering,
+                            ),
+                        ),
                     ),
                 ),
             ),
-        ))
+            tx = session,
+        )
 
         val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
-
 
         assertThat(retrievedBruksenhet).isNotNull().all {
             prop(Bruksenhet::id).equals(BruksenhetId("00000000-0000-0000-0000-000000000001"))
@@ -111,21 +121,29 @@ class BygningRepositoryTest : TestWithDb() {
     fun `henting av bruksenehet basert på tidspunkt returnerer korrekt verdi`() {
         val byggeaar = 1998
 
-        bygningRepository.saveBruksenhet(defaultBruksenhet)
-        bygningRepository.saveBruksenhet(defaultBruksenhet.copy(
-            byggeaar = Multikilde(
-                egenregistrert = Felt.Byggeaar(
-                    data = byggeaar,
-                    metadata = RegisterMetadata(
-                        registreringstidspunkt = Instant.now(),
-                        registrertAv = Foedselsnummer("31129956715"),
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        prosess = ProsessKode.Egenregistrering,
+        bygningRepository.saveBruksenheter(
+            bruksenheter = listOf(defaultBruksenhet),
+            tx = session
+        )
+        bygningRepository.saveBruksenheter(
+            bruksenheter = listOf(
+                defaultBruksenhet.copy(
+                    byggeaar = Multikilde(
+                        egenregistrert = Felt.Byggeaar(
+                            data = byggeaar,
+                            metadata = RegisterMetadata(
+                                registreringstidspunkt = Instant.now(),
+                                registrertAv = Foedselsnummer("31129956715"),
+                                kildemateriale = KildematerialeKode.Salgsoppgave,
+                                prosess = ProsessKode.Egenregistrering,
 
-                    )
-                )
-            )
-        ))
+                                ),
+                        ),
+                    ),
+                ),
+            ),
+            tx = session,
+        )
 
         val currentBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
         assertThat(currentBruksenhet).isNotNull().all {
@@ -136,7 +154,8 @@ class BygningRepositoryTest : TestWithDb() {
             }
         }
 
-        val beforeAnyRegistrations = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.parse("2020-01-01T12:00:00.00Z"))
+        val beforeAnyRegistrations =
+            bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.parse("2020-01-01T12:00:00.00Z"))
         assertThat(beforeAnyRegistrations).isNull()
     }
 

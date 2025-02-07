@@ -19,6 +19,10 @@ dependencies {
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.hikari)
+    implementation(libs.kotli.query) {
+        // Ekskluderer joda-time da vi ikke benytter dette i sql mappingen vår
+        exclude(group = "joda-time")
+    }
 
     // Serialization
     implementation(libs.fasterxml.jackson.kotlin)

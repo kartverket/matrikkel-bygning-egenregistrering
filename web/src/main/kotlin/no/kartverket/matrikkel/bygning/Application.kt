@@ -18,6 +18,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HealthRepositoryImpl
+import no.kartverket.matrikkel.bygning.infrastructure.database.TransactionalSupport
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygning.BygningRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
@@ -86,7 +87,7 @@ fun Application.mainModule() {
             )
         }
 
-    val egenregistreringRepository = EgenregistreringRepositoryImpl(dataSource)
+    val egenregistreringRepository = EgenregistreringRepositoryImpl()
     val bygningRepository = BygningRepositoryImpl(dataSource)
 
     val bygningService = BygningService(
@@ -97,6 +98,8 @@ fun Application.mainModule() {
     val egenregistreringService = EgenregistreringService(
         bygningService = bygningService,
         egenregistreringRepository = egenregistreringRepository,
+        bygningRepository = bygningRepository,
+        transactional = TransactionalSupport(dataSource)
     )
 
     routing {
