@@ -44,13 +44,10 @@ class BygningService(
             }
     }
 
-    fun createBruksenhetSnapshotsOfEgenregistrering(bygning: Bygning, egenregistrering: Egenregistrering) {
-        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.forEach { bruksenhetRegistrering ->
+    fun createSnapshotsOfBruksenheterWithLatestEgenregistrering(bygning: Bygning, egenregistrering: Egenregistrering): List<Bruksenhet> {
+        return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistrering ->
             bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetBubbleId == bruksenhetRegistrering.bruksenhetBubbleId }
                 ?.applyEgenregistrering(egenregistrering)
-                ?.let { bruksenhet ->
-                    bygningRepository.saveBruksenhet(bruksenhet)
-                }
         }
     }
 }

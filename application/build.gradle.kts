@@ -18,6 +18,10 @@ dependencies {
 
     // Norwegian Commons
     implementation(libs.norwegian.commons)
+
+    implementation(libs.kotli.query) {
+        exclude(group = "joda-time")
+    }
 }
 
 tasks.withType<Test> {

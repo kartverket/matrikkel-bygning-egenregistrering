@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning.repositories
 
+import kotliquery.TransactionalSession
+import kotliquery.sessionOf
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
@@ -13,6 +15,9 @@ abstract class TestWithDb {
         private val postgresSQLContainer = PostgreSQLContainer("postgres:15-alpine")
 
         lateinit var dataSource: DataSource
+
+        internal val session: TransactionalSession
+            get() = sessionOf(dataSource).transaction { return@transaction it }
 
         @BeforeAll
         @JvmStatic

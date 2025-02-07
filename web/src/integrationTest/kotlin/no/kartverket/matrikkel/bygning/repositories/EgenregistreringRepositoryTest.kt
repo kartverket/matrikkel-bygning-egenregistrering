@@ -12,7 +12,7 @@ import java.time.Instant
 import java.util.*
 
 class EgenregistreringRepositoryTest : TestWithDb() {
-    private val egenregistreringRepository = EgenregistreringRepositoryImpl(dataSource)
+    private val egenregistreringRepository = EgenregistreringRepositoryImpl()
 
     private val defaultBygningRegistrering = BygningRegistrering(
         bygningBubbleId = BygningBubbleId(1L),
@@ -29,7 +29,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
 
     @Test
     fun `lagring av gyldig egenregistrering skal ikke feile`() {
-        egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering)
+        egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering, session)
     }
 
     // Aner ikke om dette er en vettug måte å gjøre dette på? Vi må ha en måte å ha en tom db mellom tester, hvert fall

@@ -19,6 +19,7 @@ smileySchemaKeneratorVersion = "1.6.4"
 mockOauth2Server = "2.1.10"
 matrikkelWsClientVersion = "4.18.1.0"
 jacksonVersion = "2.18.2"
+kotliQueryVersion = "1.9.0"
 
 [libraries]
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktorVersion" }
@@ -41,6 +42,7 @@ matrikkelapi-ws-client = { group = "no.kartverket.matrikkelapi-v1", name = "matr
 hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikariVersion" }
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flywayVersion" }
 flyway-database-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql", version.ref = "flywayVersion" }
+kotli-query = { group = "com.github.seratch", name = "kotliquery", version.ref = "kotliQueryVersion" }
 
 micrometer-prometheus = { group = "io.micrometer", name = "micrometer-registry-prometheus", version.ref = "prometheusVersion" }
 logstash-encoder = { group = "net.logstash.logback", name = "logstash-logback-encoder", version.ref = "logstashVersion" }
