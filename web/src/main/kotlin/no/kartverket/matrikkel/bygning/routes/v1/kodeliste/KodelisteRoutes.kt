@@ -26,6 +26,8 @@ fun Route.kodelisteRouting() {
             }
         },
     ) {
+        throw Exception("OOOOOOH NOOOOOOO")
+
         call.respond(
             KodelisterResponse(
                 energikildeKoder = EnergikildeKode::class.toKodeList(),
