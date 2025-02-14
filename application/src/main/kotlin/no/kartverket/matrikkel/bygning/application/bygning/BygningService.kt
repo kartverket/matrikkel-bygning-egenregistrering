@@ -6,8 +6,6 @@ import com.github.michaelbull.result.map
 import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.application.models.applyEgenregistrering
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import java.time.Instant
@@ -42,12 +40,5 @@ class BygningService(
             .map { bruksenhet ->
                 bygningRepository.getBruksenhetById(bruksenhet.id.value, registreringstidspunkt) ?: bruksenhet
             }
-    }
-
-    fun createSnapshotsOfBruksenheterWithLatestEgenregistrering(bygning: Bygning, egenregistrering: Egenregistrering): List<Bruksenhet> {
-        return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistrering ->
-            bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetBubbleId == bruksenhetRegistrering.bruksenhetBubbleId }
-                ?.applyEgenregistrering(egenregistrering)
-        }
     }
 }

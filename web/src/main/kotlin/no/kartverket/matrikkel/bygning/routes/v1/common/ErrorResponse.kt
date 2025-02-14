@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.error.ErrorDetail
 import no.kartverket.matrikkel.bygning.application.models.error.MultipleValidationError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import org.slf4j.MDC
@@ -25,25 +24,17 @@ fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorRespons
     is ValidationError -> HttpStatusCode.BadRequest to ErrorResponse.BadRequestError(description = error.message)
     is MultipleValidationError -> HttpStatusCode.BadRequest to ErrorResponse.ValidationError(
         details = error.errors.map {
-            ErrorDetailResponse(
-                detail = it.message,
-            )
+            it.message
         },
     )
 }
-
-@Serializable
-data class ErrorDetailResponse(
-    val pointer: String? = null,
-    val detail: String,
-)
 
 sealed interface ErrorResponse {
     val status: Int
     val title: String
     val description: String
     val correlationId: String
-    val details: List<ErrorDetailResponse>
+    val details: List<String>
 
     @Serializable
     class ValidationError(
@@ -51,8 +42,10 @@ sealed interface ErrorResponse {
         override val title: String = "Valideringsfeil",
         override val description: String = "Requesten din inneholdt én eller flere felter som ikke kunne valideres. Se listen over feil for flere detaljer",
         override val correlationId: String = resolveCallID(),
-        override val details: List<ErrorDetailResponse> = emptyList(),
-    ) : ErrorResponse
+        override val details: List<String> = emptyList()
+    ) : ErrorResponse {
+        constructor(vararg details: String) : this(details = details.toList())
+    }
 
     @Serializable
     class BadRequestError(
@@ -60,8 +53,10 @@ sealed interface ErrorResponse {
         override val title: String = "Formateringsfeil",
         override val description: String = "Requesten din inneholdt én eller flere felter som ikke var formatert riktig. Se listen over feil for flere detaljer",
         override val correlationId: String = resolveCallID(),
-        override val details: List<ErrorDetailResponse> = emptyList(),
-    ) : ErrorResponse
+        override val details: List<String> = emptyList()
+    ) : ErrorResponse {
+        constructor(vararg details: String) : this(details = details.toList())
+    }
 
     @Serializable
     class InternalServerError(
@@ -69,8 +64,10 @@ sealed interface ErrorResponse {
         override val title: String = "Serverfeil",
         override val description: String = "Noe har gått galt på serveren. Ta kontakt med Kartverket hvis feilen vedvarer",
         override val correlationId: String = resolveCallID(),
-        override val details: List<ErrorDetailResponse> = emptyList(),
-    ) : ErrorResponse
+        override val details: List<String> = emptyList()
+    ) : ErrorResponse {
+        constructor(vararg details: String) : this(details = details.toList())
+    }
 
     @Serializable
     class NotFoundError(
@@ -78,15 +75,10 @@ sealed interface ErrorResponse {
         override val title: String = "Ikke funnet",
         override val description: String = "Ressursen du etterspurte kunne ikke bli funnet",
         override val correlationId: String = resolveCallID(),
-        override val details: List<ErrorDetailResponse> = emptyList(),
-    ) : ErrorResponse
-}
-
-fun ErrorDetail.toErrorDetailResponse(): ErrorDetailResponse {
-    return ErrorDetailResponse(
-        pointer = this.pointer,
-        detail = this.detail,
-    )
+        override val details: List<String> = emptyList()
+    ) : ErrorResponse {
+        constructor(vararg details: String) : this(details = details.toList())
+    }
 }
 
 fun resolveCallID(): String {

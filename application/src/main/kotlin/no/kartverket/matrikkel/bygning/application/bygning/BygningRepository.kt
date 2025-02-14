@@ -6,6 +6,6 @@ import java.time.Instant
 import java.util.*
 
 interface BygningRepository {
-    fun saveBruksenheter(bruksenheter: List<Bruksenhet>, tx: TransactionalSession)
+    fun saveBruksenheter(bruksenheter: List<Bruksenhet>, registreringstidspunkt: Instant, tx: TransactionalSession)
     fun getBruksenhetById(bruksenhetId: UUID, registreringstidspunkt: Instant): Bruksenhet?
 }

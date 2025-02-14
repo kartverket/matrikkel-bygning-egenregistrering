@@ -21,32 +21,49 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Oppvarm
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.VannforsyningRegistreringRequest
 import java.time.Instant
 
+internal fun EgenregistreringRequest.Companion.validBruksenhetRegistreringRequest(bruksenhetId: Long = 1L) = BruksenhetRegistreringRequest(
+    bruksenhetId = bruksenhetId,
+    bruksarealRegistrering = BruksarealRegistreringRequest(
+        totaltBruksareal = 125.0,
+        etasjeRegistreringer = null,
+        kildemateriale = KildematerialeKode.Salgsoppgave,
+    ),
+    byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Selvrapportert),
+    vannforsyningRegistrering = VannforsyningRegistreringRequest(
+        VannforsyningKode.OffentligVannverk,
+        KildematerialeKode.Salgsoppgave,
+    ),
+    avlopRegistrering = AvlopRegistreringRequest(
+        avlop = AvlopKode.OffentligKloakk,
+        KildematerialeKode.Selvrapportert,
+    ),
+    energikildeRegistrering = EnergikildeRegistreringRequest(
+        listOf(EnergikildeKode.Elektrisitet),
+        KildematerialeKode.Selvrapportert,
+    ),
+    oppvarmingRegistrering = OppvarmingRegistreringRequest(
+        listOf(OppvarmingKode.Elektrisk),
+        KildematerialeKode.Selvrapportert,
+    ),
+)
+
 internal fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
     bygningId = 1L,
     bruksenhetRegistreringer = listOf(
-        BruksenhetRegistreringRequest(
-            bruksenhetId = 1L,
-            bruksarealRegistrering = BruksarealRegistreringRequest(
-                totaltBruksareal = 125.0,
-                etasjeRegistreringer = null,
-                kildemateriale = KildematerialeKode.Salgsoppgave,
-            ),
-            byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Selvrapportert),
-            vannforsyningRegistrering = VannforsyningRegistreringRequest(
-                VannforsyningKode.OffentligVannverk,
-                KildematerialeKode.Salgsoppgave,
-            ),
-            avlopRegistrering = AvlopRegistreringRequest(
-                avlop = AvlopKode.OffentligKloakk,
-                KildematerialeKode.Selvrapportert,
-            ),
-            energikildeRegistrering = EnergikildeRegistreringRequest(
-                listOf(EnergikildeKode.Elektrisitet),
-                KildematerialeKode.Selvrapportert,
-            ),
-            oppvarmingRegistrering = OppvarmingRegistreringRequest(
-                listOf(OppvarmingKode.Elektrisk),
-                KildematerialeKode.Selvrapportert,
+        validBruksenhetRegistreringRequest(),
+    ),
+)
+
+internal fun EgenregistreringRequest.Companion.validEgenregistreringMultipleBruksenheter() = EgenregistreringRequest(
+    bygningId = 1L,
+    bruksenhetRegistreringer = listOf(
+        validBruksenhetRegistreringRequest(1L),
+        validBruksenhetRegistreringRequest(2L).copy(
+            energikildeRegistrering = null,
+            oppvarmingRegistrering = null,
+            byggeaarRegistrering = ByggeaarRegistreringRequest(
+                byggeaar = 2008,
+                kildemateriale = KildematerialeKode.Selvrapportert,
             ),
         ),
     ),
@@ -65,9 +82,9 @@ internal fun EgenregistreringRequest.Companion.ugyldigEgenregistreringMedKunBruk
                         bruksareal = 125.0,
                         EtasjeBetegnelseRequest(
                             etasjeplanKode = "H",
-                            etasjenummer = 1
-                        )
-                    )
+                            etasjenummer = 1,
+                        ),
+                    ),
                 ),
                 kildemateriale = KildematerialeKode.Salgsoppgave,
             ),
