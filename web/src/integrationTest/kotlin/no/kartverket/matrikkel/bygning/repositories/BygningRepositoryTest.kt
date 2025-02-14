@@ -57,17 +57,17 @@ class BygningRepositoryTest : TestWithDb() {
 
 
         assertThat(retrievedBruksenhet).isNotNull().all {
-            prop(Bruksenhet::id).equals(BruksenhetId("00000000-0000-0000-0000-000000000001"))
-            prop(Bruksenhet::bruksenhetBubbleId).equals(BruksenhetBubbleId(1L))
-            prop(Bruksenhet::bygningId).equals(BygningId("00000000-0000-0000-0001-000000000001"))
+            prop(Bruksenhet::id).isEqualTo(BruksenhetId("00000000-0000-0000-0000-000000000001"))
+            prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(1L))
+            prop(Bruksenhet::bygningId).isEqualTo(BygningId("00000000-0000-0000-0001-000000000001"))
             prop(Bruksenhet::avlop).all {
                 prop(Multikilde<Felt.Avlop>::egenregistrert).isNotNull().all {
-                    prop(Felt.Avlop::data).equals(AvlopKode.OffentligKloakk)
+                    prop(Felt.Avlop::data).isEqualTo(AvlopKode.OffentligKloakk)
                     prop(Felt.Avlop::metadata).all {
                         prop(RegisterMetadata::registreringstidspunkt).isNotNull()
-                        prop(RegisterMetadata::registrertAv).equals(Foedselsnummer("31129956715"))
-                        prop(RegisterMetadata::kildemateriale).equals(KildematerialeKode.Salgsoppgave)
-                        prop(RegisterMetadata::prosess).equals(ProsessKode.Egenregistrering)
+                        prop(RegisterMetadata::registrertAv).isEqualTo(Foedselsnummer("31129956715"))
+                        prop(RegisterMetadata::kildemateriale).isEqualTo(KildematerialeKode.Salgsoppgave)
+                        prop(RegisterMetadata::prosess).isEqualTo(ProsessKode.Egenregistrering)
                     }
                 }
             }
@@ -104,17 +104,17 @@ class BygningRepositoryTest : TestWithDb() {
         val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
 
         assertThat(retrievedBruksenhet).isNotNull().all {
-            prop(Bruksenhet::id).equals(BruksenhetId("00000000-0000-0000-0000-000000000001"))
-            prop(Bruksenhet::bruksenhetBubbleId).equals(BruksenhetBubbleId(1L))
-            prop(Bruksenhet::bygningId).equals(BygningId("00000000-0000-0000-0001-000000000001"))
+            prop(Bruksenhet::id).isEqualTo(BruksenhetId("00000000-0000-0000-0000-000000000001"))
+            prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(1L))
+            prop(Bruksenhet::bygningId).isEqualTo(BygningId("00000000-0000-0000-0001-000000000001"))
             prop(Bruksenhet::avlop).all {
                 prop(Multikilde<Felt.Avlop>::egenregistrert).isNotNull().all {
-                    prop(Felt.Avlop::data).equals(AvlopKode.PrivatKloakk)
+                    prop(Felt.Avlop::data).isEqualTo(AvlopKode.PrivatKloakk)
                     prop(Felt.Avlop::metadata).all {
                         prop(RegisterMetadata::registreringstidspunkt).isNotNull()
-                        prop(RegisterMetadata::registrertAv).equals(Foedselsnummer("31129956715"))
-                        prop(RegisterMetadata::kildemateriale).equals(KildematerialeKode.Salgsoppgave)
-                        prop(RegisterMetadata::prosess).equals(ProsessKode.Egenregistrering)
+                        prop(RegisterMetadata::registrertAv).isEqualTo(Foedselsnummer("31129956715"))
+                        prop(RegisterMetadata::kildemateriale).isEqualTo(KildematerialeKode.Salgsoppgave)
+                        prop(RegisterMetadata::prosess).isEqualTo(ProsessKode.Egenregistrering)
                     }
                 }
             }
