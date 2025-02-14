@@ -19,10 +19,10 @@ class EgenregistreringRepositoryImpl : EgenregistreringRepository {
     override fun saveEgenregistrering(egenregistrering: Egenregistrering, tx: TransactionalSession) {
         @Language("PostgreSQL")
         val sql = """
-                   INSERT INTO bygning.egenregistrering
-                   (id, registreringstidspunkt, eier, registrering)
-                   VALUES (:id, :registreringstidspunkt, :eier, :registrering)
-                """
+           INSERT INTO bygning.egenregistrering
+           (id, registreringstidspunkt, eier, registrering)
+           VALUES (:id, :registreringstidspunkt, :eier, :registrering)
+        """.trimIndent()
 
         tx.run(
             queryOf(

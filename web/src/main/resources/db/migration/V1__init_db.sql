@@ -18,3 +18,11 @@ CREATE TABLE bruksenhet
     data                   JSONB                    NOT NULL,
     PRIMARY KEY (id, registreringstidspunkt)
 );
+
+CREATE TABLE hendelse
+(
+    sekvensnummer          BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    registreringstidspunkt TIMESTAMP WITH TIME ZONE NOT NULL,
+    object_id              BIGINT                   NOT NULL,
+    type                   VARCHAR(32)              NOT NULL
+);

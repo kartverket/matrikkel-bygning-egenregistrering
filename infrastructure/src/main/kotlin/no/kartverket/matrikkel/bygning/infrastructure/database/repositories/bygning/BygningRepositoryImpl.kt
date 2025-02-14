@@ -18,17 +18,16 @@ import javax.sql.DataSource
 
 class BygningRepositoryImpl(private val dataSource: DataSource) : BygningRepository {
 
-    private val objectMapper = jacksonObjectMapper()
-        .registerModule(JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    private val objectMapper =
+        jacksonObjectMapper().registerModule(JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-    override fun saveBruksenheter(bruksenheter: List<Bruksenhet>, tx: TransactionalSession) {
+    override fun saveBruksenheter(bruksenheter: List<Bruksenhet>, registreringstidspunkt: Instant, tx: TransactionalSession) {
         @Language("PostgreSQL")
         val sql = """
-                    INSERT INTO bygning.bruksenhet
-                    (id, bruksenhet_bubble_id, bygning_id, registreringstidspunkt, data)
-                    VALUES (:id, :bruksenhetBubbleId, :bygningId, :registreringstidspunkt, :data)
-                """
+            INSERT INTO bygning.bruksenhet
+            (id, bruksenhet_bubble_id, bygning_id, registreringstidspunkt, data)
+            VALUES (:id, :bruksenhetBubbleId, :bygningId, :registreringstidspunkt, :data)
+        """.trimIndent()
 
         tx.batchPreparedNamedStatement(
             sql,
@@ -43,26 +42,26 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
                         this.type = "uuid"
                         this.value = it.bygningId.value.toString()
                     },
-                    "registreringstidspunkt" to Timestamp.from(Instant.now()),
+                    "registreringstidspunkt" to Timestamp.from(registreringstidspunkt),
                     "data" to PGobject().apply {
                         this.type = "jsonb"
                         this.value = objectMapper.writeValueAsString(it)
                     },
                 )
-            }
+            },
         )
     }
 
     override fun getBruksenhetById(bruksenhetId: UUID, registreringstidspunkt: Instant): Bruksenhet? {
         @Language("PostgreSQL")
         val sql = """
-                SELECT data
-                FROM bygning.bruksenhet
-                WHERE id = :id
-                AND registreringstidspunkt <= :registreringstidspunkt
-                ORDER BY registreringstidspunkt DESC
-                LIMIT 1
-            """
+            SELECT data
+            FROM bygning.bruksenhet
+            WHERE id = :id
+            AND registreringstidspunkt <= :registreringstidspunkt
+            ORDER BY registreringstidspunkt DESC
+            LIMIT 1
+        """.trimIndent()
 
         return sessionOf(dataSource).use {
             it.run(

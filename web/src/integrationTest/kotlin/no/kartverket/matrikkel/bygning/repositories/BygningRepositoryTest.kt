@@ -27,6 +27,7 @@ class BygningRepositoryTest : TestWithDb() {
 
     private val bruksenhetId = BruksenhetId("00000000-0000-0000-0000-000000000001")
     private val bygningId = BygningId("00000000-0000-0000-0001-000000000001")
+    private val defaultRegistreringstidspunkt = Instant.parse("2025-01-01T00:00:00Z")
     private val defaultBruksenhet = Bruksenhet(
         id = bruksenhetId,
         bruksenhetBubbleId = BruksenhetBubbleId(1L),
@@ -35,7 +36,7 @@ class BygningRepositoryTest : TestWithDb() {
             egenregistrert = Felt.Avlop(
                 data = AvlopKode.OffentligKloakk,
                 metadata = RegisterMetadata(
-                    registreringstidspunkt = Instant.now(),
+                    registreringstidspunkt = defaultRegistreringstidspunkt,
                     registrertAv = Foedselsnummer("31129956715"),
                     kildemateriale = KildematerialeKode.Salgsoppgave,
                     prosess = ProsessKode.Egenregistrering,
@@ -48,6 +49,7 @@ class BygningRepositoryTest : TestWithDb() {
     fun `lagret bruksenhet skal kunne hentes ut igjen`() {
         bygningRepository.saveBruksenheter(
             bruksenheter = listOf(defaultBruksenhet),
+            registreringstidspunkt = defaultRegistreringstidspunkt,
             tx = session
         )
 
@@ -76,6 +78,7 @@ class BygningRepositoryTest : TestWithDb() {
     fun `lagring av bruksenhet med ny data skal kun hente nyeste versjon`() {
         bygningRepository.saveBruksenheter(
             bruksenheter = listOf(defaultBruksenhet),
+            registreringstidspunkt = defaultRegistreringstidspunkt,
             tx = session
         )
         bygningRepository.saveBruksenheter(
@@ -85,7 +88,7 @@ class BygningRepositoryTest : TestWithDb() {
                         egenregistrert = Felt.Avlop(
                             data = AvlopKode.PrivatKloakk,
                             metadata = RegisterMetadata(
-                                registreringstidspunkt = Instant.now(),
+                                registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(60),
                                 registrertAv = Foedselsnummer("31129956715"),
                                 kildemateriale = KildematerialeKode.Salgsoppgave,
                                 prosess = ProsessKode.Egenregistrering,
@@ -94,6 +97,7 @@ class BygningRepositoryTest : TestWithDb() {
                     ),
                 ),
             ),
+            registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(60),
             tx = session,
         )
 
@@ -123,6 +127,7 @@ class BygningRepositoryTest : TestWithDb() {
 
         bygningRepository.saveBruksenheter(
             bruksenheter = listOf(defaultBruksenhet),
+            registreringstidspunkt = defaultRegistreringstidspunkt,
             tx = session
         )
         bygningRepository.saveBruksenheter(
@@ -132,7 +137,7 @@ class BygningRepositoryTest : TestWithDb() {
                         egenregistrert = Felt.Byggeaar(
                             data = byggeaar,
                             metadata = RegisterMetadata(
-                                registreringstidspunkt = Instant.now(),
+                                registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(1),
                                 registrertAv = Foedselsnummer("31129956715"),
                                 kildemateriale = KildematerialeKode.Salgsoppgave,
                                 prosess = ProsessKode.Egenregistrering,
@@ -142,6 +147,7 @@ class BygningRepositoryTest : TestWithDb() {
                     ),
                 ),
             ),
+            registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(1),
             tx = session,
         )
 

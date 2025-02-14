@@ -12,13 +12,15 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
+import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
 import no.kartverket.matrikkel.bygning.config.Env
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
+import no.kartverket.matrikkel.bygning.infrastructure.database.TransactionalSupport
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HealthRepositoryImpl
-import no.kartverket.matrikkel.bygning.infrastructure.database.TransactionalSupport
+import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HendelseRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygning.BygningRepositoryImpl
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
@@ -89,32 +91,34 @@ fun Application.mainModule() {
 
     val egenregistreringRepository = EgenregistreringRepositoryImpl()
     val bygningRepository = BygningRepositoryImpl(dataSource)
+    val hendelseRepository = HendelseRepositoryImpl(dataSource)
 
     val bygningService = BygningService(
         bygningClient = bygningClient,
         bygningRepository = bygningRepository,
     )
 
+    val hendelseService = HendelseService(
+        hendelseRepository = hendelseRepository,
+    )
+
     val egenregistreringService = EgenregistreringService(
         bygningService = bygningService,
         egenregistreringRepository = egenregistreringRepository,
+        transactional = TransactionalSupport(dataSource),
+        hendelseRepository = hendelseRepository,
         bygningRepository = bygningRepository,
-        transactional = TransactionalSupport(dataSource)
     )
 
     routing {
-        // Routes for interne endepunkter.
+        // OpenAPI / Swagger for interne routes
         route("api.json") {
             openApiSpec(OpenApiSpecIds.INTERN)
         }
         route("swagger-ui") {
             swaggerUI("/api.json")
         }
-        route("v1") {
-            internRouting(egenregistreringService, bygningService)
-        }
-
-        // Routes for eksterne endepunkter.
+        // OpenAPI / Swagger for eksterne routes
         route("ekstern") {
             route("api.json") {
                 openApiSpec(OpenApiSpecIds.EKSTERN)
@@ -123,9 +127,11 @@ fun Application.mainModule() {
                 swaggerUI("/ekstern/api.json")
             }
         }
-        route("v1") {
-            eksternRouting(bygningService)
 
+
+        route("v1") {
+            internRouting(egenregistreringService, bygningService)
+            eksternRouting(bygningService, hendelseService)
         }
     }
     runFlywayMigrations(dataSource)

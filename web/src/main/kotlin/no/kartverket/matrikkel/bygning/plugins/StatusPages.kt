@@ -6,7 +6,6 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
-import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorDetailResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -24,11 +23,7 @@ fun Application.configureStatusPages() {
                             call.respond(
                                 HttpStatusCode.BadRequest,
                                 ErrorResponse.BadRequestError(
-                                    details = listOf(
-                                        ErrorDetailResponse(
-                                            detail = cause.message ?: "Ukjent feil etter serialisering av request objekt",
-                                        ),
-                                    ),
+                                    cause.message ?: "Ukjent feil etter serialisering av request objekt",
                                 ),
                             )
                         }
@@ -37,12 +32,7 @@ fun Application.configureStatusPages() {
                             call.respond(
                                 HttpStatusCode.BadRequest,
                                 ErrorResponse.BadRequestError(
-                                    details = listOf(
-                                        ErrorDetailResponse(
-                                            detail = exception.message
-                                                ?: "Ukjent feil med request gjør at server ikke kan håndtere forespørselen",
-                                        ),
-                                    ),
+                                    exception.message ?: "Ukjent feil med request gjør at server ikke kan håndtere forespørselen",
                                 ),
                             )
                         }
@@ -55,12 +45,8 @@ fun Application.configureStatusPages() {
                     call.respond(
                         HttpStatusCode.BadRequest,
                         ErrorResponse.BadRequestError(
-                            details = listOf(
-                                ErrorDetailResponse(
-                                    detail = exception.message ?: "Et eller flere felter i requesten var ugyldig"
-                                )
-                            )
-                        )
+                            exception.message ?: "Et eller flere felter i requesten var ugyldig",
+                        ),
                     )
                 }
 
