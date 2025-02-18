@@ -32,11 +32,11 @@ class EgenregistreringRepositoryTest : TestWithDb() {
         egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering, session)
     }
 
-    // Aner ikke om dette er en vettug måte å gjøre dette på? Vi må ha en måte å ha en tom db mellom tester, hvert fall
     @BeforeEach
     fun clearEgenregistreringer() {
         dataSource.connection.use { connection ->
             connection.createStatement().use { statement ->
+                @Suppress("SqlWithoutWhere")
                 statement.execute("DELETE FROM bygning.egenregistrering")
             }
         }
