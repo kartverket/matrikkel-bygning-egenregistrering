@@ -57,5 +57,19 @@ testing {
                 implementation(libs.mockk)
             }
         }
+
+        register<JvmTestSuite>("integrationTest") {
+            dependencies {
+                implementation(project())
+                implementation(project(":application"))
+
+                implementation(libs.kotli.query)
+
+                implementation(libs.kotlin.test)
+
+                implementation(libs.assertk)
+                implementation(libs.testcontainers.postgresql)
+            }
+        }
     }
 }

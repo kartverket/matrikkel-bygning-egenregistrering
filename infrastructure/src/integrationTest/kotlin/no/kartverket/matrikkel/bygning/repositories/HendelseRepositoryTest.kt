@@ -45,11 +45,11 @@ class HendelseRepositoryTest : TestWithDb() {
         assertThat(lagredeHendelser).size().isEqualTo(2)
     }
 
-    // Aner ikke om dette er en vettug måte å gjøre dette på? Vi må ha en måte å ha en tom db mellom tester, hvert fall
     @BeforeEach
     fun clearBruksenheter() {
         dataSource.connection.use { connection ->
             connection.createStatement().use { statement ->
+                @Suppress("SqlWithoutWhere")
                 statement.execute("DELETE FROM bygning.hendelse")
             }
         }
