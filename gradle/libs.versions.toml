@@ -67,8 +67,9 @@ schema-kenerator-swagger = { group = "io.github.smiley4", name = "schema-kenerat
 
 fasterxml-jackson-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jacksonVersion" }
 [plugins]
-kotlin-jvm = { id = "jvm", version.ref = "kotlinVersion" }
-kotlin-serialization = { id = "plugin.serialization", version.ref = "kotlinVersion" }
+# Dette er så dependabot skjønner at kotlinVersion er det som styrer disse pluginene.
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }
 
 ktor = { id = "io.ktor.plugin", version.ref = "ktorVersion" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadowVersion" }
