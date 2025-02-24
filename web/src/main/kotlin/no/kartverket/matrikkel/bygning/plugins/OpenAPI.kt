@@ -80,7 +80,14 @@ private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, vers
             this.version = version
         }
         tags {
-            tagGenerator = { url -> listOf(url.getOrNull(1)?.replaceFirstChar(Char::titlecase)) }
+            tagGenerator = { url ->
+                listOf(
+                    when (url.getOrNull(1)) {
+                        "intern" -> url.getOrNull(2)?.replaceFirstChar(Char::titlecase)
+                        else -> url.getOrNull(1)?.replaceFirstChar(Char::titlecase)
+                    }
+                )
+            }
         }
         security {
             securityScheme(MASKINPORTEN_PROVIDER_NAME) {

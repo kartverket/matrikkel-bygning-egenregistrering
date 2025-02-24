@@ -22,16 +22,16 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Kildemateri
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksarealResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksarealInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.ByggeaarResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.EnergikildeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.MultikildeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.ByggeaarInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.EnergikildeInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.MultikildeInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
@@ -50,7 +50,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
         val token = mockOAuthServer.issueIDPortenJWT()
 
-        val response = client.post("/v1/egenregistreringer") {
+        val response = client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
@@ -69,7 +69,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
             val token = mockOAuthServer.issueIDPortenJWT()
 
-            val response = client.post("/v1/egenregistreringer") {
+            val response = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.validEgenregistrering(),
@@ -81,64 +81,64 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Created)
 
-            val bygningResponse = client.get("/v1/bygninger/1")
+            val bygningResponse = client.get("/v1/intern/bygninger/1")
 
             assertThat(bygningResponse.status).isEqualTo(HttpStatusCode.OK)
-            val bygning = bygningResponse.body<BygningResponse>()
+            val bygning = bygningResponse.body<BygningInternResponse>()
 
             val now = Instant.now()
 
 
             assertThat(bygning).all {
-                prop(BygningResponse::bruksenheter).index(0).all {
+                prop(BygningInternResponse::bruksenheter).index(0).all {
                     prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
                     prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
-                        prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                            prop(BruksarealResponse::data).isEqualTo(125.0)
-                            prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
+                            prop(BruksarealInternResponse::data).isEqualTo(125.0)
+                            prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
                     prop(BruksenhetResponse::byggeaar).isNotNull().all {
-                        prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
-                            prop(ByggeaarResponse::data).isEqualTo(2010)
-                            prop(ByggeaarResponse::metadata).all {
+                        prop(MultikildeInternResponse<ByggeaarInternResponse>::egenregistrert).isNotNull().all {
+                            prop(ByggeaarInternResponse::data).isEqualTo(2010)
+                            prop(ByggeaarInternResponse::metadata).all {
                                 hasRegistreringstidspunktWithinThreshold(now)
-                                prop(RegisterMetadataResponse::kildemateriale).isEqualTo(KildematerialeKode.Selvrapportert)
+                                prop(RegisterMetadataInternResponse::kildemateriale).isEqualTo(KildematerialeKode.Selvrapportert)
                             }
                         }
                     }
 
                     prop(BruksenhetResponse::vannforsyning).isNotNull().all {
-                        prop(MultikildeResponse<VannforsyningKodeResponse>::egenregistrert).isNotNull().all {
-                            prop(VannforsyningKodeResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
-                            prop(VannforsyningKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        prop(MultikildeInternResponse<VannforsyningKodeInternResponse>::egenregistrert).isNotNull().all {
+                            prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
+                            prop(VannforsyningKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
                     prop(BruksenhetResponse::avlop).isNotNull().all {
-                        prop(MultikildeResponse<AvlopKodeResponse>::egenregistrert).isNotNull().all {
-                            prop(AvlopKodeResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
-                            prop(AvlopKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        prop(MultikildeInternResponse<AvlopKodeInternResponse>::egenregistrert).isNotNull().all {
+                            prop(AvlopKodeInternResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
+                            prop(AvlopKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
                     prop(BruksenhetResponse::energikilder).isNotNull().all {
-                        prop(MultikildeResponse<EnergikildeResponse>::egenregistrert).isNotNull().all {
-                            prop(EnergikildeResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
-                            prop(EnergikildeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        prop(MultikildeInternResponse<EnergikildeInternResponse>::egenregistrert).isNotNull().all {
+                            prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
+                            prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
                     prop(BruksenhetResponse::oppvarminger).isNotNull().all {
-                        prop(MultikildeResponse<OppvarmingResponse>::egenregistrert).isNotNull().all {
-                            prop(OppvarmingResponse::data).containsExactly(OppvarmingKode.Elektrisk)
-                            prop(OppvarmingResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        prop(MultikildeInternResponse<OppvarmingInternResponse>::egenregistrert).isNotNull().all {
+                            prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
+                            prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
                 }
 
-                prop(BygningResponse::bruksenheter).index(1).all {
+                prop(BygningInternResponse::bruksenheter).index(1).all {
                     prop(BruksenhetResponse::bruksenhetId).isEqualTo(2L)
                     prop(BruksenhetResponse::totaltBruksareal).isNull()
                     prop(BruksenhetResponse::energikilder).isNull()
@@ -152,7 +152,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
         val token = mockOAuthServer.issueIDPortenJWT()
 
-        val response = client.post("/v1/egenregistreringer") {
+        val response = client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
@@ -164,7 +164,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Created)
 
-        val bruksenhetResponse = client.get("/v1/bygninger/1/bruksenheter/1")
+        val bruksenhetResponse = client.get("/v1/intern/bygninger/1/bruksenheter/1")
 
         assertThat(bruksenhetResponse.status).isEqualTo(HttpStatusCode.OK)
         val bruksenhet = bruksenhetResponse.body<BruksenhetResponse>()
@@ -174,23 +174,23 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
 
             prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
-                prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                    prop(BruksarealResponse::data).isEqualTo(125.0)
-                    prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
+                    prop(BruksarealInternResponse::data).isEqualTo(125.0)
+                    prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
 
             prop(BruksenhetResponse::energikilder).isNotNull().all {
-                prop(MultikildeResponse<EnergikildeResponse>::egenregistrert).isNotNull().all {
-                    prop(EnergikildeResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
-                    prop(EnergikildeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                prop(MultikildeInternResponse<EnergikildeInternResponse>::egenregistrert).isNotNull().all {
+                    prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
+                    prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
 
             prop(BruksenhetResponse::oppvarminger).isNotNull().all {
-                prop(MultikildeResponse<OppvarmingResponse>::egenregistrert).isNotNull().all {
-                    prop(OppvarmingResponse::data).containsExactly(OppvarmingKode.Elektrisk)
-                    prop(OppvarmingResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                prop(MultikildeInternResponse<OppvarmingInternResponse>::egenregistrert).isNotNull().all {
+                    prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
+                    prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
         }
@@ -202,7 +202,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
             val token = mockOAuthServer.issueIDPortenJWT()
 
-            val egenregistrering1 = client.post("/v1/egenregistreringer") {
+            val egenregistrering1 = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.validEgenregistrering(),
@@ -213,7 +213,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             }
             assertThat(egenregistrering1.status).isEqualTo(HttpStatusCode.Created)
 
-            val egenregistrering2 = client.post("/v1/egenregistreringer") {
+            val egenregistrering2 = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.validEgenregistrering().copy(
@@ -243,24 +243,24 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             }
             assertThat(egenregistrering2.status).isEqualTo(HttpStatusCode.Created)
 
-            val bygningResponse = client.get("/v1/bygninger/1")
+            val bygningResponse = client.get("/v1/intern/bygninger/1")
 
             assertThat(bygningResponse.status).isEqualTo(HttpStatusCode.OK)
-            val bygning = bygningResponse.body<BygningResponse>()
+            val bygning = bygningResponse.body<BygningInternResponse>()
 
             val now = Instant.now()
-            assertThat(bygning).prop(BygningResponse::bruksenheter).all {
+            assertThat(bygning).prop(BygningInternResponse::bruksenheter).all {
                 withBruksenhetId(1L).all {
                     prop(BruksenhetResponse::byggeaar).isNotNull().all {
-                        prop(MultikildeResponse<ByggeaarResponse>::egenregistrert).isNotNull().all {
-                            prop(ByggeaarResponse::data).isEqualTo(2008)
-                            prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        prop(MultikildeInternResponse<ByggeaarInternResponse>::egenregistrert).isNotNull().all {
+                            prop(ByggeaarInternResponse::data).isEqualTo(2008)
+                            prop(ByggeaarInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
                     prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
-                        prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                            prop(BruksarealResponse::data).isEqualTo(40.0)
-                            prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
+                            prop(BruksarealInternResponse::data).isEqualTo(40.0)
+                            prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
                 }
@@ -277,7 +277,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
             val token = mockOAuthServer.issueIDPortenJWT()
 
-            val response = client.post("/v1/egenregistreringer") {
+            val response = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                         EgenregistreringRequest.validEgenregistrering(),
@@ -289,18 +289,18 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Created)
 
-            val bygningResponse = client.get("/v1/bygninger/1")
+            val bygningResponse = client.get("/v1/intern/bygninger/1")
 
             assertThat(bygningResponse.status).isEqualTo(HttpStatusCode.OK)
-            val bygning = bygningResponse.body<BygningResponse>()
+            val bygning = bygningResponse.body<BygningInternResponse>()
 
             assertThat(bygning).all {
-                prop(BygningResponse::bruksareal).isNotNull().prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNull()
-                prop(BygningResponse::bruksenheter).withBruksenhetId(1L)
+                prop(BygningInternResponse::bruksareal).isNotNull().prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNull()
+                prop(BygningInternResponse::bruksenheter).withBruksenhetId(1L)
                     .prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
-                        prop(MultikildeResponse<BruksarealResponse>::egenregistrert).isNotNull().all {
-                            prop(BruksarealResponse::metadata).all {
-                                prop(RegisterMetadataResponse::registrertAv).isEqualTo("31129956715")
+                        prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
+                            prop(BruksarealInternResponse::metadata).all {
+                                prop(RegisterMetadataInternResponse::registrertAv).isEqualTo("31129956715")
                             }
                         }
                     }
@@ -313,7 +313,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
             val token = mockOAuthServer.issueIDPortenJWT()
 
-            val response = client.post("/v1/egenregistreringer") {
+            val response = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.ugyldigEgenregistreringMedKunBruksarealPerEtasje(),
@@ -337,7 +337,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-            val response = client.post("/v1/egenregistreringer") {
+            val response = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.validEgenregistrering(),

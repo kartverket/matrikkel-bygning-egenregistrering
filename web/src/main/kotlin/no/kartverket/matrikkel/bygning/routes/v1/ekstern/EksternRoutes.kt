@@ -17,7 +17,7 @@ fun Route.eksternRouting(
 ) {
     authenticate(MASKINPORTEN_PROVIDER_NAME) {
         route(
-            "/ekstern",
+            "/",
             {
                 specId = OpenApiSpecIds.EKSTERN
                 securitySchemeNames = listOf(MASKINPORTEN_PROVIDER_NAME)

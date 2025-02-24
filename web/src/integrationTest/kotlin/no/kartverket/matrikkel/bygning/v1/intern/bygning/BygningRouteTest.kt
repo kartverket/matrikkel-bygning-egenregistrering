@@ -18,15 +18,16 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksarealResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksarealInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetSimpleResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.ByggeaarResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.ByggeaarInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningSimpleResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.EnergikildeResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.EnergikildeInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
@@ -40,12 +41,12 @@ class BygningRouteTest : TestApplicationWithDb() {
     fun `gitt at en bygning id eksisterer svarer bygning route ok`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-        val response = client.get("/v1/bygninger/1")
+        val response = client.get("/v1/intern/bygninger/1")
 
         assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(response.body<BygningResponse>()).all {
-            prop(BygningResponse::bygningId).isEqualTo(1L)
-            prop(BygningResponse::bruksenheter).hasSize(2)
+        assertThat(response.body<BygningInternResponse>()).all {
+            prop(BygningInternResponse::bygningId).isEqualTo(1L)
+            prop(BygningInternResponse::bruksenheter).hasSize(2)
         }
     }
 
@@ -53,7 +54,7 @@ class BygningRouteTest : TestApplicationWithDb() {
     fun `gitt at en bygning id ikke eksisterer svarer bygning route not found`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-        val response = client.get("/v1/bygninger/10000000")
+        val response = client.get("/v1/intern/bygninger/10000000")
 
         assertThat(response.status).isEqualTo(HttpStatusCode.NotFound)
     }
@@ -62,7 +63,7 @@ class BygningRouteTest : TestApplicationWithDb() {
     fun `gitt at en bygning eksisterer uten egenregistrert data skal alle feltene vaere null`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-        val response = client.get("/v1/bygninger/1/egenregistrert")
+        val response = client.get("/v1/intern/bygninger/1/egenregistrert")
 
         assertThat(response.status).isEqualTo(HttpStatusCode.OK)
         assertThat(response.body<BygningSimpleResponse>()).all {
@@ -83,7 +84,7 @@ class BygningRouteTest : TestApplicationWithDb() {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
         val token = mockOAuthServer.issueIDPortenJWT()
 
-        client.post("/v1/egenregistreringer") {
+        client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
@@ -93,7 +94,7 @@ class BygningRouteTest : TestApplicationWithDb() {
             }
         }
 
-        val response = client.get("/v1/bygninger/1/egenregistrert")
+        val response = client.get("/v1/intern/bygninger/1/egenregistrert")
 
         val now = Instant.now()
 
@@ -102,28 +103,28 @@ class BygningRouteTest : TestApplicationWithDb() {
             prop(BygningSimpleResponse::bruksenheter).hasSize(2)
             prop(BygningSimpleResponse::bruksenheter).index(0).all {
                 prop(BruksenhetSimpleResponse::totaltBruksareal).isNotNull().all {
-                    prop(BruksarealResponse::data).isEqualTo(125.0)
-                    prop(BruksarealResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    prop(BruksarealInternResponse::data).isEqualTo(125.0)
+                    prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
                 prop(BruksenhetSimpleResponse::byggeaar).isNotNull().all {
-                    prop(ByggeaarResponse::data).isEqualTo(2010)
-                    prop(ByggeaarResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    prop(ByggeaarInternResponse::data).isEqualTo(2010)
+                    prop(ByggeaarInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
                 prop(BruksenhetSimpleResponse::vannforsyning).isNotNull().all {
-                    prop(VannforsyningKodeResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
-                    prop(VannforsyningKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
+                    prop(VannforsyningKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
                 prop(BruksenhetSimpleResponse::avlop).isNotNull().all {
-                    prop(AvlopKodeResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
-                    prop(AvlopKodeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    prop(AvlopKodeInternResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
+                    prop(AvlopKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
                 prop(BruksenhetSimpleResponse::oppvarminger).isNotNull().all {
-                    prop(OppvarmingResponse::data).containsExactly(OppvarmingKode.Elektrisk)
-                    prop(OppvarmingResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
+                    prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
                 prop(BruksenhetSimpleResponse::energikilder).isNotNull().all {
-                    prop(EnergikildeResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
-                    prop(EnergikildeResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
+                    prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
         }
@@ -133,7 +134,7 @@ class BygningRouteTest : TestApplicationWithDb() {
     fun `gitt et gyldig dato query parameter svarer bygning arkiv bad request`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-        val response = client.get("/v1/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=UGYLDIG_DATO")
+        val response = client.get("/v1/intern/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=UGYLDIG_DATO")
         assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)
     }
 
@@ -142,7 +143,7 @@ class BygningRouteTest : TestApplicationWithDb() {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
         val token = mockOAuthServer.issueIDPortenJWT()
         
-        client.post("/v1/egenregistreringer") {
+        client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
@@ -152,18 +153,18 @@ class BygningRouteTest : TestApplicationWithDb() {
             }
         }
 
-        val currentData = client.get("/v1/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=${Instant.now()}")
+        val currentData = client.get("/v1/intern/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=${Instant.now()}")
         assertThat(currentData.status).isEqualTo(HttpStatusCode.OK)
         assertThat(currentData.body<BygningSimpleResponse>()).all {
             prop(BygningSimpleResponse::bruksenheter).hasSize(2)
             prop(BygningSimpleResponse::bruksenheter).index(0).all {
                 prop(BruksenhetSimpleResponse::totaltBruksareal).isNotNull().all {
-                    prop(BruksarealResponse::data).isEqualTo(125.0)
+                    prop(BruksarealInternResponse::data).isEqualTo(125.0)
                 }
             }
         }
 
-        val oldData = client.get("/v1/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=2025-01-01T15:15:47.361080Z")
+        val oldData = client.get("/v1/intern/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=2025-01-01T15:15:47.361080Z")
         assertThat(oldData.status).isEqualTo(HttpStatusCode.OK)
         assertThat(oldData.body<BygningSimpleResponse>()).all {
             prop(BygningSimpleResponse::bruksenheter).hasSize(2)
