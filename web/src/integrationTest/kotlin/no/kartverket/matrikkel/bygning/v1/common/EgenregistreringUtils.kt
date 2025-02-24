@@ -8,7 +8,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.AvlopRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
@@ -96,8 +96,8 @@ internal fun EgenregistreringRequest.Companion.ugyldigEgenregistreringMedKunBruk
     ),
 )
 
-internal fun Assert<RegisterMetadataResponse>.hasRegistreringstidspunktWithinThreshold(now: Instant): () -> Unit {
+internal fun Assert<RegisterMetadataInternResponse>.hasRegistreringstidspunktWithinThreshold(now: Instant): () -> Unit {
     return {
-        prop(RegisterMetadataResponse::registreringstidspunkt).isBetween(now, now.plusSeconds(1))
+        prop(RegisterMetadataInternResponse::registreringstidspunkt).isBetween(now, now.plusSeconds(1))
     }
 }

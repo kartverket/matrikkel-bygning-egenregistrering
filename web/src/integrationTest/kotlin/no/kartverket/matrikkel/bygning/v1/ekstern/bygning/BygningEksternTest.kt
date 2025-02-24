@@ -28,7 +28,7 @@ class BygningEksternTest : TestApplicationWithDb() {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
         val token = mockOAuthServer.issueMaskinportenJWT()
 
-        val response = client.get("/v1/ekstern/bygninger/1") {
+        val response = client.get("/v1/bygninger/1") {
             headers {
                 append("Authorization", "Bearer ${token.serialize()}")
             }
@@ -46,7 +46,7 @@ class BygningEksternTest : TestApplicationWithDb() {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
         val token = mockOAuthServer.issueMaskinportenJWT("feil:scope")
 
-        val response = client.get("/v1/ekstern/bygninger/1") {
+        val response = client.get("/v1/bygninger/1") {
             headers {
                 append("Authorization", "Bearer ${token.serialize()}")
             }
@@ -59,7 +59,7 @@ class BygningEksternTest : TestApplicationWithDb() {
     fun `gitt et kall uten token skal tilgang nektes`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-        val response = client.get("/v1/ekstern/bygninger/1")
+        val response = client.get("/v1/bygninger/1")
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Unauthorized)
     }
@@ -70,7 +70,7 @@ class BygningEksternTest : TestApplicationWithDb() {
 
         val idportenJWT = mockOAuthServer.issueIDPortenJWT()
 
-        client.post("/v1/egenregistreringer") {
+        client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.validEgenregistreringMultipleBruksenheter(),
@@ -81,7 +81,7 @@ class BygningEksternTest : TestApplicationWithDb() {
         }
 
         val maskinportenJWT = mockOAuthServer.issueMaskinportenJWT()
-        val result = client.get("/v1/ekstern/hendelser") {
+        val result = client.get("/v1/hendelser") {
             url {
                 parameters.append("antall", "10")
             }

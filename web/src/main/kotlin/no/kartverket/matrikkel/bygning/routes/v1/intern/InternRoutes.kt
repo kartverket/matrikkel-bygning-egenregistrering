@@ -15,7 +15,7 @@ fun Route.internRouting(
     bygningService: BygningService
 ) {
     route(
-        "/",
+        "/intern",
         {
             specId = OpenApiSpecIds.INTERN
         },

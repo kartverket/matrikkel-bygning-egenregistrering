@@ -74,20 +74,19 @@ fun Application.mainModule() {
         ),
     )
 
-    val bygningClient =
-        if (Env.isLocal() && config.property("matrikkel.useStub").getString().toBoolean()) {
-            log.warn("Bruker stub for matrikkel APIet. Skal kun brukes lokalt!")
-            LocalBygningClient()
-        } else {
-            MatrikkelBygningClient(
-                MatrikkelApi(
-                    URI(config.property("matrikkel.baseUrl").getString()),
-                ).withAuth(
-                    config.property("matrikkel.username").getString(),
-                    config.property("matrikkel.password").getString(),
-                ),
-            )
-        }
+    val bygningClient = if (Env.isLocal() && config.property("matrikkel.useStub").getString().toBoolean()) {
+        log.warn("Bruker stub for matrikkel APIet. Skal kun brukes lokalt!")
+        LocalBygningClient()
+    } else {
+        MatrikkelBygningClient(
+            MatrikkelApi(
+                URI(config.property("matrikkel.baseUrl").getString()),
+            ).withAuth(
+                config.property("matrikkel.username").getString(),
+                config.property("matrikkel.password").getString(),
+            ),
+        )
+    }
 
     val egenregistreringRepository = EgenregistreringRepositoryImpl()
     val bygningRepository = BygningRepositoryImpl(dataSource)
@@ -112,20 +111,20 @@ fun Application.mainModule() {
 
     routing {
         // OpenAPI / Swagger for interne routes
+        route("intern") {
+            route("api.json") {
+                openApiSpec(OpenApiSpecIds.INTERN)
+            }
+            route("swagger-ui") {
+                swaggerUI("/intern/api.json")
+            }
+        }
+        // OpenAPI / Swagger for eksterne routes
         route("api.json") {
-            openApiSpec(OpenApiSpecIds.INTERN)
+            openApiSpec(OpenApiSpecIds.EKSTERN)
         }
         route("swagger-ui") {
             swaggerUI("/api.json")
-        }
-        // OpenAPI / Swagger for eksterne routes
-        route("ekstern") {
-            route("api.json") {
-                openApiSpec(OpenApiSpecIds.EKSTERN)
-            }
-            route("swagger-ui") {
-                swaggerUI("/ekstern/api.json")
-            }
         }
 
 

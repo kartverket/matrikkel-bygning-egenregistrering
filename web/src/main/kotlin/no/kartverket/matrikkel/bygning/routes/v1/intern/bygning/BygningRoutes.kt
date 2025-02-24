@@ -25,7 +25,7 @@ fun Route.bygningRouting(
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BygningResponse> {
+                        body<BygningInternResponse> {
                             description = "Bygningen med tilhørende bruksenheter"
                         }
                         description = "Bygningen finnes og ble hentet"
@@ -40,7 +40,7 @@ fun Route.bygningRouting(
 
             val (status, body) = bygningService.getBygningByBubbleId(bygningBubbleId = bygningId)
                 .mapBoth(
-                    success = { HttpStatusCode.OK to it.toBygningResponse() },
+                    success = { HttpStatusCode.OK to it.toBygningInternResponse() },
                     failure = ::domainErrorToResponse,
                 )
 
