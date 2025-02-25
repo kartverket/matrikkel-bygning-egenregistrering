@@ -8,8 +8,8 @@ import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.bygning.bygningEksternRouting
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.hendelseEksternRouting
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.hendelseRouting
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygningMedPersondataRouting
 
 fun Route.eksternRouting(
     bygningService: BygningService,
@@ -28,12 +28,12 @@ fun Route.eksternRouting(
                 }
             },
         ) {
-            route("bygninger") {
-                bygningEksternRouting(bygningService)
+            route("medpersondata") {
+                bygningMedPersondataRouting(bygningService)
             }
 
             route("hendelser") {
-                hendelseEksternRouting(hendelseService)
+                hendelseRouting(hendelseService)
             }
         }
     }

@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.ekstern.bygning
+package no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning
 
 import com.github.michaelbull.result.mapBoth
 import io.github.smiley4.ktorswaggerui.dsl.routing.get
@@ -9,7 +9,7 @@ import io.ktor.server.util.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 
-fun Route.bygningEksternRouting(
+fun Route.bygningMedPersondataRouting(
     bygningService: BygningService
 ) {
     route("{bygningId}") {
@@ -24,7 +24,7 @@ fun Route.bygningEksternRouting(
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BygningEksternResponse> {
+                        body<BygningMedPersondataResponse> {
                             description = "Bygningen med tilhørende bruksenheter"
                         }
                         description = "Bygningen finnes og ble hentet"
@@ -38,7 +38,7 @@ fun Route.bygningEksternRouting(
             val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
             val (status, body) = bygningService.getBygningByBubbleId(bygningId).mapBoth(
-                success = { HttpStatusCode.OK to it.toBygningEksternResponse() },
+                success = { HttpStatusCode.OK to it.toBygningMedPersondataResponse() },
                 failure = ::domainErrorToResponse,
             )
 

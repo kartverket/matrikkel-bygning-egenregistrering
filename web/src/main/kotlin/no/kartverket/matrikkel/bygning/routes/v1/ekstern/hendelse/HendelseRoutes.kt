@@ -15,7 +15,7 @@ object HendelseRoutingConstants {
     const val ANTALL_QUERY_PARAM_MAX: Long = 1000
 }
 
-fun Route.hendelseEksternRouting(
+fun Route.hendelseRouting(
     hendelseService: HendelseService
 ) {
     get(
