@@ -16,25 +16,28 @@ fun Route.eksternRouting(
     hendelseService: HendelseService,
 ) {
     authenticate(MASKINPORTEN_PROVIDER_NAME) {
-        route(
-            "/",
-            {
-                specId = OpenApiSpecIds.EKSTERN
-                securitySchemeNames = listOf(MASKINPORTEN_PROVIDER_NAME)
-                response {
-                    code(HttpStatusCode.Unauthorized) {
-                        description = "Manglende eller ugyldig token"
-                    }
-                }
-            },
-        ) {
-            route("medpersondata") {
+        route("/") {
+            routeWithMaskinporten("medpersondata", OpenApiSpecIds.MED_PERSONDATA) {
                 bygningMedPersondataRouting(bygningService)
             }
 
-            route("hendelser") {
+            routeWithMaskinporten("hendelser", OpenApiSpecIds.HENDELSER) {
                 hendelseRouting(hendelseService)
             }
         }
     }
 }
+
+private fun Route.routeWithMaskinporten(path: String, openApiSpecId: String, build: Route.() -> Unit) = route(
+    path,
+    {
+        specId = openApiSpecId
+        securitySchemeNames = listOf(MASKINPORTEN_PROVIDER_NAME)
+        response {
+            code(HttpStatusCode.Unauthorized) {
+                description = "Manglende eller ugyldig token"
+            }
+        }
+    },
+    build
+)
