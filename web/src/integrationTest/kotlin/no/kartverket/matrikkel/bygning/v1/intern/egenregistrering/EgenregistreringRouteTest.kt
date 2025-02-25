@@ -55,9 +55,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
             )
-            headers {
-                append("Authorization", "Bearer ${token.serialize()}")
-            }
+            bearerAuth(token.serialize())
         }
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -74,9 +72,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 setBody(
                     EgenregistreringRequest.validEgenregistrering(),
                 )
-                headers {
-                    append("Authorization", "Bearer ${token.serialize()}")
-                }
+                bearerAuth(token.serialize())
             }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -157,9 +153,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
             )
-            headers {
-                append("Authorization", "Bearer ${token.serialize()}")
-            }
+            bearerAuth(token.serialize())
         }
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -207,9 +201,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 setBody(
                     EgenregistreringRequest.validEgenregistrering(),
                 )
-                headers {
-                    append("Authorization", "Bearer ${token.serialize()}")
-                }
+                bearerAuth(token.serialize())
             }
             assertThat(egenregistrering1.status).isEqualTo(HttpStatusCode.Created)
 
@@ -237,9 +229,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                         ),
                     ),
                 )
-                headers {
-                    append("Authorization", "Bearer ${token.serialize()}")
-                }
+                bearerAuth(token.serialize())
             }
             assertThat(egenregistrering2.status).isEqualTo(HttpStatusCode.Created)
 
@@ -280,11 +270,9 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val response = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                        EgenregistreringRequest.validEgenregistrering(),
+                    EgenregistreringRequest.validEgenregistrering(),
                 )
-                headers {
-                    append("Authorization", "Bearer ${token.serialize()}")
-                }
+                bearerAuth(token.serialize())
             }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Created)
@@ -318,9 +306,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 setBody(
                     EgenregistreringRequest.ugyldigEgenregistreringMedKunBruksarealPerEtasje(),
                 )
-                headers {
-                    append("Authorization", "Bearer ${token.serialize()}")
-                }
+                bearerAuth(token.serialize())
             }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)

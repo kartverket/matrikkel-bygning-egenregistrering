@@ -6,6 +6,8 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import io.ktor.server.testing.*
 import kotlinx.serialization.json.Json
+import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.DEFAULT_AUDIENCE
+import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.DEFAULT_ISSUER
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -67,13 +69,17 @@ abstract class TestApplicationWithDb {
                     "storage.username" to postgresSQLContainer.username,
                     "storage.password" to postgresSQLContainer.password,
                     "matrikkel.useStub" to "true",
-                    "maskinporten.issuer" to mockOAuthServer.issuerUrl("testIssuer").toString(),
-                    "maskinporten.jwksUri" to mockOAuthServer.jwksUrl("testIssuer").toString(),
+                    "maskinporten.issuer" to mockOAuthServer.issuerUrl(DEFAULT_ISSUER).toString(),
+                    "maskinporten.jwksUri" to mockOAuthServer.jwksUrl(DEFAULT_ISSUER).toString(),
                     "maskinporten.scopes" to "kartverk:riktig:scope",
                     "maskinporten.disabled" to "false",
-                    "idporten.issuer" to mockOAuthServer.issuerUrl("testIssuer").toString(),
-                    "idporten.jwksUri" to mockOAuthServer.jwksUrl("testIssuer").toString(),
-                    "idporten.disabled" to "false"
+                    "idporten.issuer" to mockOAuthServer.issuerUrl(DEFAULT_ISSUER).toString(),
+                    "idporten.jwksUri" to mockOAuthServer.jwksUrl(DEFAULT_ISSUER).toString(),
+                    "idporten.disabled" to "false",
+                    "entra.audience" to DEFAULT_AUDIENCE,
+                    "entra.issuer" to mockOAuthServer.issuerUrl(DEFAULT_ISSUER).toString(),
+                    "entra.jwksUri" to mockOAuthServer.jwksUrl(DEFAULT_ISSUER).toString(),
+                    "entra.disabled" to "false"
                 )
             }
         }

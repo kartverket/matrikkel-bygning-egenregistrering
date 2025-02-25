@@ -1,9 +1,13 @@
 package no.kartverket.matrikkel.bygning.routes
 
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.plugins.*
 import io.ktor.server.routing.*
 
-
-inline fun <reified T : Any> RoutingCall.principalOrThrow(): T {
-    return principal<T>() ?: throw IllegalStateException("No principal was found on the incoming call, but was needed to authenticate.")
+/**
+ * Henter ut fnr fra pid claimet i IDPorten token.
+ */
+fun RoutingCall.getFnr(): String {
+    return this.principal<JWTPrincipal>()?.get("pid") ?: throw BadRequestException("pid mangler i JWTCredential")
 }

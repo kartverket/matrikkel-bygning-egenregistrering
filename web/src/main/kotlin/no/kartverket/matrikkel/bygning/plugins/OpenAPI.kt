@@ -21,6 +21,7 @@ import io.github.smiley4.schemakenerator.swagger.handleCoreAnnotations
 import io.github.smiley4.schemakenerator.swagger.handleSchemaAnnotations
 import io.github.smiley4.schemakenerator.swagger.withTitle
 import io.ktor.server.application.*
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
 import java.time.Instant
@@ -97,6 +98,12 @@ private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, vers
             }
 
             securityScheme(IDPORTEN_PROVIDER_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+
+            securityScheme(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
                 type = AuthType.HTTP
                 scheme = AuthScheme.BEARER
                 bearerFormat = "jwt"

@@ -3,16 +3,20 @@ package no.kartverket.matrikkel.bygning.plugins.authentication
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
 import io.ktor.util.*
 import no.kartverket.matrikkel.bygning.config.Env
+import no.kartverket.matrikkel.bygning.plugins.authentication.ApplicationRoles.ACCESS_AS_APPLICATION
+import no.kartverket.matrikkel.bygning.plugins.authentication.ApplicationRoles.BYGNING_ARKIVARISK_HISTORIKK
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.authentication.mock.MockJWTAuthenticationProvider
-import no.kartverket.matrikkel.bygning.plugins.authentication.mock.MockJWTConfig
+import no.kartverket.matrikkel.bygning.plugins.authentication.mock.mockJwtPrincipalForProvider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -23,21 +27,19 @@ private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 object AuthenticationConstants {
     const val IDPORTEN_PROVIDER_NAME = "idporten"
     const val MASKINPORTEN_PROVIDER_NAME = "maskinporten"
+    const val ENTRA_ID_ARKIVARISK_HISTORIKK_NAME = "entra_arkivarisk_historikk"
 }
 
-data class DigDirPrincipal(
-    /**
-     * Representerer PID/FNr for enkeltpersoner i tokens fra ID-porten,
-     * og ICD:OrgNr i tokens fra Maskinporten
-     * https://docs.digdir.no/docs/Maskinporten/maskinporten_protocol_token#identifying-organizations
-     */
-    val id: String
-)
+object ApplicationRoles {
+    const val ACCESS_AS_APPLICATION = "access_as_application"
+    const val BYGNING_ARKIVARISK_HISTORIKK = "bygning_arkivarisk_historikk"
+}
 
 data class JWTAuthenticationConfig(
     val jwksUri: String,
     val issuer: String,
-    val scopes: String?,
+    val scopes: String? = null,
+    val audience: String? = null,
 ) {
     val jwkProvider: JwkProvider
         get() = JwkProviderBuilder(URI(jwksUri).toURL())
@@ -50,13 +52,14 @@ fun Application.configureAuthentication(config: ApplicationConfig) {
     install(Authentication) {
         jwtMaskinporten(config)
         jwtIDPorten(config)
+        jwtEntraIdArkivariskHistorikk(config)
     }
 }
 
 private fun AuthenticationConfig.jwtMaskinporten(config: ApplicationConfig) {
     if (Env.isLocal() && isProviderDisabled(config, MASKINPORTEN_PROVIDER_NAME)) {
         logDisabledProviderWarning(MASKINPORTEN_PROVIDER_NAME)
-        register(MockJWTAuthenticationProvider(MockJWTConfig(MASKINPORTEN_PROVIDER_NAME)))
+        mockJwtPrincipalForProvider(MASKINPORTEN_PROVIDER_NAME)
     } else {
         jwt(MASKINPORTEN_PROVIDER_NAME) {
             val authConfig = JWTAuthenticationConfig(
@@ -70,11 +73,7 @@ private fun AuthenticationConfig.jwtMaskinporten(config: ApplicationConfig) {
                 withClaim("scope", authConfig.scopes)
             }
 
-            validate { jwtCredential ->
-                jwtCredential.getClaim("consumer", Map::class)?.let { consumer ->
-                    consumer["ID"]?.let { DigDirPrincipal(it as String) }
-                }
-            }
+            validate { credentials -> JWTPrincipal(credentials.payload) }
         }
     }
 }
@@ -82,7 +81,15 @@ private fun AuthenticationConfig.jwtMaskinporten(config: ApplicationConfig) {
 private fun AuthenticationConfig.jwtIDPorten(config: ApplicationConfig) {
     if (Env.isLocal() && isProviderDisabled(config, IDPORTEN_PROVIDER_NAME)) {
         logDisabledProviderWarning(IDPORTEN_PROVIDER_NAME)
-        register(MockJWTAuthenticationProvider(MockJWTConfig(IDPORTEN_PROVIDER_NAME)))
+        mockJwtPrincipalForProvider(IDPORTEN_PROVIDER_NAME) {
+            jwtCreator {
+                val token = JWT.create()
+                    .withClaim("pid", "31129956715")
+                    .sign(Algorithm.none())
+
+                JWT.decode(token)
+            }
+        }
     } else {
         jwt(IDPORTEN_PROVIDER_NAME) {
             val authConfig = JWTAuthenticationConfig(
@@ -95,7 +102,30 @@ private fun AuthenticationConfig.jwtIDPorten(config: ApplicationConfig) {
                 acceptLeeway(3)
             }
 
-            validate { DigDirPrincipal(it.payload.getClaim("pid").asString()) }
+            validate { credentials -> JWTPrincipal(credentials.payload) }
+        }
+    }
+}
+
+private fun AuthenticationConfig.jwtEntraIdArkivariskHistorikk(config: ApplicationConfig) {
+    if (Env.isLocal() && isProviderDisabled(config, "entra")) {
+        logDisabledProviderWarning(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME)
+        mockJwtPrincipalForProvider(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME)
+    } else {
+        jwt(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
+            val authConfig = JWTAuthenticationConfig(
+                jwksUri = config.property("entra.jwksUri").getString(),
+                issuer = config.property("entra.issuer").getString(),
+                audience = config.property("entra.audience").getString(),
+            )
+
+            verifier(authConfig.jwkProvider, authConfig.issuer) {
+                acceptLeeway(3)
+                withAudience(authConfig.audience)
+                withArrayClaim("roles", ACCESS_AS_APPLICATION, BYGNING_ARKIVARISK_HISTORIKK)
+            }
+
+            validate { credentials -> JWTPrincipal(credentials.payload) }
         }
     }
 }
@@ -105,4 +135,4 @@ private fun isProviderDisabled(config: ApplicationConfig, name: String): Boolean
 
 
 private fun logDisabledProviderWarning(name: String) =
-    log.warn("${name.toUpperCasePreservingASCIIRules()} autentisering er deaktivert! Dette skal kun aktiveres lokalt.")
+    log.warn("${name.toUpperCasePreservingASCIIRules()} autentisering er deaktivert! Dette skal kun gjøres lokalt.")
