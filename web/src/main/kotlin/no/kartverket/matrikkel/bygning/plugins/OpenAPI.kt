@@ -90,8 +90,8 @@ private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, vers
             tagGenerator = { url ->
                 listOf(
                     when (url.getOrNull(1)) {
-                        "intern" -> url.getOrNull(2)?.replaceFirstChar(Char::titlecase)
-                        else -> url.getOrNull(1)?.replaceFirstChar(Char::titlecase)
+                        "hendelser" -> url.getOrNull(1)?.replaceFirstChar(Char::titlecase)
+                        else -> url.getOrNull(2)?.replaceFirstChar(Char::titlecase)
                     }
                 )
             }
