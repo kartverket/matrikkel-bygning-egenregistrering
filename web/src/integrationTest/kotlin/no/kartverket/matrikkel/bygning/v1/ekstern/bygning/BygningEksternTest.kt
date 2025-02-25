@@ -29,9 +29,7 @@ class BygningEksternTest : TestApplicationWithDb() {
         val token = mockOAuthServer.issueMaskinportenJWT()
 
         val response = client.get("/v1/bygninger/1") {
-            headers {
-                append("Authorization", "Bearer ${token.serialize()}")
-            }
+            bearerAuth(token.serialize())
         }
 
         assertThat(response.status).isEqualTo(HttpStatusCode.OK)
@@ -47,9 +45,7 @@ class BygningEksternTest : TestApplicationWithDb() {
         val token = mockOAuthServer.issueMaskinportenJWT("feil:scope")
 
         val response = client.get("/v1/bygninger/1") {
-            headers {
-                append("Authorization", "Bearer ${token.serialize()}")
-            }
+           bearerAuth(token.serialize())
         }
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Unauthorized)
@@ -75,9 +71,7 @@ class BygningEksternTest : TestApplicationWithDb() {
             setBody(
                 EgenregistreringRequest.validEgenregistreringMultipleBruksenheter(),
             )
-            headers {
-                append("Authorization", "Bearer ${idportenJWT.serialize()}")
-            }
+            bearerAuth(idportenJWT.serialize())
         }
 
         val maskinportenJWT = mockOAuthServer.issueMaskinportenJWT()
@@ -85,9 +79,7 @@ class BygningEksternTest : TestApplicationWithDb() {
             url {
                 parameters.append("antall", "10")
             }
-            headers {
-                append("Authorization", "Bearer ${maskinportenJWT.serialize()}")
-            }
+            bearerAuth(maskinportenJWT.serialize())
         }
 
         val hendelseContainer = result.body<HendelseContainerResponse>()

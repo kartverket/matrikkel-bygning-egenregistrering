@@ -7,6 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.toInstant
 import java.time.Instant
@@ -22,6 +23,7 @@ fun Route.arkivRouting(
                         summary = "Hent egenregistrert data for en bygning for et gitt registreringstidspunkt"
                         description =
                             "Henter tidligere versjon av egenregistrert data for en bygning basert på informasjonsgrunnlaget ved gitt registreringstidspunkt"
+                        securitySchemeNames = listOf(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME)
                         request {
                             pathParameter<String>("bygningId") {
                                 required = true
@@ -69,6 +71,7 @@ fun Route.arkivRouting(
                                 summary = "Hent egenregistrert data for en bruksenhet for et gitt registreringstidspunkt"
                                 description =
                                     "Henter tidligere versjon av egenregistrert data for en bruksenhet basert på informasjonsgrunnlaget ved gitt registreringstidspunkt"
+                                securitySchemeNames = listOf(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME)
                                 request {
                                     pathParameter<String>("bygningId") {
                                         required = true

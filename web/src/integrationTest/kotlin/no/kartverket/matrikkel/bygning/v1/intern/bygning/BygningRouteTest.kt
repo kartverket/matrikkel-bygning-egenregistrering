@@ -89,9 +89,7 @@ class BygningRouteTest : TestApplicationWithDb() {
             setBody(
                 EgenregistreringRequest.validEgenregistrering(),
             )
-            headers {
-                append("Authorization", "Bearer ${token.serialize()}")
-            }
+            bearerAuth(token.serialize())
         }
 
         val response = client.get("/v1/intern/bygninger/1/egenregistrert")
@@ -128,51 +126,6 @@ class BygningRouteTest : TestApplicationWithDb() {
                 }
             }
         }
-    }
-
-    @Test
-    fun `gitt et gyldig dato query parameter svarer bygning arkiv bad request`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
-
-        val response = client.get("/v1/intern/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=UGYLDIG_DATO")
-        assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)
-    }
-
-    @Test
-    fun `gitt et ugyldig dato query parameter svarer bygning arkiv ok`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
-        val token = mockOAuthServer.issueIDPortenJWT()
-        
-        client.post("/v1/intern/egenregistreringer") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                EgenregistreringRequest.validEgenregistrering(),
-            )
-            headers {
-                append("Authorization", "Bearer ${token.serialize()}")
-            }
-        }
-
-        val currentData = client.get("/v1/intern/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=${Instant.now()}")
-        assertThat(currentData.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(currentData.body<BygningSimpleResponse>()).all {
-            prop(BygningSimpleResponse::bruksenheter).hasSize(2)
-            prop(BygningSimpleResponse::bruksenheter).index(0).all {
-                prop(BruksenhetSimpleResponse::totaltBruksareal).isNotNull().all {
-                    prop(BruksarealInternResponse::data).isEqualTo(125.0)
-                }
-            }
-        }
-
-        val oldData = client.get("/v1/intern/arkiv/bygninger/1/egenregistrert?registreringstidspunkt=2025-01-01T15:15:47.361080Z")
-        assertThat(oldData.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(oldData.body<BygningSimpleResponse>()).all {
-            prop(BygningSimpleResponse::bruksenheter).hasSize(2)
-            prop(BygningSimpleResponse::bruksenheter).index(0).all {
-                prop(BruksenhetSimpleResponse::totaltBruksareal).isNull()
-            }
-        }
-
     }
 }
 

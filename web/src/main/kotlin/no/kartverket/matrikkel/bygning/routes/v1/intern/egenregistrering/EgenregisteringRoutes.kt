@@ -14,8 +14,7 @@ import no.kartverket.matrikkel.bygning.application.egenregistrering.Egenregistre
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.authentication.DigDirPrincipal
-import no.kartverket.matrikkel.bygning.routes.principalOrThrow
+import no.kartverket.matrikkel.bygning.routes.getFnr
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
@@ -93,12 +92,11 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 }
             },
         ) {
-            val principal = call.principalOrThrow<DigDirPrincipal>()
-
+            val fnr = call.getFnr()
             // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
             val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
-            val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering(eier = principal.id) }
+            val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering(eier = fnr) }
                 .mapError(::exceptionToDomainError)
                 .andThen { egenregistreringService.addEgenregistrering(it) }
                 .mapBoth(
