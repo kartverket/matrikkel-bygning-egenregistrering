@@ -20,7 +20,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksarealInternResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetSimpleResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.ByggeaarInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningInternResponse

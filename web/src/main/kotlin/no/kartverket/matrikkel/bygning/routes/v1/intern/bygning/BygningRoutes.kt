@@ -98,7 +98,7 @@ fun Route.bygningRouting(
                         }
                         response {
                             code(HttpStatusCode.OK) {
-                                body<BruksenhetResponse> {
+                                body<BruksenhetInternResponse> {
                                     description = "Bruksenhet"
                                 }
                                 description = "Bruksenheten finnes og ble hentet"

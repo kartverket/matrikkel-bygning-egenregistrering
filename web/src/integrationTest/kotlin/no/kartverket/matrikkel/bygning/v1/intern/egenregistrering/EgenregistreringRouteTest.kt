@@ -24,7 +24,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Vannforsyni
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksarealInternResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.ByggeaarInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.EnergikildeInternResponse
@@ -91,15 +91,15 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
             assertThat(bygning).all {
                 prop(BygningInternResponse::bruksenheter).index(0).all {
-                    prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
-                    prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
+                    prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(1L)
+                    prop(BruksenhetInternResponse::totaltBruksareal).isNotNull().all {
                         prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
                             prop(BruksarealInternResponse::data).isEqualTo(125.0)
                             prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
-                    prop(BruksenhetResponse::byggeaar).isNotNull().all {
+                    prop(BruksenhetInternResponse::byggeaar).isNotNull().all {
                         prop(MultikildeInternResponse<ByggeaarInternResponse>::egenregistrert).isNotNull().all {
                             prop(ByggeaarInternResponse::data).isEqualTo(2010)
                             prop(ByggeaarInternResponse::metadata).all {
@@ -109,28 +109,28 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                         }
                     }
 
-                    prop(BruksenhetResponse::vannforsyning).isNotNull().all {
+                    prop(BruksenhetInternResponse::vannforsyning).isNotNull().all {
                         prop(MultikildeInternResponse<VannforsyningKodeInternResponse>::egenregistrert).isNotNull().all {
                             prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
                             prop(VannforsyningKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
-                    prop(BruksenhetResponse::avlop).isNotNull().all {
+                    prop(BruksenhetInternResponse::avlop).isNotNull().all {
                         prop(MultikildeInternResponse<AvlopKodeInternResponse>::egenregistrert).isNotNull().all {
                             prop(AvlopKodeInternResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
                             prop(AvlopKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
-                    prop(BruksenhetResponse::energikilder).isNotNull().all {
+                    prop(BruksenhetInternResponse::energikilder).isNotNull().all {
                         prop(MultikildeInternResponse<EnergikildeInternResponse>::egenregistrert).isNotNull().all {
                             prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
                             prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
 
-                    prop(BruksenhetResponse::oppvarminger).isNotNull().all {
+                    prop(BruksenhetInternResponse::oppvarminger).isNotNull().all {
                         prop(MultikildeInternResponse<OppvarmingInternResponse>::egenregistrert).isNotNull().all {
                             prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
                             prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
@@ -139,10 +139,10 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 }
 
                 prop(BygningInternResponse::bruksenheter).index(1).all {
-                    prop(BruksenhetResponse::bruksenhetId).isEqualTo(2L)
-                    prop(BruksenhetResponse::totaltBruksareal).isNull()
-                    prop(BruksenhetResponse::energikilder).isNull()
-                    prop(BruksenhetResponse::oppvarminger).isNull()
+                    prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(2L)
+                    prop(BruksenhetInternResponse::totaltBruksareal).isNull()
+                    prop(BruksenhetInternResponse::energikilder).isNull()
+                    prop(BruksenhetInternResponse::oppvarminger).isNull()
                 }
             }
         }
@@ -167,27 +167,27 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         val bruksenhetResponse = client.get("/v1/intern/bygninger/1/bruksenheter/1")
 
         assertThat(bruksenhetResponse.status).isEqualTo(HttpStatusCode.OK)
-        val bruksenhet = bruksenhetResponse.body<BruksenhetResponse>()
+        val bruksenhet = bruksenhetResponse.body<BruksenhetInternResponse>()
 
         val now = Instant.now()
         assertThat(bruksenhet).all {
-            prop(BruksenhetResponse::bruksenhetId).isEqualTo(1L)
+            prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(1L)
 
-            prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
+            prop(BruksenhetInternResponse::totaltBruksareal).isNotNull().all {
                 prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
                     prop(BruksarealInternResponse::data).isEqualTo(125.0)
                     prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
 
-            prop(BruksenhetResponse::energikilder).isNotNull().all {
+            prop(BruksenhetInternResponse::energikilder).isNotNull().all {
                 prop(MultikildeInternResponse<EnergikildeInternResponse>::egenregistrert).isNotNull().all {
                     prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
                     prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
 
-            prop(BruksenhetResponse::oppvarminger).isNotNull().all {
+            prop(BruksenhetInternResponse::oppvarminger).isNotNull().all {
                 prop(MultikildeInternResponse<OppvarmingInternResponse>::egenregistrert).isNotNull().all {
                     prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
                     prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
@@ -251,13 +251,13 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val now = Instant.now()
             assertThat(bygning).prop(BygningInternResponse::bruksenheter).all {
                 withBruksenhetId(1L).all {
-                    prop(BruksenhetResponse::byggeaar).isNotNull().all {
+                    prop(BruksenhetInternResponse::byggeaar).isNotNull().all {
                         prop(MultikildeInternResponse<ByggeaarInternResponse>::egenregistrert).isNotNull().all {
                             prop(ByggeaarInternResponse::data).isEqualTo(2008)
                             prop(ByggeaarInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                         }
                     }
-                    prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
+                    prop(BruksenhetInternResponse::totaltBruksareal).isNotNull().all {
                         prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
                             prop(BruksarealInternResponse::data).isEqualTo(40.0)
                             prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
@@ -265,8 +265,8 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                     }
                 }
                 withBruksenhetId(2L).all {
-                    prop(BruksenhetResponse::byggeaar).isNull()
-                    prop(BruksenhetResponse::totaltBruksareal).isNull()
+                    prop(BruksenhetInternResponse::byggeaar).isNull()
+                    prop(BruksenhetInternResponse::totaltBruksareal).isNull()
                 }
             }
         }
@@ -297,7 +297,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             assertThat(bygning).all {
                 prop(BygningInternResponse::bruksareal).isNotNull().prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNull()
                 prop(BygningInternResponse::bruksenheter).withBruksenhetId(1L)
-                    .prop(BruksenhetResponse::totaltBruksareal).isNotNull().all {
+                    .prop(BruksenhetInternResponse::totaltBruksareal).isNotNull().all {
                         prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
                             prop(BruksarealInternResponse::metadata).all {
                                 prop(RegisterMetadataInternResponse::registrertAv).isEqualTo("31129956715")
@@ -347,6 +347,6 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             assertThat(response.status).isEqualTo(HttpStatusCode.Unauthorized)
         }
 
-    private fun Assert<List<BruksenhetResponse>>.withBruksenhetId(bruksenhetId: Long) =
+    private fun Assert<List<BruksenhetInternResponse>>.withBruksenhetId(bruksenhetId: Long) =
         transform(appendName("[bruksenhetId=$bruksenhetId]")) { it.find { br -> br.bruksenhetId == bruksenhetId }!! }
 }

@@ -36,7 +36,7 @@ data class BygningInternResponse(
     val avlop: MultikildeInternResponse<AvlopKodeInternResponse>?,
     val energikilder: MultikildeInternResponse<EnergikildeInternResponse>?,
     val oppvarming: MultikildeInternResponse<OppvarmingInternResponse>?,
-    val bruksenheter: List<BruksenhetResponse>,
+    val bruksenheter: List<BruksenhetInternResponse>,
 )
 
 @Serializable
@@ -47,27 +47,27 @@ data class BygningSimpleResponse(
 )
 
 @Serializable
-data class BruksenhetEtasjerResponse(
-    val data: List<BruksenhetEtasjeResponse>,
+data class BruksenhetEtasjerInternResponse(
+    val data: List<BruksenhetEtasjeInternResponse>,
     val metadata: RegisterMetadataInternResponse
 )
 
 @Serializable
-data class BruksenhetEtasjeResponse(
-    val etasjebetegnelse: EtasjeBetegnelseResponse,
+data class BruksenhetEtasjeInternResponse(
+    val etasjebetegnelse: EtasjeBetegnelseInternResponse,
     val bruksareal: Double,
 )
 
 @Serializable
-data class EtasjeBetegnelseResponse(
+data class EtasjeBetegnelseInternResponse(
     val etasjeplanKode: String,
     val etasjenummer: Int,
 )
 
 @Serializable
-data class BruksenhetResponse(
+data class BruksenhetInternResponse(
     val bruksenhetId: Long,
-    val etasjer: MultikildeInternResponse<BruksenhetEtasjerResponse>?,
+    val etasjer: MultikildeInternResponse<BruksenhetEtasjerInternResponse>?,
     val byggeaar: MultikildeInternResponse<ByggeaarInternResponse>?,
     val totaltBruksareal: MultikildeInternResponse<BruksarealInternResponse>?,
     val vannforsyning: MultikildeInternResponse<VannforsyningKodeInternResponse>?,
@@ -79,7 +79,7 @@ data class BruksenhetResponse(
 @Serializable
 data class BruksenhetSimpleResponse(
     val bruksenhetId: Long,
-    val etasjer: BruksenhetEtasjerResponse?,
+    val etasjer: BruksenhetEtasjerInternResponse?,
     val byggeaar: ByggeaarInternResponse?,
     val totaltBruksareal: BruksarealInternResponse?,
     val vannforsyning: VannforsyningKodeInternResponse?,
@@ -148,7 +148,7 @@ fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleRespon
     bruksenheter = this.bruksenheter.map { it.toBruksenhetSimpleResponseFromEgenregistrertData() },
 )
 
-fun Bruksenhet.toBruksenhetResponse(): BruksenhetResponse = BruksenhetResponse(
+fun Bruksenhet.toBruksenhetResponse(): BruksenhetInternResponse = BruksenhetInternResponse(
     bruksenhetId = this.bruksenhetBubbleId.value,
     byggeaar = this.byggeaar.toMultikildeInternResponse(Byggeaar::toByggeaarInternResponse),
     etasjer = this.etasjer.toMultikildeInternResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
@@ -170,11 +170,11 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
     oppvarminger = this.oppvarminger.egenregistrert?.toOppvarmingResponse(),
 )
 
-private fun BruksenhetEtasjer.toBruksenhetEtasjeResponse(): BruksenhetEtasjerResponse = BruksenhetEtasjerResponse(
+private fun BruksenhetEtasjer.toBruksenhetEtasjeResponse(): BruksenhetEtasjerInternResponse = BruksenhetEtasjerInternResponse(
     data = this.data.map {
-        BruksenhetEtasjeResponse(
+        BruksenhetEtasjeInternResponse(
             bruksareal = it.bruksareal,
-            etasjebetegnelse = EtasjeBetegnelseResponse(
+            etasjebetegnelse = EtasjeBetegnelseInternResponse(
                 etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
                 etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
             ),
