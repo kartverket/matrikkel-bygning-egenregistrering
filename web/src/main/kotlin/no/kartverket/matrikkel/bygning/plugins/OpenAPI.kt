@@ -28,19 +28,25 @@ import java.time.Instant
 
 object OpenApiSpecIds {
     const val INTERN = "intern"
-    const val EKSTERN = "ekstern"
+    const val HENDELSER = "hendelser"
+    const val MED_PERSONDATA = "medpersondata"
 }
 
 fun Application.configureOpenAPI() {
     install(SwaggerUI) {
         installOpenApiSpec(
             name = OpenApiSpecIds.INTERN,
-            title = "API For Egenregistrering av Bygningsdata",
+            title = "API for egenregistrering av bygningsdata",
             version = "0.1",
         )
         installOpenApiSpec(
-            name = OpenApiSpecIds.EKSTERN,
-            title = "API For uthenting av Egenregistreringsdata for eksterne",
+            name = OpenApiSpecIds.HENDELSER,
+            title = "API for hendelseslogg for egenregistrerte bygningsdata",
+            version = "0.1",
+        )
+        installOpenApiSpec(
+            name = OpenApiSpecIds.MED_PERSONDATA,
+            title = "API for utlevering av egenregistrerte bygningsdata med personidentifiserende data",
             version = "0.1",
         )
     }

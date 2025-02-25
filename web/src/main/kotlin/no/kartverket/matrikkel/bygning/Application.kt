@@ -119,12 +119,23 @@ fun Application.mainModule() {
                 swaggerUI("/intern/api.json")
             }
         }
-        // OpenAPI / Swagger for eksterne routes
-        route("api.json") {
-            openApiSpec(OpenApiSpecIds.EKSTERN)
+        route("hendelser") {
+            // OpenAPI / Swagger for eksterne routes
+            route("api.json") {
+                openApiSpec(OpenApiSpecIds.HENDELSER)
+            }
+            route("swagger-ui") {
+                swaggerUI("/hendelser/api.json")
+            }
         }
-        route("swagger-ui") {
-            swaggerUI("/api.json")
+        route("medpersondata") {
+            // OpenAPI / Swagger for eksterne routes
+            route("api.json") {
+                openApiSpec(OpenApiSpecIds.MED_PERSONDATA)
+            }
+            route("swagger-ui") {
+                swaggerUI("/medpersondata/api.json")
+            }
         }
 
 
