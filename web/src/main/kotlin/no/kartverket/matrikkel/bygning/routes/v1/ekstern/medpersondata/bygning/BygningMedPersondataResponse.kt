@@ -91,7 +91,7 @@ fun Bygning.toBygningMedPersondataResponse(): BygningMedPersondataResponse = Byg
     },
 )
 
-private fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPersondataResponse(
+internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPersondataResponse(
     felt: T?,
     constructor: (U, RegisterMetadataMedPersondataResponse) -> O,
 ): O? {
