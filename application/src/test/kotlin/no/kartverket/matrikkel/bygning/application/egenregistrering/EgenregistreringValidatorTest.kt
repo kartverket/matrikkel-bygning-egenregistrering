@@ -46,7 +46,7 @@ class EgenregistreringValidatorTest {
     private val baseEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        eier = Foedselsnummer("31129956715"),
+        eier = Foedselsnummer("66860475309"),
         prosess = ProsessKode.Egenregistrering,
         bygningRegistrering = BygningRegistrering(
             bygningBubbleId = BygningBubbleId(1L),

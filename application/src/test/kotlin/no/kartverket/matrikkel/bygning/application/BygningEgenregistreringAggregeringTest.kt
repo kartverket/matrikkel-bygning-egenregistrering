@@ -74,7 +74,7 @@ class BygningEgenregistreringAggregeringTest {
     private val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        eier = Foedselsnummer("31129956715"),
+        eier = Foedselsnummer("66860475309"),
         bygningRegistrering = defaultBygningRegistrering,
         prosess = ProsessKode.Egenregistrering,
     )

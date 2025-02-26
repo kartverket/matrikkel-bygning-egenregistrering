@@ -37,7 +37,7 @@ class BygningRepositoryTest : TestWithDb() {
                 data = AvlopKode.OffentligKloakk,
                 metadata = RegisterMetadata(
                     registreringstidspunkt = defaultRegistreringstidspunkt,
-                    registrertAv = Foedselsnummer("31129956715"),
+                    registrertAv = Foedselsnummer("66860475309"),
                     kildemateriale = KildematerialeKode.Salgsoppgave,
                     prosess = ProsessKode.Egenregistrering,
                 ),
@@ -65,7 +65,7 @@ class BygningRepositoryTest : TestWithDb() {
                     prop(Felt.Avlop::data).isEqualTo(AvlopKode.OffentligKloakk)
                     prop(Felt.Avlop::metadata).all {
                         prop(RegisterMetadata::registreringstidspunkt).isNotNull()
-                        prop(RegisterMetadata::registrertAv).isEqualTo(Foedselsnummer("31129956715"))
+                        prop(RegisterMetadata::registrertAv).isEqualTo(Foedselsnummer("66860475309"))
                         prop(RegisterMetadata::kildemateriale).isEqualTo(KildematerialeKode.Salgsoppgave)
                         prop(RegisterMetadata::prosess).isEqualTo(ProsessKode.Egenregistrering)
                     }
@@ -89,7 +89,7 @@ class BygningRepositoryTest : TestWithDb() {
                             data = AvlopKode.PrivatKloakk,
                             metadata = RegisterMetadata(
                                 registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(60),
-                                registrertAv = Foedselsnummer("31129956715"),
+                                registrertAv = Foedselsnummer("66860475309"),
                                 kildemateriale = KildematerialeKode.Salgsoppgave,
                                 prosess = ProsessKode.Egenregistrering,
                             ),
@@ -112,7 +112,7 @@ class BygningRepositoryTest : TestWithDb() {
                     prop(Felt.Avlop::data).isEqualTo(AvlopKode.PrivatKloakk)
                     prop(Felt.Avlop::metadata).all {
                         prop(RegisterMetadata::registreringstidspunkt).isNotNull()
-                        prop(RegisterMetadata::registrertAv).isEqualTo(Foedselsnummer("31129956715"))
+                        prop(RegisterMetadata::registrertAv).isEqualTo(Foedselsnummer("66860475309"))
                         prop(RegisterMetadata::kildemateriale).isEqualTo(KildematerialeKode.Salgsoppgave)
                         prop(RegisterMetadata::prosess).isEqualTo(ProsessKode.Egenregistrering)
                     }
@@ -138,7 +138,7 @@ class BygningRepositoryTest : TestWithDb() {
                             data = byggeaar,
                             metadata = RegisterMetadata(
                                 registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(1),
-                                registrertAv = Foedselsnummer("31129956715"),
+                                registrertAv = Foedselsnummer("66860475309"),
                                 kildemateriale = KildematerialeKode.Salgsoppgave,
                                 prosess = ProsessKode.Egenregistrering,
 

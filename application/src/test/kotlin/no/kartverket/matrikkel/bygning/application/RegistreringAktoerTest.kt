@@ -25,6 +25,6 @@ class RegistreringAktoerTest {
 
     @Test
     fun `fnr med riktig lengde og oppbyggning skal valideres`() {
-        assertThat(Foedselsnummer("31129956715").value).isEqualTo("31129956715")
+        assertThat(Foedselsnummer("66860475309").value).isEqualTo("66860475309")
     }
 }

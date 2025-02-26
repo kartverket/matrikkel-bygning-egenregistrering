@@ -36,6 +36,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Bruksar
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.DEFAULT_PID
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.ugyldigEgenregistreringMedKunBruksarealPerEtasje
@@ -288,7 +289,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                     .prop(BruksenhetInternResponse::totaltBruksareal).isNotNull().all {
                         prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
                             prop(BruksarealInternResponse::metadata).all {
-                                prop(RegisterMetadataInternResponse::registrertAv).isEqualTo("31129956715")
+                                prop(RegisterMetadataInternResponse::registrertAv).isEqualTo(DEFAULT_PID)
                             }
                         }
                     }
