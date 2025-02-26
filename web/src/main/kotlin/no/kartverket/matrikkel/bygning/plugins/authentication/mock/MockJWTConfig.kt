@@ -5,12 +5,17 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.Payload
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import io.ktor.util.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-internal fun AuthenticationConfig.mockJwtPrincipalForProvider(
+private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
+
+internal fun AuthenticationConfig.mockJwt(
     name: String,
     configure: MockJWTConfig.() -> Unit = { MockJWTConfig(name) }
 ) {
-
+    log.warn("${name.toUpperCasePreservingASCIIRules()} autentisering er deaktivert! Dette skal kun gjøres lokalt.")
     val config = MockJWTConfig(name).apply(configure)
     register(MockJWTAuthenticationProvider(config))
 }

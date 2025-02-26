@@ -7,6 +7,7 @@ class MockOAuth2ServerExtensions {
     companion object {
         internal const val DEFAULT_ISSUER = "testIssuer"
         internal const val DEFAULT_AUDIENCE = "default"
+        internal const val DEFAULT_PID = "66860475309"
 
         fun MockOAuth2Server.issueMaskinportenJWT(scope: String = "kartverk:riktig:scope") = issueToken(
             issuerId = DEFAULT_ISSUER,
@@ -22,7 +23,7 @@ class MockOAuth2ServerExtensions {
         fun MockOAuth2Server.issueIDPortenJWT() = issueToken(
             issuerId = DEFAULT_ISSUER,
             claims = mapOf(
-                "pid" to "31129956715",
+                "pid" to DEFAULT_PID,
             ),
         )
 

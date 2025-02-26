@@ -9,20 +9,15 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
-import io.ktor.util.*
 import no.kartverket.matrikkel.bygning.config.Env
 import no.kartverket.matrikkel.bygning.plugins.authentication.ApplicationRoles.ACCESS_AS_APPLICATION
 import no.kartverket.matrikkel.bygning.plugins.authentication.ApplicationRoles.BYGNING_ARKIVARISK_HISTORIKK
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.authentication.mock.mockJwtPrincipalForProvider
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import no.kartverket.matrikkel.bygning.plugins.authentication.mock.mockJwt
 import java.net.URI
 import java.util.concurrent.TimeUnit
-
-private val log: Logger = LoggerFactory.getLogger(object {}::class.java)
 
 object AuthenticationConstants {
     const val IDPORTEN_PROVIDER_NAME = "idporten"
@@ -58,8 +53,7 @@ fun Application.configureAuthentication(config: ApplicationConfig) {
 
 private fun AuthenticationConfig.jwtMaskinporten(config: ApplicationConfig) {
     if (Env.isLocal() && isProviderDisabled(config, MASKINPORTEN_PROVIDER_NAME)) {
-        logDisabledProviderWarning(MASKINPORTEN_PROVIDER_NAME)
-        mockJwtPrincipalForProvider(MASKINPORTEN_PROVIDER_NAME)
+        mockJwt(MASKINPORTEN_PROVIDER_NAME)
     } else {
         jwt(MASKINPORTEN_PROVIDER_NAME) {
             val authConfig = JWTAuthenticationConfig(
@@ -80,11 +74,10 @@ private fun AuthenticationConfig.jwtMaskinporten(config: ApplicationConfig) {
 
 private fun AuthenticationConfig.jwtIDPorten(config: ApplicationConfig) {
     if (Env.isLocal() && isProviderDisabled(config, IDPORTEN_PROVIDER_NAME)) {
-        logDisabledProviderWarning(IDPORTEN_PROVIDER_NAME)
-        mockJwtPrincipalForProvider(IDPORTEN_PROVIDER_NAME) {
+        mockJwt(IDPORTEN_PROVIDER_NAME) {
             jwtCreator {
                 val token = JWT.create()
-                    .withClaim("pid", "31129956715")
+                    .withClaim("pid", "66860475309")
                     .sign(Algorithm.none())
 
                 JWT.decode(token)
@@ -109,8 +102,7 @@ private fun AuthenticationConfig.jwtIDPorten(config: ApplicationConfig) {
 
 private fun AuthenticationConfig.jwtEntraIdArkivariskHistorikk(config: ApplicationConfig) {
     if (Env.isLocal() && isProviderDisabled(config, "entra")) {
-        logDisabledProviderWarning(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME)
-        mockJwtPrincipalForProvider(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME)
+        mockJwt(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME)
     } else {
         jwt(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
             val authConfig = JWTAuthenticationConfig(
@@ -132,7 +124,3 @@ private fun AuthenticationConfig.jwtEntraIdArkivariskHistorikk(config: Applicati
 
 private fun isProviderDisabled(config: ApplicationConfig, name: String): Boolean =
     config.property("${name}.disabled").getString().toBoolean()
-
-
-private fun logDisabledProviderWarning(name: String) =
-    log.warn("${name.toUpperCasePreservingASCIIRules()} autentisering er deaktivert! Dette skal kun gjøres lokalt.")
