@@ -3,6 +3,7 @@ package no.kartverket.matrikkel.bygning.plugins
 import io.github.smiley4.ktorswaggerui.SwaggerUI
 import io.github.smiley4.ktorswaggerui.data.AuthScheme
 import io.github.smiley4.ktorswaggerui.data.AuthType
+import io.github.smiley4.ktorswaggerui.dsl.config.OpenApiSecurity
 import io.github.smiley4.ktorswaggerui.dsl.config.PluginConfigDsl
 import io.github.smiley4.schemakenerator.core.annotations.Format
 import io.github.smiley4.schemakenerator.core.annotations.Type
@@ -38,21 +39,24 @@ fun Application.configureOpenAPI() {
             name = OpenApiSpecIds.INTERN,
             title = "API for egenregistrering av bygningsdata",
             version = "0.1",
+            SecuritySchemes.MASKINPORTEN, SecuritySchemes.IDPORTEN, SecuritySchemes.ENTRA_ID_ARKIVISK_HISTORIKK,
         )
         installOpenApiSpec(
             name = OpenApiSpecIds.HENDELSER,
             title = "API for hendelseslogg for egenregistrerte bygningsdata",
             version = "0.1",
+            SecuritySchemes.MASKINPORTEN,
         )
         installOpenApiSpec(
             name = OpenApiSpecIds.MED_PERSONDATA,
             title = "API for utlevering av egenregistrerte bygningsdata med personidentifiserende data",
             version = "0.1",
+            SecuritySchemes.MASKINPORTEN,
         )
     }
 }
 
-private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, version: String) {
+private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, version: String, vararg securitySchemes: SecuritySchemes) {
     spec(name) {
         schemas {
             generator = { type ->
@@ -97,25 +101,34 @@ private fun PluginConfigDsl.installOpenApiSpec(name: String, title: String, vers
             }
         }
         security {
-            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
-                type = AuthType.HTTP
-                scheme = AuthScheme.BEARER
-                bearerFormat = "jwt"
-            }
-
-            securityScheme(IDPORTEN_PROVIDER_NAME) {
-                type = AuthType.HTTP
-                scheme = AuthScheme.BEARER
-                bearerFormat = "jwt"
-            }
-
-            securityScheme(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
-                type = AuthType.HTTP
-                scheme = AuthScheme.BEARER
-                bearerFormat = "jwt"
-            }
+            securitySchemes.forEach { it.install(this) }
         }
     }
+}
+
+private enum class SecuritySchemes {
+    MASKINPORTEN {
+        override fun install(openApiSecurity: OpenApiSecurity) = openApiSecurity.securityScheme(MASKINPORTEN_PROVIDER_NAME) {
+            this.type = AuthType.HTTP
+            this.scheme = AuthScheme.BEARER
+            this.bearerFormat = "jwt"
+        }
+    },
+    IDPORTEN {
+        override fun install(openApiSecurity: OpenApiSecurity) = openApiSecurity.securityScheme(IDPORTEN_PROVIDER_NAME) {
+            this.type = AuthType.HTTP
+            this.scheme = AuthScheme.BEARER
+            this.bearerFormat = "jwt"
+        }
+    },
+    ENTRA_ID_ARKIVISK_HISTORIKK {
+        override fun install(openApiSecurity: OpenApiSecurity) = openApiSecurity.securityScheme(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
+            this.type = AuthType.HTTP
+            this.scheme = AuthScheme.BEARER
+            this.bearerFormat = "jwt"
+        }
+    };
+    abstract fun install(openApiSecurity: OpenApiSecurity)
 }
 
 /**
