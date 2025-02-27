@@ -1,11 +1,20 @@
 package no.kartverket.matrikkel.bygning
 
+import io.github.smiley4.ktorswaggerui.SwaggerUI
+import io.github.smiley4.ktorswaggerui.data.SwaggerUIData
+import io.github.smiley4.ktorswaggerui.data.SwaggerUiSort
+import io.github.smiley4.ktorswaggerui.data.SwaggerUiSyntaxHighlight
 import io.github.smiley4.ktorswaggerui.dsl.routing.route
+import io.github.smiley4.ktorswaggerui.routing.ApiSpec
+import io.github.smiley4.ktorswaggerui.routing.ResourceContent
 import io.github.smiley4.ktorswaggerui.routing.openApiSpec
 import io.github.smiley4.ktorswaggerui.routing.swaggerUI
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
@@ -124,9 +133,6 @@ fun Application.mainModule() {
             route("api.json") {
                 openApiSpec(OpenApiSpecIds.HENDELSER)
             }
-            route("swagger-ui") {
-                swaggerUI("/hendelser/api.json")
-            }
         }
         route("medpersondata") {
             // OpenAPI / Swagger for eksterne routes
@@ -136,6 +142,12 @@ fun Application.mainModule() {
             route("swagger-ui") {
                 swaggerUI("/medpersondata/api.json")
             }
+        }
+        route("swagger-ui") {
+            swaggerUIs(
+                "Med persondata" to "/medpersondata/api.json",
+                "Hendelser" to "/hendelser/api.json",
+            )
         }
 
 
@@ -164,4 +176,65 @@ fun Application.internalModule() {
     val healthService = HealthService(healthRepository)
 
     internalRouting(meterRegistry, healthService)
+}
+
+fun Route.swaggerUIs(vararg apis: Pair<String, String>) {
+    route({ hidden = true }) {
+        get {
+            call.respondRedirect("${call.request.uri}/index.html")
+        }
+        get("{filename}") {
+            serveStaticResource(call.parameters["filename"]!!, "5.17.11", call) // Denne versjonen må stemme med hva ktor-swagger-ui bruker
+        }
+        get("swagger-initializer.js") {
+            serveSwaggerInitializer(call, ApiSpec.swaggerUiConfig, apis.asIterable())
+        }
+    }
+}
+
+private suspend fun serveSwaggerInitializer(call: ApplicationCall, swaggerUiConfig: SwaggerUIData, apis: Iterable<Pair<String, String>>) {
+    // see https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md for reference
+    val propValidatorUrl = swaggerUiConfig.validatorUrl?.let { "validatorUrl: \"$it\"" } ?: "validatorUrl: false"
+    val propDisplayOperationId = "displayOperationId: ${swaggerUiConfig.displayOperationId}"
+    val propFilter = "filter: ${swaggerUiConfig.showTagFilterInput}"
+    val propSort = "operationsSorter: " +
+        if (swaggerUiConfig.sort == SwaggerUiSort.NONE) "undefined"
+        else "\"${swaggerUiConfig.sort.value}\""
+    val propSyntaxHighlight = "syntaxHighlight: " +
+        if(swaggerUiConfig.syntaxHighlight == SwaggerUiSyntaxHighlight.DISABLED) "false"
+        else "{ theme: \"${swaggerUiConfig.syntaxHighlight.value}\" }"
+    val content = """
+			window.onload = function() {
+			  window.ui = SwaggerUIBundle({
+				urls: [${apis.joinToString(separator = ",", transform = { "{ url: \"${it.second}\", name: \"${it.first}\" }" })}],
+				dom_id: '#swagger-ui',
+				deepLinking: true,
+				presets: [
+				  SwaggerUIBundle.presets.apis,
+				  SwaggerUIStandalonePreset
+				],
+				plugins: [
+				  SwaggerUIBundle.plugins.DownloadUrl
+				],
+				layout: "StandaloneLayout",
+				withCredentials: ${swaggerUiConfig.withCredentials},
+				$propValidatorUrl,
+  				$propDisplayOperationId,
+    		    $propFilter,
+    		    $propSort,
+				$propSyntaxHighlight
+			  });
+			};
+		""".trimIndent()
+    call.respondText(ContentType.Application.JavaScript, HttpStatusCode.OK) { content }
+}
+
+private suspend fun serveStaticResource(filename: String, swaggerWebjarVersion: String, call: ApplicationCall) {
+    val resourceName = "/META-INF/resources/webjars/swagger-ui/$swaggerWebjarVersion/$filename"
+    val resource = SwaggerUI::class.java.getResource(resourceName)
+    if (resource != null) {
+        call.respond(ResourceContent(resource))
+    } else {
+        call.respond(HttpStatusCode.NotFound, "$filename could not be found")
+    }
 }
