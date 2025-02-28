@@ -159,7 +159,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
 
         assertThat(response.status).isEqualTo(HttpStatusCode.Created)
 
-        val bruksenhetResponse = client.get("/v1/intern/bygninger/1/bruksenheter/1")
+        val bruksenhetResponse = client.get("/v1/intern/bruksenheter/1")
 
         assertThat(bruksenhetResponse.status).isEqualTo(HttpStatusCode.OK)
         val bruksenhet = bruksenhetResponse.body<BruksenhetInternResponse>()

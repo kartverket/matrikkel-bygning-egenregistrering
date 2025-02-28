@@ -13,7 +13,6 @@ import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
@@ -26,12 +25,10 @@ class BygningRepositoryTest : TestWithDb() {
     private val bygningRepository = BygningRepositoryImpl(dataSource)
 
     private val bruksenhetId = BruksenhetId("00000000-0000-0000-0000-000000000001")
-    private val bygningId = BygningId("00000000-0000-0000-0001-000000000001")
     private val defaultRegistreringstidspunkt = Instant.parse("2025-01-01T00:00:00Z")
     private val defaultBruksenhet = Bruksenhet(
         id = bruksenhetId,
         bruksenhetBubbleId = BruksenhetBubbleId(1L),
-        bygningId = bygningId,
         avlop = Multikilde(
             egenregistrert = Felt.Avlop(
                 data = AvlopKode.OffentligKloakk,
@@ -59,7 +56,6 @@ class BygningRepositoryTest : TestWithDb() {
         assertThat(retrievedBruksenhet).isNotNull().all {
             prop(Bruksenhet::id).isEqualTo(BruksenhetId("00000000-0000-0000-0000-000000000001"))
             prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(1L))
-            prop(Bruksenhet::bygningId).isEqualTo(BygningId("00000000-0000-0000-0001-000000000001"))
             prop(Bruksenhet::avlop).all {
                 prop(Multikilde<Felt.Avlop>::egenregistrert).isNotNull().all {
                     prop(Felt.Avlop::data).isEqualTo(AvlopKode.OffentligKloakk)
@@ -106,7 +102,6 @@ class BygningRepositoryTest : TestWithDb() {
         assertThat(retrievedBruksenhet).isNotNull().all {
             prop(Bruksenhet::id).isEqualTo(BruksenhetId("00000000-0000-0000-0000-000000000001"))
             prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(1L))
-            prop(Bruksenhet::bygningId).isEqualTo(BygningId("00000000-0000-0000-0001-000000000001"))
             prop(Bruksenhet::avlop).all {
                 prop(Multikilde<Felt.Avlop>::egenregistrert).isNotNull().all {
                     prop(Felt.Avlop::data).isEqualTo(AvlopKode.PrivatKloakk)

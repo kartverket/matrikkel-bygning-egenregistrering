@@ -21,7 +21,6 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
@@ -110,7 +109,6 @@ class MatrikkelBygningClientTest {
             prop(Bygning::oppvarminger).isEmpty()
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(2L))
-                prop(Bruksenhet::bygningId).isEqualTo(BygningId("00000000-0000-0000-0000-000000000001"))
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
                     prop(Bruksareal::data).isEqualTo(0.0)
@@ -209,7 +207,6 @@ class MatrikkelBygningClientTest {
             }
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(2L))
-                prop(Bruksenhet::bygningId).isEqualTo(BygningId("00000000-0000-0000-0000-000000000001"))
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
                     prop(Bruksareal::data).isEqualTo(140.0)
                     prop(Bruksareal::metadata).isMatrikkelfoertBruksenhetstidspunkt()

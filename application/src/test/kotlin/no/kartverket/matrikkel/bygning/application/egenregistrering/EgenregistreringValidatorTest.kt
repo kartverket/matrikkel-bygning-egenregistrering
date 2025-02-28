@@ -36,7 +36,6 @@ class EgenregistreringValidatorTest {
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0001-000000000001"),
                 bruksenhetBubbleId = BruksenhetBubbleId(1L),
-                bygningId = bygningId,
                 etasjer = Multikilde(),
             ),
         ),

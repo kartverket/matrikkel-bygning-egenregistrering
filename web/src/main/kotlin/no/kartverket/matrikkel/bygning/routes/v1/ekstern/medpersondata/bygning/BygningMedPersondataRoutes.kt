@@ -47,3 +47,39 @@ fun Route.bygningMedPersondataRouting(
     }
 }
 
+
+fun Route.bruksenhetMedPersondataRouting(bygningService: BygningService) {
+    route("{bruksenhetId}") {
+        get(
+            {
+                summary = "Henter en bruksenhet"
+                description = "Henter en bruksenhet"
+                request {
+                    pathParameter<String>("bruksenhetId") {
+                        required = true
+                    }
+                }
+                response {
+                    code(HttpStatusCode.OK) {
+                        body<BruksenhetMedPersondataResponse> {
+                            description = "Bruksenheten"
+                        }
+                        description = "Bruksenheten finnes og ble hentet"
+                    }
+                    code(HttpStatusCode.NotFound) {
+                        description = "Fant ikke bruksenhet med gitt bruksenhetId"
+                    }
+                }
+            },
+        ) {
+            val bruksenhetId = call.parameters.getOrFail("bruksenhetId").toLong()
+
+            val (status, body) = bygningService.getBruksenhetByBubbleId(bruksenhetId).mapBoth(
+                success = { HttpStatusCode.OK to it.toBruksenhetMedPersondataResponse() },
+                failure = ::domainErrorToResponse,
+            )
+
+            call.respond(status, body)
+        }
+    }
+}

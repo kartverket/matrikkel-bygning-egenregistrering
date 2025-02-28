@@ -9,6 +9,7 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
+import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
@@ -22,22 +23,18 @@ class LocalBygningClient : BygningClient {
         Bruksenhet(
             id = BruksenhetId("00000000-0000-0000-0000-000000000001"),
             bruksenhetBubbleId = BruksenhetBubbleId(1L),
-            bygningId = BygningId("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
             id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
             bruksenhetBubbleId = BruksenhetBubbleId(2L),
-            bygningId = BygningId("00000000-0000-0000-0000-000000000001"),
         ),
         Bruksenhet(
             id = BruksenhetId("00000000-0000-0000-0000-000000000003"),
             bruksenhetBubbleId = BruksenhetBubbleId(3L),
-            bygningId = BygningId("00000000-0000-0000-0000-000000000002"),
         ),
         Bruksenhet(
             id = BruksenhetId("00000000-0000-0000-0000-000000000004"),
             bruksenhetBubbleId = BruksenhetBubbleId(4L),
-            bygningId = BygningId("00000000-0000-0000-0000-000000000002"),
         ),
     )
 
@@ -83,6 +80,16 @@ class LocalBygningClient : BygningClient {
             .toResultOr {
                 BygningNotFound(
                     message = "Bygning med bygningsnummer $bygningsnummer finnes ikke i matrikkelen",
+                )
+            }
+    }
+
+    override fun getBruksenhetByBubbleId(bruksenhetBubbleId: Long): Result<Bruksenhet, DomainError> {
+        return bruksenheter
+            .find({ it.bruksenhetBubbleId.value == bruksenhetBubbleId })
+            .toResultOr {
+                BruksenhetNotFound(
+                    message = "Bruksenhet med ID $bruksenhetBubbleId finnes ikke i matrikkelen",
                 )
             }
     }

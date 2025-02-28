@@ -12,6 +12,10 @@ fun StoreService.getBygning(id: BygningId, matrikkelContext: MatrikkelContext): 
     return getObject(id, matrikkelContext) as Bygning
 }
 
+fun StoreService.getBruksenhet(id: BruksenhetId, matrikkelContext: MatrikkelContext): Bruksenhet {
+    return getObject(id, matrikkelContext) as Bruksenhet
+}
+
 fun StoreService.getBruksenheter(ids: Iterable<BruksenhetId>, matrikkelContext: MatrikkelContext): List<Bruksenhet> {
     val objects = getObjects(MatrikkelBubbleIdList().apply { item.addAll(ids) }, matrikkelContext)
     return objects.item.map { it as Bruksenhet }

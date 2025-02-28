@@ -1,12 +1,9 @@
 package no.kartverket.matrikkel.bygning.application.bygning
 
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.map
-import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import java.time.Instant
 
@@ -25,18 +22,10 @@ class BygningService(
     }
 
     fun getBruksenhetByBubbleId(
-        bygningBubbleId: Long,
         bruksenhetBubbleId: Long,
         registreringstidspunkt: Instant = Instant.now()
     ): Result<Bruksenhet, DomainError> {
-        return bygningClient.getBygningByBubbleId(bygningBubbleId)
-            .andThen { bygning ->
-                bygning.bruksenheter
-                    .firstOrNull { bruksenhet -> bruksenhet.bruksenhetBubbleId.value == bruksenhetBubbleId }
-                    .toResultOr {
-                        BruksenhetNotFound("Fant ikke bruksenhet med id $bruksenhetBubbleId i bygning med id $bygningBubbleId")
-                    }
-            }
+        return bygningClient.getBruksenhetByBubbleId(bruksenhetBubbleId)
             .map { bruksenhet ->
                 bygningRepository.getBruksenhetById(bruksenhet.id.value, registreringstidspunkt) ?: bruksenhet
             }

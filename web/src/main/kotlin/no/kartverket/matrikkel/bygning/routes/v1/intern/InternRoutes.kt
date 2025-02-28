@@ -8,6 +8,7 @@ import no.kartverket.matrikkel.bygning.application.egenregistrering.Egenregistre
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.arkivRouting
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.bruksenhetRouting
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.bygningRouting
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.egenregistreringRouting
 import no.kartverket.matrikkel.bygning.routes.v1.kodeliste.kodelisteRouting
@@ -30,6 +31,9 @@ fun Route.internRouting(
         }
         route("bygninger") {
             bygningRouting(bygningService)
+        }
+        route("bruksenheter") {
+            bruksenhetRouting(bygningService)
         }
         authenticate(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
             route("arkiv") {

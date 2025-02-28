@@ -60,7 +60,6 @@ sealed interface Felt<T> {
 data class Bruksenhet(
     val id: BruksenhetId,
     val bruksenhetBubbleId: BruksenhetBubbleId,
-    val bygningId: BygningId,
     val etasjer: Multikilde<BruksenhetEtasjer> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val totaltBruksareal: Multikilde<Bruksareal> = Multikilde(),
