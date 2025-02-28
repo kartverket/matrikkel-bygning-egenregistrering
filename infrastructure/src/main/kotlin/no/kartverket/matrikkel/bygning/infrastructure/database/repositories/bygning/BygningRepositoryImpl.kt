@@ -25,8 +25,8 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
         @Language("PostgreSQL")
         val sql = """
             INSERT INTO bygning.bruksenhet
-            (id, bruksenhet_bubble_id, bygning_id, registreringstidspunkt, data)
-            VALUES (:id, :bruksenhetBubbleId, :bygningId, :registreringstidspunkt, :data)
+            (id, bruksenhet_bubble_id, registreringstidspunkt, data)
+            VALUES (:id, :bruksenhetBubbleId, :registreringstidspunkt, :data)
         """.trimIndent()
 
         tx.batchPreparedNamedStatement(
@@ -38,10 +38,6 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
                         this.value = it.id.value.toString()
                     },
                     "bruksenhetBubbleId" to it.bruksenhetBubbleId.value,
-                    "bygningId" to PGobject().apply {
-                        this.type = "uuid"
-                        this.value = it.bygningId.value.toString()
-                    },
                     "registreringstidspunkt" to Timestamp.from(registreringstidspunkt),
                     "data" to PGobject().apply {
                         this.type = "jsonb"

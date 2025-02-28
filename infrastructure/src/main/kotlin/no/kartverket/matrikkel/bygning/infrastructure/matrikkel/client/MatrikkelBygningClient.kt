@@ -24,13 +24,16 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenhet
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBygning
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.bruksenhetId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.bygningId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.toInstant
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.service.store.ServiceException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BruksenhetId as MatrikkelBruksenhetId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId as MatrikkelBygningId
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
@@ -98,7 +101,7 @@ class MatrikkelBygningClient(
                         autoritativ = Oppvarming(
                             data = bygning.oppvarmingsKodeIds.item.map { mapOppvarming(it) },
                             metadata = bygningsmetadata,
-                        ).takeUnless { bygning.oppvarmingsKodeIds.item.isEmpty() } // Tolker som "vet ikke"
+                        ).takeUnless { bygning.oppvarmingsKodeIds.item.isEmpty() }, // Tolker som "vet ikke"
                     ),
                     // TODO: Burde vi ha en måte å angi ukjent / ikke oppgitt?
                     bruksenheter = bruksenheter.map {
@@ -112,7 +115,6 @@ class MatrikkelBygningClient(
                         Bruksenhet(
                             id = BruksenhetId(it.uuid.uuid),
                             bruksenhetBubbleId = BruksenhetBubbleId(it.id.value),
-                            bygningId = BygningId(bygning.uuid.uuid),
                             // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                             totaltBruksareal = Multikilde(
                                 autoritativ = Bruksareal(
@@ -153,6 +155,27 @@ class MatrikkelBygningClient(
             return Err(
                 BygningNotFound(
                     message = "Bygning med nummer $bygningsnummer finnes ikke i matrikkelen",
+                ),
+            )
+        }
+    }
+
+    override fun getBruksenhetByBubbleId(bruksenhetBubbleId: Long): Result<Bruksenhet, DomainError> {
+        try {
+            val bruksenhetId: MatrikkelBruksenhetId = bruksenhetId(bruksenhetBubbleId)
+            val bruksenhet = matrikkelApi.storeService().getBruksenhet(bruksenhetId, matrikkelApi.matrikkelContext)
+
+            return Ok(
+                Bruksenhet(
+                    id = BruksenhetId(bruksenhet.uuid.uuid),
+                    bruksenhetBubbleId = BruksenhetBubbleId(bruksenhetId.value),
+                ),
+            )
+        } catch (exception: ServiceException) {
+            log.warn("Noe gikk galt under henting av bruksenhet med id bruksenhetBubbleId {}", bruksenhetBubbleId, exception)
+            return Err(
+                BygningNotFound(
+                    message = "Bruksenhet med id $bruksenhetBubbleId finnes ikke i matrikkelen",
                 ),
             )
         }

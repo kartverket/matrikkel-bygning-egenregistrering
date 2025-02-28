@@ -41,7 +41,6 @@ class BygningEgenregistreringAggregeringTest {
     private val defaultBruksenhet = Bruksenhet(
         id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
         bruksenhetBubbleId = BruksenhetBubbleId(1L),
-        bygningId = bygningId,
     )
 
     private val defaultBygning = Bygning(

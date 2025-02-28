@@ -51,6 +51,18 @@ class BygningRouteTest : TestApplicationWithDb() {
     }
 
     @Test
+    fun `gitt at en bruksenhet id eksisterer svarer bruksenhet route ok`() = testApplication {
+        val client = mainModuleWithDatabaseEnvironmentAndClient()
+
+        val response = client.get("/v1/intern/bruksenheter/1")
+
+        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
+        assertThat(response.body<BruksenhetInternResponse>()).all {
+            prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(1L)
+        }
+    }
+
+    @Test
     fun `gitt at en bygning id ikke eksisterer svarer bygning route not found`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
 
