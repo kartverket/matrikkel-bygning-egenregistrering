@@ -110,34 +110,22 @@ fun Application.mainModule() {
     )
 
     routing {
-        // OpenAPI / Swagger for interne routes
-        route("intern") {
-            route("api.json") {
-                openApiSpec(OpenApiSpecIds.INTERN)
-            }
-            route("swagger-ui") {
-                swaggerUI("/intern/api.json")
-            }
-        }
-        route("hendelser") {
-            // OpenAPI / Swagger for eksterne routes
-            route("api.json") {
-                openApiSpec(OpenApiSpecIds.HENDELSER)
-            }
-            route("swagger-ui") {
-                swaggerUI("/hendelser/api.json")
+        listOf(
+            OpenApiSpecIds.INTERN,
+            OpenApiSpecIds.BERETTIGET_INTERESSE,
+            OpenApiSpecIds.UTEN_PERSONDATA,
+            OpenApiSpecIds.MED_PERSONDATA,
+            OpenApiSpecIds.HENDELSER,
+        ).forEach { specId ->
+            route(specId) {
+                route("api.json") {
+                    openApiSpec(specId)
+                }
+                route("swagger-ui") {
+                    swaggerUI("/$specId/api.json")
+                }
             }
         }
-        route("medpersondata") {
-            // OpenAPI / Swagger for eksterne routes
-            route("api.json") {
-                openApiSpec(OpenApiSpecIds.MED_PERSONDATA)
-            }
-            route("swagger-ui") {
-                swaggerUI("/medpersondata/api.json")
-            }
-        }
-
 
         route("v1") {
             internRouting(egenregistreringService, bygningService)

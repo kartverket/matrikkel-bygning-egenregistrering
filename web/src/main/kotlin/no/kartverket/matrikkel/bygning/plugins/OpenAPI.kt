@@ -29,6 +29,8 @@ import java.time.Instant
 object OpenApiSpecIds {
     const val INTERN = "intern"
     const val HENDELSER = "hendelser"
+    const val BERETTIGET_INTERESSE = "berettigetinteresse"
+    const val UTEN_PERSONDATA = "utenpersondata"
     const val MED_PERSONDATA = "medpersondata"
 }
 
@@ -45,8 +47,18 @@ fun Application.configureOpenAPI() {
             version = "0.1",
         )
         installOpenApiSpec(
+            name = OpenApiSpecIds.BERETTIGET_INTERESSE,
+            title = "API for utlevering av egenregistrerte bygningsdata",
+            version = "0.1",
+        )
+        installOpenApiSpec(
+            name = OpenApiSpecIds.UTEN_PERSONDATA,
+            title = "API for utlevering av egenregistrerte bygningsdata uten personidentifiserende metadata",
+            version = "0.1",
+        )
+        installOpenApiSpec(
             name = OpenApiSpecIds.MED_PERSONDATA,
-            title = "API for utlevering av egenregistrerte bygningsdata med personidentifiserende data",
+            title = "API for utlevering av egenregistrerte bygningsdata med personidentifiserende metadata",
             version = "0.1",
         )
     }
