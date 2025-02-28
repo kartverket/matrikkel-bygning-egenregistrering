@@ -8,8 +8,10 @@ import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.berettigetInteresseRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.hendelseRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygningMedPersondataRouting
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.utenPersondataRouting
 
 fun Route.eksternRouting(
     bygningService: BygningService,
@@ -17,6 +19,14 @@ fun Route.eksternRouting(
 ) {
     authenticate(MASKINPORTEN_PROVIDER_NAME) {
         route("/") {
+            routeWithMaskinporten("berettigetinteresse", OpenApiSpecIds.BERETTIGET_INTERESSE) {
+                berettigetInteresseRouting(bygningService)
+            }
+
+            routeWithMaskinporten("utenpersondata", OpenApiSpecIds.UTEN_PERSONDATA) {
+                utenPersondataRouting(bygningService)
+            }
+
             routeWithMaskinporten("medpersondata", OpenApiSpecIds.MED_PERSONDATA) {
                 bygningMedPersondataRouting(bygningService)
             }
@@ -39,5 +49,5 @@ private fun Route.routeWithMaskinporten(path: String, openApiSpecId: String, bui
             }
         }
     },
-    build
+    build,
 )
