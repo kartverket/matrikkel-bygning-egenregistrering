@@ -4,18 +4,8 @@ import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Felt
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
-import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.AvlopKodeMedPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.BruksarealMedPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.ByggeaarMedPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.EnergikildeMedPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.OppvarmingMedPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.VannforsyningKodeMedPersondataResponse
+import no.kartverket.matrikkel.bygning.application.models.kodelister.*
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.*
 import no.kartverket.matrikkel.bygning.serializers.InstantSerializer
 import java.time.Instant
 
@@ -83,14 +73,9 @@ sealed interface FeltMedPersondataResponse<T> {
 data class RegisterMetadataMedPersondataResponse(
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
-    val registrertAv: RegistreringAktoerResponse,
+    val registrertAv: String,
     val kildemateriale: KildematerialeKode? = null
 )
-
-sealed interface RegistreringAktoerResponse {
-    data class FoedselsnummerResponse(val foedselsnummer: String) : RegistreringAktoerResponse
-    data class SignaturResponse(val signatur: String) : RegistreringAktoerResponse
-}
 
 fun Bygning.toBygningMedPersondataResponse(): BygningMedPersondataResponse = BygningMedPersondataResponse(
     bygningId = bygningBubbleId.value,
@@ -112,10 +97,7 @@ internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPerson
         felt.data,
         RegisterMetadataMedPersondataResponse(
             registreringstidspunkt = felt.metadata.registreringstidspunkt,
-            registrertAv = when (val registretAv = felt.metadata.registrertAv) {
-                is RegistreringAktoer.Foedselsnummer -> RegistreringAktoerResponse.FoedselsnummerResponse(registretAv.value)
-                is RegistreringAktoer.Signatur -> RegistreringAktoerResponse.SignaturResponse(registretAv.value)
-            },
+            registrertAv = felt.metadata.registrertAv.value,
             kildemateriale = felt.metadata.kildemateriale,
         ),
     )
@@ -124,9 +106,15 @@ internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPerson
 fun Bruksenhet.toBruksenhetMedPersondataResponse(): BruksenhetMedPersondataResponse = BruksenhetMedPersondataResponse(
     bruksenhetId = this.bruksenhetBubbleId.value,
     byggeaar = toFeltMedPersondataResponse(this.byggeaar.egenregistrert, ::ByggeaarMedPersondataResponse),
-    totaltBruksareal = toFeltMedPersondataResponse(this.totaltBruksareal.egenregistrert, ::BruksarealMedPersondataResponse),
-    vannforsyning = toFeltMedPersondataResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeMedPersondataResponse),
+    totaltBruksareal = toFeltMedPersondataResponse(
+        this.totaltBruksareal.egenregistrert,
+        ::BruksarealMedPersondataResponse
+    ),
+    vannforsyning = toFeltMedPersondataResponse(
+        this.vannforsyning.egenregistrert,
+        ::VannforsyningKodeMedPersondataResponse
+    ),
     avlop = toFeltMedPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeMedPersondataResponse),
     energikilder = toFeltMedPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeMedPersondataResponse),
-    oppvarminger = toFeltMedPersondataResponse(this.oppvarminger.egenregistrert, ::OppvarmingMedPersondataResponse)
+    oppvarminger = toFeltMedPersondataResponse(this.oppvarminger.egenregistrert, ::OppvarmingMedPersondataResponse),
 )

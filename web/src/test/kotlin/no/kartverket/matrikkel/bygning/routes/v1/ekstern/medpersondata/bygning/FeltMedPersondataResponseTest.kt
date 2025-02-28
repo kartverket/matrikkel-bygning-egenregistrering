@@ -28,7 +28,7 @@ class FeltMedPersondataResponseTest {
         assertThat(responseObject).isNotNull()
             .prop(FeltMedPersondataResponse<*>::metadata)
             .prop(RegisterMetadataMedPersondataResponse::registrertAv)
-            .isEqualTo(RegistreringAktoerResponse.FoedselsnummerResponse("21904798557"))
+            .isEqualTo("21904798557")
     }
 
     @Test
@@ -47,6 +47,6 @@ class FeltMedPersondataResponseTest {
         assertThat(responseObject).isNotNull()
             .prop(FeltMedPersondataResponse<*>::metadata)
             .prop(RegisterMetadataMedPersondataResponse::registrertAv)
-            .isEqualTo(RegistreringAktoerResponse.SignaturResponse("Kongen"))
+            .isEqualTo("Kongen")
     }
 }
