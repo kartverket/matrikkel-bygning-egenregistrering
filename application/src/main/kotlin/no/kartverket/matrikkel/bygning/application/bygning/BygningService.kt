@@ -30,4 +30,16 @@ class BygningService(
                 bygningRepository.getBruksenhetById(bruksenhet.id.value, registreringstidspunkt) ?: bruksenhet
             }
     }
+
+    fun getBruksenheterByBubbleIds(
+        bruksenhetBubbleIds: List<Long>,
+        registreringstidspunkt: Instant = Instant.now()
+    ): Result<List<Bruksenhet>, DomainError> {
+        return bygningClient.getBruksenheterByBubbleIds(bruksenhetBubbleIds)
+            .map { bruksenheter ->
+                bruksenheter.map { bruksenhet ->
+                    bygningRepository.getBruksenhetById(bruksenhet.id.value, registreringstidspunkt) ?: bruksenhet
+                }
+            }
+    }
 }

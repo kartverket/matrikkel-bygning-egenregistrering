@@ -48,14 +48,12 @@ internal fun EgenregistreringRequest.Companion.validBruksenhetRegistreringReques
 )
 
 internal fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
-    bygningId = 1L,
     bruksenhetRegistreringer = listOf(
         validBruksenhetRegistreringRequest(),
     ),
 )
 
 internal fun EgenregistreringRequest.Companion.validEgenregistreringMultipleBruksenheter() = EgenregistreringRequest(
-    bygningId = 1L,
     bruksenhetRegistreringer = listOf(
         validBruksenhetRegistreringRequest(1L),
         validBruksenhetRegistreringRequest(2L).copy(
@@ -70,7 +68,6 @@ internal fun EgenregistreringRequest.Companion.validEgenregistreringMultipleBruk
 )
 
 internal fun EgenregistreringRequest.Companion.ugyldigEgenregistreringMedKunBruksarealPerEtasje() = EgenregistreringRequest(
-    bygningId = 1L,
     bruksenhetRegistreringer = listOf(
         BruksenhetRegistreringRequest(
             bruksenhetId = 1L,

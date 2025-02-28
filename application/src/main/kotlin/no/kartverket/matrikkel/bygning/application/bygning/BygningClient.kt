@@ -11,4 +11,6 @@ interface BygningClient {
     fun getBygningByBygningsnummer(bygningsnummer: Long): Result<Bygning, DomainError>
 
     fun getBruksenhetByBubbleId(bruksenhetBubbleId: Long): Result<Bruksenhet, DomainError>
+
+    fun getBruksenheterByBubbleIds(bruksenhetBubbleIds: List<Long>): Result<List<Bruksenhet>, DomainError>
 }

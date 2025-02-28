@@ -33,7 +33,7 @@ class EgenregistreringRepositoryImpl : EgenregistreringRepository {
                     "eier" to egenregistrering.eier.value,
                     "registrering" to PGobject().apply {
                         this.type = "jsonb"
-                        this.value = objectMapper.writeValueAsString(egenregistrering.bygningRegistrering)
+                        this.value = objectMapper.writeValueAsString(egenregistrering.bruksenhetRegistreringer)
                     }
                 )
             ).asUpdate

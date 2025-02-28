@@ -80,7 +80,6 @@ class EgenregistreringValidatorTest {
                     ),
                 ),
             ),
-            baseBygning,
         )
 
         assertThat(validationResult.isErr).isTrue()
@@ -106,7 +105,6 @@ class EgenregistreringValidatorTest {
                     ),
                 ),
             ),
-            baseBygning,
         )
 
         assertThat(validationResult.isErr).isTrue()
@@ -144,7 +142,6 @@ class EgenregistreringValidatorTest {
                     ),
                 ),
             ),
-            bygning = baseBygning,
         )
 
         assertThat(validationResult.isErr).isTrue()

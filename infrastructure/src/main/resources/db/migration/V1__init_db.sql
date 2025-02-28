@@ -1,5 +1,6 @@
 create schema if not exists bygning;
 
+-- TODO registrering er nå egentlig bruksenhetregistreringer, ikke bygningsregistrering
 CREATE TABLE egenregistrering
 (
     id                     UUID PRIMARY KEY,

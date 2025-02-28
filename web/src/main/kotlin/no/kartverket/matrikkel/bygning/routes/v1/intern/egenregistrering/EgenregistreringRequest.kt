@@ -5,7 +5,6 @@ import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
@@ -15,7 +14,6 @@ import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -40,7 +38,6 @@ data class BruksenhetRegistreringRequest(
 
 @Serializable
 data class EgenregistreringRequest(
-    val bygningId: Long,
     val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>
 )
 
@@ -154,10 +151,7 @@ fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
         eier = Foedselsnummer(eier),
         registreringstidspunkt = Instant.now(),
         prosess = ProsessKode.Egenregistrering,
-        bygningRegistrering = BygningRegistrering(
-            bygningBubbleId = BygningBubbleId(this.bygningId),
-            bruksenhetRegistreringer = this.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
-                bruksenhetRegistrering.toBruksenhetRegistrering()
-            },
-        ),
+        bruksenhetRegistreringer = this.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
+            bruksenhetRegistrering.toBruksenhetRegistrering()
+        },
     )

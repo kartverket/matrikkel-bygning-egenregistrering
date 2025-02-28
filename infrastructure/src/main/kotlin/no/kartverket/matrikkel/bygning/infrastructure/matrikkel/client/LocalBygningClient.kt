@@ -86,10 +86,21 @@ class LocalBygningClient : BygningClient {
 
     override fun getBruksenhetByBubbleId(bruksenhetBubbleId: Long): Result<Bruksenhet, DomainError> {
         return bruksenheter
-            .find({ it.bruksenhetBubbleId.value == bruksenhetBubbleId })
+            .find { it.bruksenhetBubbleId.value == bruksenhetBubbleId }
             .toResultOr {
                 BruksenhetNotFound(
                     message = "Bruksenhet med ID $bruksenhetBubbleId finnes ikke i matrikkelen",
+                )
+            }
+    }
+
+    override fun getBruksenheterByBubbleIds(bruksenhetBubbleIds: List<Long>): Result<List<Bruksenhet>, DomainError> {
+        // TODO Burde nok inneholde informasjon om hva som ikke finnes, ikke bare at det ikke finnes
+        return bruksenheter
+            .filter { bruksenhetBubbleIds.contains(it.bruksenhetBubbleId.value) }
+            .toResultOr {
+                BruksenhetNotFound(
+                    message = "Bruksenheter med ID ${bruksenhetBubbleIds.joinToString(", ")} finnes ikke i matrikkelen",
                 )
             }
     }

@@ -180,4 +180,8 @@ class MatrikkelBygningClient(
             )
         }
     }
+
+    override fun getBruksenheterByBubbleIds(bruksenhetBubbleIds: List<Long>): Result<List<Bruksenhet>, DomainError> {
+        TODO("Not yet implemented")
+    }
 }

@@ -32,7 +32,6 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                         example("Bygning ID 1") {
                             description = "Bygning med ID 1"
                             value = EgenregistreringRequest(
-                                bygningId = 1,
                                 bruksenhetRegistreringer = listOf(
                                     BruksenhetRegistreringRequest(
                                         bruksenhetId = 1L,

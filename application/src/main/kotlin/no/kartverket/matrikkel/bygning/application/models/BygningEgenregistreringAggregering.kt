@@ -31,7 +31,7 @@ fun Bruksenhet.applyEgenregistreringer(egenregistreringer: List<Egenregistrering
 
 fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Bruksenhet {
     val bruksenhetRegistrering =
-        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetBubbleId == this.bruksenhetBubbleId }
+        egenregistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetBubbleId == this.bruksenhetBubbleId }
     if (bruksenhetRegistrering == null) {
         return this
     }
