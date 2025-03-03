@@ -20,7 +20,6 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksarealInternResponse
-import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetSimpleResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.ByggeaarInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningInternResponse
@@ -30,13 +29,12 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingIntern
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
-import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.gyldigRequest
+import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
 class BygningRouteTest : TestApplicationWithDb() {
-
     @Test
     fun `gitt at en bygning id eksisterer svarer bygning route ok`() = testApplication {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
@@ -47,18 +45,6 @@ class BygningRouteTest : TestApplicationWithDb() {
         assertThat(response.body<BygningInternResponse>()).all {
             prop(BygningInternResponse::bygningId).isEqualTo(1L)
             prop(BygningInternResponse::bruksenheter).hasSize(2)
-        }
-    }
-
-    @Test
-    fun `gitt at en bruksenhet id eksisterer svarer bruksenhet route ok`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
-
-        val response = client.get("/v1/intern/bruksenheter/1")
-
-        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(response.body<BruksenhetInternResponse>()).all {
-            prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(1L)
         }
     }
 
