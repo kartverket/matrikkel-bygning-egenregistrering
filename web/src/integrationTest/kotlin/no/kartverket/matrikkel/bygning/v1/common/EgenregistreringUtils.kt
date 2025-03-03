@@ -20,7 +20,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Oppvarm
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.VannforsyningRegistreringRequest
 import java.time.Instant
 
-internal fun EgenregistreringRequest.Companion.validBruksenhetRegistreringRequest(bruksenhetId: Long = 1L) = EgenregistreringRequest(
+internal fun EgenregistreringRequest.Companion.gyldigRequest(bruksenhetId: Long = 1L) = EgenregistreringRequest(
     bruksenhetId = bruksenhetId,
     bruksarealRegistrering = BruksarealRegistreringRequest(
         totaltBruksareal = 125.0,
@@ -46,7 +46,7 @@ internal fun EgenregistreringRequest.Companion.validBruksenhetRegistreringReques
     ),
 )
 
-internal fun EgenregistreringRequest.Companion.ugyldigEgenregistreringMedKunBruksarealPerEtasje() = EgenregistreringRequest(
+internal fun EgenregistreringRequest.Companion.ugyldigRequestKunBruksarealPerEtasje() = EgenregistreringRequest(
     bruksenhetId = 1L,
     byggeaarRegistrering = null,
     bruksarealRegistrering = BruksarealRegistreringRequest(
