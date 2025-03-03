@@ -33,7 +33,7 @@ class EgenregistreringService(
                     )
 
                     bygningRepository.saveBruksenhet(
-                        bruksenhet = createBruksenhetSnapshotsOfLatestEgenregistrering(bruksenhet, egenregistrering),
+                        bruksenhet = createBruksenhetSnapshotOfLatestEgenregistrering(bruksenhet, egenregistrering),
                         registreringstidspunkt = egenregistrering.registreringstidspunkt,
                         tx = tx,
                     )
@@ -46,7 +46,7 @@ class EgenregistreringService(
             }
     }
 
-    private fun createBruksenhetSnapshotsOfLatestEgenregistrering(
+    private fun createBruksenhetSnapshotOfLatestEgenregistrering(
         bruksenhet: Bruksenhet, egenregistrering: Egenregistrering
     ): Bruksenhet {
         return bruksenhet.applyEgenregistrering(egenregistrering)
