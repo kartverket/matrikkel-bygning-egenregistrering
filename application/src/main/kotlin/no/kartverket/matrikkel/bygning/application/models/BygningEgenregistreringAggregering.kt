@@ -30,11 +30,7 @@ fun Bruksenhet.applyEgenregistreringer(egenregistreringer: List<Egenregistrering
 }
 
 fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Bruksenhet {
-    val bruksenhetRegistrering =
-        egenregistrering.bygningRegistrering.bruksenhetRegistreringer.firstOrNull { it.bruksenhetBubbleId == this.bruksenhetBubbleId }
-    if (bruksenhetRegistrering == null) {
-        return this
-    }
+    val bruksenhetRegistrering = egenregistrering.bruksenhetRegistrering
 
     val metadata = RegisterMetadata(
         registreringstidspunkt = egenregistrering.registreringstidspunkt,

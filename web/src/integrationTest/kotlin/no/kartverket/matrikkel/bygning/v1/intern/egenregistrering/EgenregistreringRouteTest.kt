@@ -33,14 +33,13 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingIntern
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.DEFAULT_PID
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.ugyldigEgenregistreringMedKunBruksarealPerEtasje
-import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
+import no.kartverket.matrikkel.bygning.v1.common.validBruksenhetRegistreringRequest
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -54,7 +53,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         val response = client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
-                EgenregistreringRequest.validEgenregistrering(),
+                EgenregistreringRequest.validBruksenhetRegistreringRequest(),
             )
             bearerAuth(token.serialize())
         }
@@ -71,7 +70,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val response = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistrering(),
+                    EgenregistreringRequest.validBruksenhetRegistreringRequest(),
                 )
                 bearerAuth(token.serialize())
             }
@@ -152,7 +151,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
         val response = client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
-                EgenregistreringRequest.validEgenregistrering(),
+                EgenregistreringRequest.validBruksenhetRegistreringRequest(),
             )
             bearerAuth(token.serialize())
         }
@@ -200,7 +199,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val egenregistrering1 = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistrering(),
+                    EgenregistreringRequest.validBruksenhetRegistreringRequest(),
                 )
                 bearerAuth(token.serialize())
             }
@@ -209,25 +208,21 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val egenregistrering2 = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistrering().copy(
-                        bruksenhetRegistreringer = listOf(
-                            BruksenhetRegistreringRequest(
-                                bruksenhetId = 1L,
-                                bruksarealRegistrering = BruksarealRegistreringRequest(
-                                    totaltBruksareal = 40.0,
-                                    etasjeRegistreringer = null,
-                                    kildemateriale = KildematerialeKode.Salgsoppgave,
-                                ),
-                                byggeaarRegistrering = ByggeaarRegistreringRequest(
-                                    byggeaar = 2008,
-                                    kildemateriale = KildematerialeKode.AnnenDokumentasjon,
-                                ),
-                                vannforsyningRegistrering = null,
-                                avlopRegistrering = null,
-                                energikildeRegistrering = null,
-                                oppvarmingRegistrering = null,
-                            ),
+                    EgenregistreringRequest(
+                        bruksenhetId = 1L,
+                        bruksarealRegistrering = BruksarealRegistreringRequest(
+                            totaltBruksareal = 40.0,
+                            etasjeRegistreringer = null,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
                         ),
+                        byggeaarRegistrering = ByggeaarRegistreringRequest(
+                            byggeaar = 2008,
+                            kildemateriale = KildematerialeKode.AnnenDokumentasjon,
+                        ),
+                        vannforsyningRegistrering = null,
+                        avlopRegistrering = null,
+                        energikildeRegistrering = null,
+                        oppvarmingRegistrering = null,
                     ),
                 )
                 bearerAuth(token.serialize())
@@ -271,7 +266,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val response = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistrering(),
+                    EgenregistreringRequest.validBruksenhetRegistreringRequest(),
                 )
                 bearerAuth(token.serialize())
             }
@@ -284,7 +279,8 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val bygning = bygningResponse.body<BygningInternResponse>()
 
             assertThat(bygning).all {
-                prop(BygningInternResponse::bruksareal).isNotNull().prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNull()
+                prop(BygningInternResponse::bruksareal).isNotNull().prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert)
+                    .isNull()
                 prop(BygningInternResponse::bruksenheter).withBruksenhetId(1L)
                     .prop(BruksenhetInternResponse::totaltBruksareal).isNotNull().all {
                         prop(MultikildeInternResponse<BruksarealInternResponse>::egenregistrert).isNotNull().all {
@@ -327,7 +323,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val response = client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistrering(),
+                    EgenregistreringRequest.validBruksenhetRegistreringRequest(),
                 )
             }
 

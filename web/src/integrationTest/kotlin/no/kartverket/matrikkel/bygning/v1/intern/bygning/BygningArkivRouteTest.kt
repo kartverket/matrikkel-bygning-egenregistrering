@@ -19,7 +19,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BygningSimpleRes
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueM2MEntraJwt
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
-import no.kartverket.matrikkel.bygning.v1.common.validEgenregistrering
+import no.kartverket.matrikkel.bygning.v1.common.validBruksenhetRegistreringRequest
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -87,7 +87,7 @@ class BygningArkivRouteTest : TestApplicationWithDb() {
         client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
-                EgenregistreringRequest.validEgenregistrering(),
+                EgenregistreringRequest.validBruksenhetRegistreringRequest(),
             )
             bearerAuth(mockOAuthServer.issueIDPortenJWT().serialize())
         }

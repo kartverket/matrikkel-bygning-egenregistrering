@@ -86,7 +86,7 @@ class LocalBygningClient : BygningClient {
 
     override fun getBruksenhetByBubbleId(bruksenhetBubbleId: Long): Result<Bruksenhet, DomainError> {
         return bruksenheter
-            .find({ it.bruksenhetBubbleId.value == bruksenhetBubbleId })
+            .find { it.bruksenhetBubbleId.value == bruksenhetBubbleId }
             .toResultOr {
                 BruksenhetNotFound(
                     message = "Bruksenhet med ID $bruksenhetBubbleId finnes ikke i matrikkelen",

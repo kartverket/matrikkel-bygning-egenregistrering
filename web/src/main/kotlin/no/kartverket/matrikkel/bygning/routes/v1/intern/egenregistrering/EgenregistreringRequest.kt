@@ -5,7 +5,6 @@ import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
@@ -15,7 +14,6 @@ import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -28,7 +26,7 @@ import java.util.*
 
 
 @Serializable
-data class BruksenhetRegistreringRequest(
+data class EgenregistreringRequest(
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistreringRequest?,
     val byggeaarRegistrering: ByggeaarRegistreringRequest?,
@@ -36,12 +34,6 @@ data class BruksenhetRegistreringRequest(
     val oppvarmingRegistrering: OppvarmingRegistreringRequest?,
     val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
     val avlopRegistrering: AvlopRegistreringRequest?,
-)
-
-@Serializable
-data class EgenregistreringRequest(
-    val bygningId: Long,
-    val bruksenhetRegistreringer: List<BruksenhetRegistreringRequest>
 )
 
 @Serializable
@@ -103,7 +95,7 @@ fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): Etasje
     )
 }
 
-fun BruksenhetRegistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
+fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
     return BruksenhetRegistrering(
         bruksenhetBubbleId = BruksenhetBubbleId(bruksenhetId),
         bruksarealRegistrering = bruksarealRegistrering?.let { bruksarealRegistrering ->
@@ -154,10 +146,5 @@ fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
         eier = Foedselsnummer(eier),
         registreringstidspunkt = Instant.now(),
         prosess = ProsessKode.Egenregistrering,
-        bygningRegistrering = BygningRegistrering(
-            bygningBubbleId = BygningBubbleId(this.bygningId),
-            bruksenhetRegistreringer = this.bruksenhetRegistreringer.map { bruksenhetRegistrering ->
-                bruksenhetRegistrering.toBruksenhetRegistrering()
-            },
-        ),
+        bruksenhetRegistrering = this.toBruksenhetRegistrering()
     )

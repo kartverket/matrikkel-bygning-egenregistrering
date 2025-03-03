@@ -2,7 +2,11 @@ package no.kartverket.matrikkel.bygning.v1.ekstern.hendelser
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.each
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.prop
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -14,12 +18,12 @@ import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.HendelseRespon
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueMaskinportenJWT
-import no.kartverket.matrikkel.bygning.v1.common.validEgenregistreringMultipleBruksenheter
+import no.kartverket.matrikkel.bygning.v1.common.validBruksenhetRegistreringRequest
 import org.junit.jupiter.api.Test
 
 class HendelserTest : TestApplicationWithDb() {
     @Test
-    fun `gitt at man har egenregistrert på to bruksenheter så skal det være to hendelser i hendelsesloggen`() =
+    fun `gitt at man har egenregistrert to ganger så skal det være to hendelser i hendelsesloggen`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
 
@@ -28,7 +32,15 @@ class HendelserTest : TestApplicationWithDb() {
             client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.validEgenregistreringMultipleBruksenheter(),
+                    EgenregistreringRequest.Companion.validBruksenhetRegistreringRequest(),
+                )
+                bearerAuth(idportenJWT.serialize())
+            }
+
+            client.post("/v1/intern/egenregistreringer") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    EgenregistreringRequest.Companion.validBruksenhetRegistreringRequest(2L),
                 )
                 bearerAuth(idportenJWT.serialize())
             }

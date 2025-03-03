@@ -8,7 +8,6 @@ import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelsePayload.BruksenhetOppdatertPayload
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseRepository
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.applyEgenregistrering
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
@@ -22,41 +21,42 @@ class EgenregistreringService(
     private val transactional: Transactional,
 ) {
     fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, DomainError> {
-        return bygningService.getBygningByBubbleId(egenregistrering.bygningRegistrering.bygningBubbleId.value).andThen { bygning ->
-            EgenregistreringValidator.validateEgenregistrering(egenregistrering, bygning).map { bygning }
-        }.map { bygning ->
-            transactional.withTransaction { tx ->
-                egenregistreringRepository.saveEgenregistrering(egenregistrering, tx)
+        return bygningService.getBruksenhetByBubbleId(
+            bruksenhetBubbleId = egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value,
+        ).andThen { bruksenhet ->
+                EgenregistreringValidator.validateEgenregistrering(egenregistrering).map { bruksenhet }
+            }.map { bruksenhet ->
+                transactional.withTransaction { tx ->
+                    egenregistreringRepository.saveEgenregistrering(
+                        egenregistrering = egenregistrering,
+                        tx = tx,
+                    )
 
-                bygningRepository.saveBruksenheter(
-                    bruksenheter = createBruksenhetSnapshotsOfLatestEgenregistrering(bygning, egenregistrering),
-                    registreringstidspunkt = egenregistrering.registreringstidspunkt,
-                    tx = tx,
-                )
+                    bygningRepository.saveBruksenhet(
+                        bruksenhet = createBruksenhetSnapshotsOfLatestEgenregistrering(bruksenhet, egenregistrering),
+                        registreringstidspunkt = egenregistrering.registreringstidspunkt,
+                        tx = tx,
+                    )
 
-                hendelseRepository.saveHendelser(
-                    payloads = createEgenregistreringHendelsePayloads(egenregistrering),
-                    tx = tx,
-                )
+                    hendelseRepository.saveHendelse(
+                        payload = createEgenregistreringHendelsePayloads(egenregistrering),
+                        tx = tx,
+                    )
+                }
             }
-        }
     }
 
     private fun createBruksenhetSnapshotsOfLatestEgenregistrering(
-        bygning: Bygning, egenregistrering: Egenregistrering
-    ): List<Bruksenhet> {
-        return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.mapNotNull { bruksenhetRegistrering ->
-            bygning.bruksenheter.find { bruksenhet -> bruksenhet.bruksenhetBubbleId == bruksenhetRegistrering.bruksenhetBubbleId }
-                ?.applyEgenregistrering(egenregistrering)
-        }
+        bruksenhet: Bruksenhet, egenregistrering: Egenregistrering
+    ): Bruksenhet {
+        return bruksenhet.applyEgenregistrering(egenregistrering)
     }
 
-    private fun createEgenregistreringHendelsePayloads(egenregistrering: Egenregistrering): List<BruksenhetOppdatertPayload> {
-        return egenregistrering.bygningRegistrering.bruksenhetRegistreringer.map { registrering ->
-            BruksenhetOppdatertPayload(
-                objectId = registrering.bruksenhetBubbleId.value,
-                registreringstidspunkt = egenregistrering.registreringstidspunkt,
-            )
-        }
+    private fun createEgenregistreringHendelsePayloads(egenregistrering: Egenregistrering): BruksenhetOppdatertPayload {
+        return BruksenhetOppdatertPayload(
+            objectId = egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value,
+            registreringstidspunkt = egenregistrering.registreringstidspunkt,
+        )
+
     }
 }
