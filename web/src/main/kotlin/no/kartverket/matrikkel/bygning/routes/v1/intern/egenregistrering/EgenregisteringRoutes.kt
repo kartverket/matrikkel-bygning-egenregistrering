@@ -23,7 +23,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
     authenticate(IDPORTEN_PROVIDER_NAME) {
         post(
             {
-                summary = "Egenregistrering av bruksenhet"
+                summary = "Egenregistrering på bruksenhet"
                 description = "Legg til en egenregistrering på en bruksenhet"
                 securitySchemeNames = listOf(IDPORTEN_PROVIDER_NAME)
                 request {
