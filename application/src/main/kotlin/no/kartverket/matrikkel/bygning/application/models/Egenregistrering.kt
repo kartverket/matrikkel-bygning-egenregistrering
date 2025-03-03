@@ -2,7 +2,6 @@ package no.kartverket.matrikkel.bygning.application.models
 
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -64,12 +63,6 @@ data class OppvarmingRegistrering(
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
-
-data class BygningRegistrering(
-    val bygningBubbleId: BygningBubbleId,
-    val bruksenhetRegistreringer: List<BruksenhetRegistrering>
-)
-
 data class BruksenhetRegistrering(
     val bruksenhetBubbleId: BruksenhetBubbleId,
     val bruksarealRegistrering: BruksarealRegistrering?,
@@ -85,5 +78,5 @@ data class Egenregistrering(
     val eier: Foedselsnummer,
     val registreringstidspunkt: Instant,
     val prosess: ProsessKode,
-    val bygningRegistrering: BygningRegistrering,
+    val bruksenhetRegistrering: BruksenhetRegistrering,
 )

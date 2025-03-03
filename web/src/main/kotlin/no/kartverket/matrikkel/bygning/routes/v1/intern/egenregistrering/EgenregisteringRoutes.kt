@@ -29,46 +29,41 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                 request {
                     body<EgenregistreringRequest> {
                         required = true
-                        example("Bygning ID 1") {
-                            description = "Bygning med ID 1"
+                        example("Bruksenhet #1") {
+                            description = "Bruksenhet med id = 1"
                             value = EgenregistreringRequest(
-                                bygningId = 1,
-                                bruksenhetRegistreringer = listOf(
-                                    BruksenhetRegistreringRequest(
-                                        bruksenhetId = 1L,
-                                        bruksarealRegistrering = BruksarealRegistreringRequest(
-                                            totaltBruksareal = 80.0,
-                                            etasjeRegistreringer = listOf(
-                                                EtasjeBruksarealRegistreringRequest(
-                                                    bruksareal = 50.0,
-                                                    etasjebetegnelse = EtasjeBetegnelseRequest(
-                                                        etasjeplanKode = "H",
-                                                        etasjenummer = 1,
-                                                    ),
-                                                ),
-                                                EtasjeBruksarealRegistreringRequest(
-                                                    bruksareal = 30.0,
-                                                    etasjebetegnelse = EtasjeBetegnelseRequest(
-                                                        etasjeplanKode = "H",
-                                                        etasjenummer = 2,
-                                                    ),
-                                                ),
+                                bruksenhetId = 1L,
+                                bruksarealRegistrering = BruksarealRegistreringRequest(
+                                    totaltBruksareal = 80.0,
+                                    etasjeRegistreringer = listOf(
+                                        EtasjeBruksarealRegistreringRequest(
+                                            bruksareal = 50.0,
+                                            etasjebetegnelse = EtasjeBetegnelseRequest(
+                                                etasjeplanKode = "H",
+                                                etasjenummer = 1,
                                             ),
-                                            kildemateriale = KildematerialeKode.Salgsoppgave,
                                         ),
-                                        ByggeaarRegistreringRequest(
-                                            byggeaar = 2021,
-                                            kildemateriale = KildematerialeKode.Selvrapportert,
+                                        EtasjeBruksarealRegistreringRequest(
+                                            bruksareal = 30.0,
+                                            etasjebetegnelse = EtasjeBetegnelseRequest(
+                                                etasjeplanKode = "H",
+                                                etasjenummer = 2,
+                                            ),
                                         ),
-                                        energikildeRegistrering = EnergikildeRegistreringRequest(
-                                            energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
-                                            kildemateriale = KildematerialeKode.Selvrapportert,
-                                        ),
-                                        oppvarmingRegistrering = null,
-                                        vannforsyningRegistrering = null,
-                                        avlopRegistrering = null,
                                     ),
+                                    kildemateriale = KildematerialeKode.Salgsoppgave,
                                 ),
+                                ByggeaarRegistreringRequest(
+                                    byggeaar = 2021,
+                                    kildemateriale = KildematerialeKode.Selvrapportert,
+                                ),
+                                energikildeRegistrering = EnergikildeRegistreringRequest(
+                                    energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
+                                    kildemateriale = KildematerialeKode.Selvrapportert,
+                                ),
+                                oppvarmingRegistrering = null,
+                                vannforsyningRegistrering = null,
+                                avlopRegistrering = null,
                             )
                         }
                     }

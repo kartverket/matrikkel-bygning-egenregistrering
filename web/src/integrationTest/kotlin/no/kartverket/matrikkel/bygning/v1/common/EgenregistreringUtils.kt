@@ -11,7 +11,6 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Vannforsyni
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.AvlopRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksenhetRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikildeRegistreringRequest
@@ -21,7 +20,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Oppvarm
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.VannforsyningRegistreringRequest
 import java.time.Instant
 
-internal fun EgenregistreringRequest.Companion.validBruksenhetRegistreringRequest(bruksenhetId: Long = 1L) = BruksenhetRegistreringRequest(
+internal fun EgenregistreringRequest.Companion.validBruksenhetRegistreringRequest(bruksenhetId: Long = 1L) = EgenregistreringRequest(
     bruksenhetId = bruksenhetId,
     bruksarealRegistrering = BruksarealRegistreringRequest(
         totaltBruksareal = 125.0,
@@ -47,53 +46,26 @@ internal fun EgenregistreringRequest.Companion.validBruksenhetRegistreringReques
     ),
 )
 
-internal fun EgenregistreringRequest.Companion.validEgenregistrering() = EgenregistreringRequest(
-    bygningId = 1L,
-    bruksenhetRegistreringer = listOf(
-        validBruksenhetRegistreringRequest(),
-    ),
-)
-
-internal fun EgenregistreringRequest.Companion.validEgenregistreringMultipleBruksenheter() = EgenregistreringRequest(
-    bygningId = 1L,
-    bruksenhetRegistreringer = listOf(
-        validBruksenhetRegistreringRequest(1L),
-        validBruksenhetRegistreringRequest(2L).copy(
-            energikildeRegistrering = null,
-            oppvarmingRegistrering = null,
-            byggeaarRegistrering = ByggeaarRegistreringRequest(
-                byggeaar = 2008,
-                kildemateriale = KildematerialeKode.Selvrapportert,
-            ),
-        ),
-    ),
-)
-
 internal fun EgenregistreringRequest.Companion.ugyldigEgenregistreringMedKunBruksarealPerEtasje() = EgenregistreringRequest(
-    bygningId = 1L,
-    bruksenhetRegistreringer = listOf(
-        BruksenhetRegistreringRequest(
-            bruksenhetId = 1L,
-            byggeaarRegistrering = null,
-            bruksarealRegistrering = BruksarealRegistreringRequest(
-                totaltBruksareal = 50.0,
-                etasjeRegistreringer = listOf(
-                    EtasjeBruksarealRegistreringRequest(
-                        bruksareal = 125.0,
-                        EtasjeBetegnelseRequest(
-                            etasjeplanKode = "H",
-                            etasjenummer = 1,
-                        ),
-                    ),
+    bruksenhetId = 1L,
+    byggeaarRegistrering = null,
+    bruksarealRegistrering = BruksarealRegistreringRequest(
+        totaltBruksareal = 50.0,
+        etasjeRegistreringer = listOf(
+            EtasjeBruksarealRegistreringRequest(
+                bruksareal = 125.0,
+                EtasjeBetegnelseRequest(
+                    etasjeplanKode = "H",
+                    etasjenummer = 1,
                 ),
-                kildemateriale = KildematerialeKode.Salgsoppgave,
             ),
-            energikildeRegistrering = null,
-            oppvarmingRegistrering = null,
-            vannforsyningRegistrering = null,
-            avlopRegistrering = null,
         ),
+        kildemateriale = KildematerialeKode.Salgsoppgave,
     ),
+    energikildeRegistrering = null,
+    oppvarmingRegistrering = null,
+    vannforsyningRegistrering = null,
+    avlopRegistrering = null,
 )
 
 internal fun Assert<RegisterMetadataInternResponse>.hasRegistreringstidspunktWithinThreshold(now: Instant): () -> Unit {

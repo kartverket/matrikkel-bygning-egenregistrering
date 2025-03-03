@@ -44,10 +44,10 @@ class BygningRepositoryTest : TestWithDb() {
 
     @Test
     fun `lagret bruksenhet skal kunne hentes ut igjen`() {
-        bygningRepository.saveBruksenheter(
-            bruksenheter = listOf(defaultBruksenhet),
+        bygningRepository.saveBruksenhet(
+            bruksenhet = defaultBruksenhet,
             registreringstidspunkt = defaultRegistreringstidspunkt,
-            tx = session
+            tx = session,
         )
 
         val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
@@ -72,23 +72,21 @@ class BygningRepositoryTest : TestWithDb() {
 
     @Test
     fun `lagring av bruksenhet med ny data skal kun hente nyeste versjon`() {
-        bygningRepository.saveBruksenheter(
-            bruksenheter = listOf(defaultBruksenhet),
+        bygningRepository.saveBruksenhet(
+            bruksenhet = defaultBruksenhet,
             registreringstidspunkt = defaultRegistreringstidspunkt,
-            tx = session
+            tx = session,
         )
-        bygningRepository.saveBruksenheter(
-            bruksenheter = listOf(
-                defaultBruksenhet.copy(
-                    avlop = Multikilde(
-                        egenregistrert = Felt.Avlop(
-                            data = AvlopKode.PrivatKloakk,
-                            metadata = RegisterMetadata(
-                                registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(60),
-                                registrertAv = Foedselsnummer("66860475309"),
-                                kildemateriale = KildematerialeKode.Salgsoppgave,
-                                prosess = ProsessKode.Egenregistrering,
-                            ),
+        bygningRepository.saveBruksenhet(
+            bruksenhet = defaultBruksenhet.copy(
+                avlop = Multikilde(
+                    egenregistrert = Felt.Avlop(
+                        data = AvlopKode.PrivatKloakk,
+                        metadata = RegisterMetadata(
+                            registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(60),
+                            registrertAv = Foedselsnummer("66860475309"),
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            prosess = ProsessKode.Egenregistrering,
                         ),
                     ),
                 ),
@@ -120,25 +118,23 @@ class BygningRepositoryTest : TestWithDb() {
     fun `henting av bruksenehet basert på tidspunkt returnerer korrekt verdi`() {
         val byggeaar = 1998
 
-        bygningRepository.saveBruksenheter(
-            bruksenheter = listOf(defaultBruksenhet),
+        bygningRepository.saveBruksenhet(
+            bruksenhet = defaultBruksenhet,
             registreringstidspunkt = defaultRegistreringstidspunkt,
-            tx = session
+            tx = session,
         )
-        bygningRepository.saveBruksenheter(
-            bruksenheter = listOf(
-                defaultBruksenhet.copy(
-                    byggeaar = Multikilde(
-                        egenregistrert = Felt.Byggeaar(
-                            data = byggeaar,
-                            metadata = RegisterMetadata(
-                                registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(1),
-                                registrertAv = Foedselsnummer("66860475309"),
-                                kildemateriale = KildematerialeKode.Salgsoppgave,
-                                prosess = ProsessKode.Egenregistrering,
+        bygningRepository.saveBruksenhet(
+            bruksenhet = defaultBruksenhet.copy(
+                byggeaar = Multikilde(
+                    egenregistrert = Felt.Byggeaar(
+                        data = byggeaar,
+                        metadata = RegisterMetadata(
+                            registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(1),
+                            registrertAv = Foedselsnummer("66860475309"),
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            prosess = ProsessKode.Egenregistrering,
 
-                                ),
-                        ),
+                            ),
                     ),
                 ),
             ),

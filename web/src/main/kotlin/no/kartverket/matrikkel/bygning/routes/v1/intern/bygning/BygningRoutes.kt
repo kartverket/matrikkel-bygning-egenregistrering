@@ -129,11 +129,6 @@ fun Route.bruksenhetRouting(bygningService: BygningService) {
                 {
                     summary = "Hent egenregistrert data for en bruksenhet"
                     description = "Hent egenregistrert data en bruksenhet"
-                    request {
-                        pathParameter<String>("bruksenhetId") {
-                            required = true
-                        }
-                    }
                     response {
                         code(HttpStatusCode.OK) {
                             body<BruksenhetSimpleResponse> {

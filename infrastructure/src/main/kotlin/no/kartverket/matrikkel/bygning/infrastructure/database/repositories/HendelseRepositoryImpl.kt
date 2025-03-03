@@ -13,22 +13,22 @@ import org.intellij.lang.annotations.Language
 import javax.sql.DataSource
 
 class HendelseRepositoryImpl(private val dataSource: DataSource) : HendelseRepository {
-    override fun saveHendelser(payloads: List<HendelsePayload>, tx: TransactionalSession) {
+    override fun saveHendelse(payload: HendelsePayload, tx: TransactionalSession) {
         @Language("PostgreSQL")
         val sql = """
             INSERT INTO bygning.hendelse (object_id, registreringstidspunkt, type)
             VALUES(:id, :registreringstidspunkt, :type)
         """.trimIndent()
 
-        tx.batchPreparedNamedStatement(
-            sql,
-            payloads.map {
+        tx.run(
+            queryOf(
+                sql,
                 mapOf(
-                    "id" to it.objectId,
-                    "registreringstidspunkt" to it.registreringstidspunkt,
-                    "type" to it.type.name
-                )
-            },
+                    "id" to payload.objectId,
+                    "registreringstidspunkt" to payload.registreringstidspunkt,
+                    "type" to payload.type.name,
+                ),
+            ).asUpdate,
         )
     }
 
@@ -56,7 +56,7 @@ class HendelseRepositoryImpl(private val dataSource: DataSource) : HendelseRepos
                 ).map { row ->
                     Hendelse(
                         sekvensnummer = row.long("sekvensnummer"),
-                        payload = row.toHendelsePayload()
+                        payload = row.toHendelsePayload(),
                     )
                 }.asList,
             )

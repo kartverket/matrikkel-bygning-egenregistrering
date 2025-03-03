@@ -12,7 +12,6 @@ import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.BygningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
@@ -65,16 +64,11 @@ class BygningEgenregistreringAggregeringTest {
         avlopRegistrering = null,
     )
 
-    private val defaultBygningRegistrering = BygningRegistrering(
-        bygningBubbleId = BygningBubbleId(1L),
-        bruksenhetRegistreringer = listOf(defaultBruksenhetRegistrering),
-    )
-
     private val defaultEgenregistrering = Egenregistrering(
         id = UUID.randomUUID(),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         eier = Foedselsnummer("66860475309"),
-        bygningRegistrering = defaultBygningRegistrering,
+        bruksenhetRegistrering = defaultBruksenhetRegistrering,
         prosess = ProsessKode.Egenregistrering,
     )
 
@@ -97,14 +91,10 @@ class BygningEgenregistreringAggregeringTest {
         val laterRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
-                bruksenhetRegistreringer = listOf(
-                    bruksenhetRegistreringMedKildematerialeKode.copy(
-                        byggeaarRegistrering = ByggeaarRegistrering(
-                            byggeaar = 2011,
-                            kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                        ),
-                    ),
+            bruksenhetRegistrering = bruksenhetRegistreringMedKildematerialeKode.copy(
+                byggeaarRegistrering = ByggeaarRegistrering(
+                    byggeaar = 2011,
+                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
                 ),
             ),
         )
@@ -140,14 +130,10 @@ class BygningEgenregistreringAggregeringTest {
         val firstRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
-                bruksenhetRegistreringer = listOf(
-                    bruksenhetRegistreringMedKildematerialeKode.copy(
-                        byggeaarRegistrering = ByggeaarRegistrering(
-                            byggeaar = 2011,
-                            kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                        ),
-                    ),
+            bruksenhetRegistrering = bruksenhetRegistreringMedKildematerialeKode.copy(
+                byggeaarRegistrering = ByggeaarRegistrering(
+                    byggeaar = 2011,
+                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
                 ),
             ),
         )
@@ -164,15 +150,11 @@ class BygningEgenregistreringAggregeringTest {
         val laterRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
-                bruksenhetRegistreringer = listOf(
-                    defaultBruksenhetRegistrering.copy(
-                        bruksarealRegistrering = BruksarealRegistrering(
-                            totaltBruksareal = 150.0,
-                            etasjeRegistreringer = null,
-                            kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                        ),
-                    ),
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
+                bruksarealRegistrering = BruksarealRegistrering(
+                    totaltBruksareal = 150.0,
+                    etasjeRegistreringer = null,
+                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
                 ),
             ),
         )
@@ -188,23 +170,19 @@ class BygningEgenregistreringAggregeringTest {
         val firstRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.minusSeconds(60),
-            bygningRegistrering = defaultEgenregistrering.bygningRegistrering.copy(
-                bruksenhetRegistreringer = listOf(
-                    defaultBruksenhetRegistrering.copy(
-                        bruksarealRegistrering = BruksarealRegistrering(
-                            totaltBruksareal = 50.0,
-                            etasjeRegistreringer = listOf(
-                                EtasjeBruksarealRegistrering(
-                                    bruksareal = 50.0,
-                                    etasjebetegnelse = Etasjebetegnelse.of(
-                                        etasjenummer = Etasjenummer.of(1),
-                                        etasjeplanKode = EtasjeplanKode.Hovedetasje,
-                                    ),
-                                ),
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
+                bruksarealRegistrering = BruksarealRegistrering(
+                    totaltBruksareal = 50.0,
+                    etasjeRegistreringer = listOf(
+                        EtasjeBruksarealRegistrering(
+                            bruksareal = 50.0,
+                            etasjebetegnelse = Etasjebetegnelse.of(
+                                etasjenummer = Etasjenummer.of(1),
+                                etasjeplanKode = EtasjeplanKode.Hovedetasje,
                             ),
-                            kildemateriale = KildematerialeKode.Salgsoppgave,
                         ),
                     ),
+                    kildemateriale = KildematerialeKode.Salgsoppgave,
                 ),
             ),
         )

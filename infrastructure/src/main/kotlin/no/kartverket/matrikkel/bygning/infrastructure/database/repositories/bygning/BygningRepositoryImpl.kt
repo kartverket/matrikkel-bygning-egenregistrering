@@ -21,7 +21,7 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
     private val objectMapper =
         jacksonObjectMapper().registerModule(JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-    override fun saveBruksenheter(bruksenheter: List<Bruksenhet>, registreringstidspunkt: Instant, tx: TransactionalSession) {
+    override fun saveBruksenhet(bruksenhet: Bruksenhet, registreringstidspunkt: Instant, tx: TransactionalSession) {
         @Language("PostgreSQL")
         val sql = """
             INSERT INTO bygning.bruksenhet
@@ -29,22 +29,22 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
             VALUES (:id, :bruksenhetBubbleId, :registreringstidspunkt, :data)
         """.trimIndent()
 
-        tx.batchPreparedNamedStatement(
-            sql,
-            bruksenheter.map {
+        tx.run(
+            queryOf(
+                sql,
                 mapOf(
                     "id" to PGobject().apply {
                         this.type = "uuid"
-                        this.value = it.id.value.toString()
+                        this.value = bruksenhet.id.value.toString()
                     },
-                    "bruksenhetBubbleId" to it.bruksenhetBubbleId.value,
+                    "bruksenhetBubbleId" to bruksenhet.bruksenhetBubbleId.value,
                     "registreringstidspunkt" to Timestamp.from(registreringstidspunkt),
                     "data" to PGobject().apply {
                         this.type = "jsonb"
-                        this.value = objectMapper.writeValueAsString(it)
+                        this.value = objectMapper.writeValueAsString(bruksenhet)
                     },
-                )
-            },
+                ),
+            ).asUpdate,
         )
     }
 
