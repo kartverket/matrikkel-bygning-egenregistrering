@@ -18,7 +18,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.HendelseRespon
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueMaskinportenJWT
-import no.kartverket.matrikkel.bygning.v1.common.validBruksenhetRegistreringRequest
+import no.kartverket.matrikkel.bygning.v1.common.gyldigRequest
 import org.junit.jupiter.api.Test
 
 class HendelserTest : TestApplicationWithDb() {
@@ -32,7 +32,7 @@ class HendelserTest : TestApplicationWithDb() {
             client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.Companion.validBruksenhetRegistreringRequest(),
+                    EgenregistreringRequest.Companion.gyldigRequest(),
                 )
                 bearerAuth(idportenJWT.serialize())
             }
@@ -40,7 +40,7 @@ class HendelserTest : TestApplicationWithDb() {
             client.post("/v1/intern/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
-                    EgenregistreringRequest.Companion.validBruksenhetRegistreringRequest(2L),
+                    EgenregistreringRequest.Companion.gyldigRequest(2L),
                 )
                 bearerAuth(idportenJWT.serialize())
             }
