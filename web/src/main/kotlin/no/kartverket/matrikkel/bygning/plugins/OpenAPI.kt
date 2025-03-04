@@ -5,6 +5,7 @@ import io.github.smiley4.ktoropenapi.config.AuthScheme
 import io.github.smiley4.ktoropenapi.config.AuthType
 import io.github.smiley4.ktoropenapi.config.OpenApiPluginConfig
 import io.github.smiley4.ktoropenapi.config.SchemaGenerator
+import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.ktor.server.application.*
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
@@ -54,8 +55,10 @@ private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, 
             generator = SchemaGenerator.reflection {
                 customGenerator(SchemaGenerator.TypeOverwrites.Instant())
                 explicitNullTypes = false
+                referencePath = RefType.SIMPLE
             }
         }
+        postBuild = { openApi, _ -> openApi.externalDocs = null } // Ellers peker den på et sted hvor det ikke ligger noe
         info {
             this.title = title
             this.version = version
