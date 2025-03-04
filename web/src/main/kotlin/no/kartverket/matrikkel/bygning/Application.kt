@@ -120,10 +120,22 @@ fun Application.mainModule() {
                 route("api.json") {
                     openApi(specId)
                 }
-                route("swagger-ui") {
-                    swaggerUI("/$specId/api.json")
-                }
             }
+        }
+        route(OpenApiSpecIds.INTERN) {
+            route("swagger-ui") {
+                swaggerUI("/${OpenApiSpecIds.INTERN}/api.json")
+            }
+        }
+        route("swagger-ui") {
+            swaggerUI(
+                mapOf(
+                    "Berettiget interesse" to "/${OpenApiSpecIds.BERETTIGET_INTERESSE}/api.json",
+                    "Med persondata" to "/${OpenApiSpecIds.MED_PERSONDATA}/api.json",
+                    "Uten persondata" to "/${OpenApiSpecIds.UTEN_PERSONDATA}/api.json",
+                    "Hendelseslogg" to "/${OpenApiSpecIds.HENDELSER}/api.json",
+                )
+            )
         }
 
         route("v1") {
