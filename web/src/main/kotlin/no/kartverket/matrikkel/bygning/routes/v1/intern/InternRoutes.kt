@@ -1,6 +1,6 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern
 
-import io.github.smiley4.ktorswaggerui.dsl.routing.route
+import io.github.smiley4.ktoropenapi.route
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
@@ -20,7 +20,7 @@ fun Route.internRouting(
     route(
         "/intern",
         {
-            specId = OpenApiSpecIds.INTERN
+            specName = OpenApiSpecIds.INTERN
         },
     ) {
         route("kodelister") {

@@ -1,6 +1,6 @@
 package no.kartverket.matrikkel.bygning.routes.v1.ekstern
 
-import io.github.smiley4.ktorswaggerui.dsl.routing.route
+import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
@@ -41,7 +41,7 @@ fun Route.eksternRouting(
 private fun Route.routeWithMaskinporten(path: String, openApiSpecId: String, build: Route.() -> Unit) = route(
     path,
     {
-        specId = openApiSpecId
+        specName = openApiSpecId
         securitySchemeNames = listOf(MASKINPORTEN_PROVIDER_NAME)
         response {
             code(HttpStatusCode.Unauthorized) {

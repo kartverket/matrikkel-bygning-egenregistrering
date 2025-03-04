@@ -12,6 +12,14 @@ plugins {
     `jvm-test-suite`
 }
 
+java {
+    consistentResolution {
+        // Må trekke noe transitive runtime-avhengigheter inn på compileClasspath for swagger-ting.
+        // Dette gjør at vi slipper å angi versjon eksplisitt.
+        useRuntimeClasspathVersions()
+    }
+}
+
 dependencies {
     implementation(project(":application"))
     implementation(project(":infrastructure"))
@@ -39,6 +47,7 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx)
 
     // OpenAPI / Swagger
+    implementation(libs.ktor.openapi)
     implementation(libs.ktor.swagger.ui)
     implementation(libs.schema.kenerator.core)
     implementation(libs.schema.kenerator.reflection)

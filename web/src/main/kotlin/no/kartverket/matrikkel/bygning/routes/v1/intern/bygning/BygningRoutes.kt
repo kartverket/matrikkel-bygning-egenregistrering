@@ -1,8 +1,8 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern.bygning
 
 import com.github.michaelbull.result.mapBoth
-import io.github.smiley4.ktorswaggerui.dsl.routing.get
-import io.github.smiley4.ktorswaggerui.dsl.routing.route
+import io.github.smiley4.ktoropenapi.get
+import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
