@@ -9,10 +9,16 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
+import java.time.LocalDate
 import java.util.*
 
 sealed interface HasKildemateriale {
     val kildemateriale: KildematerialeKode
+}
+
+interface HasGyldighetPeriode {
+    val gyldighetDato: LocalDate?
+    val opphoerDato: LocalDate?
 }
 
 data class ByggeaarRegistrering(
@@ -51,7 +57,10 @@ data class VannforsyningRegistrering(
 data class AvlopRegistrering(
     val avlop: AvlopKode,
     override val kildemateriale: KildematerialeKode
-) : HasKildemateriale
+) : HasKildemateriale, HasGyldighetPeriode {
+    override val gyldighetDato: LocalDate? = null
+    override val opphoerDato: LocalDate? = null
+}
 
 data class EnergikildeRegistrering(
     val energikilder: List<EnergikildeKode>,

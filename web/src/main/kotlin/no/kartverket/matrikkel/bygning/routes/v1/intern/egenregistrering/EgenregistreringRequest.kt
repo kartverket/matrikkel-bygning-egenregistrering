@@ -18,10 +18,11 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
+import no.kartverket.matrikkel.bygning.serializers.LocalDateSerializer
 import java.time.Instant
+import java.time.LocalDate
 import java.util.*
 
 
@@ -30,11 +31,19 @@ data class EgenregistreringRequest(
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistreringRequest?,
     val byggeaarRegistrering: ByggeaarRegistreringRequest?,
-    val energikildeRegistrering: EnergikildeRegistreringRequest?,
+    val energikildeRegistrering: EnergikilderRegistreringRequest?,
     val oppvarmingRegistrering: OppvarmingRegistreringRequest?,
     val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
     val avlopRegistrering: AvlopRegistreringRequest?,
 )
+
+interface HasGyldighetsperiode {
+    @Serializable(with = LocalDateSerializer::class)
+    val gyldighetsdato: LocalDate?
+
+    @Serializable(with = LocalDateSerializer::class)
+    val opphoersdato: LocalDate?
+}
 
 @Serializable
 data class ByggeaarRegistreringRequest(
@@ -74,16 +83,31 @@ data class AvlopRegistreringRequest(
 )
 
 @Serializable
-data class EnergikildeRegistreringRequest(
-    val energikilder: List<EnergikildeKode>,
+data class EnergikilderRegistreringRequest(
+    val energikilde: List<EnergikildeKode>,
     val kildemateriale: KildematerialeKode,
 )
 
 @Serializable
 data class OppvarmingRegistreringRequest(
-    val oppvarminger: List<OppvarmingKode>,
-    val kildemateriale: KildematerialeKode,
+    val oppvarming: OppvarmingTest?
 )
+
+@Serializable
+data class OppvarmingTest(
+    val elektrisk: OppvarmingTest2?,
+    val sentralvarme: OppvarmingTest2?,
+    val annen: OppvarmingTest2?,
+)
+
+@Serializable
+data class OppvarmingTest2(
+    val kildemateriale: KildematerialeKode,
+    @Serializable(with = LocalDateSerializer::class)
+    override val gyldighetsdato: LocalDate?,
+    @Serializable(with = LocalDateSerializer::class)
+    override val opphoersdato: LocalDate?,
+) : HasGyldighetsperiode
 
 fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
     return EtasjeBruksarealRegistrering(
@@ -127,7 +151,7 @@ fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
         },
         energikildeRegistrering = energikildeRegistrering?.let {
             EnergikildeRegistrering(
-                energikilder = it.energikilder,
+                energikilder = it.energikilde,
                 kildemateriale = it.kildemateriale,
             )
         },
@@ -146,5 +170,5 @@ fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
         eier = Foedselsnummer(eier),
         registreringstidspunkt = Instant.now(),
         prosess = ProsessKode.Egenregistrering,
-        bruksenhetRegistrering = this.toBruksenhetRegistrering()
+        bruksenhetRegistrering = this.toBruksenhetRegistrering(),
     )

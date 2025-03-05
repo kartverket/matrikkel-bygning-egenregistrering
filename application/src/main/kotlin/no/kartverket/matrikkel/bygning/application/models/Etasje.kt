@@ -6,6 +6,7 @@ data class BygningEtasje(val etasjebetegnelse: Etasjebetegnelse, val etasjeId: L
 
 data class BruksenhetEtasje(val etasjebetegnelse: Etasjebetegnelse, val bruksareal: Double)
 
+@ConsistentCopyVisibility
 data class Etasjenummer private constructor(val loepenummer: Int) {
     companion object {
         fun of(loepenummer: Int): Etasjenummer {
