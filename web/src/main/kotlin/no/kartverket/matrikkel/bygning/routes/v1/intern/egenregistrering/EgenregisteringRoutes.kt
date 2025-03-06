@@ -4,7 +4,7 @@ import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.mapBoth
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
-import io.github.smiley4.ktorswaggerui.dsl.routing.post
+import io.github.smiley4.ktoropenapi.post
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
