@@ -5,7 +5,6 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
-import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 
@@ -72,10 +71,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
             )
         },
         oppvarminger = this.oppvarminger.aggregate(bruksenhetRegistrering.oppvarmingRegistrering) {
-            Oppvarming(
-                data = it.oppvarminger,
-                metadata = metadata.withKildemateriale(it.kildemateriale),
-            )
+            null
         },
 
         etasjer = this.etasjer.aggregate(

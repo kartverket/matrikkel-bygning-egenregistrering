@@ -17,8 +17,8 @@ sealed interface HasKildemateriale {
 }
 
 interface HasGyldighetPeriode {
-    val gyldighetDato: LocalDate?
-    val opphoerDato: LocalDate?
+    val gyldighetsdato: LocalDate?
+    val opphoersdato: LocalDate?
 }
 
 data class ByggeaarRegistrering(
@@ -57,20 +57,33 @@ data class VannforsyningRegistrering(
 data class AvlopRegistrering(
     val avlop: AvlopKode,
     override val kildemateriale: KildematerialeKode
-) : HasKildemateriale, HasGyldighetPeriode {
-    override val gyldighetDato: LocalDate? = null
-    override val opphoerDato: LocalDate? = null
-}
+) : HasKildemateriale
 
 data class EnergikildeRegistrering(
     val energikilder: List<EnergikildeKode>,
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
-data class OppvarmingRegistrering(
-    val oppvarminger: List<OppvarmingKode>,
-    override val kildemateriale: KildematerialeKode
-) : HasKildemateriale
+data class OppvarmingskildeRegistrering(
+    val oppvarming: OppvarmingKode,
+    override val kildemateriale: KildematerialeKode,
+    override val gyldighetsdato: LocalDate?,
+    override val opphoersdato: LocalDate?
+) : HasKildemateriale, HasGyldighetPeriode
+
+sealed class OppvarmingRegistrering() {
+    data class OppvarmingskilderRegistrering(
+        val oppvarmingskilder: List<OppvarmingskildeRegistrering>,
+    )
+
+    // TODO Skal en eventuell mangelregistrering ha kilde + gyldighetsperiode?
+    data class MangelRegistrering(
+        val mangel: String,
+        override val kildemateriale: KildematerialeKode,
+        override val gyldighetsdato: LocalDate?,
+        override val opphoersdato: LocalDate?,
+    ) : HasKildemateriale, HasGyldighetPeriode
+}
 
 data class BruksenhetRegistrering(
     val bruksenhetBubbleId: BruksenhetBubbleId,

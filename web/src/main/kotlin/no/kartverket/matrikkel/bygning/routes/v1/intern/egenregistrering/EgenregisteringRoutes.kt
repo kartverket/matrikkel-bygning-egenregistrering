@@ -12,14 +12,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.routes.getFnr
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 import no.kartverket.matrikkel.bygning.routes.v1.common.exceptionToDomainError
-import java.time.LocalDate
 
 fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringService) {
     authenticate(IDPORTEN_PROVIDER_NAME) {
@@ -59,17 +57,12 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                                     byggeaar = 2021,
                                     kildemateriale = KildematerialeKode.Selvrapportert,
                                 ),
-                                energikildeRegistrering = EnergikilderRegistreringRequest(
-                                    energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
-                                    kildemateriale = KildematerialeKode.Selvrapportert,
-                                ),
+                                energikildeRegistrering = null,
                                 oppvarmingRegistrering = null,
                                 vannforsyningRegistrering = null,
                                 avlopRegistrering = AvlopRegistreringRequest(
                                     avlop = AvlopKode.OffentligKloakk,
                                     kildemateriale = KildematerialeKode.Selvrapportert,
-                                    gyldighetsdato = LocalDate.of(2025, 1, 1),
-                                    opphoersdato = null,
                                 ),
                             )
                         }
