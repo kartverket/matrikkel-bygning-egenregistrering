@@ -209,7 +209,7 @@ class BygningEgenregistreringAggregeringTest {
     fun `registrering med tom liste paa listeregistering skal ikke sette felt paa bruksenhet`() {
         val bruksenhet = defaultBruksenhet.applyEgenregistreringer(listOf(defaultEgenregistrering))
 
-        assertThat(bruksenhet.oppvarminger).isEmpty()
+        assertThat(bruksenhet.oppvarming).isEmpty()
         assertThat(bruksenhet.energikilder).isEmpty()
     }
 }

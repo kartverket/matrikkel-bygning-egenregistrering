@@ -64,26 +64,12 @@ data class EnergikildeRegistrering(
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale
 
-data class OppvarmingskildeRegistrering(
-    val oppvarming: OppvarmingKode,
+data class OppvarmingRegistrering(
+    val kode: OppvarmingKode,
     override val kildemateriale: KildematerialeKode,
     override val gyldighetsdato: LocalDate?,
     override val opphoersdato: LocalDate?
 ) : HasKildemateriale, HasGyldighetPeriode
-
-sealed class OppvarmingRegistrering() {
-    data class OppvarmingskilderRegistrering(
-        val oppvarmingskilder: List<OppvarmingskildeRegistrering>,
-    )
-
-    // TODO Skal en eventuell mangelregistrering ha kilde + gyldighetsperiode?
-    data class MangelRegistrering(
-        val mangel: String,
-        override val kildemateriale: KildematerialeKode,
-        override val gyldighetsdato: LocalDate?,
-        override val opphoersdato: LocalDate?,
-    ) : HasKildemateriale, HasGyldighetPeriode
-}
 
 data class BruksenhetRegistrering(
     val bruksenhetBubbleId: BruksenhetBubbleId,
@@ -92,7 +78,7 @@ data class BruksenhetRegistrering(
     val vannforsyningRegistrering: VannforsyningRegistrering?,
     val avlopRegistrering: AvlopRegistrering?,
     val energikildeRegistrering: EnergikildeRegistrering?,
-    val oppvarmingRegistrering: OppvarmingRegistrering?,
+    val oppvarmingRegistrering: List<OppvarmingRegistrering>?,
 )
 
 data class Egenregistrering(

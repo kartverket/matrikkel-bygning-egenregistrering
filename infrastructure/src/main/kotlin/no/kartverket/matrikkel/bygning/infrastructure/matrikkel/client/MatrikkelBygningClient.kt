@@ -56,6 +56,7 @@ class MatrikkelBygningClient(
                 prosess = null,
             )
 
+            // TODO: Hvordan håndtere ukjent vs. ikke oppgitt fra matrikkel? Hva betyr en tom liste? Hva betyr null?
             return Ok(
                 Bygning(
                     id = BygningId(bygning.uuid.uuid),
@@ -64,14 +65,12 @@ class MatrikkelBygningClient(
                     byggeaar = Multikilde(
                         autoritativ = deriveByggeaarForBygning(bygning),
                     ),
-                    // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                     bruksareal = Multikilde(
                         autoritativ = Bruksareal(
                             bygning.etasjedata.bruksarealTotalt,
                             bygningsmetadata,
                         ),
                     ),
-                    // TODO: Burde vi ha kode for Ikke oppgitt?
                     vannforsyning = Multikilde(
                         autoritativ = mapVannforsyning(bygning.vannforsyningsKodeId)?.let {
                             Vannforsyning(
@@ -80,7 +79,6 @@ class MatrikkelBygningClient(
                             )
                         },
                     ),
-                    // TODO: Burde vi ha kode for Ikke oppgitt?
                     avlop = Multikilde(
                         autoritativ = mapAvloep(bygning.avlopsKodeId)?.let {
                             Avlop(
@@ -89,21 +87,20 @@ class MatrikkelBygningClient(
                             )
                         },
                     ),
-                    // TODO: Skal tom liste i matrikkelen tolkes som "vet ikke" eller "ingen"?
                     energikilder = Multikilde(
                         autoritativ = Energikilde(
                             data = bygning.energikildeKodeIds.item.map { mapEnergikilde(it) },
                             metadata = bygningsmetadata,
                         ).takeUnless { bygning.energikildeKodeIds.item.isEmpty() }, // Tolker som "vet ikke"
                     ),
-                    // TODO: Skal tom liste i matrikkelen tolkes som "vet ikke" eller "ingen"?
-                    oppvarminger = Multikilde(
-                        autoritativ = Oppvarming(
-                            data = bygning.oppvarmingsKodeIds.item.map { mapOppvarming(it) },
-                            metadata = bygningsmetadata,
-                        ).takeUnless { bygning.oppvarmingsKodeIds.item.isEmpty() }, // Tolker som "vet ikke"
+                    oppvarming = Multikilde(
+                        autoritativ = bygning.oppvarmingsKodeIds.item.map {
+                            Oppvarming(
+                                data = mapOppvarming(it),
+                                metadata = bygningsmetadata,
+                            )
+                        },
                     ),
-                    // TODO: Burde vi ha en måte å angi ukjent / ikke oppgitt?
                     bruksenheter = bruksenheter.map {
                         val bruksenhetsmetadata = RegisterMetadata(
                             it.oppdateringsdato.toInstant(),
@@ -115,7 +112,6 @@ class MatrikkelBygningClient(
                         Bruksenhet(
                             id = BruksenhetId(it.uuid.uuid),
                             bruksenhetBubbleId = BruksenhetBubbleId(it.id.value),
-                            // TODO: Hvordan innse at arealet er ukjent og hvordan håndtere dette
                             totaltBruksareal = Multikilde(
                                 autoritativ = Bruksareal(
                                     it.bruksareal,
