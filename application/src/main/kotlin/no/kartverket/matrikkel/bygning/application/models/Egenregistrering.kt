@@ -2,6 +2,7 @@ package no.kartverket.matrikkel.bygning.application.models
 
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -10,7 +11,6 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
 import java.time.LocalDate
-import java.util.*
 
 sealed interface HasKildemateriale {
     val kildemateriale: KildematerialeKode
@@ -31,7 +31,7 @@ data class BruksarealRegistrering(
     val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?,
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale {
-    fun isTotaltBruksarealEqualTotaltEtasjeArealIfSet(): Boolean {
+    fun checkIsTotaltBruksarealEqualTotaltEtasjeArealIfSet(): Boolean {
         if (etasjeRegistreringer == null) {
             return true
         }
@@ -82,9 +82,10 @@ data class BruksenhetRegistrering(
 )
 
 data class Egenregistrering(
-    val id: UUID,
+    val id: EgenregistreringId,
     val eier: Foedselsnummer,
     val registreringstidspunkt: Instant,
     val prosess: ProsessKode,
     val bruksenhetRegistrering: BruksenhetRegistrering,
+    val gjeldende: Boolean,
 )

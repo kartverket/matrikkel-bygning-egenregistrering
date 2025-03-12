@@ -14,6 +14,7 @@ import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -147,9 +148,10 @@ fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
 }
 
 fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering = Egenregistrering(
-    id = UUID.randomUUID(),
+    id = EgenregistreringId(UUID.randomUUID()),
     eier = Foedselsnummer(eier),
     registreringstidspunkt = Instant.now(),
     prosess = ProsessKode.Egenregistrering,
     bruksenhetRegistrering = this.toBruksenhetRegistrering(),
+    gjeldende = true,
 )

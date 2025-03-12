@@ -5,8 +5,11 @@ import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
+import no.kartverket.matrikkel.bygning.application.models.error.EgenregistreringNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.MultipleValidationError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
+import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse.BadRequestError
+import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse.NotFoundError
 import org.slf4j.MDC
 
 // Gjør at man kan chaine direkte videre.
@@ -18,9 +21,10 @@ fun exceptionToDomainError(e: Throwable): DomainError = when (e) {
 }
 
 fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorResponse> = when (error) {
-    is BygningNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
-    is BruksenhetNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
-    is ValidationError -> HttpStatusCode.BadRequest to ErrorResponse.BadRequestError(description = error.message)
+    is BygningNotFound -> HttpStatusCode.NotFound to NotFoundError(description = error.message)
+    is BruksenhetNotFound -> HttpStatusCode.NotFound to NotFoundError(description = error.message)
+    is EgenregistreringNotFound -> HttpStatusCode.NotFound to NotFoundError(description = error.message)
+    is ValidationError -> HttpStatusCode.BadRequest to BadRequestError(description = error.message)
     is MultipleValidationError -> HttpStatusCode.BadRequest to ErrorResponse.ValidationError(
         details = error.errors.map {
             it.message

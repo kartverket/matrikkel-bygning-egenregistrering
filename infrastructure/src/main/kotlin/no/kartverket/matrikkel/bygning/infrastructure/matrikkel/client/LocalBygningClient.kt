@@ -6,6 +6,7 @@ import no.kartverket.matrikkel.bygning.application.bygning.BygningClient
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
+import no.kartverket.matrikkel.bygning.application.models.Gyldighetsperiode
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Signatur
@@ -16,7 +17,9 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import java.time.Instant
+import java.util.*
 
 class LocalBygningClient : BygningClient {
     private val bruksenheter: List<Bruksenhet> = listOf(
@@ -52,6 +55,8 @@ class LocalBygningClient : BygningClient {
                         registrertAv = Signatur("norola"),
                         kildemateriale = null,
                         prosess = null,
+                        egenregistreringId = EgenregistreringId(UUID.randomUUID()),
+                        gyldighetsperiode = Gyldighetsperiode(),
                     ),
                 ),
             ),

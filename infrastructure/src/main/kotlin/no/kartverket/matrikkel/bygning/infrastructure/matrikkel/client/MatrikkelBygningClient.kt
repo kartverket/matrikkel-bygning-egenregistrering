@@ -54,6 +54,9 @@ class MatrikkelBygningClient(
                 bygning.oppdateringsdato.toInstant(),
                 Signatur(bygning.oppdatertAv),
                 prosess = null,
+                egenregistreringId = TODO(),
+                kildemateriale = TODO(),
+                gyldighetsperiode = TODO(),
             )
 
             // TODO: Hvordan håndtere ukjent vs. ikke oppgitt fra matrikkel? Hva betyr en tom liste? Hva betyr null?
@@ -107,6 +110,8 @@ class MatrikkelBygningClient(
                             Signatur(it.oppdatertAv),
                             kildemateriale = null,
                             prosess = null,
+                            egenregistreringId = TODO(),
+                            gyldighetsperiode = TODO(),
                         )
 
                         Bruksenhet(

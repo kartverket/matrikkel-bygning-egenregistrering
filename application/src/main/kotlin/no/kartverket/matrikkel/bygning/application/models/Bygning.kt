@@ -11,6 +11,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -66,6 +67,7 @@ data class Gyldighetsperiode(
 data class RegisterMetadata(
     val registreringstidspunkt: Instant,
     val registrertAv: RegistreringAktoer,
+    val egenregistreringId: EgenregistreringId,
     val kildemateriale: KildematerialeKode? = null,
     val prosess: ProsessKode?,
     val gyldighetsperiode: Gyldighetsperiode = Gyldighetsperiode(),

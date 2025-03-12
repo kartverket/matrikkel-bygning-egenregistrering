@@ -24,7 +24,7 @@ class EgenregistreringValidator {
         }
 
         private fun validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering: Egenregistrering): ValidationError? {
-            return if (egenregistrering.bruksenhetRegistrering.bruksarealRegistrering?.isTotaltBruksarealEqualTotaltEtasjeArealIfSet() == false) {
+            return if (egenregistrering.bruksenhetRegistrering.bruksarealRegistrering?.checkIsTotaltBruksarealEqualTotaltEtasjeArealIfSet() == false) {
                 ValidationError(
                     message = "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har registrert totalt BRA og BRA per etasje, men totalt BRA stemmer ikke overens med totalen av BRA per etasje",
                 )

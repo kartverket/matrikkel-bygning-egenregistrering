@@ -6,6 +6,7 @@ sealed interface DomainError
 
 data class BygningNotFound(val message: String) : DomainError
 data class BruksenhetNotFound(val message: String) : DomainError
+data class EgenregistreringNotFound(val message: String) : DomainError
 
 data class ValidationError(val message: String) : DomainError
 

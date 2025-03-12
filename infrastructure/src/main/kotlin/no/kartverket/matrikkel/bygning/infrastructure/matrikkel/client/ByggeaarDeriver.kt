@@ -31,7 +31,10 @@ internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Byggeaar? {
         metadata = RegisterMetadata(
             registreringstidspunkt = derivedByggeaarStatus.registrertDato.toInstant(),
             registrertAv = Signatur(derivedByggeaarStatus.oppdatertAv),
-            prosess = ProsessKode.Egenregistrering
+            prosess = ProsessKode.Egenregistrering,
+            egenregistreringId = TODO(),
+            kildemateriale = TODO(),
+            gyldighetsperiode = TODO()
         ),
     )
 }

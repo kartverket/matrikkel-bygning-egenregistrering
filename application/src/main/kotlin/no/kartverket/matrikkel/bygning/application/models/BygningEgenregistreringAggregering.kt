@@ -36,6 +36,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
         registreringstidspunkt = egenregistrering.registreringstidspunkt,
         registrertAv = egenregistrering.eier,
         prosess = egenregistrering.prosess,
+        egenregistreringId = egenregistrering.id,
         gyldighetsperiode = Gyldighetsperiode(
             gyldighetsdato = null,
             opphoersdato = null,

@@ -95,6 +95,7 @@ data class RegisterMetadataInternResponse(
     val registrertAv: String,
     val kildemateriale: KildematerialeKode?,
     val prosess: ProsessKode?,
+    val egenregistreringId: String,
     val gyldighetsaar: Int?,
     val opphoersaar: Int?,
 )
@@ -125,6 +126,7 @@ fun RegisterMetadata.toRegisterMetadataInternResponse() = RegisterMetadataIntern
     prosess = this.prosess,
     gyldighetsaar = this.gyldighetsperiode.gyldighetsdato?.year,
     opphoersaar = this.gyldighetsperiode.opphoersdato?.year,
+    egenregistreringId = this.egenregistreringId.value.toString(),
 )
 
 fun <T : Any, R : Any> Multikilde<T>.toMultikildeInternResponse(mapper: T.() -> R): MultikildeInternResponse<R>? {

@@ -54,7 +54,7 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
             SELECT data
             FROM bygning.bruksenhet
             WHERE id = :id
-            AND registreringstidspunkt <= :registreringstidspunkt
+            AND registreringstidspunkt < :registreringstidspunkt
             ORDER BY registreringstidspunkt DESC
             LIMIT 1
         """.trimIndent()
