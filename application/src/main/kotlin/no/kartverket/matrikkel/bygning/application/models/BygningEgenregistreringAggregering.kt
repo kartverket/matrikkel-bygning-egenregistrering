@@ -10,19 +10,23 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 
 fun Bygning.applyEgenregistreringer(egenregistreringer: List<Egenregistrering>): Bygning {
-    return egenregistreringer.sortedBy { it.registreringstidspunkt }.fold(this) { bygningAggregate, egenregistrering ->
-        bygningAggregate.copy(
-            bruksenheter = bygningAggregate.bruksenheter.map {
-                it.applyEgenregistrering(egenregistrering)
-            },
-        )
-    }
+    return egenregistreringer
+        .sortedBy { it.registreringstidspunkt }
+        .fold(this) { bygningAggregate, egenregistrering ->
+            bygningAggregate.copy(
+                bruksenheter = bygningAggregate.bruksenheter.map {
+                    it.applyEgenregistrering(egenregistrering)
+                },
+            )
+        }
 }
 
 fun Bruksenhet.applyEgenregistreringer(egenregistreringer: List<Egenregistrering>): Bruksenhet {
-    return egenregistreringer.sortedBy { it.registreringstidspunkt }.fold(this) { bruksenhetAggregate, egenregistrering ->
-        bruksenhetAggregate.applyEgenregistrering(egenregistrering)
-    }
+    return egenregistreringer
+        .sortedBy { it.registreringstidspunkt }
+        .fold(this) { bruksenhetAggregate, egenregistrering ->
+            bruksenhetAggregate.applyEgenregistrering(egenregistrering)
+        }
 }
 
 fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Bruksenhet {
@@ -79,11 +83,14 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
                 registrering.kode in currentOppvarming.map { current -> current.data }
             }
 
-            currentOppvarming.map { oppvarming ->
-                newOppvarmingToUpdate.find { it.kode == oppvarming.data }?.toOppvarming(metadata) ?: oppvarming
-            }.plus(
-                newOppvarmingToAdd.map { it.toOppvarming(metadata) },
-            )
+            currentOppvarming
+                .map { oppvarming ->
+                    newOppvarmingToUpdate.find { it.kode == oppvarming.data }?.toOppvarming(metadata)
+                        ?: oppvarming
+                }
+                .plus(
+                    newOppvarmingToAdd.map { it.toOppvarming(metadata) },
+                )
         },
 
         etasjer = this.etasjer.aggregate(
@@ -106,9 +113,11 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
 private fun OppvarmingRegistrering.toOppvarming(metadata: RegisterMetadata): Oppvarming {
     return Oppvarming(
         data = this.kode,
-        metadata = metadata.withKildemateriale(this.kildemateriale).withGyldighetsperiode(
-            Gyldighetsperiode(gyldighetsdato = this.gyldighetsdato, opphoersdato = this.opphoersdato),
-        ),
+        metadata = metadata
+            .withKildemateriale(this.kildemateriale)
+            .withGyldighetsperiode(
+                Gyldighetsperiode(gyldighetsdato = this.gyldighetsdato, opphoersdato = this.opphoersdato),
+            ),
     )
 }
 
