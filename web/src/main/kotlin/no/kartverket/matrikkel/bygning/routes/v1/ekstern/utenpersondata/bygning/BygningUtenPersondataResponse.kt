@@ -117,6 +117,6 @@ fun Bruksenhet.toBruksenhetUtenPersondataResponse(): BruksenhetUtenPersondataRes
         totaltBruksareal = toFeltUtenPersondataResponse(this.totaltBruksareal.egenregistrert, ::BruksarealUtenPersondataResponse),
         vannforsyning = toFeltUtenPersondataResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeUtenPersondataResponse),
         avlop = toFeltUtenPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeUtenPersondataResponse),
-        energikilder = toFeltUtenPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeUtenPersondataResponse),
+        energikilder = TODO(), // toFeltUtenPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeUtenPersondataResponse),
         oppvarming = TODO() //toFeltUtenPersondataResponse(this.oppvarminger.egenregistrert, ::OppvarmingUtenPersondataResponse),
 )

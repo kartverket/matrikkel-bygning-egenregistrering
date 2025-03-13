@@ -88,10 +88,12 @@ class MatrikkelBygningClient(
                         },
                     ),
                     energikilder = Multikilde(
-                        autoritativ = Energikilde(
-                            data = bygning.energikildeKodeIds.item.map { mapEnergikilde(it) },
-                            metadata = bygningsmetadata,
-                        ).takeUnless { bygning.energikildeKodeIds.item.isEmpty() }, // Tolker som "vet ikke"
+                        autoritativ = bygning.energikildeKodeIds.item.map {
+                            Energikilde(
+                                data = mapEnergikilde(it),
+                                metadata = bygningsmetadata,
+                            )
+                        },
                     ),
                     oppvarming = Multikilde(
                         autoritativ = bygning.oppvarmingsKodeIds.item.map {

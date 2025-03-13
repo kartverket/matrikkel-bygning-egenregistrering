@@ -28,7 +28,7 @@ data class Bygning(
     val bruksenheter: List<Bruksenhet>,
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val bruksareal: Multikilde<Bruksareal> = Multikilde(),
-    val energikilder: Multikilde<Energikilde> = Multikilde(),
+    val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
     val oppvarming: Multikilde<List<Oppvarming>> = Multikilde(),
     val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
     val avlop: Multikilde<Avlop> = Multikilde(),
@@ -40,7 +40,7 @@ data class Bruksenhet(
     val etasjer: Multikilde<BruksenhetEtasjer> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val totaltBruksareal: Multikilde<Bruksareal> = Multikilde(),
-    val energikilder: Multikilde<Energikilde> = Multikilde(),
+    val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
     val oppvarming: Multikilde<List<Oppvarming>> = Multikilde(),
     val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
     val avlop: Multikilde<Avlop> = Multikilde(),
@@ -101,9 +101,9 @@ sealed interface Felt<T> {
     ) : Felt<AvlopKode>
 
     data class Energikilde(
-        override val data: List<EnergikildeKode>,
+        override val data: EnergikildeKode,
         override val metadata: RegisterMetadata
-    ) : Felt<List<EnergikildeKode>>
+    ) : Felt<EnergikildeKode>
 
     data class Oppvarming(
         override val data: OppvarmingKode,

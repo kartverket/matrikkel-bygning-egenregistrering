@@ -72,7 +72,7 @@ data class BruksenhetInternResponse(
     val totaltBruksareal: MultikildeInternResponse<BruksarealInternResponse>?,
     val vannforsyning: MultikildeInternResponse<VannforsyningKodeInternResponse>?,
     val avlop: MultikildeInternResponse<AvlopKodeInternResponse>?,
-    val energikilder: MultikildeInternResponse<EnergikildeInternResponse>?,
+    val energikilder: MultikildeInternResponse<List<EnergikildeInternResponse>>?,
     val oppvarming: MultikildeInternResponse<List<OppvarmingInternResponse>>?,
 )
 
@@ -84,7 +84,7 @@ data class BruksenhetSimpleResponse(
     val totaltBruksareal: BruksarealInternResponse?,
     val vannforsyning: VannforsyningKodeInternResponse?,
     val avlop: AvlopKodeInternResponse?,
-    val energikilder: EnergikildeInternResponse?,
+    val energikilder: List<EnergikildeInternResponse>,
     val oppvarming: List<OppvarmingInternResponse>,
 )
 
@@ -112,7 +112,7 @@ data class VannforsyningKodeInternResponse(val data: VannforsyningKode, val meta
 data class AvlopKodeInternResponse(val data: AvlopKode, val metadata: RegisterMetadataInternResponse)
 
 @Serializable
-data class EnergikildeInternResponse(val data: List<EnergikildeKode>, val metadata: RegisterMetadataInternResponse)
+data class EnergikildeInternResponse(val data: EnergikildeKode, val metadata: RegisterMetadataInternResponse)
 
 @Serializable
 data class OppvarmingInternResponse(val data: OppvarmingKode, val metadata: RegisterMetadataInternResponse)
@@ -142,7 +142,7 @@ fun Bygning.toBygningInternResponse(): BygningInternResponse = BygningInternResp
     bruksenheter = this.bruksenheter.map(Bruksenhet::toBruksenhetResponse),
     vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
-    energikilder = this.energikilder.toMultikildeInternResponse(Energikilde::toEnergikildeResponse),
+    energikilder = TODO(), // this.energikilder.toMultikildeInternResponse(Energikilde::toEnergikildeResponse),
     oppvarming = TODO(), //this.oppvarminger.toMultikildeInternResponse(Oppvarming::toOppvarmingResponse),
 )
 
@@ -157,7 +157,7 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetInternResponse = BruksenhetInte
     byggeaar = this.byggeaar.toMultikildeInternResponse(Byggeaar::toByggeaarInternResponse),
     etasjer = this.etasjer.toMultikildeInternResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
     totaltBruksareal = this.totaltBruksareal.toMultikildeInternResponse(Bruksareal::toBruksarealResponse),
-    energikilder = this.energikilder.toMultikildeInternResponse(Energikilde::toEnergikildeResponse),
+    energikilder = this.energikilder.toMultikildeInternResponse { map(Energikilde::toEnergikildeResponse) },
     oppvarming = this.oppvarming.toMultikildeInternResponse { map(Oppvarming::toOppvarmingResponse) },
     vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
@@ -170,7 +170,7 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
     totaltBruksareal = this.totaltBruksareal.egenregistrert?.toBruksarealResponse(),
     vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
     avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
-    energikilder = this.energikilder.egenregistrert?.toEnergikildeResponse(),
+    energikilder = this.energikilder.egenregistrert?.map { it.toEnergikildeResponse() } ?: emptyList(),
     oppvarming = this.oppvarming.egenregistrert?.map { it.toOppvarmingResponse() } ?: emptyList(),
 )
 

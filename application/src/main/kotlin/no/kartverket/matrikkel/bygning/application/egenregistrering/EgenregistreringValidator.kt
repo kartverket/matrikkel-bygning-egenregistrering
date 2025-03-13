@@ -12,8 +12,7 @@ class EgenregistreringValidator {
         fun validateEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, MultipleValidationError> {
             val errors = listOfNotNull(
                 validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering),
-//                validateMangelIListeregistreringer(egenregistrering),
-                validateDupliseringIListeregistreringer(egenregistrering),
+                validateListeregistreringDuplicates(egenregistrering),
             )
 
             return if (errors.isEmpty()) {
@@ -33,18 +32,22 @@ class EgenregistreringValidator {
             }
         }
 
-        private fun validateDupliseringIListeregistreringer(egenregistrering: Egenregistrering): ValidationError? {
+        // TODO Er det noe poeng i å gjøre denne smartere? Føler dette er helt innafor, også i tilbakemelding
+        private fun validateListeregistreringDuplicates(egenregistrering: Egenregistrering): ValidationError? {
             val oppvarmingRegistrering = egenregistrering.bruksenhetRegistrering.oppvarmingRegistrering
+            val energikilderRegistrering = egenregistrering.bruksenhetRegistrering.energikildeRegistrering
 
-            if (oppvarmingRegistrering == null) return null
+            val oppvarmingHasDuplicate = oppvarmingRegistrering
+                ?.groupBy { it.oppvarming }
+                ?.any { it.value.size > 1 } == true
 
-            val oppvarmingHasDuplisering = oppvarmingRegistrering
-                .groupBy { it.kode }
-                .any { it.value.size > 1 }
+            val energikilderHasDuplicate = energikilderRegistrering
+                ?.groupBy { it.energikilde }
+                ?.any { it.value.size > 1 } == true
 
-            return if (oppvarmingHasDuplisering) {
+            return if (oppvarmingHasDuplicate || energikilderHasDuplicate) {
                 ValidationError(
-                    message = "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har dupliserte registreringer i oppvarming",
+                    message = "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har dupliserte registreringer i oppvarming eller energikilder",
                 )
             } else {
                 null

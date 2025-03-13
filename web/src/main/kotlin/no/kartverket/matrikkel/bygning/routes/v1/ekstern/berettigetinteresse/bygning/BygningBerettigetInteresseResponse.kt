@@ -41,6 +41,6 @@ fun Bruksenhet.toBruksenhetBerettigetInteresseResponse(): BruksenhetBerettigetIn
     totaltBruksareal = this.totaltBruksareal.egenregistrert?.data,
     vannforsyning = this.vannforsyning.egenregistrert?.data,
     avlop = this.avlop.egenregistrert?.data,
-    energikilder = this.energikilder.egenregistrert?.data,
+    energikilder = TODO(), //this.energikilder.egenregistrert?.data,
     oppvarming = TODO() //this.oppvarminger.egenregistrert?.data,
 )

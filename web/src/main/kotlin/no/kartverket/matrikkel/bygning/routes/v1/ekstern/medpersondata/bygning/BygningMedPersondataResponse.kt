@@ -124,6 +124,6 @@ fun Bruksenhet.toBruksenhetMedPersondataResponse(): BruksenhetMedPersondataRespo
         ::VannforsyningKodeMedPersondataResponse
     ),
     avlop = toFeltMedPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeMedPersondataResponse),
-    energikilder = toFeltMedPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeMedPersondataResponse),
+    energikilder = TODO(), // toFeltMedPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeMedPersondataResponse),
     oppvarming = TODO() //toFeltMedPersondataResponse(this.oppvarminger.egenregistrert, ::OppvarmingMedPersondataResponse),
 )

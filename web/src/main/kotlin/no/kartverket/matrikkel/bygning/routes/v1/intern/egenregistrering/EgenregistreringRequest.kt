@@ -26,16 +26,17 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.*
 
+// TODO Burde vi interface Gyldighet og Kildemateriale slik som vi gjør i domenelogikken?
 
 @Serializable
 data class EgenregistreringRequest(
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistreringRequest?,
     val byggeaarRegistrering: ByggeaarRegistreringRequest?,
-    val energikildeRegistrering: EnergikilderRegistreringRequest?,
-    val oppvarmingRegistrering: List<OppvarmingRegistreringRequest>?,
     val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
     val avlopRegistrering: AvlopRegistreringRequest?,
+    val energikildeRegistrering: List<EnergikilderRegistreringRequest>?,
+    val oppvarmingRegistrering: List<OppvarmingRegistreringRequest>?,
 )
 
 @Serializable
@@ -67,23 +68,29 @@ data class BruksarealRegistreringRequest(
 data class VannforsyningRegistreringRequest(
     val vannforsyning: VannforsyningKode,
     val kildemateriale: KildematerialeKode,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null
 )
 
 @Serializable
 data class AvlopRegistreringRequest(
     val avlop: AvlopKode,
     val kildemateriale: KildematerialeKode,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null
 )
 
 @Serializable
 data class EnergikilderRegistreringRequest(
-    val energikilde: List<EnergikildeKode>,
+    val energikilde: EnergikildeKode,
     val kildemateriale: KildematerialeKode,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null
 )
 
 @Serializable
 data class OppvarmingRegistreringRequest(
-    val kode: OppvarmingKode,
+    val oppvarming: OppvarmingKode,
     val kildemateriale: KildematerialeKode,
     val gyldighetsaar: Int? = null,
     val opphoersaar: Int? = null
@@ -117,29 +124,35 @@ fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
                 kildemateriale = it.kildemateriale,
             )
         },
+        // TODO Finne ut av år -> dato for alle greiene her
         vannforsyningRegistrering = vannforsyningRegistrering?.let {
             VannforsyningRegistrering(
                 vannforsyning = it.vannforsyning,
                 kildemateriale = it.kildemateriale,
+                gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
+                opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
             )
         },
         avlopRegistrering = avlopRegistrering?.let {
             AvlopRegistrering(
                 avlop = it.avlop,
                 kildemateriale = it.kildemateriale,
+                gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
+                opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
             )
         },
-        energikildeRegistrering = energikildeRegistrering?.let {
+        energikildeRegistrering = energikildeRegistrering?.map {
             EnergikildeRegistrering(
-                energikilder = it.energikilde,
+                energikilde = it.energikilde,
                 kildemateriale = it.kildemateriale,
+                gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
+                opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
             )
         },
         oppvarmingRegistrering = oppvarmingRegistrering?.map {
             OppvarmingRegistrering(
-                kode = it.kode,
+                oppvarming = it.oppvarming,
                 kildemateriale = it.kildemateriale,
-                // TODO Sjekke hvordan man skal deale med år -> dato
                 gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
                 opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
             )

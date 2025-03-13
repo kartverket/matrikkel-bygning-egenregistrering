@@ -51,21 +51,27 @@ data class EtasjeBruksarealRegistrering(
 
 data class VannforsyningRegistrering(
     val vannforsyning: VannforsyningKode,
-    override val kildemateriale: KildematerialeKode
-) : HasKildemateriale
+    override val kildemateriale: KildematerialeKode,
+    override val gyldighetsdato: LocalDate?,
+    override val opphoersdato: LocalDate?
+) : HasKildemateriale, HasGyldighetPeriode
 
 data class AvlopRegistrering(
     val avlop: AvlopKode,
-    override val kildemateriale: KildematerialeKode
-) : HasKildemateriale
+    override val kildemateriale: KildematerialeKode,
+    override val gyldighetsdato: LocalDate?,
+    override val opphoersdato: LocalDate?
+) : HasKildemateriale, HasGyldighetPeriode
 
 data class EnergikildeRegistrering(
-    val energikilder: List<EnergikildeKode>,
-    override val kildemateriale: KildematerialeKode
-) : HasKildemateriale
+    val energikilde: EnergikildeKode,
+    override val kildemateriale: KildematerialeKode,
+    override val gyldighetsdato: LocalDate?,
+    override val opphoersdato: LocalDate?
+) : HasKildemateriale, HasGyldighetPeriode
 
 data class OppvarmingRegistrering(
-    val kode: OppvarmingKode,
+    val oppvarming: OppvarmingKode,
     override val kildemateriale: KildematerialeKode,
     override val gyldighetsdato: LocalDate?,
     override val opphoersdato: LocalDate?
@@ -77,7 +83,7 @@ data class BruksenhetRegistrering(
     val byggeaarRegistrering: ByggeaarRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,
     val avlopRegistrering: AvlopRegistrering?,
-    val energikildeRegistrering: EnergikildeRegistrering?,
+    val energikildeRegistrering: List<EnergikildeRegistrering>?,
     val oppvarmingRegistrering: List<OppvarmingRegistrering>?,
 )
 

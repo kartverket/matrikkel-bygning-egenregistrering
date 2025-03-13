@@ -4,17 +4,13 @@ import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.mapBoth
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
-import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.post
-import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.util.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
-import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
@@ -107,7 +103,7 @@ private val egenregistreringExample = EgenregistreringRequest(
     ),
     oppvarmingRegistrering = listOf(
         OppvarmingRegistreringRequest(
-            kode = OppvarmingKode.Elektrisk,
+            oppvarming = OppvarmingKode.Elektrisk,
             kildemateriale = KildematerialeKode.Salgsoppgave,
             gyldighetsaar = 2021,
         ),
