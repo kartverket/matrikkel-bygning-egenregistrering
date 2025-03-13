@@ -73,7 +73,7 @@ data class BruksenhetInternResponse(
     val vannforsyning: MultikildeInternResponse<VannforsyningKodeInternResponse>?,
     val avlop: MultikildeInternResponse<AvlopKodeInternResponse>?,
     val energikilder: MultikildeInternResponse<EnergikildeInternResponse>?,
-    val oppvarminger: MultikildeInternResponse<OppvarmingInternResponse>?,
+    val oppvarming: MultikildeInternResponse<List<OppvarmingInternResponse>>?,
 )
 
 @Serializable
@@ -85,7 +85,7 @@ data class BruksenhetSimpleResponse(
     val vannforsyning: VannforsyningKodeInternResponse?,
     val avlop: AvlopKodeInternResponse?,
     val energikilder: EnergikildeInternResponse?,
-    val oppvarminger: OppvarmingInternResponse?,
+    val oppvarming: List<OppvarmingInternResponse>,
 )
 
 @Serializable
@@ -94,7 +94,9 @@ data class RegisterMetadataInternResponse(
     val registreringstidspunkt: Instant,
     val registrertAv: String,
     val kildemateriale: KildematerialeKode?,
-    val prosess: ProsessKode?
+    val prosess: ProsessKode?,
+    val gyldighetsaar: Int?,
+    val opphoersaar: Int?,
 )
 
 @Serializable
@@ -113,7 +115,7 @@ data class AvlopKodeInternResponse(val data: AvlopKode, val metadata: RegisterMe
 data class EnergikildeInternResponse(val data: List<EnergikildeKode>, val metadata: RegisterMetadataInternResponse)
 
 @Serializable
-data class OppvarmingInternResponse(val data: List<OppvarmingKode>, val metadata: RegisterMetadataInternResponse)
+data class OppvarmingInternResponse(val data: OppvarmingKode, val metadata: RegisterMetadataInternResponse)
 
 
 fun RegisterMetadata.toRegisterMetadataInternResponse() = RegisterMetadataInternResponse(
@@ -121,6 +123,8 @@ fun RegisterMetadata.toRegisterMetadataInternResponse() = RegisterMetadataIntern
     registrertAv = this.registrertAv.value,
     kildemateriale = this.kildemateriale,
     prosess = this.prosess,
+    gyldighetsaar = this.gyldighetsperiode.gyldighetsdato?.year,
+    opphoersaar = this.gyldighetsperiode.opphoersdato?.year,
 )
 
 fun <T : Any, R : Any> Multikilde<T>.toMultikildeInternResponse(mapper: T.() -> R): MultikildeInternResponse<R>? {
@@ -139,7 +143,7 @@ fun Bygning.toBygningInternResponse(): BygningInternResponse = BygningInternResp
     vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
     energikilder = this.energikilder.toMultikildeInternResponse(Energikilde::toEnergikildeResponse),
-    oppvarming = this.oppvarminger.toMultikildeInternResponse(Oppvarming::toOppvarmingResponse),
+    oppvarming = TODO(), //this.oppvarminger.toMultikildeInternResponse(Oppvarming::toOppvarmingResponse),
 )
 
 fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
@@ -154,7 +158,7 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetInternResponse = BruksenhetInte
     etasjer = this.etasjer.toMultikildeInternResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
     totaltBruksareal = this.totaltBruksareal.toMultikildeInternResponse(Bruksareal::toBruksarealResponse),
     energikilder = this.energikilder.toMultikildeInternResponse(Energikilde::toEnergikildeResponse),
-    oppvarminger = this.oppvarminger.toMultikildeInternResponse(Oppvarming::toOppvarmingResponse),
+    oppvarming = this.oppvarming.toMultikildeInternResponse { map(Oppvarming::toOppvarmingResponse) },
     vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
 )
@@ -167,7 +171,7 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
     vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
     avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
     energikilder = this.energikilder.egenregistrert?.toEnergikildeResponse(),
-    oppvarminger = this.oppvarminger.egenregistrert?.toOppvarmingResponse(),
+    oppvarming = this.oppvarming.egenregistrert?.map { it.toOppvarmingResponse() } ?: emptyList(),
 )
 
 private fun BruksenhetEtasjer.toBruksenhetEtasjeResponse(): BruksenhetEtasjerInternResponse = BruksenhetEtasjerInternResponse(

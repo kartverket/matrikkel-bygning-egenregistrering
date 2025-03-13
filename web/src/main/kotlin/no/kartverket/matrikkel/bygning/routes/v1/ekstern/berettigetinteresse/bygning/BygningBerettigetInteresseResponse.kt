@@ -23,7 +23,7 @@ data class BruksenhetBerettigetInteresseResponse(
     val vannforsyning: VannforsyningKode?,
     val avlop: AvlopKode?,
     val energikilder: List<EnergikildeKode>?,
-    val oppvarminger: List<OppvarmingKode>?,
+    val oppvarming: List<OppvarmingKode>?,
 )
 
 
@@ -42,5 +42,5 @@ fun Bruksenhet.toBruksenhetBerettigetInteresseResponse(): BruksenhetBerettigetIn
     vannforsyning = this.vannforsyning.egenregistrert?.data,
     avlop = this.avlop.egenregistrert?.data,
     energikilder = this.energikilder.egenregistrert?.data,
-    oppvarminger = this.oppvarminger.egenregistrert?.data,
+    oppvarming = TODO() //this.oppvarminger.egenregistrert?.data,
 )

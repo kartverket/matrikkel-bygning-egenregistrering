@@ -13,7 +13,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.AvlopRe
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
-import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikildeRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikilderRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EtasjeBetegnelseRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EtasjeBruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.OppvarmingRegistreringRequest
@@ -36,7 +36,7 @@ internal fun EgenregistreringRequest.Companion.gyldigRequest(bruksenhetId: Long 
         avlop = AvlopKode.OffentligKloakk,
         KildematerialeKode.Selvrapportert,
     ),
-    energikildeRegistrering = EnergikildeRegistreringRequest(
+    energikildeRegistrering = EnergikilderRegistreringRequest(
         listOf(EnergikildeKode.Elektrisitet),
         KildematerialeKode.Selvrapportert,
     ),

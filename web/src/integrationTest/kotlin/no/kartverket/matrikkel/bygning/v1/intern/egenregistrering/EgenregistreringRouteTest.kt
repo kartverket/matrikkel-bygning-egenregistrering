@@ -126,7 +126,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                         }
                     }
 
-                    prop(BruksenhetInternResponse::oppvarminger).isNotNull().all {
+                    prop(BruksenhetInternResponse::oppvarming).isNotNull().all {
                         prop(MultikildeInternResponse<OppvarmingInternResponse>::egenregistrert).isNotNull().all {
                             prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
                             prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
@@ -138,7 +138,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                     prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(2L)
                     prop(BruksenhetInternResponse::totaltBruksareal).isNull()
                     prop(BruksenhetInternResponse::energikilder).isNull()
-                    prop(BruksenhetInternResponse::oppvarminger).isNull()
+                    prop(BruksenhetInternResponse::oppvarming).isNull()
                 }
             }
         }
@@ -181,7 +181,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 }
             }
 
-            prop(BruksenhetInternResponse::oppvarminger).isNotNull().all {
+            prop(BruksenhetInternResponse::oppvarming).isNotNull().all {
                 prop(MultikildeInternResponse<OppvarmingInternResponse>::egenregistrert).isNotNull().all {
                     prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
                     prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)

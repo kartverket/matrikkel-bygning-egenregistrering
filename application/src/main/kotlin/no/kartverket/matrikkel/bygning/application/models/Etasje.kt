@@ -6,10 +6,10 @@ data class BygningEtasje(val etasjebetegnelse: Etasjebetegnelse, val etasjeId: L
 
 data class BruksenhetEtasje(val etasjebetegnelse: Etasjebetegnelse, val bruksareal: Double)
 
+@ConsistentCopyVisibility
 data class Etasjenummer private constructor(val loepenummer: Int) {
     companion object {
         fun of(loepenummer: Int): Etasjenummer {
-            // TODO Ta opp med fag: Trenger dette egentlig være en begrensning? Hva om Norge i 2050 får en bygning som har 101 hovedetasjer?
             if (loepenummer > 99 || loepenummer <= 0) {
                 throw IllegalArgumentException("Ugyldig etasjenummer: $loepenummer")
             }

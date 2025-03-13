@@ -14,6 +14,7 @@ import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -22,6 +23,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
+import java.time.LocalDate
 import java.util.*
 
 
@@ -30,8 +32,8 @@ data class EgenregistreringRequest(
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistreringRequest?,
     val byggeaarRegistrering: ByggeaarRegistreringRequest?,
-    val energikildeRegistrering: EnergikildeRegistreringRequest?,
-    val oppvarmingRegistrering: OppvarmingRegistreringRequest?,
+    val energikildeRegistrering: EnergikilderRegistreringRequest?,
+    val oppvarmingRegistrering: List<OppvarmingRegistreringRequest>?,
     val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
     val avlopRegistrering: AvlopRegistreringRequest?,
 )
@@ -74,15 +76,17 @@ data class AvlopRegistreringRequest(
 )
 
 @Serializable
-data class EnergikildeRegistreringRequest(
-    val energikilder: List<EnergikildeKode>,
+data class EnergikilderRegistreringRequest(
+    val energikilde: List<EnergikildeKode>,
     val kildemateriale: KildematerialeKode,
 )
 
 @Serializable
 data class OppvarmingRegistreringRequest(
-    val oppvarminger: List<OppvarmingKode>,
+    val kode: OppvarmingKode,
     val kildemateriale: KildematerialeKode,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null
 )
 
 fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
@@ -127,24 +131,26 @@ fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
         },
         energikildeRegistrering = energikildeRegistrering?.let {
             EnergikildeRegistrering(
-                energikilder = it.energikilder,
+                energikilder = it.energikilde,
                 kildemateriale = it.kildemateriale,
             )
         },
-        oppvarmingRegistrering = oppvarmingRegistrering?.let {
+        oppvarmingRegistrering = oppvarmingRegistrering?.map {
             OppvarmingRegistrering(
-                oppvarminger = it.oppvarminger,
+                kode = it.kode,
                 kildemateriale = it.kildemateriale,
+                // TODO Sjekke hvordan man skal deale med år -> dato
+                gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
+                opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
             )
         },
     )
 }
 
-fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
-    Egenregistrering(
-        id = UUID.randomUUID(),
-        eier = Foedselsnummer(eier),
-        registreringstidspunkt = Instant.now(),
-        prosess = ProsessKode.Egenregistrering,
-        bruksenhetRegistrering = this.toBruksenhetRegistrering()
-    )
+fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering = Egenregistrering(
+    id = EgenregistreringId(UUID.randomUUID()),
+    eier = Foedselsnummer(eier),
+    registreringstidspunkt = Instant.now(),
+    prosess = ProsessKode.Egenregistrering,
+    bruksenhetRegistrering = this.toBruksenhetRegistrering(),
+)

@@ -18,7 +18,6 @@ fun exceptionToDomainError(e: Throwable): DomainError = when (e) {
 }
 
 fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorResponse> = when (error) {
-    // TODO: Meldingen kan beskrives her og domainerror kan inneholde f.eks. id el.l.
     is BygningNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
     is BruksenhetNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
     is ValidationError -> HttpStatusCode.BadRequest to ErrorResponse.BadRequestError(description = error.message)

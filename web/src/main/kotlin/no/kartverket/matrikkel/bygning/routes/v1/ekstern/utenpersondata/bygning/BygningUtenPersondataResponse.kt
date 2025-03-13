@@ -33,7 +33,7 @@ data class BruksenhetUtenPersondataResponse(
     val vannforsyning: VannforsyningKodeUtenPersondataResponse?,
     val avlop: AvlopKodeUtenPersondataResponse?,
     val energikilder: EnergikildeUtenPersondataResponse?,
-    val oppvarminger: OppvarmingUtenPersondataResponse?,
+    val oppvarming: OppvarmingUtenPersondataResponse?,
 )
 
 sealed interface FeltUtenPersondataResponse<T> {
@@ -118,5 +118,5 @@ fun Bruksenhet.toBruksenhetUtenPersondataResponse(): BruksenhetUtenPersondataRes
         vannforsyning = toFeltUtenPersondataResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeUtenPersondataResponse),
         avlop = toFeltUtenPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeUtenPersondataResponse),
         energikilder = toFeltUtenPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeUtenPersondataResponse),
-        oppvarminger = toFeltUtenPersondataResponse(this.oppvarminger.egenregistrert, ::OppvarmingUtenPersondataResponse),
+        oppvarming = TODO() //toFeltUtenPersondataResponse(this.oppvarminger.egenregistrert, ::OppvarmingUtenPersondataResponse),
 )

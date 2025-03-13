@@ -2,6 +2,7 @@ package no.kartverket.matrikkel.bygning.application.models
 
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -9,10 +10,15 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
-import java.util.*
+import java.time.LocalDate
 
 sealed interface HasKildemateriale {
     val kildemateriale: KildematerialeKode
+}
+
+interface HasGyldighetPeriode {
+    val gyldighetsdato: LocalDate?
+    val opphoersdato: LocalDate?
 }
 
 data class ByggeaarRegistrering(
@@ -25,7 +31,7 @@ data class BruksarealRegistrering(
     val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?,
     override val kildemateriale: KildematerialeKode
 ) : HasKildemateriale {
-    fun isTotaltBruksarealEqualTotaltEtasjeArealIfSet(): Boolean {
+    fun checkIsTotaltBruksarealEqualTotaltEtasjeArealIfSet(): Boolean {
         if (etasjeRegistreringer == null) {
             return true
         }
@@ -59,9 +65,11 @@ data class EnergikildeRegistrering(
 ) : HasKildemateriale
 
 data class OppvarmingRegistrering(
-    val oppvarminger: List<OppvarmingKode>,
-    override val kildemateriale: KildematerialeKode
-) : HasKildemateriale
+    val kode: OppvarmingKode,
+    override val kildemateriale: KildematerialeKode,
+    override val gyldighetsdato: LocalDate?,
+    override val opphoersdato: LocalDate?
+) : HasKildemateriale, HasGyldighetPeriode
 
 data class BruksenhetRegistrering(
     val bruksenhetBubbleId: BruksenhetBubbleId,
@@ -70,11 +78,11 @@ data class BruksenhetRegistrering(
     val vannforsyningRegistrering: VannforsyningRegistrering?,
     val avlopRegistrering: AvlopRegistrering?,
     val energikildeRegistrering: EnergikildeRegistrering?,
-    val oppvarmingRegistrering: OppvarmingRegistrering?,
+    val oppvarmingRegistrering: List<OppvarmingRegistrering>?,
 )
 
 data class Egenregistrering(
-    val id: UUID,
+    val id: EgenregistreringId,
     val eier: Foedselsnummer,
     val registreringstidspunkt: Instant,
     val prosess: ProsessKode,

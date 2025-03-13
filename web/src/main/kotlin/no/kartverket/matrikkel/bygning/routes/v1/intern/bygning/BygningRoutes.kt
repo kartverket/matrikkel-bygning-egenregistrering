@@ -53,7 +53,6 @@ fun Route.bygningRouting(
             call.respond(status, body)
         }
 
-        // TODO Vil vi egentlig ha denne nå?
         route("egenregistrert") {
             get(
                 {

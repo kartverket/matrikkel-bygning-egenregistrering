@@ -95,22 +95,21 @@ class MatrikkelBygningClientTest {
         val isMatrikkelfoertBygningstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-13T00:00:00.00Z"))
         val isMatrikkelfoertBruksenhetstidspunkt = createIsMatrikkelfoertAssert(Instant.parse("2024-09-12T00:00:00.00Z"))
 
+        // TODO: Bruksareal skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
         assertThat(bygning.value, "bygning").all {
             prop(Bygning::bygningBubbleId).isEqualTo(BygningBubbleId(1L))
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
-                // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
                 prop(Bruksareal::data).isEqualTo(0.0)
                 prop(Bruksareal::metadata).isMatrikkelfoertBygningstidspunkt()
             }
             prop(Bygning::avlop).isEmpty()
             prop(Bygning::vannforsyning).isEmpty()
             prop(Bygning::energikilder).isEmpty()
-            prop(Bygning::oppvarminger).isEmpty()
+            prop(Bygning::oppvarming).isEmpty()
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(2L))
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
-                    // TODO: Dette skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
                     prop(Bruksareal::data).isEqualTo(0.0)
                     prop(Bruksareal::metadata).isMatrikkelfoertBruksenhetstidspunkt()
                 }
@@ -201,7 +200,7 @@ class MatrikkelBygningClientTest {
                 prop(Energikilde::data).containsExactly(EnergikildeKode.Elektrisitet, EnergikildeKode.Varmepumpe)
                 prop(Energikilde::metadata).isMatrikkelfoertBygningstidspunkt()
             }
-            prop(Bygning::oppvarminger).erAutoritativIkkeEgenregistrert {
+            prop(Bygning::oppvarming).erAutoritativIkkeEgenregistrert {
                 prop(Oppvarming::data).containsExactly(OppvarmingKode.Elektrisk)
                 prop(Oppvarming::metadata).isMatrikkelfoertBygningstidspunkt()
             }

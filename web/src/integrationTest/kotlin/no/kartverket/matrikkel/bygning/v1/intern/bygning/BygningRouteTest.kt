@@ -70,7 +70,7 @@ class BygningRouteTest : TestApplicationWithDb() {
                 prop(BruksenhetSimpleResponse::totaltBruksareal).isNull()
                 prop(BruksenhetSimpleResponse::avlop).isNull()
                 prop(BruksenhetSimpleResponse::byggeaar).isNull()
-                prop(BruksenhetSimpleResponse::oppvarminger).isNull()
+                prop(BruksenhetSimpleResponse::oppvarming).isNull()
                 prop(BruksenhetSimpleResponse::energikilder).isNull()
                 prop(BruksenhetSimpleResponse::vannforsyning).isNull()
             }
@@ -114,7 +114,7 @@ class BygningRouteTest : TestApplicationWithDb() {
                     prop(AvlopKodeInternResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
                     prop(AvlopKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
-                prop(BruksenhetSimpleResponse::oppvarminger).isNotNull().all {
+                prop(BruksenhetSimpleResponse::oppvarming).isNotNull().all {
                     prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
                     prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
