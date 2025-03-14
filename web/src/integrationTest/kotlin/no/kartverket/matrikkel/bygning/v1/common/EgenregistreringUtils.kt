@@ -36,13 +36,17 @@ internal fun EgenregistreringRequest.Companion.gyldigRequest(bruksenhetId: Long 
         avlop = AvlopKode.OffentligKloakk,
         KildematerialeKode.Selvrapportert,
     ),
-    energikildeRegistrering = EnergikildeRegistreringRequest(
-        listOf(EnergikildeKode.Elektrisitet),
-        KildematerialeKode.Selvrapportert,
+    energikildeRegistrering = listOf(
+        EnergikildeRegistreringRequest(
+            EnergikildeKode.Elektrisitet,
+            KildematerialeKode.Selvrapportert,
+        ),
     ),
-    oppvarmingRegistrering = OppvarmingRegistreringRequest(
-        listOf(OppvarmingKode.Elektrisk),
-        KildematerialeKode.Selvrapportert,
+    oppvarmingRegistrering = listOf(
+        OppvarmingRegistreringRequest(
+            OppvarmingKode.Elektrisk,
+            KildematerialeKode.Selvrapportert,
+        ),
     ),
 )
 

@@ -3,9 +3,10 @@ package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.containsExactly
+import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.isNullOrEmpty
 import assertk.assertions.prop
 import assertk.assertions.single
 import io.mockk.checkUnnecessaryStub
@@ -18,6 +19,7 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
+import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
@@ -105,8 +107,12 @@ class MatrikkelBygningClientTest {
             }
             prop(Bygning::avlop).isEmpty()
             prop(Bygning::vannforsyning).isEmpty()
-            prop(Bygning::energikilder).isEmpty()
-            prop(Bygning::oppvarming).isEmpty()
+            prop(Bygning::energikilder).all {
+                prop(Multikilde<List<Energikilde>>::autoritativ).isNullOrEmpty()
+            }
+            prop(Bygning::oppvarming).all {
+                prop(Multikilde<List<Oppvarming>>::autoritativ).isNullOrEmpty()
+            }
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(2L))
                 prop(Bruksenhet::totaltBruksareal).erAutoritativIkkeEgenregistrert {
@@ -197,12 +203,21 @@ class MatrikkelBygningClientTest {
                 prop(Vannforsyning::metadata).isMatrikkelfoertBygningstidspunkt()
             }
             prop(Bygning::energikilder).erAutoritativIkkeEgenregistrert {
-                prop(Energikilde::data).containsExactly(EnergikildeKode.Elektrisitet, EnergikildeKode.Varmepumpe)
-                prop(Energikilde::metadata).isMatrikkelfoertBygningstidspunkt()
+                index(0).all {
+                    prop(Energikilde::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                    prop(Energikilde::metadata).isMatrikkelfoertBygningstidspunkt()
+                }
+
+                index(1).all {
+                    prop(Energikilde::data).isEqualTo(EnergikildeKode.Varmepumpe)
+                    prop(Energikilde::metadata).isMatrikkelfoertBygningstidspunkt()
+                }
             }
             prop(Bygning::oppvarming).erAutoritativIkkeEgenregistrert {
-                prop(Oppvarming::data).containsExactly(OppvarmingKode.Elektrisk)
-                prop(Oppvarming::metadata).isMatrikkelfoertBygningstidspunkt()
+                index(0).all {
+                    prop(Oppvarming::data).isEqualTo(OppvarmingKode.Elektrisk)
+                    prop(Oppvarming::metadata).isMatrikkelfoertBygningstidspunkt()
+                }
             }
             prop(Bygning::bruksenheter).single().all {
                 prop(Bruksenhet::bruksenhetBubbleId).isEqualTo(BruksenhetBubbleId(2L))

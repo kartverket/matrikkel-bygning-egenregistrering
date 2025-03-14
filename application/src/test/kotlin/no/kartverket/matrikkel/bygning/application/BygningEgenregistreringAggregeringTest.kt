@@ -27,6 +27,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
@@ -65,7 +66,7 @@ class BygningEgenregistreringAggregeringTest {
     )
 
     private val defaultEgenregistrering = Egenregistrering(
-        id = UUID.randomUUID(),
+        id = EgenregistreringId(UUID.randomUUID()),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         eier = Foedselsnummer("66860475309"),
         bruksenhetRegistrering = defaultBruksenhetRegistrering,
@@ -89,7 +90,7 @@ class BygningEgenregistreringAggregeringTest {
     @Test
     fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste kildemateriale felt`() {
         val laterRegistrering = defaultEgenregistrering.copy(
-            id = UUID.randomUUID(),
+            id = EgenregistreringId(UUID.randomUUID()),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
             bruksenhetRegistrering = bruksenhetRegistreringMedKildematerialeKode.copy(
                 byggeaarRegistrering = ByggeaarRegistrering(
@@ -128,7 +129,7 @@ class BygningEgenregistreringAggregeringTest {
     @Test
     fun `bruksenhet med en ny egenregistring får kildemateriale fylt`() {
         val firstRegistrering = defaultEgenregistrering.copy(
-            id = UUID.randomUUID(),
+            id = EgenregistreringId(UUID.randomUUID()),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
             bruksenhetRegistrering = bruksenhetRegistreringMedKildematerialeKode.copy(
                 byggeaarRegistrering = ByggeaarRegistrering(
@@ -148,7 +149,7 @@ class BygningEgenregistreringAggregeringTest {
     @Test
     fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste feltet`() {
         val laterRegistrering = defaultEgenregistrering.copy(
-            id = UUID.randomUUID(),
+            id = EgenregistreringId(UUID.randomUUID()),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
             bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
                 bruksarealRegistrering = BruksarealRegistrering(
@@ -168,7 +169,7 @@ class BygningEgenregistreringAggregeringTest {
     @Test
     fun `bruksarealregistrering skal kun sette total hvis kun total ble registrert nyere enn etasje bruksareal`() {
         val firstRegistrering = defaultEgenregistrering.copy(
-            id = UUID.randomUUID(),
+            id = EgenregistreringId(UUID.randomUUID()),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.minusSeconds(60),
             bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
                 bruksarealRegistrering = BruksarealRegistrering(

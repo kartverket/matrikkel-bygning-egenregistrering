@@ -2,7 +2,8 @@ package no.kartverket.matrikkel.bygning.v1.intern.bygning
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.containsExactly
+import assertk.assertions.index
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
@@ -64,8 +65,8 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
             prop(BruksenhetSimpleResponse::totaltBruksareal).isNull()
             prop(BruksenhetSimpleResponse::avlop).isNull()
             prop(BruksenhetSimpleResponse::byggeaar).isNull()
-            prop(BruksenhetSimpleResponse::oppvarming).isNull()
-            prop(BruksenhetSimpleResponse::energikilder).isNull()
+            prop(BruksenhetSimpleResponse::oppvarming).isEmpty()
+            prop(BruksenhetSimpleResponse::energikilder).isEmpty()
             prop(BruksenhetSimpleResponse::vannforsyning).isNull()
         }
     }
@@ -107,12 +108,16 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
                 prop(AvlopKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
             }
             prop(BruksenhetSimpleResponse::oppvarming).isNotNull().all {
-                prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
-                prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                index(0).all {
+                    prop(OppvarmingInternResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                    prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
             }
             prop(BruksenhetSimpleResponse::energikilder).isNotNull().all {
-                prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
-                prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                index(0).all {
+                    prop(EnergikildeInternResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                    prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
             }
         }
     }

@@ -34,8 +34,8 @@ data class BygningInternResponse(
     val bruksareal: MultikildeInternResponse<BruksarealInternResponse>?,
     val vannforsyning: MultikildeInternResponse<VannforsyningKodeInternResponse>?,
     val avlop: MultikildeInternResponse<AvlopKodeInternResponse>?,
-    val energikilder: MultikildeInternResponse<EnergikildeInternResponse>?,
-    val oppvarming: MultikildeInternResponse<OppvarmingInternResponse>?,
+    val energikilder: MultikildeInternResponse<List<EnergikildeInternResponse>>?,
+    val oppvarming: MultikildeInternResponse<List<OppvarmingInternResponse>>?,
     val bruksenheter: List<BruksenhetInternResponse>,
 )
 
@@ -142,8 +142,8 @@ fun Bygning.toBygningInternResponse(): BygningInternResponse = BygningInternResp
     bruksenheter = this.bruksenheter.map(Bruksenhet::toBruksenhetResponse),
     vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
-    energikilder = TODO(), // this.energikilder.toMultikildeInternResponse(Energikilde::toEnergikildeResponse),
-    oppvarming = TODO(), //this.oppvarminger.toMultikildeInternResponse(Oppvarming::toOppvarmingResponse),
+    energikilder = this.energikilder.toMultikildeInternResponse { map { it.toEnergikildeResponse() } },
+    oppvarming = this.oppvarming.toMultikildeInternResponse { map { it.toOppvarmingResponse() } },
 )
 
 fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
