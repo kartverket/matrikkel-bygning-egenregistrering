@@ -18,14 +18,7 @@ fun Route.eksternRouting(
     hendelseService: HendelseService,
 ) {
     authenticate(MASKINPORTEN_PROVIDER_NAME) {
-        route(
-            "/",
-            {
-                // Egentlig skal denne ikke være nødvendig siden routen er wrappet i en authenticate block
-                // Ser ut til å være en bug i ktor-openapi
-                protected = true
-            },
-        ) {
+        route("/") {
             routeWithMaskinporten("berettigetinteresse", OpenApiSpecIds.BERETTIGET_INTERESSE) {
                 berettigetInteresseRouting(bygningService)
             }
