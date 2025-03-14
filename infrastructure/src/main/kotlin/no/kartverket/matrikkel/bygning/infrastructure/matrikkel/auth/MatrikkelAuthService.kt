@@ -15,7 +15,7 @@ class MatrikkelAuthService(private val matrikkelApiProvider: MatrikkelApi) : Aut
     /**
      * Returnerer brukernavnet hvis brukeren har tilgang til alle bygningsdata på landsbasis, ellers {@code null}.
      */
-    override suspend fun harMatrikkeltilgang(token: String): String? {
+    override suspend fun harMatrikkeltilgang(token: String, rolle: Matrikkelrolle): String? {
         val matrikkelApi = matrikkelApiProvider.withAuth(token)
         val brukerService = matrikkelApi.brukerService()
 
@@ -47,23 +47,10 @@ class MatrikkelAuthService(private val matrikkelApiProvider: MatrikkelApi) : Aut
                 val harAkseptabelRettighet = brukerrettighetliste.rettigheter.item
                     .filter { it.fjernetDato == null }
                     .filter { it.forvaltningsomrade is LandForvaltningsomrade }
-                    .any { it.rolleId.value in akseptableRolleIds }
+                    .any { it.rolleId.value in rolle.akseptableRolleIds }
 
                 if (harAkseptabelRettighet) bruker.brukernavn else null
             }
         }
-    }
-
-    companion object {
-        // Må eksplisitt liste alle roller, også de som arver fra andre roller i matrikkelen.
-        private val akseptableRolleIds = hashSetOf(
-            0L, // Kommunalt innsyn uten fnr
-            1L, // Kommunalt innsyn med fnr
-            11L, // Innsyn
-            12L, // Innsyn uten fnr
-            13L, // Innsyn med fnr
-            6L, // Endringslogg
-            3L, // Matrikkelfører
-        )
     }
 }

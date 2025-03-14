@@ -12,7 +12,6 @@ import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
-import no.kartverket.matrikkel.bygning.config.configureMatrikkelAuth
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.TransactionalSupport
@@ -61,7 +60,6 @@ fun Application.mainModule() {
     configureMonitoring()
     configureOpenAPI()
     configureStatusPages()
-    configureAuthentication(config)
 
     val dataSource = createDataSource(
         DatabaseConfig(
@@ -94,7 +92,7 @@ fun Application.mainModule() {
         hendelseRepository = hendelseRepository,
     )
 
-    configureMatrikkelAuth(matrikkelAuth)
+    configureAuthentication(config, matrikkelAuth)
 
     val egenregistreringService = EgenregistreringService(
         bygningService = bygningService,

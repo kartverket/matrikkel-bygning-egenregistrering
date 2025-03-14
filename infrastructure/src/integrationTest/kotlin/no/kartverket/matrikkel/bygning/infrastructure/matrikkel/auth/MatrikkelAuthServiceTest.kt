@@ -27,7 +27,7 @@ class MatrikkelAuthServiceTest {
 
         val matrikkelAuthService = MatrikkelAuthService(MatrikkelApi(URI.create(wireMock.baseUrl())))
 
-        assertThat(matrikkelAuthService.harMatrikkeltilgang("random")).isNull()
+        assertThat(matrikkelAuthService.harMatrikkeltilgang("random", Matrikkelrolle.InnsynMedPersondata)).isNull()
     }
 
     @Test
@@ -75,7 +75,7 @@ class MatrikkelAuthServiceTest {
 
         val matrikkelAuthService = MatrikkelAuthService(MatrikkelApi(URI.create(wireMock.baseUrl())))
 
-        assertThat(matrikkelAuthService.harMatrikkeltilgang("random")).isEqualTo("testbruker")
+        assertThat(matrikkelAuthService.harMatrikkeltilgang("random", Matrikkelrolle.InnsynMedPersondata)).isEqualTo("testbruker")
 
         wireMock.verify(2, postRequestedFor(urlEqualTo("/matrikkelapi/wsapi/v1/BrukerServiceWS")).withHeader("Authorization", equalTo("Bearer random")))
         wireMock.verify(1, postRequestedFor(urlEqualTo("/matrikkelapi/wsapi/v1/StoreServiceWS")).withHeader("Authorization", equalTo("Bearer random")))
