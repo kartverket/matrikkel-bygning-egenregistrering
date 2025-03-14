@@ -18,7 +18,6 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
-import java.time.LocalDate
 
 data class Bygning(
     val id: BygningId,
@@ -52,13 +51,13 @@ data class Multikilde<T : Any>(val autoritativ: T? = null, val egenregistrert: T
 
 // TODO Er det noen vurderinger som må tas ifbm. om datoer er inklusiv eller eksklusiv?
 data class Gyldighetsperiode(
-    val gyldighetsdato: LocalDate? = null,
-    val opphoersdato: LocalDate? = null,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null,
 ) {
     // TODO Burde vi egentlig bruke init?
     init {
-        if (gyldighetsdato != null && opphoersdato != null) {
-            require(gyldighetsdato < opphoersdato) { "Gyldighetsdato må være før opphørsdato" }
+        if (gyldighetsaar != null && opphoersaar != null) {
+            require(gyldighetsaar < opphoersaar) { "Gyldighetsår må være før opphørsår" }
         }
     }
 }

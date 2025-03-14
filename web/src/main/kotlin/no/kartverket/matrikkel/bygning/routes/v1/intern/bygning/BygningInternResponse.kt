@@ -123,8 +123,8 @@ fun RegisterMetadata.toRegisterMetadataInternResponse() = RegisterMetadataIntern
     registrertAv = this.registrertAv.value,
     kildemateriale = this.kildemateriale,
     prosess = this.prosess,
-    gyldighetsaar = this.gyldighetsperiode.gyldighetsdato?.year,
-    opphoersaar = this.gyldighetsperiode.opphoersdato?.year,
+    gyldighetsaar = this.gyldighetsperiode.gyldighetsaar,
+    opphoersaar = this.gyldighetsperiode.opphoersaar,
 )
 
 fun <T : Any, R : Any> Multikilde<T>.toMultikildeInternResponse(mapper: T.() -> R): MultikildeInternResponse<R>? {

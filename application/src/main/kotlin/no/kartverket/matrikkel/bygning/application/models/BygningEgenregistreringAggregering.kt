@@ -37,8 +37,8 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
         registrertAv = egenregistrering.eier,
         prosess = egenregistrering.prosess,
         gyldighetsperiode = Gyldighetsperiode(
-            gyldighetsdato = null,
-            opphoersdato = null,
+            gyldighetsaar = null,
+            opphoersaar = null,
         ),
     )
 
@@ -63,7 +63,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
                 metadata = metadata
                     .withKildemateriale(it.kildemateriale)
                     .withGyldighetsperiode(
-                        Gyldighetsperiode(gyldighetsdato = it.gyldighetsdato, opphoersdato = it.opphoersdato),
+                        Gyldighetsperiode(gyldighetsaar = it.gyldighetsaar, opphoersaar = it.opphoersaar),
                     ),
             )
         },
@@ -73,7 +73,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
                 metadata = metadata
                     .withKildemateriale(it.kildemateriale)
                     .withGyldighetsperiode(
-                        Gyldighetsperiode(gyldighetsdato = it.gyldighetsdato, opphoersdato = it.opphoersdato),
+                        Gyldighetsperiode(gyldighetsaar = it.gyldighetsaar, opphoersaar = it.opphoersaar),
                     ),
             )
         },
@@ -137,7 +137,7 @@ private fun OppvarmingRegistrering.toOppvarming(metadata: RegisterMetadata): Opp
         metadata = metadata
             .withKildemateriale(this.kildemateriale)
             .withGyldighetsperiode(
-                Gyldighetsperiode(gyldighetsdato = this.gyldighetsdato, opphoersdato = this.opphoersdato),
+                Gyldighetsperiode(gyldighetsaar = this.gyldighetsaar, opphoersaar = this.opphoersaar),
             ),
     )
 }
@@ -148,7 +148,7 @@ private fun EnergikildeRegistrering.toEnergikilde(metadata: RegisterMetadata): E
         metadata = metadata
             .withKildemateriale(this.kildemateriale)
             .withGyldighetsperiode(
-                Gyldighetsperiode(gyldighetsdato = this.gyldighetsdato, opphoersdato = this.opphoersdato),
+                Gyldighetsperiode(gyldighetsaar = this.gyldighetsaar, opphoersaar = this.opphoersaar),
             ),
     )
 }

@@ -10,15 +10,14 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
-import java.time.LocalDate
 
 sealed interface HasKildemateriale {
     val kildemateriale: KildematerialeKode
 }
 
 interface HasGyldighetPeriode {
-    val gyldighetsdato: LocalDate?
-    val opphoersdato: LocalDate?
+    val gyldighetsaar: Int?
+    val opphoersaar: Int?
 }
 
 data class ByggeaarRegistrering(
@@ -52,29 +51,29 @@ data class EtasjeBruksarealRegistrering(
 data class VannforsyningRegistrering(
     val vannforsyning: VannforsyningKode,
     override val kildemateriale: KildematerialeKode,
-    override val gyldighetsdato: LocalDate?,
-    override val opphoersdato: LocalDate?
+    override val gyldighetsaar: Int?,
+    override val opphoersaar: Int?
 ) : HasKildemateriale, HasGyldighetPeriode
 
 data class AvlopRegistrering(
     val avlop: AvlopKode,
     override val kildemateriale: KildematerialeKode,
-    override val gyldighetsdato: LocalDate?,
-    override val opphoersdato: LocalDate?
+    override val gyldighetsaar: Int?,
+    override val opphoersaar: Int?
 ) : HasKildemateriale, HasGyldighetPeriode
 
 data class EnergikildeRegistrering(
     val energikilde: EnergikildeKode,
     override val kildemateriale: KildematerialeKode,
-    override val gyldighetsdato: LocalDate?,
-    override val opphoersdato: LocalDate?
+    override val gyldighetsaar: Int?,
+    override val opphoersaar: Int?
 ) : HasKildemateriale, HasGyldighetPeriode
 
 data class OppvarmingRegistrering(
     val oppvarming: OppvarmingKode,
     override val kildemateriale: KildematerialeKode,
-    override val gyldighetsdato: LocalDate?,
-    override val opphoersdato: LocalDate?
+    override val gyldighetsaar: Int?,
+    override val opphoersaar: Int?
 ) : HasKildemateriale, HasGyldighetPeriode
 
 data class BruksenhetRegistrering(

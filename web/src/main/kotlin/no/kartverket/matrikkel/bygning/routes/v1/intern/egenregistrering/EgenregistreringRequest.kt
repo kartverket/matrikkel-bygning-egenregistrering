@@ -23,7 +23,6 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
-import java.time.LocalDate
 import java.util.*
 
 // TODO Burde vi interface Gyldighet og Kildemateriale slik som vi gjør i domenelogikken?
@@ -35,7 +34,7 @@ data class EgenregistreringRequest(
     val byggeaarRegistrering: ByggeaarRegistreringRequest?,
     val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
     val avlopRegistrering: AvlopRegistreringRequest?,
-    val energikildeRegistrering: List<EnergikilderRegistreringRequest>?,
+    val energikildeRegistrering: List<EnergikildeRegistreringRequest>?,
     val oppvarmingRegistrering: List<OppvarmingRegistreringRequest>?,
 )
 
@@ -81,7 +80,7 @@ data class AvlopRegistreringRequest(
 )
 
 @Serializable
-data class EnergikilderRegistreringRequest(
+data class EnergikildeRegistreringRequest(
     val energikilde: EnergikildeKode,
     val kildemateriale: KildematerialeKode,
     val gyldighetsaar: Int? = null,
@@ -124,37 +123,36 @@ fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
                 kildemateriale = it.kildemateriale,
             )
         },
-        // TODO Finne ut av år -> dato for alle greiene her
         vannforsyningRegistrering = vannforsyningRegistrering?.let {
             VannforsyningRegistrering(
                 vannforsyning = it.vannforsyning,
                 kildemateriale = it.kildemateriale,
-                gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
-                opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = it.opphoersaar,
             )
         },
         avlopRegistrering = avlopRegistrering?.let {
             AvlopRegistrering(
                 avlop = it.avlop,
                 kildemateriale = it.kildemateriale,
-                gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
-                opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = it.opphoersaar,
             )
         },
         energikildeRegistrering = energikildeRegistrering?.map {
             EnergikildeRegistrering(
                 energikilde = it.energikilde,
                 kildemateriale = it.kildemateriale,
-                gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
-                opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = it.opphoersaar,
             )
         },
         oppvarmingRegistrering = oppvarmingRegistrering?.map {
             OppvarmingRegistrering(
                 oppvarming = it.oppvarming,
                 kildemateriale = it.kildemateriale,
-                gyldighetsdato = it.gyldighetsaar?.let { LocalDate.of(it, 1, 1) },
-                opphoersdato = it.opphoersaar?.let { LocalDate.of(it, 1, 1) },
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = it.opphoersaar,
             )
         },
     )

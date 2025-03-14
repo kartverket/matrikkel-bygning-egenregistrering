@@ -32,16 +32,16 @@ class EgenregistreringValidator {
             }
         }
 
-        // TODO Er det noe poeng i å gjøre denne smartere? Føler dette er helt innafor, også i tilbakemelding
+        // TODO Er det noe poeng i å gjøre denne smartere? Føler dette er helt innafor, også i tilbakemelding til bruker
         private fun validateListeregistreringDuplicates(egenregistrering: Egenregistrering): ValidationError? {
             val oppvarmingRegistrering = egenregistrering.bruksenhetRegistrering.oppvarmingRegistrering
-            val energikilderRegistrering = egenregistrering.bruksenhetRegistrering.energikildeRegistrering
+            val energikildeRegistrering = egenregistrering.bruksenhetRegistrering.energikildeRegistrering
 
             val oppvarmingHasDuplicate = oppvarmingRegistrering
                 ?.groupBy { it.oppvarming }
                 ?.any { it.value.size > 1 } == true
 
-            val energikilderHasDuplicate = energikilderRegistrering
+            val energikilderHasDuplicate = energikildeRegistrering
                 ?.groupBy { it.energikilde }
                 ?.any { it.value.size > 1 } == true
 
