@@ -32,8 +32,8 @@ data class BruksenhetMedPersondataResponse(
     val totaltBruksareal: BruksarealMedPersondataResponse?,
     val vannforsyning: VannforsyningKodeMedPersondataResponse?,
     val avlop: AvlopKodeMedPersondataResponse?,
-    val energikilder: EnergikildeMedPersondataResponse?,
-    val oppvarming: OppvarmingMedPersondataResponse?,
+    val energikilder: List<EnergikildeMedPersondataResponse>?,
+    val oppvarming: List<OppvarmingMedPersondataResponse>?,
 )
 
 sealed interface FeltMedPersondataResponse<T> {
@@ -66,15 +66,15 @@ sealed interface FeltMedPersondataResponse<T> {
 
     @Serializable
     data class EnergikildeMedPersondataResponse(
-        override val data: List<EnergikildeKode>,
+        override val data: EnergikildeKode,
         override val metadata: RegisterMetadataMedPersondataResponse
-    ) : FeltMedPersondataResponse<List<EnergikildeKode>>
+    ) : FeltMedPersondataResponse<EnergikildeKode>
 
     @Serializable
     data class OppvarmingMedPersondataResponse(
-        override val data: List<OppvarmingKode>,
+        override val data: OppvarmingKode,
         override val metadata: RegisterMetadataMedPersondataResponse
-    ) : FeltMedPersondataResponse<List<OppvarmingKode>>
+    ) : FeltMedPersondataResponse<OppvarmingKode>
 }
 
 
@@ -112,6 +112,26 @@ internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPerson
     )
 }
 
+internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toListeFeltMedPersondataResponse(
+    felt: List<T>?,
+    constructor: (U, RegisterMetadataMedPersondataResponse) -> O,
+): List<O>? {
+    if (felt == null) {
+        return null
+    }
+
+    return felt.map { t ->
+        constructor(
+            t.data,
+            RegisterMetadataMedPersondataResponse(
+                registreringstidspunkt = t.metadata.registreringstidspunkt,
+                registrertAv = t.metadata.registrertAv.value,
+                kildemateriale = t.metadata.kildemateriale,
+            ),
+        )
+    }
+}
+
 fun Bruksenhet.toBruksenhetMedPersondataResponse(): BruksenhetMedPersondataResponse = BruksenhetMedPersondataResponse(
     bruksenhetId = this.bruksenhetBubbleId.value,
     byggeaar = toFeltMedPersondataResponse(this.byggeaar.egenregistrert, ::ByggeaarMedPersondataResponse),
@@ -124,6 +144,6 @@ fun Bruksenhet.toBruksenhetMedPersondataResponse(): BruksenhetMedPersondataRespo
         ::VannforsyningKodeMedPersondataResponse
     ),
     avlop = toFeltMedPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeMedPersondataResponse),
-    energikilder = TODO(), // toFeltMedPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeMedPersondataResponse),
-    oppvarming = TODO() //toFeltMedPersondataResponse(this.oppvarminger.egenregistrert, ::OppvarmingMedPersondataResponse),
+    energikilder = toListeFeltMedPersondataResponse(this.energikilder.egenregistrert, :: EnergikildeMedPersondataResponse),
+    oppvarming = toListeFeltMedPersondataResponse(this.oppvarming.egenregistrert, :: OppvarmingMedPersondataResponse),
 )
