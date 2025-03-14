@@ -24,26 +24,26 @@ class EgenregistreringService(
         return bygningService.getBruksenhetByBubbleId(
             bruksenhetBubbleId = egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value,
         ).andThen { bruksenhet ->
-                EgenregistreringValidator.validateEgenregistrering(egenregistrering).map { bruksenhet }
-            }.map { bruksenhet ->
-                transactional.withTransaction { tx ->
-                    egenregistreringRepository.saveEgenregistrering(
-                        egenregistrering = egenregistrering,
-                        tx = tx,
-                    )
+            EgenregistreringValidator.validateEgenregistrering(egenregistrering).map { bruksenhet }
+        }.map { bruksenhet ->
+            transactional.withTransaction { tx ->
+                egenregistreringRepository.saveEgenregistrering(
+                    egenregistrering = egenregistrering,
+                    tx = tx,
+                )
 
-                    bygningRepository.saveBruksenhet(
-                        bruksenhet = createBruksenhetSnapshotOfLatestEgenregistrering(bruksenhet, egenregistrering),
-                        registreringstidspunkt = egenregistrering.registreringstidspunkt,
-                        tx = tx,
-                    )
+                bygningRepository.saveBruksenhet(
+                    bruksenhet = createBruksenhetSnapshotOfLatestEgenregistrering(bruksenhet, egenregistrering),
+                    registreringstidspunkt = egenregistrering.registreringstidspunkt,
+                    tx = tx,
+                )
 
-                    hendelseRepository.saveHendelse(
-                        payload = createEgenregistreringHendelsePayloads(egenregistrering),
-                        tx = tx,
-                    )
-                }
+                hendelseRepository.saveHendelse(
+                    payload = createEgenregistreringHendelsePayloads(egenregistrering),
+                    tx = tx,
+                )
             }
+        }
     }
 
     private fun createBruksenhetSnapshotOfLatestEgenregistrering(
@@ -57,6 +57,5 @@ class EgenregistreringService(
             objectId = egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value,
             registreringstidspunkt = egenregistrering.registreringstidspunkt,
         )
-
     }
 }

@@ -12,6 +12,7 @@ class EgenregistreringValidator {
         fun validateEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, MultipleValidationError> {
             val errors = listOfNotNull(
                 validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering),
+                validateListeregistreringDuplicates(egenregistrering),
             )
 
             return if (errors.isEmpty()) {
@@ -22,9 +23,31 @@ class EgenregistreringValidator {
         }
 
         private fun validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering: Egenregistrering): ValidationError? {
-            return if (egenregistrering.bruksenhetRegistrering.bruksarealRegistrering?.isTotaltBruksarealEqualTotaltEtasjeArealIfSet() == false) {
+            return if (egenregistrering.bruksenhetRegistrering.bruksarealRegistrering?.checkIsTotaltBruksarealEqualTotaltEtasjeArealIfSet() == false) {
                 ValidationError(
                     message = "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har registrert totalt BRA og BRA per etasje, men totalt BRA stemmer ikke overens med totalen av BRA per etasje",
+                )
+            } else {
+                null
+            }
+        }
+
+        // TODO Er det noe poeng i å gjøre denne smartere? Føler dette er helt innafor, også i tilbakemelding til bruker
+        private fun validateListeregistreringDuplicates(egenregistrering: Egenregistrering): ValidationError? {
+            val oppvarmingRegistrering = egenregistrering.bruksenhetRegistrering.oppvarmingRegistrering
+            val energikildeRegistrering = egenregistrering.bruksenhetRegistrering.energikildeRegistrering
+
+            val oppvarmingHasDuplicate = oppvarmingRegistrering
+                ?.groupBy { it.oppvarming }
+                ?.any { it.value.size > 1 } == true
+
+            val energikilderHasDuplicate = energikildeRegistrering
+                ?.groupBy { it.energikilde }
+                ?.any { it.value.size > 1 } == true
+
+            return if (oppvarmingHasDuplicate || energikilderHasDuplicate) {
+                ValidationError(
+                    message = "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har dupliserte registreringer i oppvarming eller energikilder",
                 )
             } else {
                 null

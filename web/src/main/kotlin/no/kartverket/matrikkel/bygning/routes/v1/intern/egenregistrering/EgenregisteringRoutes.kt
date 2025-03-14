@@ -11,8 +11,9 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
-import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.routes.getFnr
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
@@ -31,44 +32,10 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
                         required = true
                         example("Bruksenhet #1") {
                             description = "Bruksenhet med id = 1"
-                            value = EgenregistreringRequest(
-                                bruksenhetId = 1L,
-                                bruksarealRegistrering = BruksarealRegistreringRequest(
-                                    totaltBruksareal = 80.0,
-                                    etasjeRegistreringer = listOf(
-                                        EtasjeBruksarealRegistreringRequest(
-                                            bruksareal = 50.0,
-                                            etasjebetegnelse = EtasjeBetegnelseRequest(
-                                                etasjeplanKode = "H",
-                                                etasjenummer = 1,
-                                            ),
-                                        ),
-                                        EtasjeBruksarealRegistreringRequest(
-                                            bruksareal = 30.0,
-                                            etasjebetegnelse = EtasjeBetegnelseRequest(
-                                                etasjeplanKode = "H",
-                                                etasjenummer = 2,
-                                            ),
-                                        ),
-                                    ),
-                                    kildemateriale = KildematerialeKode.Salgsoppgave,
-                                ),
-                                ByggeaarRegistreringRequest(
-                                    byggeaar = 2021,
-                                    kildemateriale = KildematerialeKode.Selvrapportert,
-                                ),
-                                energikildeRegistrering = EnergikildeRegistreringRequest(
-                                    energikilder = listOf(EnergikildeKode.Elektrisitet, EnergikildeKode.Gass),
-                                    kildemateriale = KildematerialeKode.Selvrapportert,
-                                ),
-                                oppvarmingRegistrering = null,
-                                vannforsyningRegistrering = null,
-                                avlopRegistrering = null,
-                            )
+                            value = egenregistreringExample
                         }
                     }
                 }
-
                 response {
                     code(HttpStatusCode.Created) {
                         description = "Egenregistrering ble registrert"
@@ -106,5 +73,45 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
             }
         }
     }
-
 }
+
+private val egenregistreringExample = EgenregistreringRequest(
+    bruksenhetId = 1L,
+    bruksarealRegistrering = BruksarealRegistreringRequest(
+        totaltBruksareal = 80.0,
+        etasjeRegistreringer = listOf(
+            EtasjeBruksarealRegistreringRequest(
+                bruksareal = 50.0,
+                etasjebetegnelse = EtasjeBetegnelseRequest(
+                    etasjeplanKode = "H",
+                    etasjenummer = 1,
+                ),
+            ),
+            EtasjeBruksarealRegistreringRequest(
+                bruksareal = 30.0,
+                etasjebetegnelse = EtasjeBetegnelseRequest(
+                    etasjeplanKode = "H",
+                    etasjenummer = 2,
+                ),
+            ),
+        ),
+        kildemateriale = KildematerialeKode.Salgsoppgave,
+    ),
+    byggeaarRegistrering = ByggeaarRegistreringRequest(
+        byggeaar = 2021,
+        kildemateriale = KildematerialeKode.Selvrapportert,
+    ),
+    oppvarmingRegistrering = listOf(
+        OppvarmingRegistreringRequest(
+            oppvarming = OppvarmingKode.Elektrisk,
+            kildemateriale = KildematerialeKode.Salgsoppgave,
+            gyldighetsaar = 2021,
+        ),
+    ),
+    avlopRegistrering = AvlopRegistreringRequest(
+        avlop = AvlopKode.OffentligKloakk,
+        kildemateriale = KildematerialeKode.Selvrapportert,
+    ),
+    energikildeRegistrering = null,
+    vannforsyningRegistrering = null,
+)

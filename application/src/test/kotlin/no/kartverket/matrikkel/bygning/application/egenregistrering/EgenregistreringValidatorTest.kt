@@ -12,6 +12,7 @@ import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
@@ -22,7 +23,7 @@ import kotlin.test.Test
 class EgenregistreringValidatorTest {
 
     private val baseEgenregistrering = Egenregistrering(
-        id = UUID.randomUUID(),
+        id = EgenregistreringId(UUID.randomUUID()),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         eier = Foedselsnummer("66860475309"),
         prosess = ProsessKode.Egenregistrering,

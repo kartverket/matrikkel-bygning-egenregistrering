@@ -32,8 +32,8 @@ data class BruksenhetUtenPersondataResponse(
     val totaltBruksareal: BruksarealUtenPersondataResponse?,
     val vannforsyning: VannforsyningKodeUtenPersondataResponse?,
     val avlop: AvlopKodeUtenPersondataResponse?,
-    val energikilder: EnergikildeUtenPersondataResponse?,
-    val oppvarminger: OppvarmingUtenPersondataResponse?,
+    val energikilder: List<EnergikildeUtenPersondataResponse>?,
+    val oppvarming: List<OppvarmingUtenPersondataResponse>?,
 )
 
 sealed interface FeltUtenPersondataResponse<T> {
@@ -42,47 +42,39 @@ sealed interface FeltUtenPersondataResponse<T> {
 
     @Serializable
     data class ByggeaarUtenPersondataResponse(
-        override val data: Int,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val data: Int, override val metadata: RegisterMetadataUtenPersondataResponse
     ) : FeltUtenPersondataResponse<Int>
 
     @Serializable
     data class BruksarealUtenPersondataResponse(
-        override val data: Double,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val data: Double, override val metadata: RegisterMetadataUtenPersondataResponse
     ) : FeltUtenPersondataResponse<Double>
 
     @Serializable
     data class VannforsyningKodeUtenPersondataResponse(
-        override val data: VannforsyningKode,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val data: VannforsyningKode, override val metadata: RegisterMetadataUtenPersondataResponse
     ) : FeltUtenPersondataResponse<VannforsyningKode>
 
     @Serializable
     data class AvlopKodeUtenPersondataResponse(
-        override val data: AvlopKode,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val data: AvlopKode, override val metadata: RegisterMetadataUtenPersondataResponse
     ) : FeltUtenPersondataResponse<AvlopKode>
 
     @Serializable
     data class EnergikildeUtenPersondataResponse(
-        override val data: List<EnergikildeKode>,
-        override val metadata: RegisterMetadataUtenPersondataResponse
-    ) : FeltUtenPersondataResponse<List<EnergikildeKode>>
+        override val data: EnergikildeKode, override val metadata: RegisterMetadataUtenPersondataResponse
+    ) : FeltUtenPersondataResponse<EnergikildeKode>
 
     @Serializable
     data class OppvarmingUtenPersondataResponse(
-        override val data: List<OppvarmingKode>,
-        override val metadata: RegisterMetadataUtenPersondataResponse
-    ) : FeltUtenPersondataResponse<List<OppvarmingKode>>
+        override val data: OppvarmingKode, override val metadata: RegisterMetadataUtenPersondataResponse
+    ) : FeltUtenPersondataResponse<OppvarmingKode>
 }
 
 
 @Serializable
 data class RegisterMetadataUtenPersondataResponse(
-    @Serializable(with = InstantSerializer::class)
-    val registreringstidspunkt: Instant,
-    val kildemateriale: KildematerialeKode? = null
+    @Serializable(with = InstantSerializer::class) val registreringstidspunkt: Instant, val kildemateriale: KildematerialeKode? = null
 )
 
 
@@ -94,6 +86,7 @@ fun Bygning.toBygningUtenPersondataResponse(): BygningUtenPersondataResponse = B
     },
 )
 
+// TODO Kan man slå sammen disse funksjonene på noe vis?
 private fun <U, T : Felt<U>, O : FeltUtenPersondataResponse<U>?> toFeltUtenPersondataResponse(
     felt: T?,
     constructor: (U, RegisterMetadataUtenPersondataResponse) -> O,
@@ -111,12 +104,31 @@ private fun <U, T : Felt<U>, O : FeltUtenPersondataResponse<U>?> toFeltUtenPerso
     )
 }
 
+private fun <U, T : Felt<U>, O : FeltUtenPersondataResponse<U>?> toListeFeltUtenPersondataResponse(
+    felt: List<T>?,
+    constructor: (U, RegisterMetadataUtenPersondataResponse) -> O,
+): List<O>? {
+    if (felt == null) {
+        return null
+    }
+
+    return felt.map { t ->
+        constructor(
+            t.data,
+            RegisterMetadataUtenPersondataResponse(
+                registreringstidspunkt = t.metadata.registreringstidspunkt,
+                kildemateriale = t.metadata.kildemateriale,
+            ),
+        )
+    }
+}
+
 fun Bruksenhet.toBruksenhetUtenPersondataResponse(): BruksenhetUtenPersondataResponse = BruksenhetUtenPersondataResponse(
-        bruksenhetId = this.bruksenhetBubbleId.value,
-        byggeaar = toFeltUtenPersondataResponse(this.byggeaar.egenregistrert, ::ByggeaarUtenPersondataResponse),
-        totaltBruksareal = toFeltUtenPersondataResponse(this.totaltBruksareal.egenregistrert, ::BruksarealUtenPersondataResponse),
-        vannforsyning = toFeltUtenPersondataResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeUtenPersondataResponse),
-        avlop = toFeltUtenPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeUtenPersondataResponse),
-        energikilder = toFeltUtenPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeUtenPersondataResponse),
-        oppvarminger = toFeltUtenPersondataResponse(this.oppvarminger.egenregistrert, ::OppvarmingUtenPersondataResponse),
+    bruksenhetId = this.bruksenhetBubbleId.value,
+    byggeaar = toFeltUtenPersondataResponse(this.byggeaar.egenregistrert, ::ByggeaarUtenPersondataResponse),
+    totaltBruksareal = toFeltUtenPersondataResponse(this.totaltBruksareal.egenregistrert, ::BruksarealUtenPersondataResponse),
+    vannforsyning = toFeltUtenPersondataResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeUtenPersondataResponse),
+    avlop = toFeltUtenPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeUtenPersondataResponse),
+    energikilder = toListeFeltUtenPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeUtenPersondataResponse),
+    oppvarming = toListeFeltUtenPersondataResponse(this.oppvarming.egenregistrert, ::OppvarmingUtenPersondataResponse),
 )
