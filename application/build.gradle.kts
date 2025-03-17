@@ -24,6 +24,15 @@ dependencies {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add(
+            // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-consistent-copy-visibility/
+            "-Xconsistent-data-class-copy-visibility"
+        )
+    }
+}
+
 tasks.withType<Test> {
     testLogging {
         showCauses = true
