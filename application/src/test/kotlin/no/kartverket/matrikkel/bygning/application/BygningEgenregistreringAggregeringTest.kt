@@ -74,23 +74,17 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste kildemateriale felt`() {
-        val laterRegistrering = defaultEgenregistrering.copy(
-            id = UUID.randomUUID(),
-            registreringstidspunkt = defaultEgenregistrering
-                .registreringstidspunkt
-                .plusSeconds(60),
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                bruksarealRegistrering = defaultBruksarealRegistrering.copy(
-                    totaltBruksareal = 150.0,
-                    etasjeRegistreringer = null,
-                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                ),
-                byggeaarRegistrering = ByggeaarRegistrering(
-                    byggeaar = 2011,
-                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                ),
-            ),
-        )
+        val laterRegistrering = EgenregistreringBuilder()
+            .eier(Foedselsnummer("66860475309"))
+            .bruksenhetRegistrering(
+                BruksenhetRegistreringBuilder()
+                    .byggeaarRegistrering(
+                        ByggeaarRegistrering(
+                            byggeaar = 2011,
+                            kildemateriale = KildematerialeKode.Byggesaksdokumenter,
+                        ),
+                    ).build(),
+                ).build()
 
         val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
 
