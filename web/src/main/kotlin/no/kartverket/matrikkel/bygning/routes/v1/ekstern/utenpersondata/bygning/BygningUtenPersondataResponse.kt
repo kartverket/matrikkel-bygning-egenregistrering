@@ -8,6 +8,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.AvlopKodeUtenPersondataResponse
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.BruksarealUtenPersondataResponse
@@ -82,7 +83,8 @@ sealed interface FeltUtenPersondataResponse<T> {
 data class RegisterMetadataUtenPersondataResponse(
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
-    val kildemateriale: KildematerialeKode? = null
+    val kildemateriale: KildematerialeKode? = null,
+    val prosess: ProsessKode?
 )
 
 
@@ -107,6 +109,7 @@ private fun <U, T : Felt<U>, O : FeltUtenPersondataResponse<U>?> toFeltUtenPerso
         RegisterMetadataUtenPersondataResponse(
             registreringstidspunkt = felt.metadata.registreringstidspunkt,
             kildemateriale = felt.metadata.kildemateriale,
+            prosess = felt.metadata.prosess,
         ),
     )
 }

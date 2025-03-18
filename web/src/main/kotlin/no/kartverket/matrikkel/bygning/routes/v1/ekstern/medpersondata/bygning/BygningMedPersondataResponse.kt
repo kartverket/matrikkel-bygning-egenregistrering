@@ -74,7 +74,8 @@ data class RegisterMetadataMedPersondataResponse(
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
     val registrertAv: String,
-    val kildemateriale: KildematerialeKode? = null
+    val kildemateriale: KildematerialeKode? = null,
+    val prosess: ProsessKode?
 )
 
 fun Bygning.toBygningMedPersondataResponse(): BygningMedPersondataResponse = BygningMedPersondataResponse(
@@ -99,6 +100,7 @@ internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPerson
             registreringstidspunkt = felt.metadata.registreringstidspunkt,
             registrertAv = felt.metadata.registrertAv.value,
             kildemateriale = felt.metadata.kildemateriale,
+            prosess = felt.metadata.prosess,
         ),
     )
 }
