@@ -1,5 +1,9 @@
 package no.kartverket.matrikkel.bygning.application
 
+import BruksenhetMother.standardBruksenhet
+import BruksenhetRegistreringMother.standardBruksenhetRegistrering
+import BygningMother.standardBygning
+import EgenregistreringMother.standardEgenregistrering
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.index
@@ -9,12 +13,8 @@ import assertk.assertions.isNull
 import assertk.assertions.isNullOrEmpty
 import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
-import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
-import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
@@ -26,13 +26,7 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Gyldighetsperiode
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.applyEgenregistreringer
-import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
-import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
-import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
-import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -40,75 +34,28 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Kildemateri
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import java.time.Instant
 import java.time.Year
-import java.util.*
 import kotlin.test.Test
 
 class BygningEgenregistreringAggregeringTest {
-    private val bygningId = BygningId("00000000-0000-0000-0000-000000000001")
 
-    private val defaultBruksenhet = Bruksenhet(
-        id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
-        bruksenhetBubbleId = BruksenhetBubbleId(1L),
-    )
+    private val registeringsTidspunkt = Instant.parse("2024-01-01T12:00:00.00Z")
 
-    private val defaultBygning = Bygning(
-        id = bygningId,
-        bygningBubbleId = BygningBubbleId(1L),
-        bygningsnummer = 100,
-        bruksenheter = listOf(defaultBruksenhet),
-        etasjer = emptyList(),
-    )
-
-    private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
-        bruksenhetBubbleId = BruksenhetBubbleId(1L),
-        bruksarealRegistrering = BruksarealRegistrering(
-            totaltBruksareal = 50.0,
-            etasjeRegistreringer = null,
-            kildemateriale = KildematerialeKode.Salgsoppgave,
-        ),
-        byggeaarRegistrering = null,
-        energikildeRegistrering = null,
-        oppvarmingRegistrering = null,
-        vannforsyningRegistrering = null,
-        avlopRegistrering = null,
-    )
-
-    private val defaultEgenregistrering = Egenregistrering(
-        id = EgenregistreringId(UUID.randomUUID()),
-        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        eier = Foedselsnummer("66860475309"),
-        bruksenhetRegistrering = defaultBruksenhetRegistrering,
-        prosess = ProsessKode.Egenregistrering,
-    )
-
-    private val bruksenhetRegistreringMedKildematerialeKode = BruksenhetRegistrering(
-        bruksenhetBubbleId = BruksenhetBubbleId(1L),
-        bruksarealRegistrering = BruksarealRegistrering(
-            totaltBruksareal = 50.0,
-            etasjeRegistreringer = null,
-            kildemateriale = KildematerialeKode.AnnenDokumentasjon,
-        ),
-        byggeaarRegistrering = ByggeaarRegistrering(2010, KildematerialeKode.Selvrapportert),
-        energikildeRegistrering = null,
-        oppvarmingRegistrering = null,
-        vannforsyningRegistrering = null,
-        avlopRegistrering = null,
-    )
 
     @Test
     fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste kildemateriale felt`() {
-        val laterRegistrering = defaultEgenregistrering.copy(
-            id = EgenregistreringId(UUID.randomUUID()),
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bruksenhetRegistrering = bruksenhetRegistreringMedKildematerialeKode.copy(
-                byggeaarRegistrering = ByggeaarRegistrering(
-                    byggeaar = 2011,
-                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                ),
-            ),
-        )
+        val laterRegistrering =
+            standardEgenregistrering()
+                .withRegistreringstidspunkt(registeringsTidspunkt.plusSeconds(60))
+                .withBruksenhetRegistrering(
+                    standardBruksenhetRegistrering()
+                        .withByggeaar(
+                            byggeaar = 2011,
+                            kildemateriale = KildematerialeKode.Byggesaksdokumenter)
+                        .build(),
+                ).build()
 
-        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
+        val aggregatedBygning =
+            standardBygning().build().applyEgenregistreringer(listOf(laterRegistrering, standardEgenregistrering().build()))
 
         assertThat(aggregatedBygning).all {
             prop(Bygning::bruksenheter).index(0).all {
@@ -126,9 +73,10 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `bruksenhet med en ny egenregistrering får prosess fylt`() {
-        val firstRegistrering = defaultEgenregistrering
+        val firstRegistrering = standardEgenregistrering().build()
 
-        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(defaultEgenregistrering, firstRegistrering))
+        val aggregatedBygning =
+            standardBygning().build().applyEgenregistreringer(listOf(standardEgenregistrering().build(), firstRegistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.metadata?.prosess)
             .isEqualTo(ProsessKode.Egenregistrering)
@@ -136,19 +84,16 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `bruksenhet med en ny egenregistrering får kildemateriale fylt`() {
-        val firstRegistrering = defaultEgenregistrering.copy(
-            id = EgenregistreringId(UUID.randomUUID()),
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bruksenhetRegistrering = bruksenhetRegistreringMedKildematerialeKode.copy(
-                byggeaarRegistrering = ByggeaarRegistrering(
-                    byggeaar = 2011,
-                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                ),
-            ),
-        )
+        val firstRegistrering =
+            standardEgenregistrering().withRegistreringstidspunkt(registeringsTidspunkt.plusSeconds(60))
+                .withBruksenhetRegistrering(
+                    standardBruksenhetRegistrering()
+                        .withByggeaar(byggeaar = 2011, kildemateriale = KildematerialeKode.Byggesaksdokumenter)
+                        .build(),
+                ).build()
 
         val aggregatedBygning =
-            defaultBygning.applyEgenregistreringer(listOf(firstRegistrering, defaultEgenregistrering))
+            standardBygning().build().applyEgenregistreringer(listOf(firstRegistrering, standardEgenregistrering().build()))
 
         assertThat(aggregatedBygning.bruksenheter.single().byggeaar.egenregistrert?.metadata?.kildemateriale)
             .isEqualTo(KildematerialeKode.Byggesaksdokumenter)
@@ -156,19 +101,20 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste feltet`() {
-        val laterRegistrering = defaultEgenregistrering.copy(
-            id = EgenregistreringId(UUID.randomUUID()),
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                bruksarealRegistrering = BruksarealRegistrering(
-                    totaltBruksareal = 150.0,
-                    etasjeRegistreringer = null,
-                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                ),
-            ),
-        )
+        val laterRegistrering = standardEgenregistrering()
+            .withRegistreringstidspunkt(registeringsTidspunkt.plusSeconds(60))
+            .withBruksenhetRegistrering(
+                bruksenhetRegistrering = standardBruksenhetRegistrering()
+                    .withBruksareal(
+                        bruksareal = 150.0,
+                        etasjeRegistreringer = emptyList(),
+                        kildemateriale = KildematerialeKode.Byggesaksdokumenter,
+                    )
+                    .build(),
+            ).build()
 
-        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
+        val aggregatedBygning =
+            standardBygning().build().applyEgenregistreringer(listOf(laterRegistrering, standardEgenregistrering().build()))
 
         assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data)
             .isEqualTo(150.0)
@@ -176,27 +122,29 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `bruksarealregistrering skal kun sette total hvis kun total ble registrert nyere enn etasje bruksareal`() {
-        val firstRegistrering = defaultEgenregistrering.copy(
-            id = EgenregistreringId(UUID.randomUUID()),
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.minusSeconds(60),
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                bruksarealRegistrering = BruksarealRegistrering(
-                    totaltBruksareal = 50.0,
-                    etasjeRegistreringer = listOf(
-                        EtasjeBruksarealRegistrering(
+        val firstRegistrering =
+            standardEgenregistrering()
+                .withRegistreringstidspunkt(registeringsTidspunkt.minusSeconds(60))
+                .withBruksenhetRegistrering(
+                    standardBruksenhetRegistrering()
+                        .withBruksareal(
                             bruksareal = 50.0,
-                            etasjebetegnelse = Etasjebetegnelse.of(
-                                etasjenummer = Etasjenummer.of(1),
-                                etasjeplanKode = EtasjeplanKode.Hovedetasje,
+                            etasjeRegistreringer = listOf(
+                                EtasjeBruksarealRegistrering(
+                                    bruksareal = 50.0,
+                                    etasjebetegnelse = Etasjebetegnelse.of(
+                                        etasjenummer = Etasjenummer.of(1),
+                                        etasjeplanKode = EtasjeplanKode.Hovedetasje,
+                                    ),
+                                ),
                             ),
-                        ),
-                    ),
-                    kildemateriale = KildematerialeKode.Salgsoppgave,
-                ),
-            ),
-        )
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                        )
+                        .build(),
+                ).build()
 
-        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(defaultEgenregistrering, firstRegistrering))
+        val aggregatedBygning =
+            standardBygning().build().applyEgenregistreringer(listOf(standardEgenregistrering().build(), firstRegistrering))
 
         assertThat(aggregatedBygning.bruksenheter.single().etasjer.egenregistrert).isNull()
 
@@ -216,7 +164,7 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `registrering med tom liste paa listeregistering skal ikke sette felt paa bruksenhet`() {
-        val bruksenhet = defaultBruksenhet.applyEgenregistreringer(listOf(defaultEgenregistrering))
+        val bruksenhet = standardBruksenhet().build().applyEgenregistreringer(listOf(standardEgenregistrering().build()))
 
         assertThat(bruksenhet.oppvarming).isEmpty()
         assertThat(bruksenhet.energikilder).isEmpty()
@@ -224,48 +172,54 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `registrering av listeverdier skal beholde gamle, oppdatere like, og legge inn nye verdier`() {
-        val registrering1 = defaultEgenregistrering.copy(
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                energikildeRegistrering = listOf(
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.Elektrisitet,
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        gyldighetsaar = 2010,
-                        opphoersaar = null,
-                    ),
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.AnnenEnergikilde,
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        gyldighetsaar = 2010,
-                        opphoersaar = null,
-                    ),
-                ),
-            ),
-        )
 
-        val registrering2 = defaultEgenregistrering.copy(
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(10),
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                energikildeRegistrering = listOf(
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.Elektrisitet,
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        gyldighetsaar = 2015,
-                        opphoersaar = null,
-                    ),
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.Fjernvarme,
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        gyldighetsaar = 2020,
-                        opphoersaar = null,
-                    ),
-                ),
-            ),
-        )
 
-        val result1 = defaultBruksenhet.applyEgenregistreringer(emptyList())
-        val result2 = defaultBruksenhet.applyEgenregistreringer(listOf(registrering1))
-        val result3 = defaultBruksenhet.applyEgenregistreringer(listOf(registrering1, registrering2))
+        val registrering1 = standardEgenregistrering()
+            .withBruksenhetRegistrering(
+                standardBruksenhetRegistrering()
+                    .withEnergikilderRegistreringer(
+                        energikilder = listOf(
+                            EnergikildeRegistrering(
+                                EnergikildeKode.Elektrisitet,
+                                kildemateriale = KildematerialeKode.Salgsoppgave,
+                                gyldighetsaar = 2010,
+                                opphoersaar = null,
+                            ),
+                            EnergikildeRegistrering(
+                                EnergikildeKode.AnnenEnergikilde,
+                                kildemateriale = KildematerialeKode.Salgsoppgave,
+                                gyldighetsaar = 2010,
+                                opphoersaar = null,
+                            ),
+                        ),
+                    ).build(),
+            ).build()
+
+        val registrering2 = standardEgenregistrering()
+            .withRegistreringstidspunkt(registeringsTidspunkt.plusSeconds(10))
+            .withBruksenhetRegistrering(
+                standardBruksenhetRegistrering()
+                    .withEnergikilderRegistreringer(
+                        energikilder = listOf(
+                            EnergikildeRegistrering(
+                                EnergikildeKode.Elektrisitet,
+                                kildemateriale = KildematerialeKode.Salgsoppgave,
+                                gyldighetsaar = 2015,
+                                opphoersaar = null,
+                            ),
+                            EnergikildeRegistrering(
+                                EnergikildeKode.Fjernvarme,
+                                kildemateriale = KildematerialeKode.Salgsoppgave,
+                                gyldighetsaar = 2020,
+                                opphoersaar = null,
+                            ),
+                        ),
+                    ).build(),
+            ).build()
+
+        val result1 = standardBruksenhet().build().applyEgenregistreringer(emptyList())
+        val result2 = standardBruksenhet().build().applyEgenregistreringer(listOf(registrering1))
+        val result3 = standardBruksenhet().build().applyEgenregistreringer(listOf(registrering1, registrering2))
 
         assertThat(result1).all {
             prop(Bruksenhet::energikilder).all {
@@ -330,15 +284,16 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `registrering av opphoersdato skal gjøre at verdien ikke returneres`() {
-        val registreringUtenOpphoer = defaultEgenregistrering.copy(
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                avlopRegistrering = AvlopRegistrering(
+        val registreringUtenOpphoer = standardEgenregistrering().withBruksenhetRegistrering(
+            bruksenhetRegistrering = standardBruksenhetRegistrering().withAvlopRegistrering(
+                AvlopRegistrering(
                     avlop = AvlopKode.OffentligKloakk,
                     kildemateriale = KildematerialeKode.Salgsoppgave,
                     gyldighetsaar = 2010,
                     opphoersaar = null,
                 ),
-                energikildeRegistrering = listOf(
+            ).withEnergikilderRegistreringer(
+                listOf(
                     EnergikildeRegistrering(
                         energikilde = EnergikildeKode.Elektrisitet,
                         kildemateriale = KildematerialeKode.Salgsoppgave,
@@ -346,30 +301,36 @@ class BygningEgenregistreringAggregeringTest {
                         opphoersaar = null,
                     ),
                 ),
-            ),
-        )
+            ).build(),
+        ).build()
 
-        val registreringMedOpphoer = defaultEgenregistrering.copy(
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(10),
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                avlopRegistrering = AvlopRegistrering(
-                    avlop = AvlopKode.OffentligKloakk,
-                    kildemateriale = KildematerialeKode.Salgsoppgave,
-                    gyldighetsaar = 2010,
-                    opphoersaar = 2015,
-                ),
-                energikildeRegistrering = listOf(
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.Elektrisitet,
+        val registreringMedOpphoer =
+            standardEgenregistrering().withRegistreringstidspunkt(registeringsTidspunkt.plusSeconds(10)).withBruksenhetRegistrering(
+                standardBruksenhetRegistrering().withAvlopRegistrering(
+                    AvlopRegistrering(
+                        avlop = AvlopKode.OffentligKloakk,
                         kildemateriale = KildematerialeKode.Salgsoppgave,
                         gyldighetsaar = 2010,
                         opphoersaar = 2015,
                     ),
-                ),
+                ).withEnergikilderRegistreringer(
+                    listOf(
+                        EnergikildeRegistrering(
+                            EnergikildeKode.Elektrisitet,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            gyldighetsaar = 2010,
+                            opphoersaar = 2015,
+                        ),
+                    ),
+                ).build(),
+            ).build()
+
+        val bruksenhet = standardBruksenhet().build().applyEgenregistreringer(
+            listOf(
+                registreringUtenOpphoer,
+                registreringMedOpphoer,
             ),
         )
-
-        val bruksenhet = defaultBruksenhet.applyEgenregistreringer(listOf(registreringUtenOpphoer, registreringMedOpphoer))
 
         assertThat(bruksenhet).all {
             prop(Bruksenhet::energikilder).all {
@@ -383,35 +344,37 @@ class BygningEgenregistreringAggregeringTest {
 
     @Test
     fun `registrering uten opphoersdato der det tidligere var opphørt skal returnere data`() {
-        val registreringMedOpphoer = defaultEgenregistrering.copy(
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                avlopRegistrering = AvlopRegistrering(
+        val registreringMedOpphoer = standardEgenregistrering().withBruksenhetRegistrering(
+            bruksenhetRegistrering = standardBruksenhetRegistrering().withAvlopRegistrering(
+                AvlopRegistrering(
                     avlop = AvlopKode.OffentligKloakk,
                     kildemateriale = KildematerialeKode.Salgsoppgave,
                     gyldighetsaar = 2010,
                     opphoersaar = 2015,
                 ),
-                energikildeRegistrering = listOf(
+            ).withEnergikilderRegistreringer(
+                listOf(
                     EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.Elektrisitet,
+                        EnergikildeKode.Elektrisitet,
                         kildemateriale = KildematerialeKode.Salgsoppgave,
                         gyldighetsaar = 2010,
                         opphoersaar = 2015,
                     ),
                 ),
-            ),
-        )
+            ).build(),
+        ).build()
 
-        val registreringUtenOpphoer = defaultEgenregistrering.copy(
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(10),
-            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                avlopRegistrering = AvlopRegistrering(
+        val registreringUtenOpphoer = registreringMedOpphoer.copy(
+            registreringstidspunkt = registeringsTidspunkt.plusSeconds(10),
+            bruksenhetRegistrering = standardBruksenhetRegistrering().withAvlopRegistrering(
+                AvlopRegistrering(
                     avlop = AvlopKode.OffentligKloakk,
                     kildemateriale = KildematerialeKode.Salgsoppgave,
                     gyldighetsaar = 2016,
                     opphoersaar = null,
                 ),
-                energikildeRegistrering = listOf(
+            ).withEnergikilderRegistreringer(
+                listOf(
                     EnergikildeRegistrering(
                         energikilde = EnergikildeKode.Elektrisitet,
                         kildemateriale = KildematerialeKode.Salgsoppgave,
@@ -419,10 +382,10 @@ class BygningEgenregistreringAggregeringTest {
                         opphoersaar = null,
                     ),
                 ),
-            ),
+            ).build(),
         )
 
-        val bruksenhet = defaultBruksenhet.applyEgenregistreringer(listOf(registreringUtenOpphoer, registreringMedOpphoer))
+        val bruksenhet = standardBruksenhet().build().applyEgenregistreringer(listOf(registreringUtenOpphoer, registreringMedOpphoer))
 
         assertThat(bruksenhet).all {
             prop(Bruksenhet::energikilder).all {
