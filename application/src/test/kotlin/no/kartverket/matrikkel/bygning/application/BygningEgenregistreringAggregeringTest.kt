@@ -1,5 +1,9 @@
 package no.kartverket.matrikkel.bygning.application
 
+import BruksenhetBuilder
+import BruksenhetRegistreringBuilder
+import BygningBuilder
+import EgenregistreringBuilder
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.index
@@ -9,10 +13,8 @@ import assertk.assertions.isNull
 import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
-import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
@@ -35,69 +37,54 @@ import java.util.*
 import kotlin.test.Test
 
 class BygningEgenregistreringAggregeringTest {
-    private val bygningId = BygningId("00000000-0000-0000-0000-000000000001")
+    private val defaultBruksenhet = BruksenhetBuilder()
+        .id(BruksenhetId("00000000-0000-0000-0000-000000000002"))
+        .bruksenhetBubbleId(BruksenhetBubbleId(1L))
+        .build()
 
-    private val defaultBruksenhet = Bruksenhet(
-        id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
-        bruksenhetBubbleId = BruksenhetBubbleId(1L),
+    private val defaultBygning = BygningBuilder()
+        .id(BygningId("00000000-0000-0000-0000-000000000001"))
+        .bygningBubbleId(BygningBubbleId(1L))
+        .bygningsnummer(100)
+        .bruksenheter(listOf(defaultBruksenhet))
+        .etasjer(emptyList())
+        .build()
+
+    val defaultBruksarealRegistrering = BruksarealRegistrering(
+        totaltBruksareal = 50.0,
+        etasjeRegistreringer = null,
+        kildemateriale = KildematerialeKode.Salgsoppgave,
     )
 
-    private val defaultBygning = Bygning(
-        id = bygningId,
-        bygningBubbleId = BygningBubbleId(1L),
-        bygningsnummer = 100,
-        bruksenheter = listOf(defaultBruksenhet),
-        etasjer = emptyList(),
-    )
+    private val defaultBruksenhetRegistrering = BruksenhetRegistreringBuilder()
+        .bruksenhetBubbleId(BruksenhetBubbleId(1L))
+        .bruksarealRegistrering(
+            defaultBruksarealRegistrering,
+        ).build()
 
-    private val defaultBruksenhetRegistrering = BruksenhetRegistrering(
-        bruksenhetBubbleId = BruksenhetBubbleId(1L),
-        bruksarealRegistrering = BruksarealRegistrering(
-            totaltBruksareal = 50.0,
-            etasjeRegistreringer = null,
-            kildemateriale = KildematerialeKode.Salgsoppgave,
-        ),
-        byggeaarRegistrering = null,
-        energikildeRegistrering = null,
-        oppvarmingRegistrering = null,
-        vannforsyningRegistrering = null,
-        avlopRegistrering = null,
-    )
-
-    private val defaultEgenregistrering = Egenregistrering(
-        id = UUID.randomUUID(),
-        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        eier = Foedselsnummer("66860475309"),
-        bruksenhetRegistrering = defaultBruksenhetRegistrering,
-        prosess = ProsessKode.Egenregistrering,
-    )
-
-    private val bruksenhetRegistreringMedKildematerialeKode = BruksenhetRegistrering(
-        bruksenhetBubbleId = BruksenhetBubbleId(1L),
-        bruksarealRegistrering = BruksarealRegistrering(
-            totaltBruksareal = 50.0,
-            etasjeRegistreringer = null,
-            kildemateriale = KildematerialeKode.AnnenDokumentasjon,
-        ),
-        byggeaarRegistrering = ByggeaarRegistrering(2010, KildematerialeKode.Selvrapportert),
-        energikildeRegistrering = null,
-        oppvarmingRegistrering = null,
-        vannforsyningRegistrering = null,
-        avlopRegistrering = null,
-    )
+    val defaultEgenregistrering = EgenregistreringBuilder()
+        .id(UUID.randomUUID())
+        .eier(Foedselsnummer("66860475309"))
+        .registreringstidspunkt(Instant.parse("2024-01-01T12:00:00.00Z"))
+        .prosess(ProsessKode.Egenregistrering)
+        .bruksenhetRegistrering(
+            defaultBruksenhetRegistrering,
+        )
+        .build()
 
     @Test
     fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste kildemateriale felt`() {
-        val laterRegistrering = defaultEgenregistrering.copy(
-            id = UUID.randomUUID(),
-            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bruksenhetRegistrering = bruksenhetRegistreringMedKildematerialeKode.copy(
-                byggeaarRegistrering = ByggeaarRegistrering(
-                    byggeaar = 2011,
-                    kildemateriale = KildematerialeKode.Byggesaksdokumenter,
-                ),
-            ),
-        )
+        val laterRegistrering = EgenregistreringBuilder()
+            .eier(Foedselsnummer("66860475309"))
+            .bruksenhetRegistrering(
+                BruksenhetRegistreringBuilder()
+                    .byggeaarRegistrering(
+                        ByggeaarRegistrering(
+                            byggeaar = 2011,
+                            kildemateriale = KildematerialeKode.Byggesaksdokumenter,
+                        ),
+                    ).build(),
+                ).build()
 
         val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
 
@@ -130,7 +117,7 @@ class BygningEgenregistreringAggregeringTest {
         val firstRegistrering = defaultEgenregistrering.copy(
             id = UUID.randomUUID(),
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(60),
-            bruksenhetRegistrering = bruksenhetRegistreringMedKildematerialeKode.copy(
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
                 byggeaarRegistrering = ByggeaarRegistrering(
                     byggeaar = 2011,
                     kildemateriale = KildematerialeKode.Byggesaksdokumenter,
