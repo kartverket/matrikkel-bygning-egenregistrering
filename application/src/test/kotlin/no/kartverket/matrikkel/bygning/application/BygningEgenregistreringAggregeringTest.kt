@@ -1,7 +1,7 @@
 package no.kartverket.matrikkel.bygning.application
 
 import BruksenhetBuilder
-import BruksenhetRegistreringBuilder
+import BruksenhetRegistreringBuilder1
 import BygningBuilder
 import EgenregistreringBuilder
 import assertk.all
@@ -32,11 +32,14 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
+import StandardObjectBuilder
 import java.time.Instant
 import java.util.*
 import kotlin.test.Test
 
 class BygningEgenregistreringAggregeringTest {
+    private val standardObject = StandardObjectBuilder.standardBygning
+
     private val defaultBruksenhet = BruksenhetBuilder()
         .id(BruksenhetId("00000000-0000-0000-0000-000000000002"))
         .bruksenhetBubbleId(BruksenhetBubbleId(1L))
@@ -56,9 +59,9 @@ class BygningEgenregistreringAggregeringTest {
         kildemateriale = KildematerialeKode.Salgsoppgave,
     )
 
-    private val defaultBruksenhetRegistrering = BruksenhetRegistreringBuilder()
+    private val defaultBruksenhetRegistrering = BruksenhetRegistreringBuilder1()
         .bruksenhetBubbleId(BruksenhetBubbleId(1L))
-        .bruksarealRegistrering(
+        .bruksareal(
             defaultBruksarealRegistrering,
         ).build()
 
@@ -67,8 +70,8 @@ class BygningEgenregistreringAggregeringTest {
         .eier(Foedselsnummer("66860475309"))
         .registreringstidspunkt(Instant.parse("2024-01-01T12:00:00.00Z"))
         .prosess(ProsessKode.Egenregistrering)
-        .bruksenhetRegistrering(
-            defaultBruksenhetRegistrering,
+        .bruksenhet(
+            BruksenhetMother.standardBruksenhet,
         )
         .build()
 
@@ -76,9 +79,9 @@ class BygningEgenregistreringAggregeringTest {
     fun `bruksenhet med to egenregistreringer paa ett felt skal kun gi nyeste kildemateriale felt`() {
         val laterRegistrering = EgenregistreringBuilder()
             .eier(Foedselsnummer("66860475309"))
-            .bruksenhetRegistrering(
-                BruksenhetRegistreringBuilder()
-                    .byggeaarRegistrering(
+            .bruksenhet(
+                BruksenhetRegistreringBuilder1()
+                    .byggeaar(
                         ByggeaarRegistrering(
                             byggeaar = 2011,
                             kildemateriale = KildematerialeKode.Byggesaksdokumenter,
@@ -86,7 +89,8 @@ class BygningEgenregistreringAggregeringTest {
                     ).build(),
                 ).build()
 
-        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
+        //her brukes en predefinert standarObject som
+        val aggregatedBygning = standardObject.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
 
         assertThat(aggregatedBygning).all {
             prop(Bygning::bruksenheter).index(0).all {

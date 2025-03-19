@@ -16,6 +16,8 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
+import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
@@ -101,7 +103,8 @@ class BruksenhetBuilder {
     )
 }
 
-class BruksenhetRegistreringBuilder {
+//kræsj i navngivning på builder og motherobject...
+class BruksenhetRegistreringBuilder1 {
     private var bruksenhetBubbleId: BruksenhetBubbleId = BruksenhetBubbleId(0L)
     private var bruksarealRegistrering: BruksarealRegistrering? = null
     private var byggeaarRegistrering: ByggeaarRegistrering? = null
@@ -111,18 +114,18 @@ class BruksenhetRegistreringBuilder {
     private var oppvarmingRegistrering: OppvarmingRegistrering? = null
 
     fun bruksenhetBubbleId(bruksenhetBubbleId: BruksenhetBubbleId) = apply { this.bruksenhetBubbleId = bruksenhetBubbleId }
-    fun bruksarealRegistrering(bruksarealRegistrering: BruksarealRegistrering) =
+    fun bruksareal(bruksarealRegistrering: BruksarealRegistrering) =
         apply { this.bruksarealRegistrering = bruksarealRegistrering }
 
-    fun byggeaarRegistrering(byggeaarRegistrering: ByggeaarRegistrering?) = apply { this.byggeaarRegistrering = byggeaarRegistrering }
-    fun vannforsyningRegistrering(vannforsyningRegistrering: VannforsyningRegistrering?) =
+    fun byggeaar(byggeaarRegistrering: ByggeaarRegistrering?) = apply { this.byggeaarRegistrering = byggeaarRegistrering }
+    fun vannforsyning(vannforsyningRegistrering: VannforsyningRegistrering?) =
         apply { this.vannforsyningRegistrering = vannforsyningRegistrering }
 
-    fun avlopRegistrering(avlopRegistrering: AvlopRegistrering?) = apply { this.avlopRegistrering = avlopRegistrering }
-    fun energikildeRegistrering(energikildeRegistrering: EnergikildeRegistrering?) =
+    fun avlop(avlopRegistrering: AvlopRegistrering?) = apply { this.avlopRegistrering = avlopRegistrering }
+    fun energikilde(energikildeRegistrering: EnergikildeRegistrering?) =
         apply { this.energikildeRegistrering = energikildeRegistrering }
 
-    fun oppvarmingRegistrering(oppvarmingRegistrering: OppvarmingRegistrering?) =
+    fun oppvarming(oppvarmingRegistrering: OppvarmingRegistrering?) =
         apply { this.oppvarmingRegistrering = oppvarmingRegistrering }
 
     fun build(): BruksenhetRegistrering {
@@ -143,13 +146,13 @@ class EgenregistreringBuilder {
     private var eier: Foedselsnummer? = null
     private var registreringstidspunkt: Instant = Instant.now()
     private var prosess: ProsessKode = ProsessKode.Egenregistrering
-    private var bruksenhetRegistrering: BruksenhetRegistrering ?  = null
+    private var bruksenhetRegistrering: BruksenhetRegistrering? = null
 
     fun id(id: UUID) = apply { this.id = id }
     fun eier(eier: Foedselsnummer) = apply { this.eier = eier }
     fun registreringstidspunkt(registreringstidspunkt: Instant) = apply { this.registreringstidspunkt = registreringstidspunkt }
     fun prosess(prosess: ProsessKode) = apply { this.prosess = prosess }
-    fun bruksenhetRegistrering(bruksenhetRegistrering: BruksenhetRegistrering) =
+    fun bruksenhet(bruksenhetRegistrering: BruksenhetRegistrering) =
         apply { this.bruksenhetRegistrering = bruksenhetRegistrering }
 
     fun build(): Egenregistrering {
@@ -161,6 +164,48 @@ class EgenregistreringBuilder {
             bruksenhetRegistrering = bruksenhetRegistrering!!,
         )
     }
+}
+
+ //predefinert testobject opprettet ved bruk av builder.
+object StandardObjectBuilder {
+    val standardBygning = BygningBuilder()
+        .id(BygningId("00000000-0000-0000-0000-000000000001"))
+        .bygningBubbleId(BygningBubbleId(1L))
+        .bruksareal(
+            Multikilde(
+                Bruksareal(
+                    50.0,
+                    RegisterMetadata(
+                        Instant.now(),
+                        RegistreringAktoer.Signatur("datakatalogen"),
+                        kildemateriale = KildematerialeKode.Selvrapportert,
+                        prosess = ProsessKode.Egenregistrering,
+                    ),
+                ),
+            ),
+        )
+        .bygningsnummer(123456)
+        .bruksenheter(
+            listOf(
+                BruksenhetBuilder()
+                    .id(BruksenhetId("00000000-0000-0000-0000-000000000001"))
+                    .bruksenhetBubbleId(BruksenhetBubbleId(1))
+                    .byggeaar(
+                        byggeaar = Multikilde(
+                            Byggeaar(
+                                1990,
+                                RegisterMetadata(
+                                    Instant.now(),
+                                    Foedselsnummer("66860475309"),
+                                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                                    prosess = ProsessKode.Egenregistrering,
+                                ),
+                            ),
+                        ),
+                    ).build(),
+            ),
+        )
+        .build()
 }
 
 
