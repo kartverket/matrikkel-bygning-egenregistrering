@@ -3,7 +3,6 @@ package no.kartverket.matrikkel.bygning.v1.intern.egenregistrering
 import assertk.Assert
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.containsExactly
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
@@ -37,9 +36,9 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Byggeaa
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.DEFAULT_PID
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
+import no.kartverket.matrikkel.bygning.v1.common.gyldigRequest
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
 import no.kartverket.matrikkel.bygning.v1.common.ugyldigRequestKunBruksarealPerEtasje
-import no.kartverket.matrikkel.bygning.v1.common.gyldigRequest
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -120,16 +119,20 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                     }
 
                     prop(BruksenhetInternResponse::energikilder).isNotNull().all {
-                        prop(MultikildeInternResponse<EnergikildeInternResponse>::egenregistrert).isNotNull().all {
-                            prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
-                            prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                        prop(MultikildeInternResponse<List<EnergikildeInternResponse>>::egenregistrert).isNotNull().all {
+                            index(0).all {
+                                prop(EnergikildeInternResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                                prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                            }
                         }
                     }
 
-                    prop(BruksenhetInternResponse::oppvarminger).isNotNull().all {
-                        prop(MultikildeInternResponse<OppvarmingInternResponse>::egenregistrert).isNotNull().all {
-                            prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
-                            prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    prop(BruksenhetInternResponse::oppvarming).isNotNull().all {
+                        prop(MultikildeInternResponse<List<OppvarmingInternResponse>>::egenregistrert).isNotNull().all {
+                            index(0).all {
+                                prop(OppvarmingInternResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                                prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                            }
                         }
                     }
                 }
@@ -138,7 +141,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                     prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(2L)
                     prop(BruksenhetInternResponse::totaltBruksareal).isNull()
                     prop(BruksenhetInternResponse::energikilder).isNull()
-                    prop(BruksenhetInternResponse::oppvarminger).isNull()
+                    prop(BruksenhetInternResponse::oppvarming).isNull()
                 }
             }
         }
@@ -175,16 +178,20 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             }
 
             prop(BruksenhetInternResponse::energikilder).isNotNull().all {
-                prop(MultikildeInternResponse<EnergikildeInternResponse>::egenregistrert).isNotNull().all {
-                    prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
-                    prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                prop(MultikildeInternResponse<List<EnergikildeInternResponse>>::egenregistrert).isNotNull().all {
+                    index(0).all {
+                        prop(EnergikildeInternResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                        prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
                 }
             }
 
-            prop(BruksenhetInternResponse::oppvarminger).isNotNull().all {
-                prop(MultikildeInternResponse<OppvarmingInternResponse>::egenregistrert).isNotNull().all {
-                    prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
-                    prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+            prop(BruksenhetInternResponse::oppvarming).isNotNull().all {
+                prop(MultikildeInternResponse<List<OppvarmingInternResponse>>::egenregistrert).isNotNull().all {
+                    index(0).all {
+                        prop(OppvarmingInternResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                        prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
                 }
             }
         }

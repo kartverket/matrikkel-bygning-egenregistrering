@@ -3,7 +3,6 @@ package no.kartverket.matrikkel.bygning.application.models.kodelister
 enum class EtasjeplanKode(
     override val presentasjonsnavn: String, override val beskrivelse: String, val kortnavn: String,
 ) : IKode {
-    // TODO Disse forklaringene er helt grusomme å lese for en lekmann, synes kanskje man kunne gjort sitt for å forbedre det
     Loftetasje(
         presentasjonsnavn = "Loftetasje",
         beskrivelse = "Et tilgjengelig rom over øverste alminnelige etasje som ikke oppfyller kravene til alminnelig etasje. Fri høyde må være større eller lik 1,9m i en bredde på minst 0,6 m. Loftsarealet måles til 0,6m utenfor høyde på minst 1,9m",

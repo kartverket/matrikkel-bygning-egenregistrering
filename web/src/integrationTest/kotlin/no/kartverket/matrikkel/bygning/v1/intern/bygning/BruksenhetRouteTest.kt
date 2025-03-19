@@ -2,7 +2,8 @@ package no.kartverket.matrikkel.bygning.v1.intern.bygning
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.containsExactly
+import assertk.assertions.index
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
@@ -23,6 +24,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.BruksenhetSimple
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.ByggeaarInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.EnergikildeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingInternResponse
+import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
@@ -64,8 +66,8 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
             prop(BruksenhetSimpleResponse::totaltBruksareal).isNull()
             prop(BruksenhetSimpleResponse::avlop).isNull()
             prop(BruksenhetSimpleResponse::byggeaar).isNull()
-            prop(BruksenhetSimpleResponse::oppvarminger).isNull()
-            prop(BruksenhetSimpleResponse::energikilder).isNull()
+            prop(BruksenhetSimpleResponse::oppvarming).isEmpty()
+            prop(BruksenhetSimpleResponse::energikilder).isEmpty()
             prop(BruksenhetSimpleResponse::vannforsyning).isNull()
         }
     }
@@ -106,13 +108,44 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
                 prop(AvlopKodeInternResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
                 prop(AvlopKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
             }
-            prop(BruksenhetSimpleResponse::oppvarminger).isNotNull().all {
-                prop(OppvarmingInternResponse::data).containsExactly(OppvarmingKode.Elektrisk)
-                prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+            prop(BruksenhetSimpleResponse::oppvarming).isNotNull().all {
+                index(0).all {
+                    prop(OppvarmingInternResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                    prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
             }
             prop(BruksenhetSimpleResponse::energikilder).isNotNull().all {
-                prop(EnergikildeInternResponse::data).containsExactly(EnergikildeKode.Elektrisitet)
-                prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                index(0).all {
+                    prop(EnergikildeInternResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                    prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `gitt at gyldighet blir registrert inn så skal det returneres`() = testApplication {
+        val client = mainModuleWithDatabaseEnvironmentAndClient()
+        val token = mockOAuthServer.issueIDPortenJWT()
+
+        client.post("/v1/intern/egenregistreringer") {
+            contentType(ContentType.Application.Json)
+            setBody(
+                EgenregistreringRequest.gyldigRequest(2L),
+            )
+            bearerAuth(token.serialize())
+        }
+
+        val response = client.get("/v1/intern/bruksenheter/2/egenregistrert")
+
+        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
+        assertThat(response.body<BruksenhetSimpleResponse>()).all {
+            prop(BruksenhetSimpleResponse::vannforsyning).isNotNull().all {
+                prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
+                prop(VannforsyningKodeInternResponse::metadata).all {
+                    prop(RegisterMetadataInternResponse::gyldighetsaar).isEqualTo(2010)
+                    prop(RegisterMetadataInternResponse::opphoersaar).isEqualTo(2020)
+                }
             }
         }
     }

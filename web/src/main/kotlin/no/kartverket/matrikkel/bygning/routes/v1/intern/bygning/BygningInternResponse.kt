@@ -34,8 +34,8 @@ data class BygningInternResponse(
     val bruksareal: MultikildeInternResponse<BruksarealInternResponse>?,
     val vannforsyning: MultikildeInternResponse<VannforsyningKodeInternResponse>?,
     val avlop: MultikildeInternResponse<AvlopKodeInternResponse>?,
-    val energikilder: MultikildeInternResponse<EnergikildeInternResponse>?,
-    val oppvarming: MultikildeInternResponse<OppvarmingInternResponse>?,
+    val energikilder: MultikildeInternResponse<List<EnergikildeInternResponse>>?,
+    val oppvarming: MultikildeInternResponse<List<OppvarmingInternResponse>>?,
     val bruksenheter: List<BruksenhetInternResponse>,
 )
 
@@ -72,8 +72,8 @@ data class BruksenhetInternResponse(
     val totaltBruksareal: MultikildeInternResponse<BruksarealInternResponse>?,
     val vannforsyning: MultikildeInternResponse<VannforsyningKodeInternResponse>?,
     val avlop: MultikildeInternResponse<AvlopKodeInternResponse>?,
-    val energikilder: MultikildeInternResponse<EnergikildeInternResponse>?,
-    val oppvarminger: MultikildeInternResponse<OppvarmingInternResponse>?,
+    val energikilder: MultikildeInternResponse<List<EnergikildeInternResponse>>?,
+    val oppvarming: MultikildeInternResponse<List<OppvarmingInternResponse>>?,
 )
 
 @Serializable
@@ -84,8 +84,8 @@ data class BruksenhetSimpleResponse(
     val totaltBruksareal: BruksarealInternResponse?,
     val vannforsyning: VannforsyningKodeInternResponse?,
     val avlop: AvlopKodeInternResponse?,
-    val energikilder: EnergikildeInternResponse?,
-    val oppvarminger: OppvarmingInternResponse?,
+    val energikilder: List<EnergikildeInternResponse>,
+    val oppvarming: List<OppvarmingInternResponse>,
 )
 
 @Serializable
@@ -94,7 +94,9 @@ data class RegisterMetadataInternResponse(
     val registreringstidspunkt: Instant,
     val registrertAv: String,
     val kildemateriale: KildematerialeKode?,
-    val prosess: ProsessKode?
+    val prosess: ProsessKode?,
+    val gyldighetsaar: Int?,
+    val opphoersaar: Int?,
 )
 
 @Serializable
@@ -110,10 +112,10 @@ data class VannforsyningKodeInternResponse(val data: VannforsyningKode, val meta
 data class AvlopKodeInternResponse(val data: AvlopKode, val metadata: RegisterMetadataInternResponse)
 
 @Serializable
-data class EnergikildeInternResponse(val data: List<EnergikildeKode>, val metadata: RegisterMetadataInternResponse)
+data class EnergikildeInternResponse(val data: EnergikildeKode, val metadata: RegisterMetadataInternResponse)
 
 @Serializable
-data class OppvarmingInternResponse(val data: List<OppvarmingKode>, val metadata: RegisterMetadataInternResponse)
+data class OppvarmingInternResponse(val data: OppvarmingKode, val metadata: RegisterMetadataInternResponse)
 
 
 fun RegisterMetadata.toRegisterMetadataInternResponse() = RegisterMetadataInternResponse(
@@ -121,6 +123,8 @@ fun RegisterMetadata.toRegisterMetadataInternResponse() = RegisterMetadataIntern
     registrertAv = this.registrertAv.value,
     kildemateriale = this.kildemateriale,
     prosess = this.prosess,
+    gyldighetsaar = this.gyldighetsperiode.gyldighetsaar?.value,
+    opphoersaar = this.gyldighetsperiode.opphoersaar?.value,
 )
 
 fun <T : Any, R : Any> Multikilde<T>.toMultikildeInternResponse(mapper: T.() -> R): MultikildeInternResponse<R>? {
@@ -138,8 +142,8 @@ fun Bygning.toBygningInternResponse(): BygningInternResponse = BygningInternResp
     bruksenheter = this.bruksenheter.map(Bruksenhet::toBruksenhetResponse),
     vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
-    energikilder = this.energikilder.toMultikildeInternResponse(Energikilde::toEnergikildeResponse),
-    oppvarming = this.oppvarminger.toMultikildeInternResponse(Oppvarming::toOppvarmingResponse),
+    energikilder = this.energikilder.toMultikildeInternResponse { map { it.toEnergikildeResponse() } },
+    oppvarming = this.oppvarming.toMultikildeInternResponse { map { it.toOppvarmingResponse() } },
 )
 
 fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
@@ -153,8 +157,8 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetInternResponse = BruksenhetInte
     byggeaar = this.byggeaar.toMultikildeInternResponse(Byggeaar::toByggeaarInternResponse),
     etasjer = this.etasjer.toMultikildeInternResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
     totaltBruksareal = this.totaltBruksareal.toMultikildeInternResponse(Bruksareal::toBruksarealResponse),
-    energikilder = this.energikilder.toMultikildeInternResponse(Energikilde::toEnergikildeResponse),
-    oppvarminger = this.oppvarminger.toMultikildeInternResponse(Oppvarming::toOppvarmingResponse),
+    energikilder = this.energikilder.toMultikildeInternResponse { map(Energikilde::toEnergikildeResponse) },
+    oppvarming = this.oppvarming.toMultikildeInternResponse { map(Oppvarming::toOppvarmingResponse) },
     vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
 )
@@ -166,8 +170,8 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
     totaltBruksareal = this.totaltBruksareal.egenregistrert?.toBruksarealResponse(),
     vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
     avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
-    energikilder = this.energikilder.egenregistrert?.toEnergikildeResponse(),
-    oppvarminger = this.oppvarminger.egenregistrert?.toOppvarmingResponse(),
+    energikilder = this.energikilder.egenregistrert?.map { it.toEnergikildeResponse() } ?: emptyList(),
+    oppvarming = this.oppvarming.egenregistrert?.map { it.toOppvarmingResponse() } ?: emptyList(),
 )
 
 private fun BruksenhetEtasjer.toBruksenhetEtasjeResponse(): BruksenhetEtasjerInternResponse = BruksenhetEtasjerInternResponse(

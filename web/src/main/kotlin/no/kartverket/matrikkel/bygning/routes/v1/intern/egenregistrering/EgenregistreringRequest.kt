@@ -14,6 +14,7 @@ import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -24,16 +25,15 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Vannforsyni
 import java.time.Instant
 import java.util.*
 
-
 @Serializable
 data class EgenregistreringRequest(
     val bruksenhetId: Long,
     val bruksarealRegistrering: BruksarealRegistreringRequest?,
     val byggeaarRegistrering: ByggeaarRegistreringRequest?,
-    val energikildeRegistrering: EnergikildeRegistreringRequest?,
-    val oppvarmingRegistrering: OppvarmingRegistreringRequest?,
     val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
     val avlopRegistrering: AvlopRegistreringRequest?,
+    val energikildeRegistrering: List<EnergikildeRegistreringRequest>?,
+    val oppvarmingRegistrering: List<OppvarmingRegistreringRequest>?,
 )
 
 @Serializable
@@ -65,24 +65,32 @@ data class BruksarealRegistreringRequest(
 data class VannforsyningRegistreringRequest(
     val vannforsyning: VannforsyningKode,
     val kildemateriale: KildematerialeKode,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null
 )
 
 @Serializable
 data class AvlopRegistreringRequest(
     val avlop: AvlopKode,
     val kildemateriale: KildematerialeKode,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null
 )
 
 @Serializable
 data class EnergikildeRegistreringRequest(
-    val energikilder: List<EnergikildeKode>,
+    val energikilde: EnergikildeKode,
     val kildemateriale: KildematerialeKode,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null
 )
 
 @Serializable
 data class OppvarmingRegistreringRequest(
-    val oppvarminger: List<OppvarmingKode>,
+    val oppvarming: OppvarmingKode,
     val kildemateriale: KildematerialeKode,
+    val gyldighetsaar: Int? = null,
+    val opphoersaar: Int? = null
 )
 
 fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
@@ -117,34 +125,41 @@ fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
             VannforsyningRegistrering(
                 vannforsyning = it.vannforsyning,
                 kildemateriale = it.kildemateriale,
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = it.opphoersaar,
             )
         },
         avlopRegistrering = avlopRegistrering?.let {
             AvlopRegistrering(
                 avlop = it.avlop,
                 kildemateriale = it.kildemateriale,
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = it.opphoersaar,
             )
         },
-        energikildeRegistrering = energikildeRegistrering?.let {
+        energikildeRegistrering = energikildeRegistrering?.map {
             EnergikildeRegistrering(
-                energikilder = it.energikilder,
+                energikilde = it.energikilde,
                 kildemateriale = it.kildemateriale,
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = it.opphoersaar,
             )
         },
-        oppvarmingRegistrering = oppvarmingRegistrering?.let {
+        oppvarmingRegistrering = oppvarmingRegistrering?.map {
             OppvarmingRegistrering(
-                oppvarminger = it.oppvarminger,
+                oppvarming = it.oppvarming,
                 kildemateriale = it.kildemateriale,
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = it.opphoersaar,
             )
         },
     )
 }
 
-fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
-    Egenregistrering(
-        id = UUID.randomUUID(),
-        eier = Foedselsnummer(eier),
-        registreringstidspunkt = Instant.now(),
-        prosess = ProsessKode.Egenregistrering,
-        bruksenhetRegistrering = this.toBruksenhetRegistrering()
-    )
+fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering = Egenregistrering(
+    id = EgenregistreringId(UUID.randomUUID()),
+    eier = Foedselsnummer(eier),
+    registreringstidspunkt = Instant.now(),
+    prosess = ProsessKode.Egenregistrering,
+    bruksenhetRegistrering = this.toBruksenhetRegistrering(),
+)
