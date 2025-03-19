@@ -29,20 +29,26 @@ internal fun EgenregistreringRequest.Companion.gyldigRequest(bruksenhetId: Long 
     ),
     byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Selvrapportert),
     vannforsyningRegistrering = VannforsyningRegistreringRequest(
-        VannforsyningKode.OffentligVannverk,
-        KildematerialeKode.Salgsoppgave,
+        vannforsyning = VannforsyningKode.OffentligVannverk,
+        kildemateriale = KildematerialeKode.Salgsoppgave,
+        gyldighetsaar = 2010,
+        opphoersaar = 2020,
     ),
     avlopRegistrering = AvlopRegistreringRequest(
         avlop = AvlopKode.OffentligKloakk,
-        KildematerialeKode.Selvrapportert,
+        kildemateriale = KildematerialeKode.Selvrapportert,
     ),
-    energikildeRegistrering = EnergikildeRegistreringRequest(
-        listOf(EnergikildeKode.Elektrisitet),
-        KildematerialeKode.Selvrapportert,
+    energikildeRegistrering = listOf(
+        EnergikildeRegistreringRequest(
+            energikilde = EnergikildeKode.Elektrisitet,
+            kildemateriale = KildematerialeKode.Selvrapportert,
+        ),
     ),
-    oppvarmingRegistrering = OppvarmingRegistreringRequest(
-        listOf(OppvarmingKode.Elektrisk),
-        KildematerialeKode.Selvrapportert,
+    oppvarmingRegistrering = listOf(
+        OppvarmingRegistreringRequest(
+            oppvarming = OppvarmingKode.Elektrisk,
+            kildemateriale = KildematerialeKode.Selvrapportert,
+        ),
     ),
 )
 

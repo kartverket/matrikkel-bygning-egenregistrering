@@ -36,6 +36,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
         registreringstidspunkt = egenregistrering.registreringstidspunkt,
         registrertAv = egenregistrering.eier,
         prosess = egenregistrering.prosess,
+        gyldighetsperiode = Gyldighetsperiode.of(),
     )
 
     return this.copy(
@@ -56,26 +57,50 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
         vannforsyning = this.vannforsyning.aggregate(bruksenhetRegistrering.vannforsyningRegistrering) {
             Vannforsyning(
                 data = it.vannforsyning,
-                metadata = metadata.withKildemateriale(it.kildemateriale),
+                metadata = metadata
+                    .withKildemateriale(it.kildemateriale)
+                    .withGyldighetsperiode(
+                        Gyldighetsperiode.of(gyldighetsaar = it.gyldighetsaar, opphoersaar = it.opphoersaar),
+                    ),
             )
         },
         avlop = this.avlop.aggregate(bruksenhetRegistrering.avlopRegistrering) {
             Avlop(
                 data = it.avlop,
-                metadata = metadata.withKildemateriale(it.kildemateriale),
+                metadata = metadata
+                    .withKildemateriale(it.kildemateriale)
+                    .withGyldighetsperiode(
+                        Gyldighetsperiode.of(gyldighetsaar = it.gyldighetsaar, opphoersaar = it.opphoersaar),
+                    ),
             )
         },
-        energikilder = this.energikilder.aggregate(bruksenhetRegistrering.energikildeRegistrering) {
-            Energikilde(
-                data = it.energikilder,
-                metadata = metadata.withKildemateriale(it.kildemateriale),
-            )
+
+        energikilder = this.energikilder.aggregate(bruksenhetRegistrering.energikildeRegistrering) { energikildeRegistrering ->
+            val currentEnergikilder = energikilder.egenregistrert.orEmpty()
+
+            val (newEnergikilderToUpdate, newEnergikilderToAdd) = energikildeRegistrering
+                .map { it.toEnergikilde(metadata) }
+                .partition { energikilde ->
+                    energikilde.data in currentEnergikilder.map { current -> current.data }
+                }
+
+            currentEnergikilder
+                .map { energikilde -> newEnergikilderToUpdate.find { it.data == energikilde.data } ?: energikilde }
+                .plus(newEnergikilderToAdd)
         },
-        oppvarminger = this.oppvarminger.aggregate(bruksenhetRegistrering.oppvarmingRegistrering) {
-            Oppvarming(
-                data = it.oppvarminger,
-                metadata = metadata.withKildemateriale(it.kildemateriale),
-            )
+
+        oppvarming = this.oppvarming.aggregate(bruksenhetRegistrering.oppvarmingRegistrering) { oppvarmingRegistrering ->
+            val currentOppvarming = oppvarming.egenregistrert.orEmpty()
+
+            val (newOppvarmingToUpdate, newOppvarmingToAdd) = oppvarmingRegistrering
+                .map { it.toOppvarming(metadata) }
+                .partition { oppvarming ->
+                    oppvarming.data in currentOppvarming.map { current -> current.data }
+                }
+
+            currentOppvarming
+                .map { oppvarming -> newOppvarmingToUpdate.find { it.data == oppvarming.data } ?: oppvarming }
+                .plus(newOppvarmingToAdd)
         },
 
         etasjer = this.etasjer.aggregate(
@@ -92,6 +117,28 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
                 metadata = metadata.withKildemateriale(bruksenhetRegistrering.bruksarealRegistrering?.kildemateriale),
             )
         },
+    )
+}
+
+private fun OppvarmingRegistrering.toOppvarming(metadata: RegisterMetadata): Oppvarming {
+    return Oppvarming(
+        data = this.oppvarming,
+        metadata = metadata
+            .withKildemateriale(this.kildemateriale)
+            .withGyldighetsperiode(
+                Gyldighetsperiode.of(gyldighetsaar = this.gyldighetsaar, opphoersaar = this.opphoersaar),
+            ),
+    )
+}
+
+private fun EnergikildeRegistrering.toEnergikilde(metadata: RegisterMetadata): Energikilde {
+    return Energikilde(
+        data = this.energikilde,
+        metadata = metadata
+            .withKildemateriale(this.kildemateriale)
+            .withGyldighetsperiode(
+                Gyldighetsperiode.of(gyldighetsaar = this.gyldighetsaar, opphoersaar = this.opphoersaar),
+            ),
     )
 }
 
@@ -114,4 +161,8 @@ private fun <T : Any, V : Any> Multikilde<T>.aggregate(
 
 private fun RegisterMetadata.withKildemateriale(kildemateriale: KildematerialeKode?): RegisterMetadata {
     return this.copy(kildemateriale = kildemateriale)
+}
+
+private fun RegisterMetadata.withGyldighetsperiode(gyldighetsperiode: Gyldighetsperiode): RegisterMetadata {
+    return this.copy(gyldighetsperiode = gyldighetsperiode)
 }

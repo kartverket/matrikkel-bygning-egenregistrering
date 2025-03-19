@@ -10,10 +10,13 @@ import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
+import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import java.time.Instant
 import java.util.*
@@ -22,7 +25,7 @@ import kotlin.test.Test
 class EgenregistreringValidatorTest {
 
     private val baseEgenregistrering = Egenregistrering(
-        id = UUID.randomUUID(),
+        id = EgenregistreringId(UUID.randomUUID()),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         eier = Foedselsnummer("66860475309"),
         prosess = ProsessKode.Egenregistrering,
@@ -68,5 +71,33 @@ class EgenregistreringValidatorTest {
         assertThat(validationResult.isErr).isTrue()
         assertThat(validationResult.error.errors).hasSize(1)
         assertThat(validationResult.error.errors.first().message).contains("totalt BRA stemmer ikke overens")
+    }
+
+    @Test
+    fun `egenregistrering med duplikatverdier i listeregistrering skal feile`() {
+        val egenregistreringWithDuplicate = baseEgenregistrering.copy(
+            bruksenhetRegistrering = baseEgenregistrering.bruksenhetRegistrering.copy(
+                oppvarmingRegistrering = listOf(
+                    OppvarmingRegistrering(
+                        oppvarming = OppvarmingKode.Elektrisk,
+                        kildemateriale = KildematerialeKode.Selvrapportert,
+                        gyldighetsaar = 2024,
+                        opphoersaar = 2024,
+                    ),
+                    OppvarmingRegistrering(
+                        oppvarming = OppvarmingKode.Elektrisk,
+                        kildemateriale = KildematerialeKode.Selvrapportert,
+                        gyldighetsaar = 2025,
+                        opphoersaar = 2026,
+                    ),
+                ),
+            ),
+        )
+
+        val result = EgenregistreringValidator.validateEgenregistrering(egenregistreringWithDuplicate)
+
+        assertThat(result.isErr).isTrue()
+        assertThat(result.error.errors).hasSize(1)
+        assertThat(result.error.errors.first().message).contains("har dupliserte registreringer")
     }
 }

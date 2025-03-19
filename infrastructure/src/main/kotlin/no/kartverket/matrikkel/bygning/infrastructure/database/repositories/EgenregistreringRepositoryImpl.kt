@@ -26,7 +26,7 @@ class EgenregistreringRepositoryImpl : EgenregistreringRepository {
             queryOf(
                 sql,
                 mapOf(
-                    "id" to egenregistrering.id,
+                    "id" to egenregistrering.id.value,
                     "registreringstidspunkt" to egenregistrering.registreringstidspunkt,
                     "eier" to egenregistrering.eier.value,
                     "registrering" to PGobject().apply {

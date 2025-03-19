@@ -4,6 +4,7 @@ import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
 import org.junit.jupiter.api.BeforeEach
@@ -15,7 +16,7 @@ class EgenregistreringRepositoryTest : TestWithDb() {
     private val egenregistreringRepository = EgenregistreringRepositoryImpl()
 
     private val defaultEgenregistrering = Egenregistrering(
-        id = UUID.randomUUID(),
+        id = EgenregistreringId(UUID.randomUUID()),
         registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
         eier = Foedselsnummer("66860475309"),
         prosess = ProsessKode.Egenregistrering,
