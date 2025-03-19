@@ -9,7 +9,6 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import java.util.*
 
 object BruksenhetMother {
     fun bruksenhet(): Builder {

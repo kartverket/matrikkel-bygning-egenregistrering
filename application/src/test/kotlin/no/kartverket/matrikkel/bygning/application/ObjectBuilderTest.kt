@@ -1,11 +1,6 @@
-import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
-import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
-import no.kartverket.matrikkel.bygning.application.models.BygningEtasje
+import no.kartverket.matrikkel.bygning.application.models.*
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
-import no.kartverket.matrikkel.bygning.application.models.Multikilde
-import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode

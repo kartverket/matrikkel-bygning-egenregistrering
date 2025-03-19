@@ -1,9 +1,11 @@
 package no.kartverket.matrikkel.bygning.application
 
 import BruksenhetBuilder
+import BruksenhetMother
 import BruksenhetRegistreringBuilder1
 import BygningBuilder
 import EgenregistreringBuilder
+import StandardObjectBuilder
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.index
@@ -32,7 +34,6 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
-import StandardObjectBuilder
 import java.time.Instant
 import java.util.*
 import kotlin.test.Test
