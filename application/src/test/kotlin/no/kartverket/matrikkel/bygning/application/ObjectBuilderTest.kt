@@ -60,7 +60,7 @@ class ObjectBuilderTest {
 
     @Test
     fun `should build EgenregistreringRequest with default values`() {
-        val egenregistrering = BruksenhetRegistreringBuilder().build()
+        val egenregistrering = BruksenhetRegistreringBuilder1().build()
         assertEquals(0L, egenregistrering.bruksenhetBubbleId.value)
         assertEquals(null, egenregistrering.bruksarealRegistrering)
         assertEquals(null, egenregistrering.byggeaarRegistrering)
@@ -72,9 +72,13 @@ class ObjectBuilderTest {
 
     @Test
     fun `should build EgenregistreringRequest with custom values`() {
-        val egenregistrering = BruksenhetRegistreringBuilder()
+        val egenregistrering = BruksenhetRegistreringBuilder1()
             .bruksenhetBubbleId(BruksenhetBubbleId(123))
-            .bruksarealRegistrering(BruksarealRegistrering(100.0, null, KildematerialeKode.Selvrapportert))
+            .bruksareal(
+                BruksarealRegistrering(
+                    100.0,
+                    null,
+                    KildematerialeKode.Selvrapportert))
             .build()
 
         assertEquals(123, egenregistrering.bruksenhetBubbleId.value)
