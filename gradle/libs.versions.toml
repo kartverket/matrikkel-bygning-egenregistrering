@@ -1,6 +1,6 @@
 [versions]
 ktorVersion = "3.1.1"
-kotlinVersion = "2.1.10"
+kotlinVersion = "2.1.20"
 logbackVersion = "1.5.18"
 logstashVersion = "8.0"
 prometheusVersion = "1.14.5"
