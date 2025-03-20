@@ -86,7 +86,9 @@ data class RegisterMetadataMedPersondataResponse(
     val registreringstidspunkt: Instant,
     val registrertAv: String,
     val kildemateriale: KildematerialeKode? = null,
-    val prosess: ProsessKode?
+    val prosess: ProsessKode?,
+    val gyldighetsaar: Int?,
+    val opphoersaar: Int?,
 )
 
 fun Bygning.toBygningMedPersondataResponse(): BygningMedPersondataResponse = BygningMedPersondataResponse(
@@ -102,6 +104,8 @@ private fun RegisterMetadata.toRegisterMetadataMedPersondataResponse(): Register
     kildemateriale = kildemateriale,
     prosess = prosess,
     registrertAv = registrertAv.value,
+    gyldighetsaar = gyldighetsperiode.gyldighetsaar?.value,
+    opphoersaar = gyldighetsperiode.opphoersaar?.value
 )
 
 internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPersondataResponse(
