@@ -5,11 +5,15 @@ import io.github.smiley4.ktoropenapi.config.AuthScheme
 import io.github.smiley4.ktoropenapi.config.AuthType
 import io.github.smiley4.ktoropenapi.config.OpenApiPluginConfig
 import io.github.smiley4.ktoropenapi.config.SchemaGenerator
+import io.github.smiley4.ktoropenapi.config.SecurityConfig
 import io.github.smiley4.schemakenerator.swagger.data.RefType
 import io.ktor.server.application.*
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_BERETTIGET_INTERESSE
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_MED_PERSONDATA
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_UTEN_PERSONDATA
 
 object OpenApiSpecIds {
     const val INTERN = "intern"
@@ -25,31 +29,91 @@ fun Application.configureOpenAPI() {
             name = OpenApiSpecIds.INTERN,
             title = "API for egenregistrering av bygningsdata",
             version = "0.1",
-        )
+        ) {
+            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+
+            securityScheme(IDPORTEN_PROVIDER_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+
+            securityScheme(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+        }
         installOpenApiSpec(
             name = OpenApiSpecIds.HENDELSER,
             title = "API for hendelseslogg for egenregistrerte bygningsdata",
             version = "0.1",
-        )
+        ) {
+            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+        }
         installOpenApiSpec(
             name = OpenApiSpecIds.BERETTIGET_INTERESSE,
             title = "API for utlevering av egenregistrerte bygningsdata",
             version = "0.1",
-        )
+        ) {
+            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+
+            securityScheme(MATRIKKEL_AUTH_BERETTIGET_INTERESSE) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+        }
         installOpenApiSpec(
             name = OpenApiSpecIds.UTEN_PERSONDATA,
             title = "API for utlevering av egenregistrerte bygningsdata uten personidentifiserende metadata",
             version = "0.1",
-        )
+        ) {
+            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+
+            securityScheme(MATRIKKEL_AUTH_UTEN_PERSONDATA) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+        }
         installOpenApiSpec(
             name = OpenApiSpecIds.MED_PERSONDATA,
             title = "API for utlevering av egenregistrerte bygningsdata med personidentifiserende metadata",
             version = "0.1",
-        )
+        ) {
+            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+
+            securityScheme(MATRIKKEL_AUTH_MED_PERSONDATA) {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BEARER
+                bearerFormat = "jwt"
+            }
+        }
     }
 }
 
-private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, version: String) {
+private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, version: String, securityConfig: SecurityConfig.() -> Unit) {
     spec(name) {
         schemas {
             generator = SchemaGenerator.reflection {
@@ -74,23 +138,7 @@ private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, 
             }
         }
         security {
-            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
-                type = AuthType.HTTP
-                scheme = AuthScheme.BEARER
-                bearerFormat = "jwt"
-            }
-
-            securityScheme(IDPORTEN_PROVIDER_NAME) {
-                type = AuthType.HTTP
-                scheme = AuthScheme.BEARER
-                bearerFormat = "jwt"
-            }
-
-            securityScheme(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
-                type = AuthType.HTTP
-                scheme = AuthScheme.BEARER
-                bearerFormat = "jwt"
-            }
+            securityConfig()
         }
     }
 }
