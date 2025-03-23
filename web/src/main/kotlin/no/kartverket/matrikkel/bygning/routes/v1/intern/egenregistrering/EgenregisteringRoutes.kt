@@ -101,17 +101,21 @@ private val egenregistreringExample = EgenregistreringRequest(
         byggeaar = 2021,
         kildemateriale = KildematerialeKode.Selvrapportert,
     ),
-    oppvarmingRegistrering = listOf(
-        OppvarmingRegistreringRequest(
-            oppvarming = OppvarmingKode.Elektrisk,
-            kildemateriale = KildematerialeKode.Salgsoppgave,
-            gyldighetsaar = 2021,
+    oppvarmingRegistrering = OppvarmingRegistreringRequest.Data(
+        data = listOf(
+            OppvarmingDataRequest(
+                oppvarming = OppvarmingKode.Elektrisk,
+                kildemateriale = KildematerialeKode.Salgsoppgave,
+                gyldighetsaar = 2021,
+            ),
         ),
     ),
     avlopRegistrering = AvlopRegistreringRequest(
         avlop = AvlopKode.OffentligKloakk,
         kildemateriale = KildematerialeKode.Selvrapportert,
     ),
-    energikildeRegistrering = null,
+    energikildeRegistrering = EnergikildeRegistreringRequest.HarIkke(
+        kildemateriale = KildematerialeKode.Selvrapportert,
+    ),
     vannforsyningRegistrering = null,
 )

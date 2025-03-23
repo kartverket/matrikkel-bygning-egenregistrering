@@ -1,11 +1,16 @@
 package no.kartverket.matrikkel.bygning.application.models
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Felt.EnergikildeOpplysning
 import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
+import no.kartverket.matrikkel.bygning.application.models.Felt.OppvarmingOpplysning
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
@@ -40,8 +45,8 @@ data class Bruksenhet(
     val etasjer: Multikilde<BruksenhetEtasjer> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val totaltBruksareal: Multikilde<Bruksareal> = Multikilde(),
-    val energikilder: Multikilde<List<Energikilde>> = Multikilde(),
-    val oppvarming: Multikilde<List<Oppvarming>> = Multikilde(),
+    val energikilder: Multikilde<EnergikildeOpplysning> = Multikilde(),
+    val oppvarming: Multikilde<OppvarmingOpplysning> = Multikilde(),
     val vannforsyning: Multikilde<Vannforsyning> = Multikilde(),
     val avlop: Multikilde<Avlop> = Multikilde(),
 )
@@ -112,6 +117,94 @@ sealed interface Felt<T> {
         override val data: AvlopKode,
         override val metadata: RegisterMetadata
     ) : Felt<AvlopKode>
+
+    @JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type",
+    )
+    @JsonSubTypes(
+        value = [
+            Type(value = EnergikildeOpplysning.HarIkke::class, name = "harIkke"),
+            Type(value = EnergikildeOpplysning.Data::class, name = "data"),
+        ],
+    )
+    sealed class EnergikildeOpplysning {
+        abstract fun toEnergikilder(): List<Energikilde>
+
+        data class HarIkke private constructor(val metadata: RegisterMetadata) : EnergikildeOpplysning() {
+
+            companion object {
+                fun of(metadata: RegisterMetadata) = HarIkke(metadata)
+            }
+
+            override fun toEnergikilder(): List<Energikilde> = listOf(
+                Energikilde(
+                    data = EnergikildeKode.HarIkke,
+                    metadata = metadata,
+                ),
+            )
+        }
+
+        data class Data private constructor(val data: List<Energikilde>) : EnergikildeOpplysning() {
+
+            companion object {
+                fun of(data: List<Energikilde>): Data {
+                    require(
+                        !data.map { it.data }
+                            .any { it == EnergikildeKode.HarIkke },
+                    ) { "${EnergikildeKode.HarIkke} er ikke en gyldig kode for energikilder" }
+                    return Data(data)
+                }
+            }
+
+            override fun toEnergikilder(): List<Energikilde> = data
+        }
+    }
+
+    @JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type",
+    )
+    @JsonSubTypes(
+        value = [
+            Type(value = EnergikildeOpplysning.HarIkke::class, name = "harIkke"),
+            Type(value = EnergikildeOpplysning.Data::class, name = "data"),
+        ],
+    )
+    sealed class OppvarmingOpplysning {
+        abstract fun toOppvarming(): List<Oppvarming>
+
+        data class HarIkke private constructor(val metadata: RegisterMetadata) : OppvarmingOpplysning() {
+
+            companion object {
+                fun of(metadata: RegisterMetadata) = HarIkke(metadata)
+            }
+
+            override fun toOppvarming(): List<Oppvarming> = listOf(
+                Oppvarming(
+                    data = OppvarmingKode.HarIkke,
+                    metadata = metadata,
+                ),
+            )
+        }
+
+        data class Data private constructor(val data: List<Oppvarming>) : OppvarmingOpplysning() {
+
+            companion object {
+                fun of(data: List<Oppvarming>): Data {
+                    require(
+                        !data.map { it.data }
+                            .any { it == OppvarmingKode.HarIkke },
+                    ) { "${OppvarmingKode.HarIkke} er ikke en gyldig kode for oppvarming" }
+                    return Data(data)
+                }
+            }
+
+            override fun toOppvarming(): List<Oppvarming> = data
+        }
+    }
 
     data class Energikilde(
         override val data: EnergikildeKode,

@@ -46,14 +46,4 @@ class HendelseRepositoryTest : TestWithDb() {
         }
         assertThat(lagredeHendelser).size().isEqualTo(2)
     }
-
-    @BeforeEach
-    fun clearBruksenheter() {
-        dataSource.connection.use { connection ->
-            connection.createStatement().use { statement ->
-                @Suppress("SqlWithoutWhere")
-                statement.execute("DELETE FROM bygning.hendelse")
-            }
-        }
-    }
 }

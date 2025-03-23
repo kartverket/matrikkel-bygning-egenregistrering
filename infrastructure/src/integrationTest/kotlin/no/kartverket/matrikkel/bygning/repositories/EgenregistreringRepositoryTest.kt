@@ -7,7 +7,6 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.EgenregistreringRepositoryImpl
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.*
@@ -34,15 +33,5 @@ class EgenregistreringRepositoryTest : TestWithDb() {
     @Test
     fun `lagring av gyldig egenregistrering skal ikke feile`() {
         egenregistreringRepository.saveEgenregistrering(defaultEgenregistrering, session)
-    }
-
-    @BeforeEach
-    fun clearEgenregistreringer() {
-        dataSource.connection.use { connection ->
-            connection.createStatement().use { statement ->
-                @Suppress("SqlWithoutWhere")
-                statement.execute("DELETE FROM bygning.egenregistrering")
-            }
-        }
     }
 }

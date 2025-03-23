@@ -13,9 +13,11 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.AvlopRe
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikildeDataRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikildeRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EtasjeBetegnelseRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EtasjeBruksarealRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.OppvarmingDataRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.OppvarmingRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.VannforsyningRegistreringRequest
 import java.time.Instant
@@ -38,16 +40,20 @@ internal fun EgenregistreringRequest.Companion.gyldigRequest(bruksenhetId: Long 
         avlop = AvlopKode.OffentligKloakk,
         kildemateriale = KildematerialeKode.Selvrapportert,
     ),
-    energikildeRegistrering = listOf(
-        EnergikildeRegistreringRequest(
-            energikilde = EnergikildeKode.Elektrisitet,
-            kildemateriale = KildematerialeKode.Selvrapportert,
+    energikildeRegistrering = EnergikildeRegistreringRequest.Data(
+        data = listOf(
+            EnergikildeDataRequest(
+                energikilde = EnergikildeKode.Elektrisitet,
+                kildemateriale = KildematerialeKode.Selvrapportert,
+            ),
         ),
     ),
-    oppvarmingRegistrering = listOf(
-        OppvarmingRegistreringRequest(
-            oppvarming = OppvarmingKode.Elektrisk,
-            kildemateriale = KildematerialeKode.Selvrapportert,
+    oppvarmingRegistrering = OppvarmingRegistreringRequest.Data(
+        data = listOf(
+            OppvarmingDataRequest(
+                oppvarming = OppvarmingKode.Elektrisk,
+                kildemateriale = KildematerialeKode.Selvrapportert,
+            ),
         ),
     ),
 )

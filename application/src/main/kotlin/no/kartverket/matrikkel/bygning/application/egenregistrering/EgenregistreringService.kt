@@ -9,7 +9,7 @@ import no.kartverket.matrikkel.bygning.application.hendelser.HendelsePayload.Bru
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseRepository
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
-import no.kartverket.matrikkel.bygning.application.models.applyEgenregistrering
+import no.kartverket.matrikkel.bygning.application.models.aggregering.applyEgenregistrering
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.application.transaction.Transactional
 

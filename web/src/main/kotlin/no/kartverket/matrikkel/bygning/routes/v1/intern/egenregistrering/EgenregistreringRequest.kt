@@ -1,15 +1,19 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering
 
+import io.github.smiley4.schemakenerator.core.annotations.Name
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.EnergikildeDataRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
+import no.kartverket.matrikkel.bygning.application.models.OppvarmingDataRegistrering
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.VannforsyningRegistrering
@@ -32,8 +36,8 @@ data class EgenregistreringRequest(
     val byggeaarRegistrering: ByggeaarRegistreringRequest?,
     val vannforsyningRegistrering: VannforsyningRegistreringRequest?,
     val avlopRegistrering: AvlopRegistreringRequest?,
-    val energikildeRegistrering: List<EnergikildeRegistreringRequest>?,
-    val oppvarmingRegistrering: List<OppvarmingRegistreringRequest>?,
+    val oppvarmingRegistrering: OppvarmingRegistreringRequest?,
+    val energikildeRegistrering: EnergikildeRegistreringRequest?,
 )
 
 @Serializable
@@ -78,7 +82,21 @@ data class AvlopRegistreringRequest(
 )
 
 @Serializable
-data class EnergikildeRegistreringRequest(
+sealed class EnergikildeRegistreringRequest {
+
+    @Serializable
+    @SerialName("harIkke")
+    @Name("harIkke")
+    data class HarIkke(val kildemateriale: KildematerialeKode) : EnergikildeRegistreringRequest()
+
+    @Serializable
+    @SerialName("data")
+    @Name("data")
+    data class Data(val data: List<EnergikildeDataRequest>) : EnergikildeRegistreringRequest()
+}
+
+@Serializable
+data class EnergikildeDataRequest(
     val energikilde: EnergikildeKode,
     val kildemateriale: KildematerialeKode,
     val gyldighetsaar: Int? = null,
@@ -86,7 +104,21 @@ data class EnergikildeRegistreringRequest(
 )
 
 @Serializable
-data class OppvarmingRegistreringRequest(
+sealed class OppvarmingRegistreringRequest {
+
+    @Serializable
+    @SerialName("harIkke")
+    @Name("harIkke")
+    data class HarIkke(val kildemateriale: KildematerialeKode) : OppvarmingRegistreringRequest()
+
+    @Serializable
+    @SerialName("data")
+    @Name("data")
+    data class Data(val data: List<OppvarmingDataRequest>) : OppvarmingRegistreringRequest()
+}
+
+@Serializable
+data class OppvarmingDataRequest(
     val oppvarming: OppvarmingKode,
     val kildemateriale: KildematerialeKode,
     val gyldighetsaar: Int? = null,
@@ -137,22 +169,42 @@ fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
                 opphoersaar = it.opphoersaar,
             )
         },
-        energikildeRegistrering = energikildeRegistrering?.map {
-            EnergikildeRegistrering(
-                energikilde = it.energikilde,
-                kildemateriale = it.kildemateriale,
-                gyldighetsaar = it.gyldighetsaar,
-                opphoersaar = it.opphoersaar,
-            )
+        energikildeRegistrering = energikildeRegistrering?.let { energikildeRegistrering ->
+            when (energikildeRegistrering) {
+                is EnergikildeRegistreringRequest.HarIkke -> EnergikildeRegistrering.HarIkke(
+                    kildemateriale = energikildeRegistrering.kildemateriale,
+                )
+
+                is EnergikildeRegistreringRequest.Data -> EnergikildeRegistrering.Data(
+                    data = energikildeRegistrering.data.map {
+                        EnergikildeDataRegistrering(
+                            energikilde = it.energikilde,
+                            kildemateriale = it.kildemateriale,
+                            gyldighetsaar = it.gyldighetsaar,
+                            opphoersaar = it.opphoersaar,
+                        )
+                    },
+                )
+            }
         },
-        oppvarmingRegistrering = oppvarmingRegistrering?.map {
-            OppvarmingRegistrering(
-                oppvarming = it.oppvarming,
-                kildemateriale = it.kildemateriale,
-                gyldighetsaar = it.gyldighetsaar,
-                opphoersaar = it.opphoersaar,
-            )
-        },
+        oppvarmingRegistrering = oppvarmingRegistrering?.let { oppvarmingRegistrering ->
+            when (oppvarmingRegistrering) {
+                is OppvarmingRegistreringRequest.HarIkke -> OppvarmingRegistrering.HarIkke(
+                    kildemateriale = oppvarmingRegistrering.kildemateriale,
+                )
+
+                is OppvarmingRegistreringRequest.Data -> OppvarmingRegistrering.Data(
+                    data = oppvarmingRegistrering.data.map {
+                        OppvarmingDataRegistrering(
+                            oppvarming = it.oppvarming,
+                            kildemateriale = it.kildemateriale,
+                            gyldighetsaar = it.gyldighetsaar,
+                            opphoersaar = it.opphoersaar,
+                        )
+                    },
+                )
+            }
+        }
     )
 }
 
