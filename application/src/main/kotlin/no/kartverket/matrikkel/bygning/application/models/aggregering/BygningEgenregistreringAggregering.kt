@@ -1,13 +1,22 @@
-package no.kartverket.matrikkel.bygning.application.models
+package no.kartverket.matrikkel.bygning.application.models.aggregering
 
+import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
+import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
+import no.kartverket.matrikkel.bygning.application.models.BruksenhetEtasje
+import no.kartverket.matrikkel.bygning.application.models.Bygning
+import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Felt.Avlop
 import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
-import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
-import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
+import no.kartverket.matrikkel.bygning.application.models.Felt.EnergikildeOpplysning
+import no.kartverket.matrikkel.bygning.application.models.Felt.OppvarmingOpplysning
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
-import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
+import no.kartverket.matrikkel.bygning.application.models.Gyldighetsperiode
+import no.kartverket.matrikkel.bygning.application.models.Multikilde
+import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
+import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 
 fun Bygning.applyEgenregistreringer(egenregistreringer: List<Egenregistrering>): Bygning =
     egenregistreringer.sortedBy { it.registreringstidspunkt }.fold(this) { bygningAggregate, egenregistrering ->
@@ -80,40 +89,50 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
             },
         energikilder =
             this.energikilder.aggregate(bruksenhetRegistrering.energikildeRegistrering) { energikildeRegistrering ->
-                val currentEnergikilder = energikilder.egenregistrert.orEmpty()
+                when (energikildeRegistrering) {
+                    is EnergikildeRegistrering.HarIkke ->
+                        EnergikildeOpplysning.HarIkke.of(
+                            metadata = metadata.withKildemateriale(energikildeRegistrering.kildemateriale),
+                        )
 
-                val (newEnergikilderToUpdate, newEnergikilderToAdd) =
-                    energikildeRegistrering
-                        .map {
-                            it.toEnergikilde(
-                                metadata,
-                            )
-                        }.partition { energikilde ->
-                            energikilde.data in currentEnergikilder.map { current -> current.data }
-                        }
-
-                currentEnergikilder
-                    .map { energikilde ->
-                        newEnergikilderToUpdate.find { it.data == energikilde.data } ?: energikilde
-                    }.plus(newEnergikilderToAdd)
-                    .filter { !it.erOpphoert() }
+                    is EnergikildeRegistrering.Data ->
+                        EnergikildeOpplysning.Data.of(
+                            data =
+                                oppdaterEnergikilder(
+                                    energikildeRegistrering = energikildeRegistrering,
+                                    metadata = metadata,
+                                    currentEnergikilder =
+                                        when (this.energikilder.egenregistrert) {
+                                            is EnergikildeOpplysning.Data -> this.energikilder.egenregistrert.data
+                                            is EnergikildeOpplysning.HarIkke, null -> emptyList()
+                                        },
+                                ),
+                        )
+                }
             },
         oppvarming =
             this.oppvarming.aggregate(bruksenhetRegistrering.oppvarmingRegistrering) { oppvarmingRegistrering ->
-                val currentOppvarming = oppvarming.egenregistrert.orEmpty()
+                when (oppvarmingRegistrering) {
+                    is OppvarmingRegistrering.HarIkke ->
+                        OppvarmingOpplysning.HarIkke.of(
+                            metadata = metadata.withKildemateriale(oppvarmingRegistrering.kildemateriale),
+                        )
 
-                val (newOppvarmingToUpdate, newOppvarmingToAdd) =
-                    oppvarmingRegistrering
-                        .map { it.toOppvarming(metadata) }
-                        .partition { oppvarming ->
-                            oppvarming.data in currentOppvarming.map { current -> current.data }
-                        }
-
-                currentOppvarming
-                    .map { oppvarming ->
-                        newOppvarmingToUpdate.find { it.data == oppvarming.data } ?: oppvarming
-                    }.plus(newOppvarmingToAdd)
-                    .filter { !it.erOpphoert() }
+                    is OppvarmingRegistrering.Data ->
+                        OppvarmingOpplysning.Data.of(
+                            data =
+                                oppdaterOppvarming(
+                                    oppvarmingRegistrering =
+                                    oppvarmingRegistrering,
+                                    metadata = metadata,
+                                    currentOppvarming =
+                                        when (this.oppvarming.egenregistrert) {
+                                            is OppvarmingOpplysning.Data -> this.oppvarming.egenregistrert.data
+                                            is OppvarmingOpplysning.HarIkke, null -> emptyList()
+                                        },
+                                ),
+                        )
+                }
             },
         etasjer =
             this.etasjer.aggregate(
@@ -134,24 +153,6 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
     )
 }
 
-private fun OppvarmingRegistrering.toOppvarming(metadata: RegisterMetadata): Oppvarming =
-    Oppvarming(
-        data = this.oppvarming,
-        metadata =
-            metadata.withKildemateriale(this.kildemateriale).withGyldighetsperiode(
-                Gyldighetsperiode.of(gyldighetsaar = this.gyldighetsaar, opphoersaar = this.opphoersaar),
-            ),
-    )
-
-private fun EnergikildeRegistrering.toEnergikilde(metadata: RegisterMetadata): Energikilde =
-    Energikilde(
-        data = this.energikilde,
-        metadata =
-            metadata.withKildemateriale(this.kildemateriale).withGyldighetsperiode(
-                Gyldighetsperiode.of(gyldighetsaar = this.gyldighetsaar, opphoersaar = this.opphoersaar),
-            ),
-    )
-
 private fun BruksarealRegistrering?.isBothEtasjeAndTotalRegistrert(): Boolean =
     this?.totaltBruksareal != null && etasjeRegistreringer?.isNotEmpty() == true
 
@@ -170,9 +171,3 @@ private fun <T : Any, V : Any> Multikilde<T>.aggregate(
 
     return withEgenregistrert(mapper(registrering))
 }
-
-private fun RegisterMetadata.withKildemateriale(kildemateriale: KildematerialeKode?): RegisterMetadata =
-    this.copy(kildemateriale = kildemateriale)
-
-private fun RegisterMetadata.withGyldighetsperiode(gyldighetsperiode: Gyldighetsperiode): RegisterMetadata =
-    this.copy(gyldighetsperiode = gyldighetsperiode)

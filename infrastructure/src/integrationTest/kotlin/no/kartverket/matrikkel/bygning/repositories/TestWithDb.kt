@@ -6,11 +6,27 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.createDataSource
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.testcontainers.containers.PostgreSQLContainer
 import javax.sql.DataSource
 
 abstract class TestWithDb {
+    @AfterEach
+    fun clearData() {
+        dataSource.connection.use { connection ->
+            connection.createStatement().use { statement ->
+                statement.execute(
+                    """
+                    DELETE FROM bygning.bruksenhet;
+                    DELETE FROM bygning.egenregistrering;
+                    DELETE FROM bygning.hendelse;
+                    """,
+                )
+            }
+        }
+    }
+
     companion object {
         private val postgresSQLContainer = PostgreSQLContainer("postgres:15-alpine")
 

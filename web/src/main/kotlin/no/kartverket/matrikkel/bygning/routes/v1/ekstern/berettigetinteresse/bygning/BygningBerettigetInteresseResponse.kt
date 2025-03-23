@@ -67,6 +67,6 @@ fun Bruksenhet.toBruksenhetBerettigetInteresseResponse(): BruksenhetBerettigetIn
             },
         vannforsyning = this.vannforsyning.egenregistrert?.data,
         avlop = this.avlop.egenregistrert?.data,
-        energikilder = this.energikilder.egenregistrert?.map { it.data },
-        oppvarming = this.oppvarming.egenregistrert?.map { it.data },
+        energikilder = this.energikilder.egenregistrert?.let { opplysning -> opplysning.toEnergikilder().map { it.data } },
+        oppvarming = this.oppvarming.egenregistrert?.let { opplysning -> opplysning.toOppvarming().map { it.data } },
     )

@@ -193,6 +193,14 @@ fun Bruksenhet.toBruksenhetMedPersondataResponse(): BruksenhetMedPersondataRespo
                 ::VannforsyningKodeMedPersondataResponse,
             ),
         avlop = toFeltMedPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeMedPersondataResponse),
-        energikilder = toListeFeltMedPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeMedPersondataResponse),
-        oppvarming = toListeFeltMedPersondataResponse(this.oppvarming.egenregistrert, ::OppvarmingMedPersondataResponse),
+        energikilder =
+            toListeFeltMedPersondataResponse(
+                this.energikilder.egenregistrert?.toEnergikilder(),
+                ::EnergikildeMedPersondataResponse,
+            ),
+        oppvarming =
+            toListeFeltMedPersondataResponse(
+                this.oppvarming.egenregistrert?.toOppvarming(),
+                ::OppvarmingMedPersondataResponse,
+            ),
     )

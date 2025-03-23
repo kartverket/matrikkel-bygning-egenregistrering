@@ -179,6 +179,14 @@ fun Bruksenhet.toBruksenhetUtenPersondataResponse(): BruksenhetUtenPersondataRes
         etasjer = this.etasjer.egenregistrert?.toEtasjeUtenPersondataResponse(),
         vannforsyning = toFeltUtenPersondataResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeUtenPersondataResponse),
         avlop = toFeltUtenPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeUtenPersondataResponse),
-        energikilder = toListeFeltUtenPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeUtenPersondataResponse),
-        oppvarming = toListeFeltUtenPersondataResponse(this.oppvarming.egenregistrert, ::OppvarmingUtenPersondataResponse),
+        energikilder =
+            toListeFeltUtenPersondataResponse(
+                this.energikilder.egenregistrert?.toEnergikilder(),
+                ::EnergikildeUtenPersondataResponse,
+            ),
+        oppvarming =
+            toListeFeltUtenPersondataResponse(
+                this.oppvarming.egenregistrert?.toOppvarming(),
+                ::OppvarmingUtenPersondataResponse,
+            ),
     )

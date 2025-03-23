@@ -62,7 +62,17 @@ data class AvlopRegistrering(
 ) : HasKildemateriale,
     HasGyldighetPeriode
 
-data class EnergikildeRegistrering(
+sealed class EnergikildeRegistrering {
+    data class HarIkke(
+        val kildemateriale: KildematerialeKode,
+    ) : EnergikildeRegistrering()
+
+    data class Data(
+        val data: List<EnergikildeDataRegistrering>,
+    ) : EnergikildeRegistrering()
+}
+
+data class EnergikildeDataRegistrering(
     val energikilde: EnergikildeKode,
     override val kildemateriale: KildematerialeKode,
     override val gyldighetsaar: Int?,
@@ -70,7 +80,17 @@ data class EnergikildeRegistrering(
 ) : HasKildemateriale,
     HasGyldighetPeriode
 
-data class OppvarmingRegistrering(
+sealed class OppvarmingRegistrering {
+    data class HarIkke(
+        val kildemateriale: KildematerialeKode,
+    ) : OppvarmingRegistrering()
+
+    data class Data(
+        val data: List<OppvarmingDataRegistrering>,
+    ) : OppvarmingRegistrering()
+}
+
+data class OppvarmingDataRegistrering(
     val oppvarming: OppvarmingKode,
     override val kildemateriale: KildematerialeKode,
     override val gyldighetsaar: Int?,
@@ -84,8 +104,8 @@ data class BruksenhetRegistrering(
     val byggeaarRegistrering: ByggeaarRegistrering?,
     val vannforsyningRegistrering: VannforsyningRegistrering?,
     val avlopRegistrering: AvlopRegistrering?,
-    val energikildeRegistrering: List<EnergikildeRegistrering>?,
-    val oppvarmingRegistrering: List<OppvarmingRegistrering>?,
+    val energikildeRegistrering: EnergikildeRegistrering?,
+    val oppvarmingRegistrering: OppvarmingRegistrering?,
 )
 
 data class Egenregistrering(

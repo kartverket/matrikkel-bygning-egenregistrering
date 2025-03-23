@@ -17,7 +17,6 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygning.BygningRepositoryImpl
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -164,15 +163,5 @@ class BygningRepositoryTest : TestWithDb() {
         val beforeAnyRegistrations =
             bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.parse("2020-01-01T12:00:00.00Z"))
         assertThat(beforeAnyRegistrations).isNull()
-    }
-
-    @BeforeEach
-    fun clearBruksenheter() {
-        dataSource.connection.use { connection ->
-            connection.createStatement().use { statement ->
-                @Suppress("SqlWithoutWhere")
-                statement.execute("DELETE FROM bygning.bruksenhet")
-            }
-        }
     }
 }
