@@ -13,6 +13,8 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.AvlopKodeMedPersondataResponse
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.BruksarealMedPersondataResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.BruksenhetEtasjerMedPersondataResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.BruksenhetEtasjerMedPersondataResponse.BruksenhetEtasjeMedPersondataResponse
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.ByggeaarMedPersondataResponse
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.EnergikildeMedPersondataResponse
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.OppvarmingMedPersondataResponse
@@ -32,6 +34,7 @@ data class BruksenhetMedPersondataResponse(
     val bruksenhetId: Long,
     val byggeaar: ByggeaarMedPersondataResponse?,
     val totaltBruksareal: BruksarealMedPersondataResponse?,
+    val etasjer: BruksenhetEtasjerMedPersondataResponse?,
     val vannforsyning: VannforsyningKodeMedPersondataResponse?,
     val avlop: AvlopKodeMedPersondataResponse?,
     val energikilder: List<EnergikildeMedPersondataResponse>?,
@@ -53,6 +56,18 @@ sealed interface FeltMedPersondataResponse<T> {
         override val data: Double,
         override val metadata: RegisterMetadataMedPersondataResponse
     ) : FeltMedPersondataResponse<Double>
+
+    @Serializable
+    data class BruksenhetEtasjerMedPersondataResponse(
+        override val data: List<BruksenhetEtasjeMedPersondataResponse>,
+        override val metadata: RegisterMetadataMedPersondataResponse
+    ) : FeltMedPersondataResponse<List<BruksenhetEtasjeMedPersondataResponse>> {
+        @Serializable
+        data class BruksenhetEtasjeMedPersondataResponse(
+            val etasjeBetegnelse: String,
+            val bruksareal: Double
+        )
+    }
 
     @Serializable
     data class VannforsyningKodeMedPersondataResponse(
@@ -99,14 +114,15 @@ fun Bygning.toBygningMedPersondataResponse(): BygningMedPersondataResponse = Byg
     },
 )
 
-private fun RegisterMetadata.toRegisterMetadataMedPersondataResponse(): RegisterMetadataMedPersondataResponse = RegisterMetadataMedPersondataResponse(
-    registreringstidspunkt = registreringstidspunkt,
-    kildemateriale = kildemateriale,
-    prosess = prosess,
-    registrertAv = registrertAv.value,
-    gyldighetsaar = gyldighetsperiode.gyldighetsaar?.value,
-    opphoersaar = gyldighetsperiode.opphoersaar?.value
-)
+private fun RegisterMetadata.toRegisterMetadataMedPersondataResponse(): RegisterMetadataMedPersondataResponse =
+    RegisterMetadataMedPersondataResponse(
+        registreringstidspunkt = registreringstidspunkt,
+        kildemateriale = kildemateriale,
+        prosess = prosess,
+        registrertAv = registrertAv.value,
+        gyldighetsaar = gyldighetsperiode.gyldighetsaar?.value,
+        opphoersaar = gyldighetsperiode.opphoersaar?.value,
+    )
 
 internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPersondataResponse(
     felt: T?,
@@ -118,7 +134,7 @@ internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toFeltMedPerson
 
     return constructor(
         felt.data,
-        felt.metadata.toRegisterMetadataMedPersondataResponse()
+        felt.metadata.toRegisterMetadataMedPersondataResponse(),
     )
 }
 
@@ -133,23 +149,35 @@ internal fun <U, T : Felt<U>, O : FeltMedPersondataResponse<U>?> toListeFeltMedP
     return list.map { felt ->
         constructor(
             felt.data,
-            felt.metadata.toRegisterMetadataMedPersondataResponse()
+            felt.metadata.toRegisterMetadataMedPersondataResponse(),
         )
     }
 }
+
+private fun Felt.BruksenhetEtasjer.toEtasjeMedPersondataResponse(): BruksenhetEtasjerMedPersondataResponse =
+    BruksenhetEtasjerMedPersondataResponse(
+        data = this.data.map {
+            BruksenhetEtasjeMedPersondataResponse(
+                etasjeBetegnelse = it.etasjebetegnelse.toString(),
+                bruksareal = it.bruksareal,
+            )
+        },
+        metadata = this.metadata.toRegisterMetadataMedPersondataResponse(),
+    )
 
 fun Bruksenhet.toBruksenhetMedPersondataResponse(): BruksenhetMedPersondataResponse = BruksenhetMedPersondataResponse(
     bruksenhetId = this.bruksenhetBubbleId.value,
     byggeaar = toFeltMedPersondataResponse(this.byggeaar.egenregistrert, ::ByggeaarMedPersondataResponse),
     totaltBruksareal = toFeltMedPersondataResponse(
         this.totaltBruksareal.egenregistrert,
-        ::BruksarealMedPersondataResponse
+        ::BruksarealMedPersondataResponse,
     ),
+    etasjer = this.etasjer.egenregistrert?.toEtasjeMedPersondataResponse(),
     vannforsyning = toFeltMedPersondataResponse(
         this.vannforsyning.egenregistrert,
-        ::VannforsyningKodeMedPersondataResponse
+        ::VannforsyningKodeMedPersondataResponse,
     ),
     avlop = toFeltMedPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeMedPersondataResponse),
-    energikilder = toListeFeltMedPersondataResponse(this.energikilder.egenregistrert, :: EnergikildeMedPersondataResponse),
-    oppvarming = toListeFeltMedPersondataResponse(this.oppvarming.egenregistrert, :: OppvarmingMedPersondataResponse),
+    energikilder = toListeFeltMedPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeMedPersondataResponse),
+    oppvarming = toListeFeltMedPersondataResponse(this.oppvarming.egenregistrert, ::OppvarmingMedPersondataResponse),
 )
