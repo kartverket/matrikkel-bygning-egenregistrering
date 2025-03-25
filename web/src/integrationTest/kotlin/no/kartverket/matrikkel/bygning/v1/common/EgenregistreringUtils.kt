@@ -32,7 +32,7 @@ internal fun EgenregistreringRequest.Companion.gyldigRequest(bruksenhetId: Long 
         vannforsyning = VannforsyningKode.OffentligVannverk,
         kildemateriale = KildematerialeKode.Salgsoppgave,
         gyldighetsaar = 2010,
-        opphoersaar = 2020,
+        opphoersaar = null,
     ),
     avlopRegistrering = AvlopRegistreringRequest(
         avlop = AvlopKode.OffentligKloakk,

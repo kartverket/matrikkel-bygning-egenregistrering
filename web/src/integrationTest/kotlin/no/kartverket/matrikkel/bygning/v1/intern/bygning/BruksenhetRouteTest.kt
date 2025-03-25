@@ -144,7 +144,6 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
                 prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
                 prop(VannforsyningKodeInternResponse::metadata).all {
                     prop(RegisterMetadataInternResponse::gyldighetsaar).isEqualTo(2010)
-                    prop(RegisterMetadataInternResponse::opphoersaar).isEqualTo(2020)
                 }
             }
         }

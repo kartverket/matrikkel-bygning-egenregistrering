@@ -231,13 +231,13 @@ class BygningEgenregistreringAggregeringTest {
                         energikilde = EnergikildeKode.Elektrisitet,
                         kildemateriale = KildematerialeKode.Salgsoppgave,
                         gyldighetsaar = 2010,
-                        opphoersaar = 2015,
+                        opphoersaar = null,
                     ),
                     EnergikildeRegistrering(
                         energikilde = EnergikildeKode.AnnenEnergikilde,
                         kildemateriale = KildematerialeKode.Salgsoppgave,
                         gyldighetsaar = 2010,
-                        opphoersaar = 2015,
+                        opphoersaar = null,
                     ),
                 ),
             ),
@@ -251,13 +251,13 @@ class BygningEgenregistreringAggregeringTest {
                         energikilde = EnergikildeKode.Elektrisitet,
                         kildemateriale = KildematerialeKode.Salgsoppgave,
                         gyldighetsaar = 2015,
-                        opphoersaar = 2020,
+                        opphoersaar = null,
                     ),
                     EnergikildeRegistrering(
                         energikilde = EnergikildeKode.Fjernvarme,
                         kildemateriale = KildematerialeKode.Salgsoppgave,
                         gyldighetsaar = 2020,
-                        opphoersaar = 2022,
+                        opphoersaar = null,
                     ),
                 ),
             ),
@@ -281,7 +281,6 @@ class BygningEgenregistreringAggregeringTest {
                         prop(Felt.Energikilde::metadata).all {
                             prop(RegisterMetadata::gyldighetsperiode).all {
                                 prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
                             }
                         }
                     }
@@ -290,7 +289,6 @@ class BygningEgenregistreringAggregeringTest {
                         prop(Felt.Energikilde::metadata).all {
                             prop(RegisterMetadata::gyldighetsperiode).all {
                                 prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
                             }
                         }
                     }
@@ -306,7 +304,6 @@ class BygningEgenregistreringAggregeringTest {
                         prop(Felt.Energikilde::metadata).all {
                             prop(RegisterMetadata::gyldighetsperiode).all {
                                 prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2015))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2020))
                             }
                         }
                     }
@@ -315,7 +312,6 @@ class BygningEgenregistreringAggregeringTest {
                         prop(Felt.Energikilde::metadata).all {
                             prop(RegisterMetadata::gyldighetsperiode).all {
                                 prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
                             }
                         }
                     }
@@ -324,7 +320,6 @@ class BygningEgenregistreringAggregeringTest {
                         prop(Felt.Energikilde::metadata).all {
                             prop(RegisterMetadata::gyldighetsperiode).all {
                                 prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2020))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2022))
                             }
                         }
                     }
