@@ -122,4 +122,8 @@ sealed interface Felt<T> {
         override val data: OppvarmingKode,
         override val metadata: RegisterMetadata
     ) : Felt<OppvarmingKode>
+
+    fun erOpphoert(): Boolean {
+        return metadata.gyldighetsperiode.opphoersaar != null
+    }
 }

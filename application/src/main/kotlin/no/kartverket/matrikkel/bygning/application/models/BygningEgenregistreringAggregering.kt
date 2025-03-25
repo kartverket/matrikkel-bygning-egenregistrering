@@ -62,7 +62,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
                     .withGyldighetsperiode(
                         Gyldighetsperiode.of(gyldighetsaar = it.gyldighetsaar, opphoersaar = it.opphoersaar),
                     ),
-            )
+            ).takeIf { !it.erOpphoert() }
         },
         avlop = this.avlop.aggregate(bruksenhetRegistrering.avlopRegistrering) {
             Avlop(
@@ -72,7 +72,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
                     .withGyldighetsperiode(
                         Gyldighetsperiode.of(gyldighetsaar = it.gyldighetsaar, opphoersaar = it.opphoersaar),
                     ),
-            )
+            ).takeIf { !it.erOpphoert() }
         },
 
         energikilder = this.energikilder.aggregate(bruksenhetRegistrering.energikildeRegistrering) { energikildeRegistrering ->
@@ -87,6 +87,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
             currentEnergikilder
                 .map { energikilde -> newEnergikilderToUpdate.find { it.data == energikilde.data } ?: energikilde }
                 .plus(newEnergikilderToAdd)
+                .filter { !it.erOpphoert() }
         },
 
         oppvarming = this.oppvarming.aggregate(bruksenhetRegistrering.oppvarmingRegistrering) { oppvarmingRegistrering ->
@@ -101,6 +102,7 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
             currentOppvarming
                 .map { oppvarming -> newOppvarmingToUpdate.find { it.data == oppvarming.data } ?: oppvarming }
                 .plus(newOppvarmingToAdd)
+                .filter { !it.erOpphoert() }
         },
 
         etasjer = this.etasjer.aggregate(

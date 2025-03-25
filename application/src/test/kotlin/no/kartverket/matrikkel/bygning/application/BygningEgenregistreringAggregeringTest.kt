@@ -6,7 +6,9 @@ import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import assertk.assertions.isNullOrEmpty
 import assertk.assertions.prop
+import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
@@ -31,6 +33,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
+import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -323,6 +326,128 @@ class BygningEgenregistreringAggregeringTest {
                                 prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2020))
                                 prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2022))
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `registrering av opphoersdato skal gjøre at verdien ikke returneres`() {
+        val registreringUtenOpphoer = defaultEgenregistrering.copy(
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
+                avlopRegistrering = AvlopRegistrering(
+                    avlop = AvlopKode.OffentligKloakk,
+                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                    gyldighetsaar = 2010,
+                    opphoersaar = null,
+                ),
+                energikildeRegistrering = listOf(
+                    EnergikildeRegistrering(
+                        energikilde = EnergikildeKode.Elektrisitet,
+                        kildemateriale = KildematerialeKode.Salgsoppgave,
+                        gyldighetsaar = 2010,
+                        opphoersaar = null,
+                    ),
+                ),
+            ),
+        )
+
+        val registreringMedOpphoer = defaultEgenregistrering.copy(
+            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(10),
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
+                avlopRegistrering = AvlopRegistrering(
+                    avlop = AvlopKode.OffentligKloakk,
+                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                    gyldighetsaar = 2010,
+                    opphoersaar = 2015,
+                ),
+                energikildeRegistrering = listOf(
+                    EnergikildeRegistrering(
+                        energikilde = EnergikildeKode.Elektrisitet,
+                        kildemateriale = KildematerialeKode.Salgsoppgave,
+                        gyldighetsaar = 2010,
+                        opphoersaar = 2015,
+                    ),
+                ),
+            ),
+        )
+
+        val bruksenhet = defaultBruksenhet.applyEgenregistreringer(listOf(registreringUtenOpphoer, registreringMedOpphoer))
+
+        assertThat(bruksenhet).all {
+            prop(Bruksenhet::energikilder).all {
+                prop(Multikilde<List<Felt.Energikilde>>::egenregistrert).isNullOrEmpty()
+            }
+            prop(Bruksenhet::avlop).all {
+                prop(Multikilde<Felt.Avlop>::egenregistrert).isNull()
+            }
+        }
+    }
+
+    @Test
+    fun `registrering uten opphoersdato der det tidligere var opphørt skal returnere data`() {
+        val registreringMedOpphoer = defaultEgenregistrering.copy(
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
+                avlopRegistrering = AvlopRegistrering(
+                    avlop = AvlopKode.OffentligKloakk,
+                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                    gyldighetsaar = 2010,
+                    opphoersaar = 2015,
+                ),
+                energikildeRegistrering = listOf(
+                    EnergikildeRegistrering(
+                        energikilde = EnergikildeKode.Elektrisitet,
+                        kildemateriale = KildematerialeKode.Salgsoppgave,
+                        gyldighetsaar = 2010,
+                        opphoersaar = 2015,
+                    ),
+                ),
+            ),
+        )
+
+        val registreringUtenOpphoer = defaultEgenregistrering.copy(
+            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(10),
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
+                avlopRegistrering = AvlopRegistrering(
+                    avlop = AvlopKode.OffentligKloakk,
+                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                    gyldighetsaar = 2016,
+                    opphoersaar = null,
+                ),
+                energikildeRegistrering = listOf(
+                    EnergikildeRegistrering(
+                        energikilde = EnergikildeKode.Elektrisitet,
+                        kildemateriale = KildematerialeKode.Salgsoppgave,
+                        gyldighetsaar = 2016,
+                        opphoersaar = null,
+                    ),
+                ),
+            ),
+        )
+
+        val bruksenhet = defaultBruksenhet.applyEgenregistreringer(listOf(registreringUtenOpphoer, registreringMedOpphoer))
+
+        assertThat(bruksenhet).all {
+            prop(Bruksenhet::energikilder).all {
+                prop(Multikilde<List<Felt.Energikilde>>::egenregistrert).isNotNull().all {
+                    index(0).all {
+                        prop(Felt.Energikilde::metadata).all {
+                            prop(RegisterMetadata::gyldighetsperiode).all {
+                                prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2016))
+                                prop(Gyldighetsperiode::opphoersaar).isNull()
+                            }
+                        }
+                    }
+                }
+            }
+            prop(Bruksenhet::avlop).all {
+                prop(Multikilde<Felt.Avlop>::egenregistrert).isNotNull().all {
+                    prop(Felt.Avlop::metadata).all {
+                        prop(RegisterMetadata::gyldighetsperiode).all {
+                            prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2016))
+                            prop(Gyldighetsperiode::opphoersaar).isNull()
                         }
                     }
                 }
