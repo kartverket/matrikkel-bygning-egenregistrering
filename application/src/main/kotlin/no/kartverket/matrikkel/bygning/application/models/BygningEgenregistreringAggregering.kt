@@ -54,23 +54,23 @@ fun Bruksenhet.applyEgenregistrering(egenregistrering: Egenregistrering): Brukse
                 metadata.withKildemateriale(bruksenhetRegistrering.bruksarealRegistrering?.kildemateriale),
             )
         },
-        vannforsyning = this.vannforsyning.aggregate(bruksenhetRegistrering.vannforsyningRegistrering) {
+        vannforsyning = this.vannforsyning.aggregate(bruksenhetRegistrering.vannforsyningRegistrering) { vannforsyningRegistrering ->
             Vannforsyning(
-                data = it.vannforsyning,
+                data = vannforsyningRegistrering.vannforsyning,
                 metadata = metadata
-                    .withKildemateriale(it.kildemateriale)
+                    .withKildemateriale(vannforsyningRegistrering.kildemateriale)
                     .withGyldighetsperiode(
-                        Gyldighetsperiode.of(gyldighetsaar = it.gyldighetsaar, opphoersaar = it.opphoersaar),
+                        Gyldighetsperiode.of(gyldighetsaar = vannforsyningRegistrering.gyldighetsaar, opphoersaar = vannforsyningRegistrering.opphoersaar),
                     ),
             ).takeIf { !it.erOpphoert() }
         },
-        avlop = this.avlop.aggregate(bruksenhetRegistrering.avlopRegistrering) {
+        avlop = this.avlop.aggregate(bruksenhetRegistrering.avlopRegistrering) { avlopRegistrering ->
             Avlop(
-                data = it.avlop,
+                data = avlopRegistrering.avlop,
                 metadata = metadata
-                    .withKildemateriale(it.kildemateriale)
+                    .withKildemateriale(avlopRegistrering.kildemateriale)
                     .withGyldighetsperiode(
-                        Gyldighetsperiode.of(gyldighetsaar = it.gyldighetsaar, opphoersaar = it.opphoersaar),
+                        Gyldighetsperiode.of(gyldighetsaar = avlopRegistrering.gyldighetsaar, opphoersaar = avlopRegistrering.opphoersaar),
                     ),
             ).takeIf { !it.erOpphoert() }
         },
