@@ -64,8 +64,14 @@ sealed interface FeltMedPersondataResponse<T> {
     ) : FeltMedPersondataResponse<List<BruksenhetEtasjeMedPersondataResponse>> {
         @Serializable
         data class BruksenhetEtasjeMedPersondataResponse(
-            val etasjeBetegnelse: String,
+            val etasjeBetegnelse: EtasjeBetegnelseMedPersondataResponse,
             val bruksareal: Double
+        )
+
+        @Serializable
+        data class EtasjeBetegnelseMedPersondataResponse(
+            val etasjeplanKode: String,
+            val etasjenummer: Int,
         )
     }
 
@@ -158,7 +164,10 @@ private fun Felt.BruksenhetEtasjer.toEtasjeMedPersondataResponse(): BruksenhetEt
     BruksenhetEtasjerMedPersondataResponse(
         data = this.data.map {
             BruksenhetEtasjeMedPersondataResponse(
-                etasjeBetegnelse = it.etasjebetegnelse.toString(),
+                etasjeBetegnelse = BruksenhetEtasjerMedPersondataResponse.EtasjeBetegnelseMedPersondataResponse(
+                    etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
+                    etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
+                ),
                 bruksareal = it.bruksareal,
             )
         },
