@@ -29,9 +29,15 @@ data class BruksenhetBerettigetInteresseResponse(
 
 @Serializable
 data class BruksenhetEtasjeBerettigetInteresseResponse(
-    val etasjeBetegnelse: String,
+    val etasjeBetegnelse: EtasjeBetegnelseBerettigetInteresseResponse,
     val bruksareal: Double,
-)
+) {
+    @Serializable
+    data class EtasjeBetegnelseBerettigetInteresseResponse(
+        val etasjeplanKode: String,
+        val etasjenummer: Int,
+    )
+}
 
 fun Bygning.toBygningBerettigetInteresseResponse(): BygningBerettigetInteresseResponse = BygningBerettigetInteresseResponse(
     bygningId = bygningBubbleId.value,
@@ -47,7 +53,10 @@ fun Bruksenhet.toBruksenhetBerettigetInteresseResponse(): BruksenhetBerettigetIn
     totaltBruksareal = this.totaltBruksareal.egenregistrert?.data,
     etasjer = this.etasjer.egenregistrert?.data?.map {
         BruksenhetEtasjeBerettigetInteresseResponse(
-            etasjeBetegnelse = it.etasjebetegnelse.toString(),
+            etasjeBetegnelse = BruksenhetEtasjeBerettigetInteresseResponse.EtasjeBetegnelseBerettigetInteresseResponse(
+                etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
+                etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
+            ),
             bruksareal = it.bruksareal,
         )
     },
