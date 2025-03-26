@@ -15,6 +15,7 @@ import io.ktor.server.testing.*
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.AvlopKodeInternResponse
@@ -27,6 +28,8 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.OppvarmingIntern
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.RegisterMetadataInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKodeInternResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikildeRegistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.OppvarmingRegistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.gyldigRequest
 import no.kartverket.matrikkel.bygning.v1.common.hasRegistreringstidspunktWithinThreshold
@@ -128,13 +131,14 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
         val client = mainModuleWithDatabaseEnvironmentAndClient()
         val token = mockOAuthServer.issueIDPortenJWT()
 
-        client.post("/v1/intern/egenregistreringer") {
+        val egenregistreringResponse = client.post("/v1/intern/egenregistreringer") {
             contentType(ContentType.Application.Json)
             setBody(
                 EgenregistreringRequest.gyldigRequest(2L),
             )
             bearerAuth(token.serialize())
         }
+        assertThat(egenregistreringResponse.status).isEqualTo(HttpStatusCode.Created)
 
         val response = client.get("/v1/intern/bruksenheter/2/egenregistrert")
 
@@ -145,6 +149,68 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
                 prop(VannforsyningKodeInternResponse::metadata).all {
                     prop(RegisterMetadataInternResponse::gyldighetsaar).isEqualTo(2010)
                     prop(RegisterMetadataInternResponse::opphoersaar).isEqualTo(2020)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `gitt at energikilde blir registrert med har ikke, returneres dette som eneste element i listen`() = testApplication {
+        val client = mainModuleWithDatabaseEnvironmentAndClient()
+        val token = mockOAuthServer.issueIDPortenJWT()
+
+        val egenregistreringResponse = client.post("/v1/intern/egenregistreringer") {
+            contentType(ContentType.Application.Json)
+            setBody(
+                EgenregistreringRequest.gyldigRequest().copy(
+                    energikildeRegistrering = EnergikildeRegistreringRequest.HarIkke(KildematerialeKode.Selvrapportert)
+                ),
+            )
+            bearerAuth(token.serialize())
+        }
+
+        assertThat(egenregistreringResponse.status).isEqualTo(HttpStatusCode.Created)
+
+        val response = client.get("/v1/intern/bruksenheter/1/egenregistrert")
+        val now = Instant.now()
+
+        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
+        assertThat(response.body<BruksenhetSimpleResponse>()).all {
+            prop(BruksenhetSimpleResponse::energikilder).isNotNull().all {
+                index(0).all {
+                    prop(EnergikildeInternResponse::data).isEqualTo(EnergikildeKode.HarIkke)
+                    prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `gitt at oppvarming blir registrert med har ikke, returneres dette som eneste element i listen`() = testApplication {
+        val client = mainModuleWithDatabaseEnvironmentAndClient()
+        val token = mockOAuthServer.issueIDPortenJWT()
+
+        val egenregistreringResponse = client.post("/v1/intern/egenregistreringer") {
+            contentType(ContentType.Application.Json)
+            setBody(
+                EgenregistreringRequest.gyldigRequest().copy(
+                    oppvarmingRegistrering = OppvarmingRegistreringRequest.HarIkke(KildematerialeKode.Selvrapportert)
+                ),
+            )
+            bearerAuth(token.serialize())
+        }
+
+        assertThat(egenregistreringResponse.status).isEqualTo(HttpStatusCode.Created)
+
+        val response = client.get("/v1/intern/bruksenheter/1/egenregistrert")
+        val now = Instant.now()
+
+        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
+        assertThat(response.body<BruksenhetSimpleResponse>()).all {
+            prop(BruksenhetSimpleResponse::oppvarming).isNotNull().all {
+                index(0).all {
+                    prop(OppvarmingInternResponse::data).isEqualTo(OppvarmingKode.HarIkke)
+                    prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
             }
         }

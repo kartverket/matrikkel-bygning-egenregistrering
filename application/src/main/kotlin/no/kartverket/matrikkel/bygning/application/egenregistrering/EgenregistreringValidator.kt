@@ -4,6 +4,8 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
+import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.error.MultipleValidationError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 
@@ -33,10 +35,8 @@ class EgenregistreringValidator {
         }
 
         private fun validateListeregistreringDuplicates(egenregistrering: Egenregistrering): ValidationError? {
-            val oppvarmingHasDuplicate =
-                egenregistrering.bruksenhetRegistrering.oppvarmingRegistrering.hasDuplicateElements { it.oppvarming }
-            val energikilderHasDuplicate =
-                egenregistrering.bruksenhetRegistrering.energikildeRegistrering.hasDuplicateElements { it.energikilde }
+            val oppvarmingHasDuplicate = oppvarmingHasDuplicates(egenregistrering.bruksenhetRegistrering.oppvarmingRegistrering)
+            val energikilderHasDuplicate = energikildeHasDuplicates(egenregistrering.bruksenhetRegistrering.energikildeRegistrering)
 
             return if (oppvarmingHasDuplicate || energikilderHasDuplicate) {
                 ValidationError(
@@ -45,6 +45,16 @@ class EgenregistreringValidator {
             } else {
                 null
             }
+        }
+
+        private fun oppvarmingHasDuplicates(oppvarmingRegistrering: OppvarmingRegistrering?) = when (oppvarmingRegistrering) {
+            is OppvarmingRegistrering.Data -> oppvarmingRegistrering.data.hasDuplicateElements { it.oppvarming }
+            is OppvarmingRegistrering.HarIkke, null -> false
+        }
+
+        private fun energikildeHasDuplicates(energikildeRegistrering: EnergikildeRegistrering?) = when (energikildeRegistrering) {
+            is EnergikildeRegistrering.Data -> energikildeRegistrering.data.hasDuplicateElements { it.energikilde }
+            is EnergikildeRegistrering.HarIkke, null -> false
         }
 
         private fun <T> List<T>?.hasDuplicateElements(keySelector: (T) -> Any): Boolean =

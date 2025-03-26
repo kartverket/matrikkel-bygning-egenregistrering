@@ -4,6 +4,7 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
@@ -13,6 +14,7 @@ import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Bygning
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.EnergikildeDataRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
@@ -25,7 +27,7 @@ import no.kartverket.matrikkel.bygning.application.models.Gyldighetsperiode
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
-import no.kartverket.matrikkel.bygning.application.models.applyEgenregistreringer
+import no.kartverket.matrikkel.bygning.application.models.aggregering.applyEgenregistreringer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
@@ -127,8 +129,7 @@ class BygningEgenregistreringAggregeringTest {
 
         val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(defaultEgenregistrering, firstRegistrering))
 
-        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.metadata?.prosess)
-            .isEqualTo(ProsessKode.Egenregistrering)
+        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.metadata?.prosess).isEqualTo(ProsessKode.Egenregistrering)
     }
 
     @Test
@@ -144,11 +145,9 @@ class BygningEgenregistreringAggregeringTest {
             ),
         )
 
-        val aggregatedBygning =
-            defaultBygning.applyEgenregistreringer(listOf(firstRegistrering, defaultEgenregistrering))
+        val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(firstRegistrering, defaultEgenregistrering))
 
-        assertThat(aggregatedBygning.bruksenheter.single().byggeaar.egenregistrert?.metadata?.kildemateriale)
-            .isEqualTo(KildematerialeKode.Byggesaksdokumenter)
+        assertThat(aggregatedBygning.bruksenheter.single().byggeaar.egenregistrert?.metadata?.kildemateriale).isEqualTo(KildematerialeKode.Byggesaksdokumenter)
     }
 
     @Test
@@ -167,8 +166,7 @@ class BygningEgenregistreringAggregeringTest {
 
         val aggregatedBygning = defaultBygning.applyEgenregistreringer(listOf(laterRegistrering, defaultEgenregistrering))
 
-        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data)
-            .isEqualTo(150.0)
+        assertThat(aggregatedBygning.bruksenheter.single().totaltBruksareal.egenregistrert?.data).isEqualTo(150.0)
     }
 
     @Test
@@ -223,38 +221,43 @@ class BygningEgenregistreringAggregeringTest {
     fun `registrering av listeverdier skal beholde gamle, oppdatere like, og legge inn nye verdier`() {
         val registrering1 = defaultEgenregistrering.copy(
             bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                energikildeRegistrering = listOf(
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.Elektrisitet,
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        gyldighetsaar = 2010,
-                        opphoersaar = 2015,
-                    ),
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.AnnenEnergikilde,
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        gyldighetsaar = 2010,
-                        opphoersaar = 2015,
+                energikildeRegistrering = EnergikildeRegistrering.Data(
+                    data = listOf(
+                        EnergikildeDataRegistrering(
+                            energikilde = EnergikildeKode.Elektrisitet,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            gyldighetsaar = 2010,
+                            opphoersaar = 2015,
+                        ),
+                        EnergikildeDataRegistrering(
+                            energikilde = EnergikildeKode.AnnenEnergikilde,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            gyldighetsaar = 2010,
+                            opphoersaar = 2015,
+                        ),
                     ),
                 ),
             ),
         )
 
+
         val registrering2 = defaultEgenregistrering.copy(
             registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(10),
             bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
-                energikildeRegistrering = listOf(
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.Elektrisitet,
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        gyldighetsaar = 2015,
-                        opphoersaar = 2020,
-                    ),
-                    EnergikildeRegistrering(
-                        energikilde = EnergikildeKode.Fjernvarme,
-                        kildemateriale = KildematerialeKode.Salgsoppgave,
-                        gyldighetsaar = 2020,
-                        opphoersaar = 2022,
+                energikildeRegistrering = EnergikildeRegistrering.Data(
+                    data = listOf(
+                        EnergikildeDataRegistrering(
+                            energikilde = EnergikildeKode.Elektrisitet,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            gyldighetsaar = 2015,
+                            opphoersaar = 2020,
+                        ),
+                        EnergikildeDataRegistrering(
+                            energikilde = EnergikildeKode.Fjernvarme,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            gyldighetsaar = 2020,
+                            opphoersaar = 2022,
+                        ),
                     ),
                 ),
             ),
@@ -266,66 +269,145 @@ class BygningEgenregistreringAggregeringTest {
 
         assertThat(result1).all {
             prop(Bruksenhet::energikilder).all {
-                prop(Multikilde<List<Felt.Energikilde>>::egenregistrert).isNull()
+                prop(Multikilde<Felt.EnergikildeOpplysning>::egenregistrert).isNull()
             }
         }
 
         assertThat(result2).all {
             prop(Bruksenhet::energikilder).all {
-                prop(Multikilde<List<Felt.Energikilde>>::egenregistrert).isNotNull().all {
-                    index(0).all {
-                        prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.Elektrisitet)
-                        prop(Felt.Energikilde::metadata).all {
-                            prop(RegisterMetadata::gyldighetsperiode).all {
-                                prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
+                prop(Multikilde<Felt.EnergikildeOpplysning>::egenregistrert).isNotNull()
+                    .isInstanceOf(Felt.EnergikildeOpplysning.Data::class.java).all {
+                        prop(Felt.EnergikildeOpplysning.Data::data).all {
+                            index(0).all {
+                                prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                                prop(Felt.Energikilde::metadata).all {
+                                    prop(RegisterMetadata::gyldighetsperiode).all {
+                                        prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
+                                        prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
+                                    }
+                                }
+                            }
+                            index(1).all {
+                                prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.AnnenEnergikilde)
+                                prop(Felt.Energikilde::metadata).all {
+                                    prop(RegisterMetadata::gyldighetsperiode).all {
+                                        prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
+                                        prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
+                                    }
+                                }
                             }
                         }
                     }
-                    index(1).all {
-                        prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.AnnenEnergikilde)
-                        prop(Felt.Energikilde::metadata).all {
-                            prop(RegisterMetadata::gyldighetsperiode).all {
-                                prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
-                            }
-                        }
-                    }
-                }
             }
         }
 
         assertThat(result3).all {
             prop(Bruksenhet::energikilder).all {
-                prop(Multikilde<List<Felt.Energikilde>>::egenregistrert).isNotNull().all {
-                    index(0).all {
-                        prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.Elektrisitet)
-                        prop(Felt.Energikilde::metadata).all {
-                            prop(RegisterMetadata::gyldighetsperiode).all {
-                                prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2015))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2020))
+                prop(Multikilde<Felt.EnergikildeOpplysning>::egenregistrert).isNotNull()
+                    .isInstanceOf(Felt.EnergikildeOpplysning.Data::class).all {
+                        prop(Felt.EnergikildeOpplysning.Data::data).all {
+                            index(0).all {
+                                prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                                prop(Felt.Energikilde::metadata).all {
+                                    prop(RegisterMetadata::gyldighetsperiode).all {
+                                        prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2015))
+                                        prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2020))
+                                    }
+                                }
+                            }
+                            index(1).all {
+                                prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.AnnenEnergikilde)
+                                prop(Felt.Energikilde::metadata).all {
+                                    prop(RegisterMetadata::gyldighetsperiode).all {
+                                        prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
+                                        prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
+                                    }
+                                }
+                            }
+                            index(2).all {
+                                prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.Fjernvarme)
+                                prop(Felt.Energikilde::metadata).all {
+                                    prop(RegisterMetadata::gyldighetsperiode).all {
+                                        prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2020))
+                                        prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2022))
+                                    }
+                                }
                             }
                         }
                     }
-                    index(1).all {
-                        prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.AnnenEnergikilde)
-                        prop(Felt.Energikilde::metadata).all {
-                            prop(RegisterMetadata::gyldighetsperiode).all {
-                                prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
+            }
+        }
+    }
+
+    @Test
+    fun `bruksenhet med har ikke energikilde erstatter eksisterende energikilder`() {
+        val registrering1 = defaultEgenregistrering.copy(
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
+                energikildeRegistrering = EnergikildeRegistrering.Data(
+                    data = listOf(
+                        EnergikildeDataRegistrering(
+                            energikilde = EnergikildeKode.Elektrisitet,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            gyldighetsaar = 2010,
+                            opphoersaar = 2015,
+                        ),
+                        EnergikildeDataRegistrering(
+                            energikilde = EnergikildeKode.AnnenEnergikilde,
+                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                            gyldighetsaar = 2010,
+                            opphoersaar = 2015,
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val registrering2 = defaultEgenregistrering.copy(
+            registreringstidspunkt = defaultEgenregistrering.registreringstidspunkt.plusSeconds(10),
+            bruksenhetRegistrering = defaultBruksenhetRegistrering.copy(
+                energikildeRegistrering = EnergikildeRegistrering.HarIkke(kildemateriale = KildematerialeKode.Selvrapportert),
+            ),
+        )
+
+        val result1 = defaultBruksenhet.applyEgenregistreringer(listOf(registrering1))
+        val result2 = defaultBruksenhet.applyEgenregistreringer(listOf(registrering2))
+
+        assertThat(result1).all {
+            prop(Bruksenhet::energikilder).all {
+                prop(Multikilde<Felt.EnergikildeOpplysning>::egenregistrert).isNotNull()
+                    .isInstanceOf(Felt.EnergikildeOpplysning.Data::class.java).all {
+                        prop(Felt.EnergikildeOpplysning.Data::data).all {
+                            index(0).all {
+                                prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                                prop(Felt.Energikilde::metadata).all {
+                                    prop(RegisterMetadata::gyldighetsperiode).all {
+                                        prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
+                                        prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
+                                    }
+                                }
+                            }
+                            index(1).all {
+                                prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.AnnenEnergikilde)
+                                prop(Felt.Energikilde::metadata).all {
+                                    prop(RegisterMetadata::gyldighetsperiode).all {
+                                        prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2010))
+                                        prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2015))
+                                    }
+                                }
                             }
                         }
                     }
-                    index(2).all {
-                        prop(Felt.Energikilde::data).isEqualTo(EnergikildeKode.Fjernvarme)
-                        prop(Felt.Energikilde::metadata).all {
-                            prop(RegisterMetadata::gyldighetsperiode).all {
-                                prop(Gyldighetsperiode::gyldighetsaar).isEqualTo(Year.of(2020))
-                                prop(Gyldighetsperiode::opphoersaar).isEqualTo(Year.of(2022))
-                            }
+            }
+        }
+
+        assertThat(result2).all {
+            prop(Bruksenhet::energikilder).all {
+                prop(Multikilde<Felt.EnergikildeOpplysning>::egenregistrert).isNotNull()
+                    .isInstanceOf(Felt.EnergikildeOpplysning.HarIkke::class.java).all {
+                        prop(Felt.EnergikildeOpplysning.HarIkke::metadata).all {
+                            prop(RegisterMetadata::kildemateriale).isEqualTo(KildematerialeKode.Selvrapportert)
                         }
                     }
-                }
             }
         }
     }

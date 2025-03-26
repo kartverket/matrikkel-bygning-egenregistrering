@@ -8,7 +8,9 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Felt.EnergikildeOpplysning
 import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
+import no.kartverket.matrikkel.bygning.application.models.Felt.OppvarmingOpplysning
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
@@ -157,8 +159,8 @@ fun Bruksenhet.toBruksenhetResponse(): BruksenhetInternResponse = BruksenhetInte
     byggeaar = this.byggeaar.toMultikildeInternResponse(Byggeaar::toByggeaarInternResponse),
     etasjer = this.etasjer.toMultikildeInternResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
     totaltBruksareal = this.totaltBruksareal.toMultikildeInternResponse(Bruksareal::toBruksarealResponse),
-    energikilder = this.energikilder.toMultikildeInternResponse { map(Energikilde::toEnergikildeResponse) },
-    oppvarming = this.oppvarming.toMultikildeInternResponse { map(Oppvarming::toOppvarmingResponse) },
+    energikilder = this.energikilder.toMultikildeInternResponse(EnergikildeOpplysning::toEnergikildeResponse),
+    oppvarming = this.oppvarming.toMultikildeInternResponse(OppvarmingOpplysning::toOppvarmingResponse),
     vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
     avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
 )
@@ -170,8 +172,8 @@ fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSim
     totaltBruksareal = this.totaltBruksareal.egenregistrert?.toBruksarealResponse(),
     vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
     avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
-    energikilder = this.energikilder.egenregistrert?.map { it.toEnergikildeResponse() } ?: emptyList(),
-    oppvarming = this.oppvarming.egenregistrert?.map { it.toOppvarmingResponse() } ?: emptyList(),
+    energikilder = this.energikilder.egenregistrert?.toEnergikildeResponse() ?: emptyList(),
+    oppvarming = this.oppvarming.egenregistrert?.toOppvarmingResponse() ?: emptyList(),
 )
 
 private fun BruksenhetEtasjer.toBruksenhetEtasjeResponse(): BruksenhetEtasjerInternResponse = BruksenhetEtasjerInternResponse(
@@ -212,7 +214,21 @@ private fun Energikilde.toEnergikildeResponse() = EnergikildeInternResponse(
     metadata = this.metadata.toRegisterMetadataInternResponse(),
 )
 
+private fun EnergikildeOpplysning.toEnergikildeResponse() = this.toEnergikilder().map {
+    EnergikildeInternResponse(
+        data = it.data,
+        metadata = it.metadata.toRegisterMetadataInternResponse(),
+    )
+}
+
 private fun Oppvarming.toOppvarmingResponse() = OppvarmingInternResponse(
     data = this.data,
     metadata = this.metadata.toRegisterMetadataInternResponse(),
 )
+
+private fun OppvarmingOpplysning.toOppvarmingResponse() = this.toOppvarming().map {
+    OppvarmingInternResponse(
+        data = it.data,
+        metadata = it.metadata.toRegisterMetadataInternResponse(),
+    )
+}
