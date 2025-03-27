@@ -70,7 +70,7 @@ fun Application.mainModule() {
     )
 
     val matrikkelApiConfig = MatrikkelApiConfig(
-        useStub = config.property("matrikkel.useStub").getString().toBoolean(),
+        useStub = config.propertyOrNull("matrikkel.useStub")?.getString().toBoolean(),
         baseUrl = config.propertyOrNull("matrikkel.baseUrl")?.getString() ?: "",
         username = config.propertyOrNull("matrikkel.username")?.getString() ?: "",
         password = config.propertyOrNull("matrikkel.password")?.getString() ?: "",
