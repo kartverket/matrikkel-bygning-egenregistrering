@@ -23,6 +23,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.KommuneBubbleId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenhet
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
@@ -61,6 +62,7 @@ class MatrikkelBygningClient(
                 Bygning(
                     id = BygningId(bygning.uuid.uuid),
                     bygningBubbleId = BygningBubbleId(bygning.id.value),
+                    kommuneBubbleId = KommuneBubbleId(bygning.kommuneId.value),
                     bygningsnummer = bygning.bygningsnummer,
                     byggeaar = Multikilde(
                         autoritativ = deriveByggeaarForBygning(bygning),

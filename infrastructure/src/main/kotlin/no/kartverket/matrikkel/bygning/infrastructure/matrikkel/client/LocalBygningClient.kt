@@ -16,6 +16,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.KommuneBubbleId
 import java.time.Instant
 
 class LocalBygningClient : BygningClient {
@@ -42,6 +43,7 @@ class LocalBygningClient : BygningClient {
         Bygning(
             id = BygningId("00000000-0000-0000-0000-000000000001"),
             bygningBubbleId = BygningBubbleId(1L),
+            kommuneBubbleId = KommuneBubbleId(9876),
             bygningsnummer = 100L,
             bruksenheter = bruksenheter.subList(0, 2),
             bruksareal = Multikilde(
@@ -59,6 +61,7 @@ class LocalBygningClient : BygningClient {
         ),
         Bygning(
             bygningBubbleId = BygningBubbleId(2L),
+            kommuneBubbleId = KommuneBubbleId(9876),
             bygningsnummer = 200L,
             id = BygningId("00000000-0000-0000-0000-000000000002"),
             bruksenheter = bruksenheter.subList(2, 4),

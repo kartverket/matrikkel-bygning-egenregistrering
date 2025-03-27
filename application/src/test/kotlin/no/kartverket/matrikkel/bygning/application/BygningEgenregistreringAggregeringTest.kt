@@ -33,6 +33,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
 import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
+import no.kartverket.matrikkel.bygning.application.models.ids.KommuneBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -54,6 +55,7 @@ class BygningEgenregistreringAggregeringTest {
     private val defaultBygning = Bygning(
         id = bygningId,
         bygningBubbleId = BygningBubbleId(1L),
+        kommuneBubbleId = KommuneBubbleId(9876),
         bygningsnummer = 100,
         bruksenheter = listOf(defaultBruksenhet),
         etasjer = emptyList(),

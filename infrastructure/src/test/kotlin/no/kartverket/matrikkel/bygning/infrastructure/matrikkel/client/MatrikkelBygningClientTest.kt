@@ -23,6 +23,7 @@ import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
+import no.kartverket.matrikkel.bygning.application.models.ids.KommuneBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
@@ -44,6 +45,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.MatrikkelOppv
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.MatrikkelVannforsyningKode
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.bruksenhetId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.bygningId
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.id.kommuneId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.matchers.erAutoritativIkkeEgenregistrert
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.matchers.isEmpty
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.matchers.matchId
@@ -71,6 +73,7 @@ class MatrikkelBygningClientTest {
             every { getObject(matchId(bygningId), any()) } returns bygning {
                 id = bygningId
                 uuid = bygningUUID
+                kommuneId = kommuneId(9876L)
                 bygningsnummer = 1000L
                 oppdateringsdato = timestampUtc(2024, 9, 13)
                 oppdatertAv = "TestAnsatt"
@@ -100,6 +103,7 @@ class MatrikkelBygningClientTest {
         // TODO: Bruksareal skal egentlig være "vet ikke", som kanskje ikke skal representeres slik
         assertThat(bygning.value, "bygning").all {
             prop(Bygning::bygningBubbleId).isEqualTo(BygningBubbleId(1L))
+            prop(Bygning::kommuneBubbleId).isEqualTo(KommuneBubbleId(9876L))
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
                 prop(Bruksareal::data).isEqualTo(0.0)
@@ -142,6 +146,7 @@ class MatrikkelBygningClientTest {
             every { getObject(matchId(bygningId), any()) } returns bygning {
                 id = bygningId
                 uuid = bygningUUID
+                kommuneId = kommuneId(9876L)
                 bygningsnummer = 1000L
                 oppdateringsdato = timestampUtc(2024, 9, 12)
                 oppdatertAv = "TestAnsatt"
@@ -189,6 +194,7 @@ class MatrikkelBygningClientTest {
 
         assertThat(bygning.value, "bygning").isNotNull().all {
             prop(Bygning::bygningBubbleId).isEqualTo(BygningBubbleId(1L))
+            prop(Bygning::kommuneBubbleId).isEqualTo(KommuneBubbleId(9876L))
             prop(Bygning::bygningsnummer).isEqualTo(1000L)
             prop(Bygning::bruksareal).erAutoritativIkkeEgenregistrert {
                 prop(Bruksareal::data).isEqualTo(150.0)
