@@ -20,7 +20,11 @@ data class MatrikkelApiConfig(
     val baseUrl: String,
     val username: String,
     val password: String,
-)
+) {
+    companion object {
+        fun forStubbing() = MatrikkelApiConfig(useStub = true, "", "", "")
+    }
+}
 
 class MatrikkelApi(private val baseUrl: URI) {
     private val storeServiceFactory = StoreServiceWS()
@@ -57,8 +61,9 @@ class MatrikkelApi(private val baseUrl: URI) {
         private fun BindingProvider.configure(endpointPath: String) {
             requestContext[BindingProvider.ENDPOINT_ADDRESS_PROPERTY] = baseUrl.resolve(endpointPath).toString()
             MDC.get("request_id")?.let {
+                @Suppress("UNCHECKED_CAST")
                 (requestContext.computeIfAbsent(MessageContext.HTTP_REQUEST_HEADERS) { HashMap<String, MutableList<String>>() } as HashMap<String, MutableList<String>>)
-                    .computeIfAbsent("X-Request-ID") { ArrayList<String>() }
+                    .computeIfAbsent("X-Request-ID") { ArrayList() }
                     .add(it)
             }
             authenticator(requestContext)

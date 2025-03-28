@@ -107,6 +107,7 @@ testing {
                 implementation(libs.ktor.server.auth.jwt)
 
                 implementation(libs.assertk)
+                implementation(libs.mockk)
 
                 implementation(libs.testcontainers.postgresql)
                 implementation(libs.kotli.query) {

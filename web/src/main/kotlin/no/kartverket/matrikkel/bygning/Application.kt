@@ -3,12 +3,14 @@ package no.kartverket.matrikkel.bygning
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktorswaggerui.swaggerUI
 import io.ktor.server.application.*
+import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
+import no.kartverket.matrikkel.bygning.application.egenregistrering.DefaultEgenregistreringService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
@@ -23,6 +25,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygn
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiFactory
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.auth.AuthService
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
 import no.kartverket.matrikkel.bygning.plugins.authentication.configureAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
@@ -56,11 +59,6 @@ val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 fun Application.mainModule() {
     val config = loadConfiguration(environment)
 
-    configureHTTP()
-    configureMonitoring()
-    configureOpenAPI()
-    configureStatusPages()
-
     val dataSource = createDataSource(
         DatabaseConfig(
             databaseUrl = config.property("storage.jdbcURL").getString(),
@@ -92,9 +90,7 @@ fun Application.mainModule() {
         hendelseRepository = hendelseRepository,
     )
 
-    configureAuthentication(config, matrikkelAuth)
-
-    val egenregistreringService = EgenregistreringService(
+    val egenregistreringService = DefaultEgenregistreringService(
         bygningService = bygningService,
         egenregistreringRepository = egenregistreringRepository,
         transactional = TransactionalSupport(dataSource),
@@ -102,6 +98,9 @@ fun Application.mainModule() {
         bygningRepository = bygningRepository,
     )
 
+    configureRouting(config, matrikkelAuth, egenregistreringService, bygningService, hendelseService)
+
+    // Setter opp dette utenfor configureRouting siden tester antagelig ikke har bruk for det
     routing {
         listOf(
             OpenApiSpecIds.INTERN,
@@ -128,16 +127,34 @@ fun Application.mainModule() {
                     "Med persondata" to "/${OpenApiSpecIds.MED_PERSONDATA}/api.json",
                     "Uten persondata" to "/${OpenApiSpecIds.UTEN_PERSONDATA}/api.json",
                     "Hendelseslogg" to "/${OpenApiSpecIds.HENDELSER}/api.json",
-                )
+                ),
             )
         }
+    }
 
+    runFlywayMigrations(dataSource)
+}
+
+fun Application.configureRouting(
+    config: ApplicationConfig,
+    matrikkelAuth: AuthService,
+    egenregistreringService: EgenregistreringService,
+    bygningService: BygningService,
+    hendelseService: HendelseService
+) {
+    configureHTTP()
+    configureMonitoring()
+    configureOpenAPI()
+    configureStatusPages()
+
+    configureAuthentication(config, matrikkelAuth)
+
+    routing {
         route("v1") {
             internRouting(egenregistreringService, bygningService)
             eksternRouting(bygningService, hendelseService)
         }
     }
-    runFlywayMigrations(dataSource)
 }
 
 fun Application.internalModule() {

@@ -2,6 +2,7 @@ package no.kartverket.matrikkel.bygning.routes.v1.common
 
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
+import no.kartverket.matrikkel.bygning.application.models.error.AuthorizationError
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
@@ -26,6 +27,7 @@ fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorRespons
             it.message
         },
     )
+    is AuthorizationError -> HttpStatusCode.Forbidden to ErrorResponse.Forbidden()
 }
 
 sealed interface ErrorResponse {
@@ -42,9 +44,7 @@ sealed interface ErrorResponse {
         override val description: String = "Requesten din inneholdt én eller flere felter som ikke kunne valideres. Se listen over feil for flere detaljer",
         override val correlationId: String = resolveCallID(),
         override val details: List<String> = emptyList()
-    ) : ErrorResponse {
-        constructor(vararg details: String) : this(details = details.toList())
-    }
+    ) : ErrorResponse
 
     @Serializable
     class BadRequestError(
@@ -64,9 +64,7 @@ sealed interface ErrorResponse {
         override val description: String = "Noe har gått galt på serveren. Ta kontakt med Kartverket hvis feilen vedvarer",
         override val correlationId: String = resolveCallID(),
         override val details: List<String> = emptyList()
-    ) : ErrorResponse {
-        constructor(vararg details: String) : this(details = details.toList())
-    }
+    ) : ErrorResponse
 
     @Serializable
     class NotFoundError(
@@ -75,8 +73,16 @@ sealed interface ErrorResponse {
         override val description: String = "Ressursen du etterspurte kunne ikke bli funnet",
         override val correlationId: String = resolveCallID(),
         override val details: List<String> = emptyList()
+    ) : ErrorResponse
+
+    @Serializable
+    class Forbidden(
+        override val correlationId: String = resolveCallID(),
+        override val details: List<String> = emptyList()
     ) : ErrorResponse {
-        constructor(vararg details: String) : this(details = details.toList())
+        override val status: Int = HttpStatusCode.Forbidden.value
+        override val title: String = "Ingen tilgang"
+        override val description: String = "Du har ikke tilgang til etterspurt ressurs"
     }
 }
 

@@ -10,3 +10,5 @@ data class BruksenhetNotFound(val message: String) : DomainError
 data class ValidationError(val message: String) : DomainError
 
 data class MultipleValidationError(val errors: List<ValidationError>) : DomainError
+
+data object AuthorizationError : DomainError
