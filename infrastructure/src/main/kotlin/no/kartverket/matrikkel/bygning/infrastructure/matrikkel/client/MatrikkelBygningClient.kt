@@ -38,7 +38,7 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.BygningId as M
 
 // TODO Håndtering av at matrikkel servicene thrower på visse vanlige HTTP koder, ikke bare full try/catch
 class MatrikkelBygningClient(
-    private val matrikkelApi: MatrikkelApi.WithAuth
+    private val matrikkelApi: MatrikkelApi.WithAuth,
 ) : BygningClient {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -50,11 +50,12 @@ class MatrikkelBygningClient(
 
             val bruksenheter = matrikkelApi.storeService().getBruksenheter(bygning.bruksenhetIds.item, matrikkelApi.matrikkelContext)
 
-            val bygningsmetadata = RegisterMetadata(
-                bygning.oppdateringsdato.toInstant(),
-                Signatur(bygning.oppdatertAv),
-                prosess = null,
-            )
+            val bygningsmetadata =
+                RegisterMetadata(
+                    bygning.oppdateringsdato.toInstant(),
+                    Signatur(bygning.oppdatertAv),
+                    prosess = null,
+                )
 
             // TODO: Hvordan håndtere ukjent vs. ikke oppgitt fra matrikkel? Hva betyr en tom liste? Hva betyr null?
             return Ok(
@@ -62,75 +63,92 @@ class MatrikkelBygningClient(
                     id = BygningId(bygning.uuid.uuid),
                     bygningBubbleId = BygningBubbleId(bygning.id.value),
                     bygningsnummer = bygning.bygningsnummer,
-                    byggeaar = Multikilde(
-                        autoritativ = deriveByggeaarForBygning(bygning),
-                    ),
-                    bruksareal = Multikilde(
-                        autoritativ = Bruksareal(
-                            bygning.etasjedata.bruksarealTotalt,
-                            bygningsmetadata,
+                    byggeaar =
+                        Multikilde(
+                            autoritativ = deriveByggeaarForBygning(bygning),
                         ),
-                    ),
-                    vannforsyning = Multikilde(
-                        autoritativ = mapVannforsyning(bygning.vannforsyningsKodeId)?.let {
-                            Vannforsyning(
-                                it,
-                                bygningsmetadata,
-                            )
-                        },
-                    ),
-                    avlop = Multikilde(
-                        autoritativ = mapAvloep(bygning.avlopsKodeId)?.let {
-                            Avlop(
-                                it,
-                                bygningsmetadata,
-                            )
-                        },
-                    ),
-                    energikilder = Multikilde(
-                        autoritativ = bygning.energikildeKodeIds.item.map {
-                            Energikilde(
-                                data = mapEnergikilde(it),
-                                metadata = bygningsmetadata,
-                            )
-                        },
-                    ),
-                    oppvarming = Multikilde(
-                        autoritativ = bygning.oppvarmingsKodeIds.item.map {
-                            Oppvarming(
-                                data = mapOppvarming(it),
-                                metadata = bygningsmetadata,
-                            )
-                        },
-                    ),
-                    bruksenheter = bruksenheter.map {
-                        val bruksenhetsmetadata = RegisterMetadata(
-                            it.oppdateringsdato.toInstant(),
-                            Signatur(it.oppdatertAv),
-                            kildemateriale = null,
-                            prosess = null,
-                        )
-
-                        Bruksenhet(
-                            id = BruksenhetId(it.uuid.uuid),
-                            bruksenhetBubbleId = BruksenhetBubbleId(it.id.value),
-                            totaltBruksareal = Multikilde(
-                                autoritativ = Bruksareal(
-                                    it.bruksareal,
-                                    bruksenhetsmetadata,
+                    bruksareal =
+                        Multikilde(
+                            autoritativ =
+                                Bruksareal(
+                                    bygning.etasjedata.bruksarealTotalt,
+                                    bygningsmetadata,
                                 ),
-                            ),
-                        )
-                    },
-                    etasjer = bygning.etasjer.item.mapNotNull { etasje ->
-                        BygningEtasje(
-                            etasjeId = etasje.id,
-                            etasjebetegnelse = Etasjebetegnelse.of(
-                                etasjenummer = Etasjenummer.of(etasje.etasjenummer),
-                                etasjeplanKode = mapEtasjeplanKode(etasje.etasjeplanKodeId),
-                            ),
-                        )
-                    },
+                        ),
+                    vannforsyning =
+                        Multikilde(
+                            autoritativ =
+                                mapVannforsyning(bygning.vannforsyningsKodeId)?.let {
+                                    Vannforsyning(
+                                        it,
+                                        bygningsmetadata,
+                                    )
+                                },
+                        ),
+                    avlop =
+                        Multikilde(
+                            autoritativ =
+                                mapAvloep(bygning.avlopsKodeId)?.let {
+                                    Avlop(
+                                        it,
+                                        bygningsmetadata,
+                                    )
+                                },
+                        ),
+                    energikilder =
+                        Multikilde(
+                            autoritativ =
+                                bygning.energikildeKodeIds.item.map {
+                                    Energikilde(
+                                        data = mapEnergikilde(it),
+                                        metadata = bygningsmetadata,
+                                    )
+                                },
+                        ),
+                    oppvarming =
+                        Multikilde(
+                            autoritativ =
+                                bygning.oppvarmingsKodeIds.item.map {
+                                    Oppvarming(
+                                        data = mapOppvarming(it),
+                                        metadata = bygningsmetadata,
+                                    )
+                                },
+                        ),
+                    bruksenheter =
+                        bruksenheter.map {
+                            val bruksenhetsmetadata =
+                                RegisterMetadata(
+                                    it.oppdateringsdato.toInstant(),
+                                    Signatur(it.oppdatertAv),
+                                    kildemateriale = null,
+                                    prosess = null,
+                                )
+
+                            Bruksenhet(
+                                id = BruksenhetId(it.uuid.uuid),
+                                bruksenhetBubbleId = BruksenhetBubbleId(it.id.value),
+                                totaltBruksareal =
+                                    Multikilde(
+                                        autoritativ =
+                                            Bruksareal(
+                                                it.bruksareal,
+                                                bruksenhetsmetadata,
+                                            ),
+                                    ),
+                            )
+                        },
+                    etasjer =
+                        bygning.etasjer.item.mapNotNull { etasje ->
+                            BygningEtasje(
+                                etasjeId = etasje.id,
+                                etasjebetegnelse =
+                                    Etasjebetegnelse.of(
+                                        etasjenummer = Etasjenummer.of(etasje.etasjenummer),
+                                        etasjeplanKode = mapEtasjeplanKode(etasje.etasjeplanKodeId),
+                                    ),
+                            )
+                        },
                 ),
             )
         } catch (exception: ServiceException) {

@@ -3,16 +3,14 @@ package no.kartverket.matrikkel.bygning.routes.v1.intern.bygning
 import com.github.michaelbull.result.mapBoth
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
-import io.ktor.http.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.util.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.util.getOrFail
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 
-fun Route.bygningRouting(
-    bygningService: BygningService
-) {
+fun Route.bygningRouting(bygningService: BygningService) {
     route(
         "{bygningId}",
         {
@@ -44,11 +42,13 @@ fun Route.bygningRouting(
         ) {
             val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-            val (status, body) = bygningService.getBygningByBubbleId(bygningBubbleId = bygningId)
-                .mapBoth(
-                    success = { HttpStatusCode.OK to it.toBygningInternResponse() },
-                    failure = ::domainErrorToResponse,
-                )
+            val (status, body) =
+                bygningService
+                    .getBygningByBubbleId(bygningBubbleId = bygningId)
+                    .mapBoth(
+                        success = { HttpStatusCode.OK to it.toBygningInternResponse() },
+                        failure = ::domainErrorToResponse,
+                    )
 
             call.respond(status, body)
         }
@@ -70,10 +70,11 @@ fun Route.bygningRouting(
             ) {
                 val bygningId = call.parameters.getOrFail("bygningId").toLong()
 
-                val (status, body) = bygningService.getBygningByBubbleId(bygningBubbleId = bygningId).mapBoth(
-                    success = { HttpStatusCode.OK to it.toBygningSimpleResponseFromEgenregistrertData() },
-                    failure = ::domainErrorToResponse,
-                )
+                val (status, body) =
+                    bygningService.getBygningByBubbleId(bygningBubbleId = bygningId).mapBoth(
+                        success = { HttpStatusCode.OK to it.toBygningSimpleResponseFromEgenregistrertData() },
+                        failure = ::domainErrorToResponse,
+                    )
 
                 call.respond(status, body)
             }

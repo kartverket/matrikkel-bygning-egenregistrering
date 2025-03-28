@@ -12,7 +12,7 @@ data class HendelseResponse(
     val objectId: Long,
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
-    val type: BygningHendelseType
+    val type: BygningHendelseType,
 )
 
 @Serializable
@@ -20,15 +20,15 @@ data class HendelseContainerResponse(
     val hendelser: List<HendelseResponse>,
 )
 
-fun List<Hendelse>.toHendelseContainerResponse(): HendelseContainerResponse {
-    return HendelseContainerResponse(
-        hendelser = this.map { hendelse ->
-            HendelseResponse(
-                sekvensnummer = hendelse.sekvensnummer,
-                objectId = hendelse.payload.objectId,
-                registreringstidspunkt = hendelse.payload.registreringstidspunkt,
-                type = hendelse.payload.type,
-            )
-        },
+fun List<Hendelse>.toHendelseContainerResponse(): HendelseContainerResponse =
+    HendelseContainerResponse(
+        hendelser =
+            this.map { hendelse ->
+                HendelseResponse(
+                    sekvensnummer = hendelse.sekvensnummer,
+                    objectId = hendelse.payload.objectId,
+                    registreringstidspunkt = hendelse.payload.registreringstidspunkt,
+                    type = hendelse.payload.type,
+                )
+            },
     )
-}

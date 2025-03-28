@@ -23,7 +23,8 @@ import java.time.Instant
 
 @Serializable
 data class MultikildeInternResponse<T : Any>(
-    val autoritativ: T? = null, val egenregistrert: T? = null
+    val autoritativ: T? = null,
+    val egenregistrert: T? = null,
 )
 
 @Serializable
@@ -43,13 +44,13 @@ data class BygningInternResponse(
 data class BygningSimpleResponse(
     val bygningId: Long,
     val bygningsnummer: Long,
-    val bruksenheter: List<BruksenhetSimpleResponse>
+    val bruksenheter: List<BruksenhetSimpleResponse>,
 )
 
 @Serializable
 data class BruksenhetEtasjerInternResponse(
     val data: List<BruksenhetEtasjeInternResponse>,
-    val metadata: RegisterMetadataInternResponse
+    val metadata: RegisterMetadataInternResponse,
 )
 
 @Serializable
@@ -100,119 +101,149 @@ data class RegisterMetadataInternResponse(
 )
 
 @Serializable
-data class ByggeaarInternResponse(val data: Int, val metadata: RegisterMetadataInternResponse)
-
-@Serializable
-data class BruksarealInternResponse(val data: Double, val metadata: RegisterMetadataInternResponse)
-
-@Serializable
-data class VannforsyningKodeInternResponse(val data: VannforsyningKode, val metadata: RegisterMetadataInternResponse)
-
-@Serializable
-data class AvlopKodeInternResponse(val data: AvlopKode, val metadata: RegisterMetadataInternResponse)
-
-@Serializable
-data class EnergikildeInternResponse(val data: EnergikildeKode, val metadata: RegisterMetadataInternResponse)
-
-@Serializable
-data class OppvarmingInternResponse(val data: OppvarmingKode, val metadata: RegisterMetadataInternResponse)
-
-
-fun RegisterMetadata.toRegisterMetadataInternResponse() = RegisterMetadataInternResponse(
-    registreringstidspunkt = this.registreringstidspunkt,
-    registrertAv = this.registrertAv.value,
-    kildemateriale = this.kildemateriale,
-    prosess = this.prosess,
-    gyldighetsaar = this.gyldighetsperiode.gyldighetsaar?.value,
-    opphoersaar = this.gyldighetsperiode.opphoersaar?.value,
+data class ByggeaarInternResponse(
+    val data: Int,
+    val metadata: RegisterMetadataInternResponse,
 )
 
-fun <T : Any, R : Any> Multikilde<T>.toMultikildeInternResponse(mapper: T.() -> R): MultikildeInternResponse<R>? {
-    return MultikildeInternResponse(
+@Serializable
+data class BruksarealInternResponse(
+    val data: Double,
+    val metadata: RegisterMetadataInternResponse,
+)
+
+@Serializable
+data class VannforsyningKodeInternResponse(
+    val data: VannforsyningKode,
+    val metadata: RegisterMetadataInternResponse,
+)
+
+@Serializable
+data class AvlopKodeInternResponse(
+    val data: AvlopKode,
+    val metadata: RegisterMetadataInternResponse,
+)
+
+@Serializable
+data class EnergikildeInternResponse(
+    val data: EnergikildeKode,
+    val metadata: RegisterMetadataInternResponse,
+)
+
+@Serializable
+data class OppvarmingInternResponse(
+    val data: OppvarmingKode,
+    val metadata: RegisterMetadataInternResponse,
+)
+
+fun RegisterMetadata.toRegisterMetadataInternResponse() =
+    RegisterMetadataInternResponse(
+        registreringstidspunkt = this.registreringstidspunkt,
+        registrertAv = this.registrertAv.value,
+        kildemateriale = this.kildemateriale,
+        prosess = this.prosess,
+        gyldighetsaar = this.gyldighetsperiode.gyldighetsaar?.value,
+        opphoersaar = this.gyldighetsperiode.opphoersaar?.value,
+    )
+
+fun <T : Any, R : Any> Multikilde<T>.toMultikildeInternResponse(mapper: T.() -> R): MultikildeInternResponse<R>? =
+    MultikildeInternResponse(
         autoritativ?.mapper(),
         egenregistrert?.mapper(),
     ).takeUnless { autoritativ == null && egenregistrert == null }
-}
 
-fun Bygning.toBygningInternResponse(): BygningInternResponse = BygningInternResponse(
-    bygningId = this.bygningBubbleId.value,
-    bygningsnummer = this.bygningsnummer,
-    byggeaar = this.byggeaar.toMultikildeInternResponse(Byggeaar::toByggeaarInternResponse),
-    bruksareal = this.bruksareal.toMultikildeInternResponse(Bruksareal::toBruksarealResponse),
-    bruksenheter = this.bruksenheter.map(Bruksenhet::toBruksenhetResponse),
-    vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
-    avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
-    energikilder = this.energikilder.toMultikildeInternResponse { map { it.toEnergikildeResponse() } },
-    oppvarming = this.oppvarming.toMultikildeInternResponse { map { it.toOppvarmingResponse() } },
-)
+fun Bygning.toBygningInternResponse(): BygningInternResponse =
+    BygningInternResponse(
+        bygningId = this.bygningBubbleId.value,
+        bygningsnummer = this.bygningsnummer,
+        byggeaar = this.byggeaar.toMultikildeInternResponse(Byggeaar::toByggeaarInternResponse),
+        bruksareal = this.bruksareal.toMultikildeInternResponse(Bruksareal::toBruksarealResponse),
+        bruksenheter = this.bruksenheter.map(Bruksenhet::toBruksenhetResponse),
+        vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
+        avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
+        energikilder = this.energikilder.toMultikildeInternResponse { map { it.toEnergikildeResponse() } },
+        oppvarming = this.oppvarming.toMultikildeInternResponse { map { it.toOppvarmingResponse() } },
+    )
 
-fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse = BygningSimpleResponse(
-    bygningId = this.bygningBubbleId.value,
-    bygningsnummer = this.bygningsnummer,
-    bruksenheter = this.bruksenheter.map { it.toBruksenhetSimpleResponseFromEgenregistrertData() },
-)
+fun Bygning.toBygningSimpleResponseFromEgenregistrertData(): BygningSimpleResponse =
+    BygningSimpleResponse(
+        bygningId = this.bygningBubbleId.value,
+        bygningsnummer = this.bygningsnummer,
+        bruksenheter = this.bruksenheter.map { it.toBruksenhetSimpleResponseFromEgenregistrertData() },
+    )
 
-fun Bruksenhet.toBruksenhetResponse(): BruksenhetInternResponse = BruksenhetInternResponse(
-    bruksenhetId = this.bruksenhetBubbleId.value,
-    byggeaar = this.byggeaar.toMultikildeInternResponse(Byggeaar::toByggeaarInternResponse),
-    etasjer = this.etasjer.toMultikildeInternResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
-    totaltBruksareal = this.totaltBruksareal.toMultikildeInternResponse(Bruksareal::toBruksarealResponse),
-    energikilder = this.energikilder.toMultikildeInternResponse { map(Energikilde::toEnergikildeResponse) },
-    oppvarming = this.oppvarming.toMultikildeInternResponse { map(Oppvarming::toOppvarmingResponse) },
-    vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
-    avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
-)
+fun Bruksenhet.toBruksenhetResponse(): BruksenhetInternResponse =
+    BruksenhetInternResponse(
+        bruksenhetId = this.bruksenhetBubbleId.value,
+        byggeaar = this.byggeaar.toMultikildeInternResponse(Byggeaar::toByggeaarInternResponse),
+        etasjer = this.etasjer.toMultikildeInternResponse(BruksenhetEtasjer::toBruksenhetEtasjeResponse),
+        totaltBruksareal = this.totaltBruksareal.toMultikildeInternResponse(Bruksareal::toBruksarealResponse),
+        energikilder = this.energikilder.toMultikildeInternResponse { map(Energikilde::toEnergikildeResponse) },
+        oppvarming = this.oppvarming.toMultikildeInternResponse { map(Oppvarming::toOppvarmingResponse) },
+        vannforsyning = this.vannforsyning.toMultikildeInternResponse(Vannforsyning::toVannforsyningResponse),
+        avlop = this.avlop.toMultikildeInternResponse(Avlop::toAvlopKodeResponse),
+    )
 
-fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse = BruksenhetSimpleResponse(
-    bruksenhetId = this.bruksenhetBubbleId.value,
-    byggeaar = this.byggeaar.egenregistrert?.toByggeaarInternResponse(),
-    etasjer = this.etasjer.egenregistrert?.toBruksenhetEtasjeResponse(),
-    totaltBruksareal = this.totaltBruksareal.egenregistrert?.toBruksarealResponse(),
-    vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
-    avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
-    energikilder = this.energikilder.egenregistrert?.map { it.toEnergikildeResponse() } ?: emptyList(),
-    oppvarming = this.oppvarming.egenregistrert?.map { it.toOppvarmingResponse() } ?: emptyList(),
-)
+fun Bruksenhet.toBruksenhetSimpleResponseFromEgenregistrertData(): BruksenhetSimpleResponse =
+    BruksenhetSimpleResponse(
+        bruksenhetId = this.bruksenhetBubbleId.value,
+        byggeaar = this.byggeaar.egenregistrert?.toByggeaarInternResponse(),
+        etasjer = this.etasjer.egenregistrert?.toBruksenhetEtasjeResponse(),
+        totaltBruksareal = this.totaltBruksareal.egenregistrert?.toBruksarealResponse(),
+        vannforsyning = this.vannforsyning.egenregistrert?.toVannforsyningResponse(),
+        avlop = this.avlop.egenregistrert?.toAvlopKodeResponse(),
+        energikilder = this.energikilder.egenregistrert?.map { it.toEnergikildeResponse() } ?: emptyList(),
+        oppvarming = this.oppvarming.egenregistrert?.map { it.toOppvarmingResponse() } ?: emptyList(),
+    )
 
-private fun BruksenhetEtasjer.toBruksenhetEtasjeResponse(): BruksenhetEtasjerInternResponse = BruksenhetEtasjerInternResponse(
-    data = this.data.map {
-        BruksenhetEtasjeInternResponse(
-            bruksareal = it.bruksareal,
-            etasjebetegnelse = EtasjeBetegnelseInternResponse(
-                etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
-                etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
-            ),
-        )
-    },
-    metadata = this.metadata.toRegisterMetadataInternResponse(),
-)
+private fun BruksenhetEtasjer.toBruksenhetEtasjeResponse(): BruksenhetEtasjerInternResponse =
+    BruksenhetEtasjerInternResponse(
+        data =
+            this.data.map {
+                BruksenhetEtasjeInternResponse(
+                    bruksareal = it.bruksareal,
+                    etasjebetegnelse =
+                        EtasjeBetegnelseInternResponse(
+                            etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
+                            etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
+                        ),
+                )
+            },
+        metadata = this.metadata.toRegisterMetadataInternResponse(),
+    )
 
-private fun Byggeaar.toByggeaarInternResponse(): ByggeaarInternResponse = ByggeaarInternResponse(
-    data = this.data,
-    metadata = this.metadata.toRegisterMetadataInternResponse(),
-)
+private fun Byggeaar.toByggeaarInternResponse(): ByggeaarInternResponse =
+    ByggeaarInternResponse(
+        data = this.data,
+        metadata = this.metadata.toRegisterMetadataInternResponse(),
+    )
 
-private fun Bruksareal.toBruksarealResponse(): BruksarealInternResponse = BruksarealInternResponse(
-    data = this.data,
-    metadata = this.metadata.toRegisterMetadataInternResponse(),
-)
+private fun Bruksareal.toBruksarealResponse(): BruksarealInternResponse =
+    BruksarealInternResponse(
+        data = this.data,
+        metadata = this.metadata.toRegisterMetadataInternResponse(),
+    )
 
-private fun Vannforsyning.toVannforsyningResponse(): VannforsyningKodeInternResponse = VannforsyningKodeInternResponse(
-    data = this.data,
-    metadata = this.metadata.toRegisterMetadataInternResponse(),
-)
+private fun Vannforsyning.toVannforsyningResponse(): VannforsyningKodeInternResponse =
+    VannforsyningKodeInternResponse(
+        data = this.data,
+        metadata = this.metadata.toRegisterMetadataInternResponse(),
+    )
 
-private fun Avlop.toAvlopKodeResponse(): AvlopKodeInternResponse = AvlopKodeInternResponse(
-    data = this.data,
-    metadata = this.metadata.toRegisterMetadataInternResponse(),
-)
+private fun Avlop.toAvlopKodeResponse(): AvlopKodeInternResponse =
+    AvlopKodeInternResponse(
+        data = this.data,
+        metadata = this.metadata.toRegisterMetadataInternResponse(),
+    )
 
-private fun Energikilde.toEnergikildeResponse() = EnergikildeInternResponse(
-    data = this.data,
-    metadata = this.metadata.toRegisterMetadataInternResponse(),
-)
+private fun Energikilde.toEnergikildeResponse() =
+    EnergikildeInternResponse(
+        data = this.data,
+        metadata = this.metadata.toRegisterMetadataInternResponse(),
+    )
 
-private fun Oppvarming.toOppvarmingResponse() = OppvarmingInternResponse(
-    data = this.data,
-    metadata = this.metadata.toRegisterMetadataInternResponse(),
-)
+private fun Oppvarming.toOppvarmingResponse() =
+    OppvarmingInternResponse(
+        data = this.data,
+        metadata = this.metadata.toRegisterMetadataInternResponse(),
+    )

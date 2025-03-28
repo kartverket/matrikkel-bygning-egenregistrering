@@ -57,39 +57,45 @@ import kotlin.test.Test
 class MatrikkelBygningClientTest {
     @Test
     fun `mapping takler minimalt utfylt bygning`() {
-        val mockStoreService = mockk<StoreService> {
-            val bygningId = bygningId(1L)
-            val bygningUUID = UUID().apply {
-                uuid = "00000000-0000-0000-0000-000000000001"
-                navnerom = "uuid"
+        val mockStoreService =
+            mockk<StoreService> {
+                val bygningId = bygningId(1L)
+                val bygningUUID =
+                    UUID().apply {
+                        uuid = "00000000-0000-0000-0000-000000000001"
+                        navnerom = "uuid"
+                    }
+                val bruksenhetId = bruksenhetId(2L)
+                val bruksenhetUUID =
+                    UUID().apply {
+                        uuid = "00000000-0000-0000-0001-000000000001"
+                        navnerom = "uuid"
+                    }
+                every { getObject(matchId(bygningId), any()) } returns
+                    bygning {
+                        id = bygningId
+                        uuid = bygningUUID
+                        bygningsnummer = 1000L
+                        oppdateringsdato = timestampUtc(2024, 9, 13)
+                        oppdatertAv = "TestAnsatt"
+                        bruksenhetIds(bruksenhetId)
+                    }
+                every { getObjects(matchIds(bruksenhetId), any()) } returns
+                    matrikkelBubbleObjectList(
+                        bruksenhet {
+                            id = bruksenhetId
+                            uuid = bruksenhetUUID
+                            byggId = bygningId
+                            oppdateringsdato = timestampUtc(2024, 9, 12)
+                            oppdatertAv = "TestAnsatt"
+                        },
+                    )
             }
-            val bruksenhetId = bruksenhetId(2L)
-            val bruksenhetUUID = UUID().apply {
-                uuid = "00000000-0000-0000-0001-000000000001"
-                navnerom = "uuid"
+        val mockApi =
+            mockk<MatrikkelApi.WithAuth> {
+                every { matrikkelContext } returns MatrikkelContext()
+                every { storeService() } returns mockStoreService
             }
-            every { getObject(matchId(bygningId), any()) } returns bygning {
-                id = bygningId
-                uuid = bygningUUID
-                bygningsnummer = 1000L
-                oppdateringsdato = timestampUtc(2024, 9, 13)
-                oppdatertAv = "TestAnsatt"
-                bruksenhetIds(bruksenhetId)
-            }
-            every { getObjects(matchIds(bruksenhetId), any()) } returns matrikkelBubbleObjectList(
-                bruksenhet {
-                    id = bruksenhetId
-                    uuid = bruksenhetUUID
-                    byggId = bygningId
-                    oppdateringsdato = timestampUtc(2024, 9, 12)
-                    oppdatertAv = "TestAnsatt"
-                },
-            )
-        }
-        val mockApi = mockk<MatrikkelApi.WithAuth> {
-            every { matrikkelContext } returns MatrikkelContext()
-            every { storeService() } returns mockStoreService
-        }
 
         val client = MatrikkelBygningClient(mockApi)
         val bygning = client.getBygningByBubbleId(1L)
@@ -128,58 +134,66 @@ class MatrikkelBygningClientTest {
     @Test
     fun `mapping mapper alle felter i fullt utfylt bygning`() {
         // Bygningen er ikke fullt utfylt for det som enda ikke blir brukt
-        val mockStoreService = mockk<StoreService> {
-            val bygningId = bygningId(1L)
-            val bygningUUID = UUID().apply {
-                uuid = "00000000-0000-0000-0000-000000000001"
-                navnerom = "uuid"
+        val mockStoreService =
+            mockk<StoreService> {
+                val bygningId = bygningId(1L)
+                val bygningUUID =
+                    UUID().apply {
+                        uuid = "00000000-0000-0000-0000-000000000001"
+                        navnerom = "uuid"
+                    }
+                val bruksenhetId = bruksenhetId(2L)
+                val bruksenhetUUID =
+                    UUID().apply {
+                        uuid = "00000000-0000-0000-0001-000000000001"
+                        navnerom = "uuid"
+                    }
+                every { getObject(matchId(bygningId), any()) } returns
+                    bygning {
+                        id = bygningId
+                        uuid = bygningUUID
+                        bygningsnummer = 1000L
+                        oppdateringsdato = timestampUtc(2024, 9, 12)
+                        oppdatertAv = "TestAnsatt"
+                        vannforsyningsKodeId = MatrikkelVannforsyningKode.TilknyttetOffVannverk()
+                        avlopsKodeId = MatrikkelAvlopKode.OffentligKloakk()
+                        energikildeKodeIds =
+                            energikildeKodeIdList(
+                                MatrikkelEnergikildeKode.Elektrisitet(),
+                                MatrikkelEnergikildeKode.Varmepumpe(),
+                            )
+                        oppvarmingsKodeIds =
+                            oppvarmingsKodeIdList(
+                                MatrikkelOppvarmingKode.Elektrisk(),
+                            )
+                        etasjedata.bruksarealTotalt = 150.0
+                        etasjer(
+                            etasje {
+                                id = 1L
+                                etasjeplanKodeId = MatrikkelEtasjeplanKode.Hovedetasje()
+                                etasjenummer = 1
+                                bruksarealTotalt = 150.0
+                            },
+                        )
+                        bruksenhetIds(bruksenhetId)
+                    }
+                every { getObjects(matchIds(bruksenhetId), any()) } returns
+                    matrikkelBubbleObjectList(
+                        bruksenhet {
+                            id = bruksenhetId
+                            uuid = bruksenhetUUID
+                            byggId = bygningId
+                            oppdateringsdato = timestampUtc(2024, 9, 13)
+                            oppdatertAv = "TestAnsatt"
+                            bruksareal = 140.0
+                        },
+                    )
             }
-            val bruksenhetId = bruksenhetId(2L)
-            val bruksenhetUUID = UUID().apply {
-                uuid = "00000000-0000-0000-0001-000000000001"
-                navnerom = "uuid"
+        val mockApi =
+            mockk<MatrikkelApi.WithAuth> {
+                every { matrikkelContext } returns MatrikkelContext()
+                every { storeService() } returns mockStoreService
             }
-            every { getObject(matchId(bygningId), any()) } returns bygning {
-                id = bygningId
-                uuid = bygningUUID
-                bygningsnummer = 1000L
-                oppdateringsdato = timestampUtc(2024, 9, 12)
-                oppdatertAv = "TestAnsatt"
-                vannforsyningsKodeId = MatrikkelVannforsyningKode.TilknyttetOffVannverk()
-                avlopsKodeId = MatrikkelAvlopKode.OffentligKloakk()
-                energikildeKodeIds = energikildeKodeIdList(
-                    MatrikkelEnergikildeKode.Elektrisitet(),
-                    MatrikkelEnergikildeKode.Varmepumpe(),
-                )
-                oppvarmingsKodeIds = oppvarmingsKodeIdList(
-                    MatrikkelOppvarmingKode.Elektrisk(),
-                )
-                etasjedata.bruksarealTotalt = 150.0
-                etasjer(
-                    etasje {
-                        id = 1L
-                        etasjeplanKodeId = MatrikkelEtasjeplanKode.Hovedetasje()
-                        etasjenummer = 1
-                        bruksarealTotalt = 150.0
-                    },
-                )
-                bruksenhetIds(bruksenhetId)
-            }
-            every { getObjects(matchIds(bruksenhetId), any()) } returns matrikkelBubbleObjectList(
-                bruksenhet {
-                    id = bruksenhetId
-                    uuid = bruksenhetUUID
-                    byggId = bygningId
-                    oppdateringsdato = timestampUtc(2024, 9, 13)
-                    oppdatertAv = "TestAnsatt"
-                    bruksareal = 140.0
-                },
-            )
-        }
-        val mockApi = mockk<MatrikkelApi.WithAuth> {
-            every { matrikkelContext } returns MatrikkelContext()
-            every { storeService() } returns mockStoreService
-        }
 
         val client = MatrikkelBygningClient(mockApi)
         val bygning = client.getBygningByBubbleId(1L)
@@ -231,9 +245,8 @@ class MatrikkelBygningClientTest {
         checkUnnecessaryStub(mockStoreService, mockApi)
     }
 
-    private fun createIsMatrikkelfoertAssert(expectedRegistreringstidspunkt: Instant): Assert<RegisterMetadata>.() -> Unit {
-        return {
+    private fun createIsMatrikkelfoertAssert(expectedRegistreringstidspunkt: Instant): Assert<RegisterMetadata>.() -> Unit =
+        {
             prop(RegisterMetadata::registreringstidspunkt).isEqualTo(expectedRegistreringstidspunkt)
         }
-    }
 }

@@ -5,7 +5,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 
 plugins {
     kotlin("jvm")
-
     `jvm-test-suite`
 }
 

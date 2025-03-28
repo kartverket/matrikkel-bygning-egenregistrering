@@ -8,10 +8,15 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.prop
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.server.testing.*
+import io.ktor.client.call.body
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.server.testing.testApplication
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
@@ -35,120 +40,121 @@ import java.time.Instant
 
 class BruksenhetRouteTest : TestApplicationWithDb() {
     @Test
-    fun `gitt at en bruksenhet id eksisterer svarer bruksenhet route ok`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
+    fun `gitt at en bruksenhet id eksisterer svarer bruksenhet route ok`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-        val response = client.get("/v1/intern/bruksenheter/1")
+            val response = client.get("/v1/intern/bruksenheter/1")
 
-        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(response.body<BruksenhetInternResponse>()).all {
-            prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(1L)
-        }
-    }
-
-    @Test
-    fun `gitt at en bruksenhet id ikke eksisterer svarer bygning route not found`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
-
-        val response = client.get("/v1/intern/bruksenheter/10000000")
-
-        assertThat(response.status).isEqualTo(HttpStatusCode.NotFound)
-    }
-
-    @Test
-    fun `gitt at en bruksenhet eksisterer uten egenregistrert data skal alle feltene vaere null`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
-
-        val response = client.get("/v1/intern/bruksenheter/1/egenregistrert")
-
-        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(response.body<BruksenhetSimpleResponse>()).all {
-            prop(BruksenhetSimpleResponse::totaltBruksareal).isNull()
-            prop(BruksenhetSimpleResponse::avlop).isNull()
-            prop(BruksenhetSimpleResponse::byggeaar).isNull()
-            prop(BruksenhetSimpleResponse::oppvarming).isEmpty()
-            prop(BruksenhetSimpleResponse::energikilder).isEmpty()
-            prop(BruksenhetSimpleResponse::vannforsyning).isNull()
-        }
-    }
-
-
-    @Test
-    fun `gitt at en bruksenhet eksisterer med noe egenregistrert data feltene vaere satt`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
-        val token = mockOAuthServer.issueIDPortenJWT()
-
-        client.post("/v1/intern/egenregistreringer") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                EgenregistreringRequest.gyldigRequest(2L),
-            )
-            bearerAuth(token.serialize())
+            assertThat(response.status).isEqualTo(HttpStatusCode.OK)
+            assertThat(response.body<BruksenhetInternResponse>()).all {
+                prop(BruksenhetInternResponse::bruksenhetId).isEqualTo(1L)
+            }
         }
 
-        val response = client.get("/v1/intern/bruksenheter/2/egenregistrert")
+    @Test
+    fun `gitt at en bruksenhet id ikke eksisterer svarer bygning route not found`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-        val now = Instant.now()
+            val response = client.get("/v1/intern/bruksenheter/10000000")
 
-        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(response.body<BruksenhetSimpleResponse>()).all {
-            prop(BruksenhetSimpleResponse::totaltBruksareal).isNotNull().all {
-                prop(BruksarealInternResponse::data).isEqualTo(125.0)
-                prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+            assertThat(response.status).isEqualTo(HttpStatusCode.NotFound)
+        }
+
+    @Test
+    fun `gitt at en bruksenhet eksisterer uten egenregistrert data skal alle feltene vaere null`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+
+            val response = client.get("/v1/intern/bruksenheter/1/egenregistrert")
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.OK)
+            assertThat(response.body<BruksenhetSimpleResponse>()).all {
+                prop(BruksenhetSimpleResponse::totaltBruksareal).isNull()
+                prop(BruksenhetSimpleResponse::avlop).isNull()
+                prop(BruksenhetSimpleResponse::byggeaar).isNull()
+                prop(BruksenhetSimpleResponse::oppvarming).isEmpty()
+                prop(BruksenhetSimpleResponse::energikilder).isEmpty()
+                prop(BruksenhetSimpleResponse::vannforsyning).isNull()
             }
-            prop(BruksenhetSimpleResponse::byggeaar).isNotNull().all {
-                prop(ByggeaarInternResponse::data).isEqualTo(2010)
-                prop(ByggeaarInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+        }
+
+    @Test
+    fun `gitt at en bruksenhet eksisterer med noe egenregistrert data feltene vaere satt`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+            val token = mockOAuthServer.issueIDPortenJWT()
+
+            client.post("/v1/intern/egenregistreringer") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    EgenregistreringRequest.gyldigRequest(2L),
+                )
+                bearerAuth(token.serialize())
             }
-            prop(BruksenhetSimpleResponse::vannforsyning).isNotNull().all {
-                prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
-                prop(VannforsyningKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
-            }
-            prop(BruksenhetSimpleResponse::avlop).isNotNull().all {
-                prop(AvlopKodeInternResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
-                prop(AvlopKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
-            }
-            prop(BruksenhetSimpleResponse::oppvarming).isNotNull().all {
-                index(0).all {
-                    prop(OppvarmingInternResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
-                    prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+
+            val response = client.get("/v1/intern/bruksenheter/2/egenregistrert")
+
+            val now = Instant.now()
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.OK)
+            assertThat(response.body<BruksenhetSimpleResponse>()).all {
+                prop(BruksenhetSimpleResponse::totaltBruksareal).isNotNull().all {
+                    prop(BruksarealInternResponse::data).isEqualTo(125.0)
+                    prop(BruksarealInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
-            }
-            prop(BruksenhetSimpleResponse::energikilder).isNotNull().all {
-                index(0).all {
-                    prop(EnergikildeInternResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
-                    prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                prop(BruksenhetSimpleResponse::byggeaar).isNotNull().all {
+                    prop(ByggeaarInternResponse::data).isEqualTo(2010)
+                    prop(ByggeaarInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
                 }
-            }
-        }
-    }
-
-    @Test
-    fun `gitt at gyldighet blir registrert inn så skal det returneres`() = testApplication {
-        val client = mainModuleWithDatabaseEnvironmentAndClient()
-        val token = mockOAuthServer.issueIDPortenJWT()
-
-        client.post("/v1/intern/egenregistreringer") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                EgenregistreringRequest.gyldigRequest(2L),
-            )
-            bearerAuth(token.serialize())
-        }
-
-        val response = client.get("/v1/intern/bruksenheter/2/egenregistrert")
-
-        assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(response.body<BruksenhetSimpleResponse>()).all {
-            prop(BruksenhetSimpleResponse::vannforsyning).isNotNull().all {
-                prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
-                prop(VannforsyningKodeInternResponse::metadata).all {
-                    prop(RegisterMetadataInternResponse::gyldighetsaar).isEqualTo(2010)
+                prop(BruksenhetSimpleResponse::vannforsyning).isNotNull().all {
+                    prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
+                    prop(VannforsyningKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
+                prop(BruksenhetSimpleResponse::avlop).isNotNull().all {
+                    prop(AvlopKodeInternResponse::data).isEqualTo(AvlopKode.OffentligKloakk)
+                    prop(AvlopKodeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                }
+                prop(BruksenhetSimpleResponse::oppvarming).isNotNull().all {
+                    index(0).all {
+                        prop(OppvarmingInternResponse::data).isEqualTo(OppvarmingKode.Elektrisk)
+                        prop(OppvarmingInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
+                }
+                prop(BruksenhetSimpleResponse::energikilder).isNotNull().all {
+                    index(0).all {
+                        prop(EnergikildeInternResponse::data).isEqualTo(EnergikildeKode.Elektrisitet)
+                        prop(EnergikildeInternResponse::metadata).hasRegistreringstidspunktWithinThreshold(now)
+                    }
                 }
             }
         }
-    }
+
+    @Test
+    fun `gitt at gyldighet blir registrert inn så skal det returneres`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+            val token = mockOAuthServer.issueIDPortenJWT()
+
+            client.post("/v1/intern/egenregistreringer") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    EgenregistreringRequest.gyldigRequest(2L),
+                )
+                bearerAuth(token.serialize())
+            }
+
+            val response = client.get("/v1/intern/bruksenheter/2/egenregistrert")
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.OK)
+            assertThat(response.body<BruksenhetSimpleResponse>()).all {
+                prop(BruksenhetSimpleResponse::vannforsyning).isNotNull().all {
+                    prop(VannforsyningKodeInternResponse::data).isEqualTo(VannforsyningKode.OffentligVannverk)
+                    prop(VannforsyningKodeInternResponse::metadata).all {
+                        prop(RegisterMetadataInternResponse::gyldighetsaar).isEqualTo(2010)
+                    }
+                }
+            }
+        }
 }
-
-
-

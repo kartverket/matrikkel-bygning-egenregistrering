@@ -11,23 +11,26 @@ class BygningService(
     private val bygningClient: BygningClient,
     private val bygningRepository: BygningRepository,
 ) {
-    fun getBygningByBubbleId(bygningBubbleId: Long, registreringstidspunkt: Instant = Instant.now()): Result<Bygning, DomainError> {
-        return bygningClient.getBygningByBubbleId(bygningBubbleId).map { bygning ->
+    fun getBygningByBubbleId(
+        bygningBubbleId: Long,
+        registreringstidspunkt: Instant = Instant.now(),
+    ): Result<Bygning, DomainError> =
+        bygningClient.getBygningByBubbleId(bygningBubbleId).map { bygning ->
             bygning.copy(
-                bruksenheter = bygning.bruksenheter.map { bruksenhet ->
-                    bygningRepository.getBruksenhetById(bruksenhet.id.value, registreringstidspunkt) ?: bruksenhet
-                },
+                bruksenheter =
+                    bygning.bruksenheter.map { bruksenhet ->
+                        bygningRepository.getBruksenhetById(bruksenhet.id.value, registreringstidspunkt) ?: bruksenhet
+                    },
             )
         }
-    }
 
     fun getBruksenhetByBubbleId(
         bruksenhetBubbleId: Long,
-        registreringstidspunkt: Instant = Instant.now()
-    ): Result<Bruksenhet, DomainError> {
-        return bygningClient.getBruksenhetByBubbleId(bruksenhetBubbleId)
+        registreringstidspunkt: Instant = Instant.now(),
+    ): Result<Bruksenhet, DomainError> =
+        bygningClient
+            .getBruksenhetByBubbleId(bruksenhetBubbleId)
             .map { bruksenhet ->
                 bygningRepository.getBruksenhetById(bruksenhet.id.value, registreringstidspunkt) ?: bruksenhet
             }
-    }
 }

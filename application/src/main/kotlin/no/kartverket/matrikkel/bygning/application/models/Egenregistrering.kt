@@ -22,13 +22,13 @@ interface HasGyldighetPeriode {
 
 data class ByggeaarRegistrering(
     val byggeaar: Int,
-    override val kildemateriale: KildematerialeKode
+    override val kildemateriale: KildematerialeKode,
 ) : HasKildemateriale
 
 data class BruksarealRegistrering(
     val totaltBruksareal: Double,
     val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>?,
-    override val kildemateriale: KildematerialeKode
+    override val kildemateriale: KildematerialeKode,
 ) : HasKildemateriale {
     fun checkIsTotaltBruksarealEqualTotaltEtasjeArealIfSet(): Boolean {
         if (etasjeRegistreringer == null) {
@@ -38,9 +38,7 @@ data class BruksarealRegistrering(
         return totaltBruksareal == totaltEtasjeAreal()
     }
 
-    fun totaltEtasjeAreal(): Double {
-        return etasjeRegistreringer?.sumOf { it.bruksareal } ?: 0.0
-    }
+    fun totaltEtasjeAreal(): Double = etasjeRegistreringer?.sumOf { it.bruksareal } ?: 0.0
 }
 
 data class EtasjeBruksarealRegistrering(
@@ -52,29 +50,33 @@ data class VannforsyningRegistrering(
     val vannforsyning: VannforsyningKode,
     override val kildemateriale: KildematerialeKode,
     override val gyldighetsaar: Int?,
-    override val opphoersaar: Int?
-) : HasKildemateriale, HasGyldighetPeriode
+    override val opphoersaar: Int?,
+) : HasKildemateriale,
+    HasGyldighetPeriode
 
 data class AvlopRegistrering(
     val avlop: AvlopKode,
     override val kildemateriale: KildematerialeKode,
     override val gyldighetsaar: Int?,
-    override val opphoersaar: Int?
-) : HasKildemateriale, HasGyldighetPeriode
+    override val opphoersaar: Int?,
+) : HasKildemateriale,
+    HasGyldighetPeriode
 
 data class EnergikildeRegistrering(
     val energikilde: EnergikildeKode,
     override val kildemateriale: KildematerialeKode,
     override val gyldighetsaar: Int?,
-    override val opphoersaar: Int?
-) : HasKildemateriale, HasGyldighetPeriode
+    override val opphoersaar: Int?,
+) : HasKildemateriale,
+    HasGyldighetPeriode
 
 data class OppvarmingRegistrering(
     val oppvarming: OppvarmingKode,
     override val kildemateriale: KildematerialeKode,
     override val gyldighetsaar: Int?,
-    override val opphoersaar: Int?
-) : HasKildemateriale, HasGyldighetPeriode
+    override val opphoersaar: Int?,
+) : HasKildemateriale,
+    HasGyldighetPeriode
 
 data class BruksenhetRegistrering(
     val bruksenhetBubbleId: BruksenhetBubbleId,

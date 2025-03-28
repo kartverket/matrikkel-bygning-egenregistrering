@@ -48,75 +48,75 @@ sealed interface FeltUtenPersondataResponse<T> {
     @Serializable
     data class ByggeaarUtenPersondataResponse(
         override val data: Int,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val metadata: RegisterMetadataUtenPersondataResponse,
     ) : FeltUtenPersondataResponse<Int>
 
     @Serializable
     data class BruksarealUtenPersondataResponse(
         override val data: Double,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val metadata: RegisterMetadataUtenPersondataResponse,
     ) : FeltUtenPersondataResponse<Double>
 
     @Serializable
     data class BruksenhetEtasjerUtenPersondataResponse(
         override val data: List<BruksenhetEtasjeUtenPersondataResponse>,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val metadata: RegisterMetadataUtenPersondataResponse,
     ) : FeltUtenPersondataResponse<List<BruksenhetEtasjeUtenPersondataResponse>> {
         @Serializable
         data class BruksenhetEtasjeUtenPersondataResponse(
             val etasjeBetegnelse: EtasjeBetegnelseUtenPersondataResponse,
-            val bruksareal: Double
+            val bruksareal: Double,
         )
 
         @Serializable
-        data class EtasjeBetegnelseUtenPersondataResponse (
+        data class EtasjeBetegnelseUtenPersondataResponse(
             val etasjeplanKode: String,
-            val etasjenummer: Int
+            val etasjenummer: Int,
         )
     }
 
     @Serializable
     data class VannforsyningKodeUtenPersondataResponse(
         override val data: VannforsyningKode,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val metadata: RegisterMetadataUtenPersondataResponse,
     ) : FeltUtenPersondataResponse<VannforsyningKode>
 
     @Serializable
     data class AvlopKodeUtenPersondataResponse(
         override val data: AvlopKode,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val metadata: RegisterMetadataUtenPersondataResponse,
     ) : FeltUtenPersondataResponse<AvlopKode>
 
     @Serializable
     data class EnergikildeUtenPersondataResponse(
         override val data: EnergikildeKode,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val metadata: RegisterMetadataUtenPersondataResponse,
     ) : FeltUtenPersondataResponse<EnergikildeKode>
 
     @Serializable
     data class OppvarmingUtenPersondataResponse(
         override val data: OppvarmingKode,
-        override val metadata: RegisterMetadataUtenPersondataResponse
+        override val metadata: RegisterMetadataUtenPersondataResponse,
     ) : FeltUtenPersondataResponse<OppvarmingKode>
 }
-
 
 @Serializable
 data class RegisterMetadataUtenPersondataResponse(
     @Serializable(with = InstantSerializer::class)
     val registreringstidspunkt: Instant,
     val kildemateriale: KildematerialeKode? = null,
-    val prosess: ProsessKode?
+    val prosess: ProsessKode?,
 )
 
-
-fun Bygning.toBygningUtenPersondataResponse(): BygningUtenPersondataResponse = BygningUtenPersondataResponse(
-    bygningId = bygningBubbleId.value,
-    bygningsnummer = bygningsnummer,
-    bruksenheter = bruksenheter.map {
-        it.toBruksenhetUtenPersondataResponse()
-    },
-)
+fun Bygning.toBygningUtenPersondataResponse(): BygningUtenPersondataResponse =
+    BygningUtenPersondataResponse(
+        bygningId = bygningBubbleId.value,
+        bygningsnummer = bygningsnummer,
+        bruksenheter =
+            bruksenheter.map {
+                it.toBruksenhetUtenPersondataResponse()
+            },
+    )
 
 private fun RegisterMetadata.toRegisterMetadataUtenPersondataResponse(): RegisterMetadataUtenPersondataResponse =
     RegisterMetadataUtenPersondataResponse(
@@ -157,26 +157,28 @@ private fun <U, T : Felt<U>, O : FeltUtenPersondataResponse<U>?> toListeFeltUten
 
 private fun Felt.BruksenhetEtasjer.toEtasjeUtenPersondataResponse(): BruksenhetEtasjerUtenPersondataResponse =
     BruksenhetEtasjerUtenPersondataResponse(
-        data = this.data.map {
-            BruksenhetEtasjeUtenPersondataResponse(
-                etasjeBetegnelse = BruksenhetEtasjerUtenPersondataResponse.EtasjeBetegnelseUtenPersondataResponse(
-                    etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
-                    etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
-                ),
-                bruksareal = it.bruksareal,
-            )
-        },
+        data =
+            this.data.map {
+                BruksenhetEtasjeUtenPersondataResponse(
+                    etasjeBetegnelse =
+                        BruksenhetEtasjerUtenPersondataResponse.EtasjeBetegnelseUtenPersondataResponse(
+                            etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
+                            etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
+                        ),
+                    bruksareal = it.bruksareal,
+                )
+            },
         metadata = this.metadata.toRegisterMetadataUtenPersondataResponse(),
     )
 
-
-fun Bruksenhet.toBruksenhetUtenPersondataResponse(): BruksenhetUtenPersondataResponse = BruksenhetUtenPersondataResponse(
-    bruksenhetId = this.bruksenhetBubbleId.value,
-    byggeaar = toFeltUtenPersondataResponse(this.byggeaar.egenregistrert, ::ByggeaarUtenPersondataResponse),
-    totaltBruksareal = toFeltUtenPersondataResponse(this.totaltBruksareal.egenregistrert, ::BruksarealUtenPersondataResponse),
-    etasjer = this.etasjer.egenregistrert?.toEtasjeUtenPersondataResponse(),
-    vannforsyning = toFeltUtenPersondataResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeUtenPersondataResponse),
-    avlop = toFeltUtenPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeUtenPersondataResponse),
-    energikilder = toListeFeltUtenPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeUtenPersondataResponse),
-    oppvarming = toListeFeltUtenPersondataResponse(this.oppvarming.egenregistrert, ::OppvarmingUtenPersondataResponse),
-)
+fun Bruksenhet.toBruksenhetUtenPersondataResponse(): BruksenhetUtenPersondataResponse =
+    BruksenhetUtenPersondataResponse(
+        bruksenhetId = this.bruksenhetBubbleId.value,
+        byggeaar = toFeltUtenPersondataResponse(this.byggeaar.egenregistrert, ::ByggeaarUtenPersondataResponse),
+        totaltBruksareal = toFeltUtenPersondataResponse(this.totaltBruksareal.egenregistrert, ::BruksarealUtenPersondataResponse),
+        etasjer = this.etasjer.egenregistrert?.toEtasjeUtenPersondataResponse(),
+        vannforsyning = toFeltUtenPersondataResponse(this.vannforsyning.egenregistrert, ::VannforsyningKodeUtenPersondataResponse),
+        avlop = toFeltUtenPersondataResponse(this.avlop.egenregistrert, ::AvlopKodeUtenPersondataResponse),
+        energikilder = toListeFeltUtenPersondataResponse(this.energikilder.egenregistrert, ::EnergikildeUtenPersondataResponse),
+        oppvarming = toListeFeltUtenPersondataResponse(this.oppvarming.egenregistrert, ::OppvarmingUtenPersondataResponse),
+    )

@@ -1,11 +1,12 @@
 package no.kartverket.matrikkel.bygning.plugins
 
-import io.ktor.http.*
-import io.ktor.serialization.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.response.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.JsonConvertException
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,7 +33,8 @@ fun Application.configureStatusPages() {
                             call.respond(
                                 HttpStatusCode.BadRequest,
                                 ErrorResponse.BadRequestError(
-                                    exception.message ?: "Ukjent feil med request gjør at server ikke kan håndtere forespørselen",
+                                    exception.message
+                                        ?: "Ukjent feil med request gjør at server ikke kan håndtere forespørselen",
                                 ),
                             )
                         }

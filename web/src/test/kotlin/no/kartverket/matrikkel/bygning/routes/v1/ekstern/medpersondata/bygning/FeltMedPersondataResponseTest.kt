@@ -14,18 +14,20 @@ import kotlin.test.Test
 class FeltMedPersondataResponseTest {
     @Test
     fun `mapping av felt med foedselsnummer`() {
-        val byggeaar = Felt.Byggeaar(
-            2000,
-            RegisterMetadata(
-                Instant.now(),
-                RegistreringAktoer.Foedselsnummer("21904798557"),
-                null,
-                null,
-            ),
-        )
+        val byggeaar =
+            Felt.Byggeaar(
+                2000,
+                RegisterMetadata(
+                    Instant.now(),
+                    RegistreringAktoer.Foedselsnummer("21904798557"),
+                    null,
+                    null,
+                ),
+            )
 
         val responseObject = toFeltMedPersondataResponse(byggeaar, ::ByggeaarMedPersondataResponse)
-        assertThat(responseObject).isNotNull()
+        assertThat(responseObject)
+            .isNotNull()
             .prop(FeltMedPersondataResponse<*>::metadata)
             .prop(RegisterMetadataMedPersondataResponse::registrertAv)
             .isEqualTo("21904798557")
@@ -33,18 +35,20 @@ class FeltMedPersondataResponseTest {
 
     @Test
     fun `mapping av felt med signatur`() {
-        val byggeaar = Felt.Byggeaar(
-            2000,
-            RegisterMetadata(
-                Instant.now(),
-                RegistreringAktoer.Signatur("Kongen"),
-                null,
-                null,
-            ),
-        )
+        val byggeaar =
+            Felt.Byggeaar(
+                2000,
+                RegisterMetadata(
+                    Instant.now(),
+                    RegistreringAktoer.Signatur("Kongen"),
+                    null,
+                    null,
+                ),
+            )
 
         val responseObject = toFeltMedPersondataResponse(byggeaar, ::ByggeaarMedPersondataResponse)
-        assertThat(responseObject).isNotNull()
+        assertThat(responseObject)
+            .isNotNull()
             .prop(FeltMedPersondataResponse<*>::metadata)
             .prop(RegisterMetadataMedPersondataResponse::registrertAv)
             .isEqualTo("Kongen")

@@ -4,7 +4,7 @@ import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.messageContains
-import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.*
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import kotlin.test.Test
 
 class RegistreringAktoerTest {

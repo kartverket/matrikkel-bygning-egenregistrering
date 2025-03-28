@@ -11,14 +11,16 @@ import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Sig
 @JsonSubTypes(
     value = [
         JsonSubTypes.Type(value = Foedselsnummer::class, name = "foedselsnummer"),
-        JsonSubTypes.Type(value = Signatur::class, name = "signatur")
-    ]
+        JsonSubTypes.Type(value = Signatur::class, name = "signatur"),
+    ],
 )
 sealed class RegistreringAktoer {
     abstract val value: String
 
     @JsonTypeName("foedselsnummer")
-    data class Foedselsnummer(override val value: String) : RegistreringAktoer() {
+    data class Foedselsnummer(
+        override val value: String,
+    ) : RegistreringAktoer() {
         init {
             // TODO Dette burde ikke være lov når vi er i prod, da må vi sjekke miljøet vi er i
             FodselsnummerValidator.ALLOW_SYNTHETIC_NUMBERS = true
@@ -32,5 +34,7 @@ sealed class RegistreringAktoer {
     }
 
     @JsonTypeName("signatur")
-    data class Signatur(override val value: String) : RegistreringAktoer()
+    data class Signatur(
+        override val value: String,
+    ) : RegistreringAktoer()
 }

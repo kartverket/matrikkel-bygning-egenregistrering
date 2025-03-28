@@ -7,7 +7,8 @@ import io.github.smiley4.ktoropenapi.config.OpenApiPluginConfig
 import io.github.smiley4.ktoropenapi.config.SchemaGenerator
 import io.github.smiley4.ktoropenapi.config.SecurityConfig
 import io.github.smiley4.schemakenerator.swagger.data.RefType
-import io.ktor.server.application.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
@@ -113,16 +114,23 @@ fun Application.configureOpenAPI() {
     }
 }
 
-private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, version: String, securityConfig: SecurityConfig.() -> Unit) {
+private fun OpenApiPluginConfig.installOpenApiSpec(
+    name: String,
+    title: String,
+    version: String,
+    securityConfig: SecurityConfig.() -> Unit,
+) {
     spec(name) {
         schemas {
-            generator = SchemaGenerator.reflection {
-                customGenerator(SchemaGenerator.TypeOverwrites.Instant())
-                explicitNullTypes = false
-                referencePath = RefType.SIMPLE
-            }
+            generator =
+                SchemaGenerator.reflection {
+                    customGenerator(SchemaGenerator.TypeOverwrites.Instant())
+                    explicitNullTypes = false
+                    referencePath = RefType.SIMPLE
+                }
         }
-        postBuild = { openApi, _ -> openApi.externalDocs = null } // Ellers peker den på et sted hvor det ikke ligger noe
+        postBuild =
+            { openApi, _ -> openApi.externalDocs = null } // Ellers peker den på et sted hvor det ikke ligger noe
         info {
             this.title = title
             this.version = version
@@ -133,7 +141,7 @@ private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, 
                     when (url.getOrNull(1)) {
                         "hendelser" -> url.getOrNull(1)?.replaceFirstChar(Char::titlecase)
                         else -> url.getOrNull(2)?.replaceFirstChar(Char::titlecase)
-                    }
+                    },
                 )
             }
         }

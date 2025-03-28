@@ -7,14 +7,17 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.Energiki
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.OppvarmingsKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.OppvarmingsKodeIdList
 
-fun matrikkelBubbleObjectList(vararg bubbles: MatrikkelBubbleObject) = MatrikkelBubbleObjectList().apply {
-    item.addAll(bubbles)
-}
+fun matrikkelBubbleObjectList(vararg bubbles: MatrikkelBubbleObject) =
+    MatrikkelBubbleObjectList().apply {
+        item.addAll(bubbles)
+    }
 
-fun energikildeKodeIdList(vararg ids: EnergikildeKodeId) = EnergikildeKodeIdList().apply {
-    item.addAll(ids)
-}
+fun energikildeKodeIdList(vararg ids: EnergikildeKodeId) =
+    EnergikildeKodeIdList().apply {
+        item.addAll(ids)
+    }
 
-fun oppvarmingsKodeIdList(vararg ids: OppvarmingsKodeId) = OppvarmingsKodeIdList().apply {
-    item.addAll(ids)
-}
+fun oppvarmingsKodeIdList(vararg ids: OppvarmingsKodeId) =
+    OppvarmingsKodeIdList().apply {
+        item.addAll(ids)
+    }

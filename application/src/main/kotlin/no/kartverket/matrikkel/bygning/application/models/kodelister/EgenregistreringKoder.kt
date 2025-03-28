@@ -2,7 +2,7 @@ package no.kartverket.matrikkel.bygning.application.models.kodelister
 
 enum class VannforsyningKode(
     override val presentasjonsnavn: String,
-    override val beskrivelse: String
+    override val beskrivelse: String,
 ) : IKode {
     OffentligVannverk("Offentlig vannverk", "Bygget er tilknyttet offentlig vannverk"),
     TilknyttetPrivatVannverk(
@@ -16,21 +16,21 @@ enum class VannforsyningKode(
     AnnenPrivatIkkeInnlagtVann(
         "Annen privat men ikke innlagt vann",
         "Annen privat vannforsyning, bygget har ikke innlagt vann",
-    )
+    ),
 }
 
 enum class AvlopKode(
     override val presentasjonsnavn: String,
-    override val beskrivelse: String
+    override val beskrivelse: String,
 ) : IKode {
     OffentligKloakk("Offentlig kloakk", "Avløp er offentlig kloakk"),
     PrivatKloakk("Privat kloakk", "Avløp er privat kloakk"),
-    IngenKloakk("Ingen kloakk", "Ingen tilknytning til kloakk")
+    IngenKloakk("Ingen kloakk", "Ingen tilknytning til kloakk"),
 }
 
 enum class EnergikildeKode(
     override val presentasjonsnavn: String,
-    override val beskrivelse: String
+    override val beskrivelse: String,
 ) : IKode {
     AnnenEnergikilde(
         "Annen energikilde",
@@ -47,26 +47,35 @@ enum class EnergikildeKode(
 
 enum class OppvarmingKode(
     override val presentasjonsnavn: String,
-    override val beskrivelse: String
+    override val beskrivelse: String,
 ) : IKode {
     Elektrisk("Elektrisk", "Elektrisk oppvarming"),
     Sentralvarme("Sentralvarme", "Sentralvarme"),
-    AnnenOppvarming("Annen oppvarming", "Annen oppvarming")
+    AnnenOppvarming("Annen oppvarming", "Annen oppvarming"),
 }
 
 enum class KildematerialeKode(
     override val presentasjonsnavn: String,
-    override val beskrivelse: String
+    override val beskrivelse: String,
 ) : IKode {
     Selvrapportert("Selvrapportert", "Du har selv gjort en vurdering av hva som er riktig, men har ikke dokumentasjon."),
-    Salgsoppgave("Salgsoppgave", "Du har sett dette i salgsoppgaven eller en tilhørende rapport (tilstandsrapport, boligsalgsrapport, takstrapport osv)."),
-    Byggesaksdokumenter("Byggesaksdokumenter", "Du har funnet dette i dokumenter laget i forbindelse med en byggesak, for eksempel tegninger, tillatelser eller ferdigattest."),
-    AnnenDokumentasjon("Annen dokumentasjon", "Hvis du har noe dokumentasjon som ikke passer i de andre alternativene, men det er mulig å dokumentere valget ditt.")
+    Salgsoppgave(
+        "Salgsoppgave",
+        "Du har sett dette i salgsoppgaven eller en tilhørende rapport (tilstandsrapport, boligsalgsrapport, takstrapport osv).",
+    ),
+    Byggesaksdokumenter(
+        "Byggesaksdokumenter",
+        "Du har funnet dette i dokumenter laget i forbindelse med en byggesak, for eksempel tegninger, tillatelser eller ferdigattest.",
+    ),
+    AnnenDokumentasjon(
+        "Annen dokumentasjon",
+        "Hvis du har noe dokumentasjon som ikke passer i de andre alternativene, men det er mulig å dokumentere valget ditt.",
+    ),
 }
 
 enum class ProsessKode(
     override val presentasjonsnavn: String,
-    override val beskrivelse: String
+    override val beskrivelse: String,
 ) : IKode {
     Egenregistrering("Egenregistrering", "Føringen er en egenregistrering gjort av bruker ved hjelp av Min Eiendom"),
 }

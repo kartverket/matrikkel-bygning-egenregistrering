@@ -2,11 +2,19 @@ package no.kartverket.matrikkel.bygning.application.models
 
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
 
-data class BygningEtasje(val etasjebetegnelse: Etasjebetegnelse, val etasjeId: Long)
+data class BygningEtasje(
+    val etasjebetegnelse: Etasjebetegnelse,
+    val etasjeId: Long,
+)
 
-data class BruksenhetEtasje(val etasjebetegnelse: Etasjebetegnelse, val bruksareal: Double)
+data class BruksenhetEtasje(
+    val etasjebetegnelse: Etasjebetegnelse,
+    val bruksareal: Double,
+)
 
-data class Etasjenummer private constructor(val loepenummer: Int) {
+data class Etasjenummer private constructor(
+    val loepenummer: Int,
+) {
     companion object {
         fun of(loepenummer: Int): Etasjenummer {
             if (loepenummer > 99 || loepenummer <= 0) {
@@ -17,9 +25,7 @@ data class Etasjenummer private constructor(val loepenummer: Int) {
         }
     }
 
-    override fun toString(): String {
-        return loepenummer.toString().padStart(2, '0')
-    }
+    override fun toString(): String = loepenummer.toString().padStart(2, '0')
 }
 
 data class Etasjebetegnelse private constructor(
@@ -49,15 +55,15 @@ data class Etasjebetegnelse private constructor(
     }
 
     companion object {
-        fun of(etasjenummer: Etasjenummer, etasjeplanKode: EtasjeplanKode): Etasjebetegnelse {
-            return Etasjebetegnelse(
+        fun of(
+            etasjenummer: Etasjenummer,
+            etasjeplanKode: EtasjeplanKode,
+        ): Etasjebetegnelse =
+            Etasjebetegnelse(
                 etasjeplanKode = etasjeplanKode,
                 etasjenummer = etasjenummer,
             )
-        }
     }
 
-    override fun toString(): String {
-        return "${etasjeplanKode}${etasjenummer.loepenummer}"
-    }
+    override fun toString(): String = "${etasjeplanKode}${etasjenummer.loepenummer}"
 }

@@ -15,12 +15,13 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.Bygning as Mat
 private val EARLIEST_DATE_FOR_DERIVING_BYGGEAAR = LocalDate.of(2009, 4, 25)
 
 internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Byggeaar? {
-    val derivedByggeaarStatus = bygning.bygningsstatusHistorikker.item
-        .filter { isAfterThresholdDate(it) }
-        .filter { isCorrectBygningsstatusKode(it.bygningsstatusKodeId) }
-        .filter { isNotDeleted(it) }
-        .filter { isRegistrertDatoAfterVedtaksdato(it) }
-        .minByOrNull { it.dato.toLocalDate() }
+    val derivedByggeaarStatus =
+        bygning.bygningsstatusHistorikker.item
+            .filter { isAfterThresholdDate(it) }
+            .filter { isCorrectBygningsstatusKode(it.bygningsstatusKodeId) }
+            .filter { isNotDeleted(it) }
+            .filter { isRegistrertDatoAfterVedtaksdato(it) }
+            .minByOrNull { it.dato.toLocalDate() }
 
     if (derivedByggeaarStatus == null) {
         return null
@@ -28,11 +29,12 @@ internal fun deriveByggeaarForBygning(bygning: MatrikkelBygning): Byggeaar? {
 
     return Byggeaar(
         data = derivedByggeaarStatus.dato.toLocalDate().year,
-        metadata = RegisterMetadata(
-            registreringstidspunkt = derivedByggeaarStatus.registrertDato.toInstant(),
-            registrertAv = Signatur(derivedByggeaarStatus.oppdatertAv),
-            prosess = ProsessKode.Egenregistrering
-        ),
+        metadata =
+            RegisterMetadata(
+                registreringstidspunkt = derivedByggeaarStatus.registrertDato.toInstant(),
+                registrertAv = Signatur(derivedByggeaarStatus.oppdatertAv),
+                prosess = ProsessKode.Egenregistrering,
+            ),
     )
 }
 
@@ -40,7 +42,8 @@ private fun isAfterThresholdDate(bygningsstatus: BygningsstatusHistorikk): Boole
     bygningsstatus.registrertDato.toLocalDate() > EARLIEST_DATE_FOR_DERIVING_BYGGEAAR
 
 private fun isCorrectBygningsstatusKode(bygningsstatusKodeId: BygningsstatusKodeId): Boolean =
-    bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.FerdigAttest().value || bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse().value
+    bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.FerdigAttest().value ||
+        bygningsstatusKodeId.value == MatrikkelBygningsstatusKode.MidlertidigBrukstillatelse().value
 
 private fun isNotDeleted(bygningsstatus: BygningsstatusHistorikk): Boolean = bygningsstatus.slettetDato == null
 

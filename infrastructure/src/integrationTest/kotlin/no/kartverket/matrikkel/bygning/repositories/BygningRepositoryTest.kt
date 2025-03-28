@@ -26,21 +26,25 @@ class BygningRepositoryTest : TestWithDb() {
 
     private val bruksenhetId = BruksenhetId("00000000-0000-0000-0000-000000000001")
     private val defaultRegistreringstidspunkt = Instant.parse("2025-01-01T00:00:00Z")
-    private val defaultBruksenhet = Bruksenhet(
-        id = bruksenhetId,
-        bruksenhetBubbleId = BruksenhetBubbleId(1L),
-        avlop = Multikilde(
-            egenregistrert = Felt.Avlop(
-                data = AvlopKode.OffentligKloakk,
-                metadata = RegisterMetadata(
-                    registreringstidspunkt = defaultRegistreringstidspunkt,
-                    registrertAv = Foedselsnummer("66860475309"),
-                    kildemateriale = KildematerialeKode.Salgsoppgave,
-                    prosess = ProsessKode.Egenregistrering,
+    private val defaultBruksenhet =
+        Bruksenhet(
+            id = bruksenhetId,
+            bruksenhetBubbleId = BruksenhetBubbleId(1L),
+            avlop =
+                Multikilde(
+                    egenregistrert =
+                        Felt.Avlop(
+                            data = AvlopKode.OffentligKloakk,
+                            metadata =
+                                RegisterMetadata(
+                                    registreringstidspunkt = defaultRegistreringstidspunkt,
+                                    registrertAv = Foedselsnummer("66860475309"),
+                                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                                    prosess = ProsessKode.Egenregistrering,
+                                ),
+                        ),
                 ),
-            ),
-        ),
-    )
+        )
 
     @Test
     fun `lagret bruksenhet skal kunne hentes ut igjen`() {
@@ -51,7 +55,6 @@ class BygningRepositoryTest : TestWithDb() {
         )
 
         val retrievedBruksenhet = bygningRepository.getBruksenhetById(defaultBruksenhet.id.value, Instant.now())
-
 
         assertThat(retrievedBruksenhet).isNotNull().all {
             prop(Bruksenhet::id).isEqualTo(BruksenhetId("00000000-0000-0000-0000-000000000001"))
@@ -78,19 +81,23 @@ class BygningRepositoryTest : TestWithDb() {
             tx = session,
         )
         bygningRepository.saveBruksenhet(
-            bruksenhet = defaultBruksenhet.copy(
-                avlop = Multikilde(
-                    egenregistrert = Felt.Avlop(
-                        data = AvlopKode.PrivatKloakk,
-                        metadata = RegisterMetadata(
-                            registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(60),
-                            registrertAv = Foedselsnummer("66860475309"),
-                            kildemateriale = KildematerialeKode.Salgsoppgave,
-                            prosess = ProsessKode.Egenregistrering,
+            bruksenhet =
+                defaultBruksenhet.copy(
+                    avlop =
+                        Multikilde(
+                            egenregistrert =
+                                Felt.Avlop(
+                                    data = AvlopKode.PrivatKloakk,
+                                    metadata =
+                                        RegisterMetadata(
+                                            registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(60),
+                                            registrertAv = Foedselsnummer("66860475309"),
+                                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                                            prosess = ProsessKode.Egenregistrering,
+                                        ),
+                                ),
                         ),
-                    ),
                 ),
-            ),
             registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(60),
             tx = session,
         )
@@ -124,20 +131,23 @@ class BygningRepositoryTest : TestWithDb() {
             tx = session,
         )
         bygningRepository.saveBruksenhet(
-            bruksenhet = defaultBruksenhet.copy(
-                byggeaar = Multikilde(
-                    egenregistrert = Felt.Byggeaar(
-                        data = byggeaar,
-                        metadata = RegisterMetadata(
-                            registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(1),
-                            registrertAv = Foedselsnummer("66860475309"),
-                            kildemateriale = KildematerialeKode.Salgsoppgave,
-                            prosess = ProsessKode.Egenregistrering,
-
-                            ),
-                    ),
+            bruksenhet =
+                defaultBruksenhet.copy(
+                    byggeaar =
+                        Multikilde(
+                            egenregistrert =
+                                Felt.Byggeaar(
+                                    data = byggeaar,
+                                    metadata =
+                                        RegisterMetadata(
+                                            registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(1),
+                                            registrertAv = Foedselsnummer("66860475309"),
+                                            kildemateriale = KildematerialeKode.Salgsoppgave,
+                                            prosess = ProsessKode.Egenregistrering,
+                                        ),
+                                ),
+                        ),
                 ),
-            ),
             registreringstidspunkt = defaultRegistreringstidspunkt.plusSeconds(1),
             tx = session,
         )

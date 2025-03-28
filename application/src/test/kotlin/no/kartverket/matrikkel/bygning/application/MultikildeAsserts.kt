@@ -12,7 +12,8 @@ fun <T : Any> Assert<Multikilde<T>>.isEmpty() {
     prop(Multikilde<T>::egenregistrert).isNull()
 }
 
-fun <T : Any> Assert<Multikilde<T>>.erAutoritativIkkeEgenregistrert(body: Assert<T>.() -> Unit) = all {
-    prop(Multikilde<T>::autoritativ).isNotNull().all(body)
-    prop(Multikilde<T>::egenregistrert).isNull()
-}
+fun <T : Any> Assert<Multikilde<T>>.erAutoritativIkkeEgenregistrert(body: Assert<T>.() -> Unit) =
+    all {
+        prop(Multikilde<T>::autoritativ).isNotNull().all(body)
+        prop(Multikilde<T>::egenregistrert).isNull()
+    }

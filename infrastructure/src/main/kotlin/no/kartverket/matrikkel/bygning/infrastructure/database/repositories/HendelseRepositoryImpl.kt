@@ -12,13 +12,19 @@ import no.kartverket.matrikkel.bygning.application.hendelser.HendelseRepository
 import org.intellij.lang.annotations.Language
 import javax.sql.DataSource
 
-class HendelseRepositoryImpl(private val dataSource: DataSource) : HendelseRepository {
-    override fun saveHendelse(payload: HendelsePayload, tx: TransactionalSession) {
+class HendelseRepositoryImpl(
+    private val dataSource: DataSource,
+) : HendelseRepository {
+    override fun saveHendelse(
+        payload: HendelsePayload,
+        tx: TransactionalSession,
+    ) {
         @Language("PostgreSQL")
-        val sql = """
+        val sql =
+            """
             INSERT INTO bygning.hendelse (object_id, registreringstidspunkt, type)
             VALUES(:id, :registreringstidspunkt, :type)
-        """.trimIndent()
+            """.trimIndent()
 
         tx.run(
             queryOf(
@@ -32,10 +38,14 @@ class HendelseRepositoryImpl(private val dataSource: DataSource) : HendelseRepos
         )
     }
 
-    override fun getHendelser(fra: Long, antall: Long): List<Hendelse> {
-        return sessionOf(dataSource).use {
+    override fun getHendelser(
+        fra: Long,
+        antall: Long,
+    ): List<Hendelse> =
+        sessionOf(dataSource).use {
             @Language("PostgreSQL")
-            val sql = """
+            val sql =
+                """
                 SELECT 
                     sekvensnummer,
                     object_id,
@@ -44,7 +54,7 @@ class HendelseRepositoryImpl(private val dataSource: DataSource) : HendelseRepos
                 FROM bygning.hendelse
                 WHERE sekvensnummer >= :fra
                 LIMIT :antall
-            """.trimIndent()
+                """.trimIndent()
 
             it.run(
                 queryOf(
@@ -61,18 +71,17 @@ class HendelseRepositoryImpl(private val dataSource: DataSource) : HendelseRepos
                 }.asList,
             )
         }
-    }
 
-    private fun Row.toHendelsePayload(): HendelsePayload {
-        return when (val type = string("type")) {
-            BygningHendelseType.BRUKSENHET_OPPDATERT.name -> BruksenhetOppdatertPayload(
-                objectId = long("object_id"),
-                registreringstidspunkt = sqlTimestamp("registreringstidspunkt").toInstant(),
-            )
+    private fun Row.toHendelsePayload(): HendelsePayload =
+        when (val type = string("type")) {
+            BygningHendelseType.BRUKSENHET_OPPDATERT.name ->
+                BruksenhetOppdatertPayload(
+                    objectId = long("object_id"),
+                    registreringstidspunkt = sqlTimestamp("registreringstidspunkt").toInstant(),
+                )
 
             else -> {
                 throw IllegalArgumentException("Ukjent hendelsestype: $type")
             }
         }
-    }
 }

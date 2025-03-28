@@ -10,19 +10,25 @@ fyll ut README med informasjon om dette.
 
 Prosjektet er bygd og kjørt med `temurin-21` JRE og IntelliJ default Kotlin SDK.
 
-### Tilgang til Github packages 
-Prosjektet benytter felles bibliotker fra Kartverket via Github Packages. For å få tilgang til å laste inn disse lokalt via gradle må du: 
-1. Opprette et Personal Access Token (PAT) på GitHub, med tilgangen `read:packages`. Les hvordan du oppretter en PAT [her](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic). Tokenet må autoriseres med SSO. 
-2. Legg til tokenet i din lokale gradle.properties fil (**ikke** i repoet). For eksempel i .gradle-mappen på brukeren din:
+### Tilgang til Github packages
+
+Prosjektet benytter felles bibliotker fra Kartverket via Github Packages. For å få tilgang til å laste inn disse lokalt
+via gradle må du:
+
+1. Opprette et Personal Access Token (PAT) på GitHub, med tilgangen `read:packages`. Les hvordan du oppretter en
+   PAT [her](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic).
+   Tokenet må autoriseres med SSO.
+2. Legg til tokenet i din lokale gradle.properties fil (**ikke** i repoet). For eksempel i .gradle-mappen på brukeren
+   din:
+
 ```
 KV_PACKAGES_PAT=<KV_PACKAGES_PAT>
 ```
 
-
-
-
 ### TLDR
+
 Vil du kjøre alt av applikasjon og database med Docker, gjør følgende:
+
 ```shell
 $ export PORT=<PORT_NUMMER>          # Optional
 $ export INTERNAL_PORT=<PORT_NUMMER> # Optional
@@ -118,3 +124,33 @@ oppsett, spesielt hvis man benytter Docker Desktop.
 Men hvis man benytter Colima som container runtime er det nødvendig å sette opp noen ekstra miljøvariabler for å få
 testene til å kjøre.  
 Se testcontainers sin egen dokumentasjon [her](https://java.testcontainers.org/supported_docker_environment/)
+
+### Formatering
+
+Dette prosjektet bruker KtLint som formateringsverktøy for å sikre samme formatering mellom flere utviklere. KtLint er
+opinionated, men har sterke regler for defaults som gjør at man ikke vil få forskjellig utseende avhengig av hvor en
+utvikler for eksempel setter newlines.
+
+KtLint er lagt til i byggeløyper, som gjør at det er påkrevd å kjøre KtLint før bygging. Det anbefales å laste ned
+KtLint på egen maskin, og hvis du selv bruker IntelliJ, så bør du bruke ktlint-intellij-plugin for å få en bedre
+integrasjon i IDEen.
+
+Hvis du har lastet ned KtLint og den er på PATH, kan du også legge inn en pre-commit-hook som kjører KtLint før du
+commiter, ved å kjøre følgende:
+
+```shell
+$ ktlint installGitPreCommitHook
+```
+
+For å kjøre KtLint manuelt slik som gjort i byggeløyper kan du kjøre følgende:
+
+```shell
+# Kjører KtLint på alle Kotlin-filer i prosjektet, gruppert på fil
+ktlint --reporter='plain?group_by_file'
+
+# Kjører KtLint på alle Kotlin-filer i prosjektet, og automatisk retter feil som kan rettes 
+ktlint --format
+```
+
+Det kan være noen tilfeller hvor det er regler satt i KtLint som ikke er default for IntelliJ. Dette kan
+justeres under `Settings > Editor > Code Style > Kotlin`.

@@ -1,0 +1,60 @@
+name: Setup KtLint and format
+description: Sets up KtLint, checks formatting, and manages PR comments
+
+runs:
+  using: composite
+
+  steps:
+    - name: Setup KtLint
+      uses: nbadal/action-ktlint-setup@v1
+      with:
+        ktlint_version: '1.5.0'
+
+    - name: Run KtLint and capture errors
+      id: ktlint-check
+      shell: bash
+      continue-on-error: true
+      run: |
+        set +e
+        ktlint_output=$(ktlint --reporter='plain?group_by_file' 2>&1)
+        ktlint_exit_code=$?
+        set -e
+
+        printf "KTLINT_OUTPUT<<EOF\n%s\nEOF\n" "$ktlint_output" >> $GITHUB_ENV
+        echo "KTLINT_EXIT_CODE=$ktlint_exit_code" >> $GITHUB_ENV
+
+    - name: Kommenter ved feil
+      if: env.KTLINT_EXIT_CODE != 0 && github.event_name == 'pull_request'
+      uses: thollander/actions-comment-pull-request@v3
+      with:
+        message: |
+          > [!CAUTION]
+          > ### KtLint Fant Formateringsfeil
+          
+          <details>
+            <summary>Se oversikt over feil</summary>
+          
+            ```
+            ${{ env.KTLINT_OUTPUT }}
+            ```
+          
+          </details>
+        comment-tag: ktlint-formatting-check
+        mode: upsert
+
+    - name: Slett hvis ikke feil
+      if: env.KTLINT_EXIT_CODE == 0 && github.event_name == 'pull_request'
+      uses: thollander/actions-comment-pull-request@v3
+      with:
+        message: Gammel status
+        comment-tag: ktlint-formatting-check
+        mode: delete
+
+    - name: Vis output og exit med riktig kode
+      shell: bash
+      run: |
+        if [[ ${{ env.KTLINT_EXIT_CODE }} -ne 0 ]]; then
+          echo "${{ env.KTLINT_OUTPUT }}"
+        fi
+        
+        exit ${{ env.KTLINT_EXIT_CODE }}

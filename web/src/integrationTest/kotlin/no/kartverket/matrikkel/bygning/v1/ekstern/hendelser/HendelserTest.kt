@@ -7,10 +7,14 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.prop
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.server.testing.*
+import io.ktor.client.call.body
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.server.testing.testApplication
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.application.hendelser.BygningHendelseType
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.HendelseContainerResponse
@@ -46,12 +50,13 @@ class HendelserTest : TestApplicationWithDb() {
             }
 
             val maskinportenJWT = mockOAuthServer.issueMaskinportenJWT()
-            val result = client.get("/v1/hendelser") {
-                url {
-                    parameters.append("antall", "10")
+            val result =
+                client.get("/v1/hendelser") {
+                    url {
+                        parameters.append("antall", "10")
+                    }
+                    bearerAuth(maskinportenJWT.serialize())
                 }
-                bearerAuth(maskinportenJWT.serialize())
-            }
 
             val hendelseContainer = result.body<HendelseContainerResponse>()
 

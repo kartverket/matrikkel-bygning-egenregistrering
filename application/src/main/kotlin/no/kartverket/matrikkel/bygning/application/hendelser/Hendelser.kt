@@ -8,7 +8,7 @@ enum class BygningHendelseType {
 
 data class Hendelse(
     val sekvensnummer: Long,
-    val payload: HendelsePayload
+    val payload: HendelsePayload,
 )
 
 interface HendelsePayload {

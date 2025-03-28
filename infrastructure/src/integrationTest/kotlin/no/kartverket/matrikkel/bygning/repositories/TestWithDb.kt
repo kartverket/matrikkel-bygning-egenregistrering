@@ -24,13 +24,14 @@ abstract class TestWithDb {
         fun setUp() {
             postgresSQLContainer.withDatabaseName("bygning")
             postgresSQLContainer.start()
-            dataSource = createDataSource(
-                DatabaseConfig(
-                    databaseUrl = postgresSQLContainer.jdbcUrl.removePrefix("jdbc:"),
-                    username = postgresSQLContainer.username,
-                    password = postgresSQLContainer.password,
-                ),
-            )
+            dataSource =
+                createDataSource(
+                    DatabaseConfig(
+                        databaseUrl = postgresSQLContainer.jdbcUrl.removePrefix("jdbc:"),
+                        username = postgresSQLContainer.username,
+                        password = postgresSQLContainer.password,
+                    ),
+                )
             runFlywayMigrations(dataSource)
         }
 

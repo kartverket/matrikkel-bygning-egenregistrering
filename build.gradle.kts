@@ -6,4 +6,3 @@ allprojects {
     group = "no.kartverket.matrikkel.bygning"
     version = "0.0.1"
 }
-

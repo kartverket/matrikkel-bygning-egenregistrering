@@ -10,10 +10,11 @@ import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 class EgenregistreringValidator {
     companion object {
         fun validateEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, MultipleValidationError> {
-            val errors = listOfNotNull(
-                validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering),
-                validateListeregistreringDuplicates(egenregistrering),
-            )
+            val errors =
+                listOfNotNull(
+                    validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering),
+                    validateListeregistreringDuplicates(egenregistrering),
+                )
 
             return if (errors.isEmpty()) {
                 Ok(Unit)
@@ -22,15 +23,19 @@ class EgenregistreringValidator {
             }
         }
 
-        private fun validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(egenregistrering: Egenregistrering): ValidationError? {
-            return if (egenregistrering.bruksenhetRegistrering.bruksarealRegistrering?.checkIsTotaltBruksarealEqualTotaltEtasjeArealIfSet() == false) {
+        private fun validateBruksarealRegistreringerTotaltArealIsEqualEtasjerIfExists(
+            egenregistrering: Egenregistrering,
+        ): ValidationError? =
+            if (egenregistrering.bruksenhetRegistrering.bruksarealRegistrering?.checkIsTotaltBruksarealEqualTotaltEtasjeArealIfSet() ==
+                false
+            ) {
                 ValidationError(
-                    message = "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har registrert totalt BRA og BRA per etasje, men totalt BRA stemmer ikke overens med totalen av BRA per etasje",
+                    message = @Suppress("ktlint:standard:max-line-length")
+                    "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har registrert totalt BRA og BRA per etasje, men totalt BRA stemmer ikke overens med totalen av BRA per etasje",
                 )
             } else {
                 null
             }
-        }
 
         private fun validateListeregistreringDuplicates(egenregistrering: Egenregistrering): ValidationError? {
             val oppvarmingHasDuplicate =
@@ -40,7 +45,8 @@ class EgenregistreringValidator {
 
             return if (oppvarmingHasDuplicate || energikilderHasDuplicate) {
                 ValidationError(
-                    message = "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har dupliserte registreringer i oppvarming eller energikilder",
+                    message = @Suppress("ktlint:standard:max-line-length")
+                    "Bruksenhet med ID ${egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value} har dupliserte registreringer i oppvarming eller energikilder",
                 )
             } else {
                 null

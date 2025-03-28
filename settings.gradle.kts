@@ -10,9 +10,10 @@ dependencyResolutionManagement {
             name = "WSClient"
             url = uri("https://maven.pkg.github.com/kartverket/matrikkelapi-v1-wsclient")
 
-            val token = System.getenv("KV_PACKAGES_PAT") // For GitHub workflows
-                ?: extra["KV_PACKAGES_PAT"] // For local development
-                ?: throw InvalidUserDataException("missing 'KV_PACKAGES_PAT' property")
+            val token =
+                System.getenv("KV_PACKAGES_PAT") // For GitHub workflows
+                    ?: extra["KV_PACKAGES_PAT"] // For local development
+                    ?: throw InvalidUserDataException("missing 'KV_PACKAGES_PAT' property")
             val tokenString = token as String
 
             credentials(HttpHeaderCredentials::class) {

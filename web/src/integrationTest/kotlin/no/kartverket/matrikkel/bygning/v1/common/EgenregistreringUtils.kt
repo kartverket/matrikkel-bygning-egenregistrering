@@ -20,62 +20,70 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.Oppvarm
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.VannforsyningRegistreringRequest
 import java.time.Instant
 
-internal fun EgenregistreringRequest.Companion.gyldigRequest(bruksenhetId: Long = 1L) = EgenregistreringRequest(
-    bruksenhetId = bruksenhetId,
-    bruksarealRegistrering = BruksarealRegistreringRequest(
-        totaltBruksareal = 125.0,
-        etasjeRegistreringer = null,
-        kildemateriale = KildematerialeKode.Salgsoppgave,
-    ),
-    byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Selvrapportert),
-    vannforsyningRegistrering = VannforsyningRegistreringRequest(
-        vannforsyning = VannforsyningKode.OffentligVannverk,
-        kildemateriale = KildematerialeKode.Salgsoppgave,
-        gyldighetsaar = 2010,
-        opphoersaar = null,
-    ),
-    avlopRegistrering = AvlopRegistreringRequest(
-        avlop = AvlopKode.OffentligKloakk,
-        kildemateriale = KildematerialeKode.Selvrapportert,
-    ),
-    energikildeRegistrering = listOf(
-        EnergikildeRegistreringRequest(
-            energikilde = EnergikildeKode.Elektrisitet,
-            kildemateriale = KildematerialeKode.Selvrapportert,
-        ),
-    ),
-    oppvarmingRegistrering = listOf(
-        OppvarmingRegistreringRequest(
-            oppvarming = OppvarmingKode.Elektrisk,
-            kildemateriale = KildematerialeKode.Selvrapportert,
-        ),
-    ),
-)
-
-internal fun EgenregistreringRequest.Companion.ugyldigRequestKunBruksarealPerEtasje() = EgenregistreringRequest(
-    bruksenhetId = 1L,
-    byggeaarRegistrering = null,
-    bruksarealRegistrering = BruksarealRegistreringRequest(
-        totaltBruksareal = 50.0,
-        etasjeRegistreringer = listOf(
-            EtasjeBruksarealRegistreringRequest(
-                bruksareal = 125.0,
-                EtasjeBetegnelseRequest(
-                    etasjeplanKode = "H",
-                    etasjenummer = 1,
+internal fun EgenregistreringRequest.Companion.gyldigRequest(bruksenhetId: Long = 1L) =
+    EgenregistreringRequest(
+        bruksenhetId = bruksenhetId,
+        bruksarealRegistrering =
+            BruksarealRegistreringRequest(
+                totaltBruksareal = 125.0,
+                etasjeRegistreringer = null,
+                kildemateriale = KildematerialeKode.Salgsoppgave,
+            ),
+        byggeaarRegistrering = ByggeaarRegistreringRequest(2010, KildematerialeKode.Selvrapportert),
+        vannforsyningRegistrering =
+            VannforsyningRegistreringRequest(
+                vannforsyning = VannforsyningKode.OffentligVannverk,
+                kildemateriale = KildematerialeKode.Salgsoppgave,
+                gyldighetsaar = 2010,
+                opphoersaar = null,
+            ),
+        avlopRegistrering =
+            AvlopRegistreringRequest(
+                avlop = AvlopKode.OffentligKloakk,
+                kildemateriale = KildematerialeKode.Selvrapportert,
+            ),
+        energikildeRegistrering =
+            listOf(
+                EnergikildeRegistreringRequest(
+                    energikilde = EnergikildeKode.Elektrisitet,
+                    kildemateriale = KildematerialeKode.Selvrapportert,
                 ),
             ),
-        ),
-        kildemateriale = KildematerialeKode.Salgsoppgave,
-    ),
-    energikildeRegistrering = null,
-    oppvarmingRegistrering = null,
-    vannforsyningRegistrering = null,
-    avlopRegistrering = null,
-)
+        oppvarmingRegistrering =
+            listOf(
+                OppvarmingRegistreringRequest(
+                    oppvarming = OppvarmingKode.Elektrisk,
+                    kildemateriale = KildematerialeKode.Selvrapportert,
+                ),
+            ),
+    )
 
-internal fun Assert<RegisterMetadataInternResponse>.hasRegistreringstidspunktWithinThreshold(now: Instant): () -> Unit {
-    return {
+internal fun EgenregistreringRequest.Companion.ugyldigRequestKunBruksarealPerEtasje() =
+    EgenregistreringRequest(
+        bruksenhetId = 1L,
+        byggeaarRegistrering = null,
+        bruksarealRegistrering =
+            BruksarealRegistreringRequest(
+                totaltBruksareal = 50.0,
+                etasjeRegistreringer =
+                    listOf(
+                        EtasjeBruksarealRegistreringRequest(
+                            bruksareal = 125.0,
+                            EtasjeBetegnelseRequest(
+                                etasjeplanKode = "H",
+                                etasjenummer = 1,
+                            ),
+                        ),
+                    ),
+                kildemateriale = KildematerialeKode.Salgsoppgave,
+            ),
+        energikildeRegistrering = null,
+        oppvarmingRegistrering = null,
+        vannforsyningRegistrering = null,
+        avlopRegistrering = null,
+    )
+
+internal fun Assert<RegisterMetadataInternResponse>.hasRegistreringstidspunktWithinThreshold(now: Instant): () -> Unit =
+    {
         prop(RegisterMetadataInternResponse::registreringstidspunkt).isBetween(now, now.plusSeconds(1))
     }
-}

@@ -5,9 +5,10 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.MatrikkelBubbleId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.MatrikkelBubbleIdList
 import kotlin.reflect.KClass
 
-inline fun <reified I : MatrikkelBubbleId> MockKMatcherScope.matchId(id: I) = match<I> {
-    it.value == id.value
-}
+inline fun <reified I : MatrikkelBubbleId> MockKMatcherScope.matchId(id: I) =
+    match<I> {
+        it.value == id.value
+    }
 
 fun MockKMatcherScope.matchIds(vararg ids: MatrikkelBubbleId): MatrikkelBubbleIdList {
     val idMap = HashMap<KClass<*>, HashSet<Long>>()
