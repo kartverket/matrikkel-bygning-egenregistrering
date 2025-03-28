@@ -1,8 +1,8 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern
 
 import io.github.smiley4.ktoropenapi.route
-import io.ktor.server.auth.*
-import io.ktor.server.routing.*
+import io.ktor.server.auth.authenticate
+import io.ktor.server.routing.Route
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
@@ -15,7 +15,7 @@ import no.kartverket.matrikkel.bygning.routes.v1.kodeliste.kodelisteRouting
 
 fun Route.internRouting(
     egenregistreringService: EgenregistreringService,
-    bygningService: BygningService
+    bygningService: BygningService,
 ) {
     route(
         "/intern",

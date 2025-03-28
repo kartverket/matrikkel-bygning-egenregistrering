@@ -20,42 +20,40 @@ class EgenregistreringService(
     private val bygningRepository: BygningRepository,
     private val transactional: Transactional,
 ) {
-    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, DomainError> {
-        return bygningService.getBruksenhetByBubbleId(
-            bruksenhetBubbleId = egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value,
-        ).andThen { bruksenhet ->
-            EgenregistreringValidator.validateEgenregistrering(egenregistrering).map { bruksenhet }
-        }.map { bruksenhet ->
-            transactional.withTransaction { tx ->
-                egenregistreringRepository.saveEgenregistrering(
-                    egenregistrering = egenregistrering,
-                    tx = tx,
-                )
+    fun addEgenregistrering(egenregistrering: Egenregistrering): Result<Unit, DomainError> =
+        bygningService
+            .getBruksenhetByBubbleId(
+                bruksenhetBubbleId = egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value,
+            ).andThen { bruksenhet ->
+                EgenregistreringValidator.validateEgenregistrering(egenregistrering).map { bruksenhet }
+            }.map { bruksenhet ->
+                transactional.withTransaction { tx ->
+                    egenregistreringRepository.saveEgenregistrering(
+                        egenregistrering = egenregistrering,
+                        tx = tx,
+                    )
 
-                bygningRepository.saveBruksenhet(
-                    bruksenhet = createBruksenhetSnapshotOfLatestEgenregistrering(bruksenhet, egenregistrering),
-                    registreringstidspunkt = egenregistrering.registreringstidspunkt,
-                    tx = tx,
-                )
+                    bygningRepository.saveBruksenhet(
+                        bruksenhet = createBruksenhetSnapshotOfLatestEgenregistrering(bruksenhet, egenregistrering),
+                        registreringstidspunkt = egenregistrering.registreringstidspunkt,
+                        tx = tx,
+                    )
 
-                hendelseRepository.saveHendelse(
-                    payload = createEgenregistreringHendelsePayloads(egenregistrering),
-                    tx = tx,
-                )
+                    hendelseRepository.saveHendelse(
+                        payload = createEgenregistreringHendelsePayloads(egenregistrering),
+                        tx = tx,
+                    )
+                }
             }
-        }
-    }
 
     private fun createBruksenhetSnapshotOfLatestEgenregistrering(
-        bruksenhet: Bruksenhet, egenregistrering: Egenregistrering
-    ): Bruksenhet {
-        return bruksenhet.applyEgenregistrering(egenregistrering)
-    }
+        bruksenhet: Bruksenhet,
+        egenregistrering: Egenregistrering,
+    ): Bruksenhet = bruksenhet.applyEgenregistrering(egenregistrering)
 
-    private fun createEgenregistreringHendelsePayloads(egenregistrering: Egenregistrering): BruksenhetOppdatertPayload {
-        return BruksenhetOppdatertPayload(
+    private fun createEgenregistreringHendelsePayloads(egenregistrering: Egenregistrering): BruksenhetOppdatertPayload =
+        BruksenhetOppdatertPayload(
             objectId = egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value,
             registreringstidspunkt = egenregistrering.registreringstidspunkt,
         )
-    }
 }

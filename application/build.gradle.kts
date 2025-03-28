@@ -5,7 +5,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 
 plugins {
     kotlin("jvm")
-
     `jvm-test-suite`
 }
 
@@ -28,7 +27,7 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add(
             // https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-consistent-copy-visibility/
-            "-Xconsistent-data-class-copy-visibility"
+            "-Xconsistent-data-class-copy-visibility",
         )
     }
 }

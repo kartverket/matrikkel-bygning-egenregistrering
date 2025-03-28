@@ -46,7 +46,10 @@ data class Bruksenhet(
     val avlop: Multikilde<Avlop> = Multikilde(),
 )
 
-data class Multikilde<T : Any>(val autoritativ: T? = null, val egenregistrert: T? = null) {
+data class Multikilde<T : Any>(
+    val autoritativ: T? = null,
+    val egenregistrert: T? = null,
+) {
     fun withEgenregistrert(verdi: T?): Multikilde<T> = copy(egenregistrert = verdi)
 }
 
@@ -55,7 +58,10 @@ data class Gyldighetsperiode private constructor(
     val opphoersaar: Year?,
 ) {
     companion object {
-        fun of(gyldighetsaar: Year?, opphoersaar: Year?): Gyldighetsperiode {
+        fun of(
+            gyldighetsaar: Year?,
+            opphoersaar: Year?,
+        ): Gyldighetsperiode {
             if (gyldighetsaar != null && opphoersaar != null) {
                 require(gyldighetsaar <= opphoersaar) {
                     "Gyldighetsår må være før eller lik opphørsår"
@@ -67,12 +73,14 @@ data class Gyldighetsperiode private constructor(
             )
         }
 
-        fun of(gyldighetsaar: Int? = null, opphoersaar: Int? = null): Gyldighetsperiode {
-            return of(
+        fun of(
+            gyldighetsaar: Int? = null,
+            opphoersaar: Int? = null,
+        ): Gyldighetsperiode =
+            of(
                 gyldighetsaar = gyldighetsaar?.let { Year.of(it) },
                 opphoersaar = opphoersaar?.let { Year.of(it) },
             )
-        }
     }
 }
 
@@ -90,40 +98,38 @@ sealed interface Felt<T> {
 
     data class Byggeaar(
         override val data: Int,
-        override val metadata: RegisterMetadata
+        override val metadata: RegisterMetadata,
     ) : Felt<Int>
 
     data class Vannforsyning(
         override val data: VannforsyningKode,
-        override val metadata: RegisterMetadata
+        override val metadata: RegisterMetadata,
     ) : Felt<VannforsyningKode>
 
     data class Bruksareal(
         override val data: Double,
-        override val metadata: RegisterMetadata
+        override val metadata: RegisterMetadata,
     ) : Felt<Double>
 
     data class BruksenhetEtasjer(
         override val data: List<BruksenhetEtasje>,
-        override val metadata: RegisterMetadata
+        override val metadata: RegisterMetadata,
     ) : Felt<List<BruksenhetEtasje>>
 
     data class Avlop(
         override val data: AvlopKode,
-        override val metadata: RegisterMetadata
+        override val metadata: RegisterMetadata,
     ) : Felt<AvlopKode>
 
     data class Energikilde(
         override val data: EnergikildeKode,
-        override val metadata: RegisterMetadata
+        override val metadata: RegisterMetadata,
     ) : Felt<EnergikildeKode>
 
     data class Oppvarming(
         override val data: OppvarmingKode,
-        override val metadata: RegisterMetadata
+        override val metadata: RegisterMetadata,
     ) : Felt<OppvarmingKode>
 
-    fun erOpphoert(): Boolean {
-        return metadata.gyldighetsperiode.opphoersaar != null
-    }
+    fun erOpphoert(): Boolean = metadata.gyldighetsperiode.opphoersaar != null
 }

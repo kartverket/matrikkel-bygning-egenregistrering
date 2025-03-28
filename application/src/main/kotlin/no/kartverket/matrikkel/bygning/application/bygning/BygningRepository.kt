@@ -3,9 +3,17 @@ package no.kartverket.matrikkel.bygning.application.bygning
 import kotliquery.TransactionalSession
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 interface BygningRepository {
-    fun saveBruksenhet(bruksenhet: Bruksenhet, registreringstidspunkt: Instant, tx: TransactionalSession)
-    fun getBruksenhetById(bruksenhetId: UUID, registreringstidspunkt: Instant): Bruksenhet?
+    fun saveBruksenhet(
+        bruksenhet: Bruksenhet,
+        registreringstidspunkt: Instant,
+        tx: TransactionalSession,
+    )
+
+    fun getBruksenhetById(
+        bruksenhetId: UUID,
+        registreringstidspunkt: Instant,
+    ): Bruksenhet?
 }

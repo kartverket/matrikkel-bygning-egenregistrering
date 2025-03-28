@@ -13,61 +13,74 @@ import org.intellij.lang.annotations.Language
 import org.postgresql.util.PGobject
 import java.sql.Timestamp
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import javax.sql.DataSource
 
-class BygningRepositoryImpl(private val dataSource: DataSource) : BygningRepository {
-
+class BygningRepositoryImpl(
+    private val dataSource: DataSource,
+) : BygningRepository {
     private val objectMapper =
         jacksonObjectMapper().registerModule(JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-    override fun saveBruksenhet(bruksenhet: Bruksenhet, registreringstidspunkt: Instant, tx: TransactionalSession) {
+    override fun saveBruksenhet(
+        bruksenhet: Bruksenhet,
+        registreringstidspunkt: Instant,
+        tx: TransactionalSession,
+    ) {
         @Language("PostgreSQL")
-        val sql = """
+        val sql =
+            """
             INSERT INTO bygning.bruksenhet
             (id, bruksenhet_bubble_id, registreringstidspunkt, data)
             VALUES (:id, :bruksenhetBubbleId, :registreringstidspunkt, :data)
-        """.trimIndent()
+            """.trimIndent()
 
         tx.run(
             queryOf(
                 sql,
                 mapOf(
-                    "id" to PGobject().apply {
-                        this.type = "uuid"
-                        this.value = bruksenhet.id.value.toString()
-                    },
+                    "id" to
+                        PGobject().apply {
+                            this.type = "uuid"
+                            this.value = bruksenhet.id.value.toString()
+                        },
                     "bruksenhetBubbleId" to bruksenhet.bruksenhetBubbleId.value,
                     "registreringstidspunkt" to Timestamp.from(registreringstidspunkt),
-                    "data" to PGobject().apply {
-                        this.type = "jsonb"
-                        this.value = objectMapper.writeValueAsString(bruksenhet)
-                    },
+                    "data" to
+                        PGobject().apply {
+                            this.type = "jsonb"
+                            this.value = objectMapper.writeValueAsString(bruksenhet)
+                        },
                 ),
             ).asUpdate,
         )
     }
 
-    override fun getBruksenhetById(bruksenhetId: UUID, registreringstidspunkt: Instant): Bruksenhet? {
+    override fun getBruksenhetById(
+        bruksenhetId: UUID,
+        registreringstidspunkt: Instant,
+    ): Bruksenhet? {
         @Language("PostgreSQL")
-        val sql = """
+        val sql =
+            """
             SELECT data
             FROM bygning.bruksenhet
             WHERE id = :id
             AND registreringstidspunkt <= :registreringstidspunkt
             ORDER BY registreringstidspunkt DESC
             LIMIT 1
-        """.trimIndent()
+            """.trimIndent()
 
         return sessionOf(dataSource).use {
             it.run(
                 queryOf(
                     sql,
                     mapOf(
-                        "id" to PGobject().apply {
-                            this.type = "uuid"
-                            this.value = bruksenhetId.toString()
-                        },
+                        "id" to
+                            PGobject().apply {
+                                this.type = "uuid"
+                                this.value = bruksenhetId.toString()
+                            },
                         "registreringstidspunkt" to Timestamp.from(registreringstidspunkt),
                     ),
                 ).map { row ->
@@ -77,4 +90,3 @@ class BygningRepositoryImpl(private val dataSource: DataSource) : BygningReposit
         }
     }
 }
-

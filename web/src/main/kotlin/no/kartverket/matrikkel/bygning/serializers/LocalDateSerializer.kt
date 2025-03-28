@@ -10,11 +10,12 @@ import java.time.LocalDate
 object LocalDateSerializer : KSerializer<LocalDate> {
     override val descriptor = PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): LocalDate {
-        return LocalDate.parse(decoder.decodeString())
-    }
+    override fun deserialize(decoder: Decoder): LocalDate = LocalDate.parse(decoder.decodeString())
 
-    override fun serialize(encoder: Encoder, value: LocalDate) {
+    override fun serialize(
+        encoder: Encoder,
+        value: LocalDate,
+    ) {
         encoder.encodeString(value.toString())
     }
 }

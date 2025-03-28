@@ -39,29 +39,34 @@ data class BruksenhetEtasjeBerettigetInteresseResponse(
     )
 }
 
-fun Bygning.toBygningBerettigetInteresseResponse(): BygningBerettigetInteresseResponse = BygningBerettigetInteresseResponse(
-    bygningId = bygningBubbleId.value,
-    bygningsnummer = bygningsnummer,
-    bruksenheter = bruksenheter.map {
-        it.toBruksenhetBerettigetInteresseResponse()
-    },
-)
+fun Bygning.toBygningBerettigetInteresseResponse(): BygningBerettigetInteresseResponse =
+    BygningBerettigetInteresseResponse(
+        bygningId = bygningBubbleId.value,
+        bygningsnummer = bygningsnummer,
+        bruksenheter =
+            bruksenheter.map {
+                it.toBruksenhetBerettigetInteresseResponse()
+            },
+    )
 
-fun Bruksenhet.toBruksenhetBerettigetInteresseResponse(): BruksenhetBerettigetInteresseResponse = BruksenhetBerettigetInteresseResponse(
-    bruksenhetId = this.bruksenhetBubbleId.value,
-    byggeaar = this.byggeaar.egenregistrert?.data,
-    totaltBruksareal = this.totaltBruksareal.egenregistrert?.data,
-    etasjer = this.etasjer.egenregistrert?.data?.map {
-        BruksenhetEtasjeBerettigetInteresseResponse(
-            etasjeBetegnelse = BruksenhetEtasjeBerettigetInteresseResponse.EtasjeBetegnelseBerettigetInteresseResponse(
-                etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
-                etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
-            ),
-            bruksareal = it.bruksareal,
-        )
-    },
-    vannforsyning = this.vannforsyning.egenregistrert?.data,
-    avlop = this.avlop.egenregistrert?.data,
-    energikilder = this.energikilder.egenregistrert?.map { it.data },
-    oppvarming = this.oppvarming.egenregistrert?.map { it.data },
-)
+fun Bruksenhet.toBruksenhetBerettigetInteresseResponse(): BruksenhetBerettigetInteresseResponse =
+    BruksenhetBerettigetInteresseResponse(
+        bruksenhetId = this.bruksenhetBubbleId.value,
+        byggeaar = this.byggeaar.egenregistrert?.data,
+        totaltBruksareal = this.totaltBruksareal.egenregistrert?.data,
+        etasjer =
+            this.etasjer.egenregistrert?.data?.map {
+                BruksenhetEtasjeBerettigetInteresseResponse(
+                    etasjeBetegnelse =
+                        BruksenhetEtasjeBerettigetInteresseResponse.EtasjeBetegnelseBerettigetInteresseResponse(
+                            etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
+                            etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
+                        ),
+                    bruksareal = it.bruksareal,
+                )
+            },
+        vannforsyning = this.vannforsyning.egenregistrert?.data,
+        avlop = this.avlop.egenregistrert?.data,
+        energikilder = this.energikilder.egenregistrert?.map { it.data },
+        oppvarming = this.oppvarming.egenregistrert?.map { it.data },
+    )

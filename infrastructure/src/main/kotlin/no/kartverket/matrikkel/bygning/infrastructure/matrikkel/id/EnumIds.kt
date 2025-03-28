@@ -10,36 +10,47 @@ import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.Kjokkent
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.OppvarmingsKodeId
 import no.statkart.matrikkel.matrikkelapi.wsapi.v1.domain.bygning.koder.VannforsyningsKodeId
 
-enum class MatrikkelEtasjeplanKode(private val idValue: Long) {
+enum class MatrikkelEtasjeplanKode(
+    private val idValue: Long,
+) {
     IkkeOppgitt(0),
     Hovedetasje(1),
     Kjelleretasje(2),
     Loft(3),
-    Underetasje(4);
+    Underetasje(4),
+    ;
 
     operator fun invoke() = EtasjeplanKodeId().apply { value = idValue }
 }
 
-enum class MatrikkelVannforsyningKode(private val idValue: Long) {
+enum class MatrikkelVannforsyningKode(
+    private val idValue: Long,
+) {
     IkkeOppgitt(0),
     TilknyttetOffVannverk(1),
     TilknyttetPrivatVannverk(2),
     AnnenPrivatInnlagt(3),
-    AnnenPrivatIkkeInnlagt(4);
+    AnnenPrivatIkkeInnlagt(4),
+    ;
 
     operator fun invoke() = VannforsyningsKodeId().apply { value = idValue }
 }
 
-enum class MatrikkelAvlopKode(private val idValue: Long) {
+enum class MatrikkelAvlopKode(
+    private val idValue: Long,
+) {
     IkkeOppgitt(0),
     OffentligKloakk(1),
     PrivatKloakk(2),
-    IngenKloakk(3);
+    IngenKloakk(3),
+    ;
 
     operator fun invoke() = AvlopsKodeId().apply { value = idValue }
 }
 
-enum class MatrikkelEnergikildeKode(private val idValue: Long) {
+enum class MatrikkelEnergikildeKode(
+    private val idValue: Long,
+) {
     Elektrisitet(0),
     OljeParafin(1),
     Biobrensel(2),
@@ -47,33 +58,43 @@ enum class MatrikkelEnergikildeKode(private val idValue: Long) {
     Varmepumpe(4),
     Gass(5),
     Fjernvarme(6),
-    AnnenEnergiKilde(7);
+    AnnenEnergiKilde(7),
+    ;
 
     operator fun invoke() = EnergikildeKodeId().apply { value = idValue }
 }
 
-enum class MatrikkelOppvarmingKode(private val idValue: Long) {
+enum class MatrikkelOppvarmingKode(
+    private val idValue: Long,
+) {
     Elektrisk(0),
     Sentralvarme(1),
-    AnnenOppvarming(2);
+    AnnenOppvarming(2),
+    ;
 
     operator fun invoke() = OppvarmingsKodeId().apply { value = idValue }
 }
 
-enum class MatrikkelKjokkentilgangKode(private val idValue: Long) {
+enum class MatrikkelKjokkentilgangKode(
+    private val idValue: Long,
+) {
     IkkeOppgitt(0),
     Kjokken(1),
     IkkeKjokken(2),
     FellesKjokken(3),
-    Ukjent(4);
+    Ukjent(4),
+    ;
 
     operator fun invoke() = KjokkentilgangKodeId().apply { value = idValue }
 }
 
-enum class MatrikkelBygningsstatusKode(private val idValue: Long) {
+enum class MatrikkelBygningsstatusKode(
+    private val idValue: Long,
+) {
     MidlertidigBrukstillatelse(2),
     FerdigAttest(3),
-    TattIBruk(4);
+    TattIBruk(4),
+    ;
 
     operator fun invoke() = BygningsstatusKodeId().apply { value = idValue }
 }

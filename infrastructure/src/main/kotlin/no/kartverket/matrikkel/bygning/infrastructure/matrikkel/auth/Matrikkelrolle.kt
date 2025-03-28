@@ -2,7 +2,7 @@ package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.auth
 
 enum class Matrikkelrolle(
     /** Må eksplisitt liste alle roller, også de som arver fra andre roller i matrikkelen. */
-    val akseptableRolleIds: Set<Long>
+    val akseptableRolleIds: Set<Long>,
 ) {
     BerettigetInteresse(
         hashSetOf(
@@ -33,5 +33,5 @@ enum class Matrikkelrolle(
             13L, // Innsyn med fnr
             3L, // Matrikkelfører
         ),
-    )
+    ),
 }

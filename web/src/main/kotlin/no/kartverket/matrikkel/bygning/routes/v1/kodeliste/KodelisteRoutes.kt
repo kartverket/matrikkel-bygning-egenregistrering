@@ -1,9 +1,10 @@
 package no.kartverket.matrikkel.bygning.routes.v1.kodeliste
 
 import io.github.smiley4.ktoropenapi.get
-import io.ktor.http.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.route
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EtasjeplanKode
@@ -46,16 +47,18 @@ fun Route.kodelisteRouting() {
 }
 
 private inline fun <reified T> Route.kodelisteRoute(
-    name: String, kodeClass: KClass<T>
-): Route where T : Enum<T>, T : IKode {
-    return route(name) {
+    name: String,
+    kodeClass: KClass<T>,
+): Route where T : Enum<T>, T : IKode =
+    route(name) {
         get(
             {
                 summary = "Henter kodeliste relatert til $name"
-                description = "Henter kodeliste relatert til $name, med tilhørende kode, kodenavn, presentasjonsnavn og beskrivelse"
+                description =
+                    "Henter kodeliste relatert til $name, med tilhørende kode, kodenavn, presentasjonsnavn og beskrivelse"
                 response {
                     code(HttpStatusCode.OK) {
-                        body<List<Kode>>() {
+                        body<List<Kode>> {
                             description = "Kodeliste for $name"
                         }
                     }
@@ -65,4 +68,3 @@ private inline fun <reified T> Route.kodelisteRoute(
             call.respond(kodeClass.toKodeList())
         }
     }
-}

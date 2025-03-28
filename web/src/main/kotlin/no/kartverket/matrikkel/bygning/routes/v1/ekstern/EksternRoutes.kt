@@ -1,9 +1,9 @@
 package no.kartverket.matrikkel.bygning.routes.v1.ekstern
 
 import io.github.smiley4.ktoropenapi.route
-import io.ktor.http.*
-import io.ktor.server.auth.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.auth.authenticate
+import io.ktor.server.routing.Route
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
@@ -21,7 +21,11 @@ fun Route.eksternRouting(
     hendelseService: HendelseService,
 ) {
     route("/") {
-        eksternApiRoute("berettigetinteresse", OpenApiSpecIds.BERETTIGET_INTERESSE, MATRIKKEL_AUTH_BERETTIGET_INTERESSE) {
+        eksternApiRoute(
+            "berettigetinteresse",
+            OpenApiSpecIds.BERETTIGET_INTERESSE,
+            MATRIKKEL_AUTH_BERETTIGET_INTERESSE,
+        ) {
             berettigetInteresseRouting(bygningService)
         }
 
@@ -43,7 +47,7 @@ private fun Route.eksternApiRoute(
     path: String,
     openApiSpecId: String,
     matrikkelAuthSchemeName: String? = null,
-    build: Route.() -> Unit
+    build: Route.() -> Unit,
 ) = route(
     path,
     {

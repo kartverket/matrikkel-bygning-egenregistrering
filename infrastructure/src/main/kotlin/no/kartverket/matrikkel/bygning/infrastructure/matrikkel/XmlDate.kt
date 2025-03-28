@@ -10,18 +10,16 @@ fun MatrikkelTimestamp.toInstant(): Instant {
     return calendar.toInstant()
 }
 
-fun MatrikkelTimestamp.toLocalDate(): LocalDate {
-    return LocalDate.of(
+fun MatrikkelTimestamp.toLocalDate(): LocalDate =
+    LocalDate.of(
         timestamp.year,
         timestamp.month,
         timestamp.day,
     )
-}
 
-fun MatrikkelLocalDate.toLocalDate(): LocalDate {
-    return LocalDate.of(
+fun MatrikkelLocalDate.toLocalDate(): LocalDate =
+    LocalDate.of(
         date.year,
         date.month,
         date.day,
     )
-}

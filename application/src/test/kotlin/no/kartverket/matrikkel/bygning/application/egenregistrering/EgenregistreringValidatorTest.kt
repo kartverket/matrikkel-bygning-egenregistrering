@@ -19,85 +19,103 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Kildemateri
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import kotlin.test.Test
 
 class EgenregistreringValidatorTest {
-
-    private val baseEgenregistrering = Egenregistrering(
-        id = EgenregistreringId(UUID.randomUUID()),
-        registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
-        eier = Foedselsnummer("66860475309"),
-        prosess = ProsessKode.Egenregistrering,
-        bruksenhetRegistrering = BruksenhetRegistrering(
-            bruksenhetBubbleId = BruksenhetBubbleId(1L),
-            bruksarealRegistrering = null,
-            energikildeRegistrering = null,
-            oppvarmingRegistrering = null,
-            byggeaarRegistrering = null,
-            vannforsyningRegistrering = null,
-            avlopRegistrering = null,
-        ),
-    )
-
-    @Test
-    fun `egenregistrering med totalt BRA != sum av BRA skal feile`() {
-        val validationResult = EgenregistreringValidator.validateEgenregistrering(
-            egenregistrering = baseEgenregistrering.copy(
-                bruksenhetRegistrering = BruksenhetRegistrering(
+    private val baseEgenregistrering =
+        Egenregistrering(
+            id = EgenregistreringId(UUID.randomUUID()),
+            registreringstidspunkt = Instant.parse("2024-01-01T12:00:00.00Z"),
+            eier = Foedselsnummer("66860475309"),
+            prosess = ProsessKode.Egenregistrering,
+            bruksenhetRegistrering =
+                BruksenhetRegistrering(
                     bruksenhetBubbleId = BruksenhetBubbleId(1L),
-                    bruksarealRegistrering = BruksarealRegistrering(
-                        totaltBruksareal = 50.0,
-                        etasjeRegistreringer = listOf(
-                            EtasjeBruksarealRegistrering(
-                                bruksareal = 55.0,
-                                etasjebetegnelse = Etasjebetegnelse.of(
-                                    etasjenummer = Etasjenummer.of(1),
-                                    etasjeplanKode = EtasjeplanKode.Kjelleretasje,
-                                ),
-                            ),
-                        ),
-                        kildemateriale = KildematerialeKode.Selvrapportert,
-                    ),
+                    bruksarealRegistrering = null,
                     energikildeRegistrering = null,
                     oppvarmingRegistrering = null,
                     byggeaarRegistrering = null,
                     vannforsyningRegistrering = null,
                     avlopRegistrering = null,
                 ),
-            ),
         )
+
+    @Test
+    fun `egenregistrering med totalt BRA != sum av BRA skal feile`() {
+        val validationResult =
+            EgenregistreringValidator.validateEgenregistrering(
+                egenregistrering =
+                    baseEgenregistrering.copy(
+                        bruksenhetRegistrering =
+                            BruksenhetRegistrering(
+                                bruksenhetBubbleId = BruksenhetBubbleId(1L),
+                                bruksarealRegistrering =
+                                    BruksarealRegistrering(
+                                        totaltBruksareal = 50.0,
+                                        etasjeRegistreringer =
+                                            listOf(
+                                                EtasjeBruksarealRegistrering(
+                                                    bruksareal = 55.0,
+                                                    etasjebetegnelse =
+                                                        Etasjebetegnelse.of(
+                                                            etasjenummer = Etasjenummer.of(1),
+                                                            etasjeplanKode = EtasjeplanKode.Kjelleretasje,
+                                                        ),
+                                                ),
+                                            ),
+                                        kildemateriale = KildematerialeKode.Selvrapportert,
+                                    ),
+                                energikildeRegistrering = null,
+                                oppvarmingRegistrering = null,
+                                byggeaarRegistrering = null,
+                                vannforsyningRegistrering = null,
+                                avlopRegistrering = null,
+                            ),
+                    ),
+            )
 
         assertThat(validationResult.isErr).isTrue()
         assertThat(validationResult.error.errors).hasSize(1)
-        assertThat(validationResult.error.errors.first().message).contains("totalt BRA stemmer ikke overens")
+        assertThat(
+            validationResult.error.errors
+                .first()
+                .message,
+        ).contains("totalt BRA stemmer ikke overens")
     }
 
     @Test
     fun `egenregistrering med duplikatverdier i listeregistrering skal feile`() {
-        val egenregistreringWithDuplicate = baseEgenregistrering.copy(
-            bruksenhetRegistrering = baseEgenregistrering.bruksenhetRegistrering.copy(
-                oppvarmingRegistrering = listOf(
-                    OppvarmingRegistrering(
-                        oppvarming = OppvarmingKode.Elektrisk,
-                        kildemateriale = KildematerialeKode.Selvrapportert,
-                        gyldighetsaar = 2024,
-                        opphoersaar = 2024,
+        val egenregistreringWithDuplicate =
+            baseEgenregistrering.copy(
+                bruksenhetRegistrering =
+                    baseEgenregistrering.bruksenhetRegistrering.copy(
+                        oppvarmingRegistrering =
+                            listOf(
+                                OppvarmingRegistrering(
+                                    oppvarming = OppvarmingKode.Elektrisk,
+                                    kildemateriale = KildematerialeKode.Selvrapportert,
+                                    gyldighetsaar = 2024,
+                                    opphoersaar = 2024,
+                                ),
+                                OppvarmingRegistrering(
+                                    oppvarming = OppvarmingKode.Elektrisk,
+                                    kildemateriale = KildematerialeKode.Selvrapportert,
+                                    gyldighetsaar = 2025,
+                                    opphoersaar = 2026,
+                                ),
+                            ),
                     ),
-                    OppvarmingRegistrering(
-                        oppvarming = OppvarmingKode.Elektrisk,
-                        kildemateriale = KildematerialeKode.Selvrapportert,
-                        gyldighetsaar = 2025,
-                        opphoersaar = 2026,
-                    ),
-                ),
-            ),
-        )
+            )
 
         val result = EgenregistreringValidator.validateEgenregistrering(egenregistreringWithDuplicate)
 
         assertThat(result.isErr).isTrue()
         assertThat(result.error.errors).hasSize(1)
-        assertThat(result.error.errors.first().message).contains("har dupliserte registreringer")
+        assertThat(
+            result.error.errors
+                .first()
+                .message,
+        ).contains("har dupliserte registreringer")
     }
 }

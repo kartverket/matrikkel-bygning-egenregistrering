@@ -20,18 +20,20 @@ class HendelseRepositoryTest : TestWithDb() {
     @Test
     fun `skal kunne hente ut lagrede hendelser`() {
         hendelseRepositoryTest.saveHendelse(
-            payload = HendelsePayload.BruksenhetOppdatertPayload(
-                objectId = 1L,
-                registreringstidspunkt = Instant.parse("2025-01-01T12:00:00.00Z"),
-            ),
+            payload =
+                HendelsePayload.BruksenhetOppdatertPayload(
+                    objectId = 1L,
+                    registreringstidspunkt = Instant.parse("2025-01-01T12:00:00.00Z"),
+                ),
             tx = session,
         )
 
         hendelseRepositoryTest.saveHendelse(
-            payload = HendelsePayload.BruksenhetOppdatertPayload(
-                objectId = 2L,
-                registreringstidspunkt = Instant.parse("2025-01-01T12:00:00.00Z"),
-            ),
+            payload =
+                HendelsePayload.BruksenhetOppdatertPayload(
+                    objectId = 2L,
+                    registreringstidspunkt = Instant.parse("2025-01-01T12:00:00.00Z"),
+                ),
             tx = session,
         )
 

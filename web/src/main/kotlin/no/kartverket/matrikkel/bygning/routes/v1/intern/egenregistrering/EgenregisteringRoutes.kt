@@ -5,11 +5,11 @@ import com.github.michaelbull.result.mapBoth
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
 import io.github.smiley4.ktoropenapi.post
-import io.ktor.http.*
-import io.ktor.server.auth.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -58,13 +58,14 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
             // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
             val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 
-            val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering(eier = fnr) }
-                .mapError(::exceptionToDomainError)
-                .andThen { egenregistreringService.addEgenregistrering(it) }
-                .mapBoth(
-                    success = { HttpStatusCode.Created to null },
-                    failure = ::domainErrorToResponse,
-                )
+            val (status, body) =
+                runCatching { egenregistreringRequest.toEgenregistrering(eier = fnr) }
+                    .mapError(::exceptionToDomainError)
+                    .andThen { egenregistreringService.addEgenregistrering(it) }
+                    .mapBoth(
+                        success = { HttpStatusCode.Created to null },
+                        failure = ::domainErrorToResponse,
+                    )
 
             if (body == null) {
                 call.respond(status)
@@ -75,43 +76,51 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
     }
 }
 
-private val egenregistreringExample = EgenregistreringRequest(
-    bruksenhetId = 1L,
-    bruksarealRegistrering = BruksarealRegistreringRequest(
-        totaltBruksareal = 80.0,
-        etasjeRegistreringer = listOf(
-            EtasjeBruksarealRegistreringRequest(
-                bruksareal = 50.0,
-                etasjebetegnelse = EtasjeBetegnelseRequest(
-                    etasjeplanKode = "H",
-                    etasjenummer = 1,
+private val egenregistreringExample =
+    EgenregistreringRequest(
+        bruksenhetId = 1L,
+        bruksarealRegistrering =
+            BruksarealRegistreringRequest(
+                totaltBruksareal = 80.0,
+                etasjeRegistreringer =
+                    listOf(
+                        EtasjeBruksarealRegistreringRequest(
+                            bruksareal = 50.0,
+                            etasjebetegnelse =
+                                EtasjeBetegnelseRequest(
+                                    etasjeplanKode = "H",
+                                    etasjenummer = 1,
+                                ),
+                        ),
+                        EtasjeBruksarealRegistreringRequest(
+                            bruksareal = 30.0,
+                            etasjebetegnelse =
+                                EtasjeBetegnelseRequest(
+                                    etasjeplanKode = "H",
+                                    etasjenummer = 2,
+                                ),
+                        ),
+                    ),
+                kildemateriale = KildematerialeKode.Salgsoppgave,
+            ),
+        byggeaarRegistrering =
+            ByggeaarRegistreringRequest(
+                byggeaar = 2021,
+                kildemateriale = KildematerialeKode.Selvrapportert,
+            ),
+        oppvarmingRegistrering =
+            listOf(
+                OppvarmingRegistreringRequest(
+                    oppvarming = OppvarmingKode.Elektrisk,
+                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                    gyldighetsaar = 2021,
                 ),
             ),
-            EtasjeBruksarealRegistreringRequest(
-                bruksareal = 30.0,
-                etasjebetegnelse = EtasjeBetegnelseRequest(
-                    etasjeplanKode = "H",
-                    etasjenummer = 2,
-                ),
+        avlopRegistrering =
+            AvlopRegistreringRequest(
+                avlop = AvlopKode.OffentligKloakk,
+                kildemateriale = KildematerialeKode.Selvrapportert,
             ),
-        ),
-        kildemateriale = KildematerialeKode.Salgsoppgave,
-    ),
-    byggeaarRegistrering = ByggeaarRegistreringRequest(
-        byggeaar = 2021,
-        kildemateriale = KildematerialeKode.Selvrapportert,
-    ),
-    oppvarmingRegistrering = listOf(
-        OppvarmingRegistreringRequest(
-            oppvarming = OppvarmingKode.Elektrisk,
-            kildemateriale = KildematerialeKode.Salgsoppgave,
-            gyldighetsaar = 2021,
-        ),
-    ),
-    avlopRegistrering = AvlopRegistreringRequest(
-        avlop = AvlopKode.OffentligKloakk,
-        kildemateriale = KildematerialeKode.Selvrapportert,
-    ),
-    energikildeRegistrering = null,
-    vannforsyningRegistrering = null,
-)
+        energikildeRegistrering = null,
+        vannforsyningRegistrering = null,
+    )

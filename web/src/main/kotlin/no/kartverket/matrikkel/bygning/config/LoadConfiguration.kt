@@ -1,7 +1,8 @@
 package no.kartverket.matrikkel.bygning.config
 
-import io.ktor.server.application.*
-import io.ktor.server.config.*
+import io.ktor.server.application.ApplicationEnvironment
+import io.ktor.server.config.ApplicationConfig
+import io.ktor.server.config.withFallback
 import no.kartverket.matrikkel.bygning.config.Env.LOCAL
 import no.kartverket.matrikkel.bygning.config.Env.SKIP
 import org.slf4j.Logger
@@ -17,9 +18,8 @@ fun loadConfiguration(environment: ApplicationEnvironment): ApplicationConfig =
             environment.config.withFallback(ApplicationConfig(it))
         }
 
-private fun configLocation(): String {
-    return when (Env.current()) {
+private fun configLocation(): String =
+    when (Env.current()) {
         SKIP -> "application.conf"
         LOCAL -> "application-local.conf"
     }
-}

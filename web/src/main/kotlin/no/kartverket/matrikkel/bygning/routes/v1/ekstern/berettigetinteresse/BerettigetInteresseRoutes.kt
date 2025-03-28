@@ -1,13 +1,12 @@
 package no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse
 
-import io.ktor.server.routing.*
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.route
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.bygning.bruksenhetBerettigetInteresseRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.bygning.bygningBerettigetInteresseRouting
 
-fun Route.berettigetInteresseRouting(
-    bygningService: BygningService
-) {
+fun Route.berettigetInteresseRouting(bygningService: BygningService) {
     route("bygninger") {
         bygningBerettigetInteresseRouting(bygningService)
     }

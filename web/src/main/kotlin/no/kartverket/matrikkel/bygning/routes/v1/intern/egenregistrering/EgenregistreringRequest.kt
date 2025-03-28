@@ -23,7 +23,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Serializable
 data class EgenregistreringRequest(
@@ -66,7 +66,7 @@ data class VannforsyningRegistreringRequest(
     val vannforsyning: VannforsyningKode,
     val kildemateriale: KildematerialeKode,
     val gyldighetsaar: Int? = null,
-    val opphoersaar: Int? = null
+    val opphoersaar: Int? = null,
 )
 
 @Serializable
@@ -74,7 +74,7 @@ data class AvlopRegistreringRequest(
     val avlop: AvlopKode,
     val kildemateriale: KildematerialeKode,
     val gyldighetsaar: Int? = null,
-    val opphoersaar: Int? = null
+    val opphoersaar: Int? = null,
 )
 
 @Serializable
@@ -82,7 +82,7 @@ data class EnergikildeRegistreringRequest(
     val energikilde: EnergikildeKode,
     val kildemateriale: KildematerialeKode,
     val gyldighetsaar: Int? = null,
-    val opphoersaar: Int? = null
+    val opphoersaar: Int? = null,
 )
 
 @Serializable
@@ -90,76 +90,83 @@ data class OppvarmingRegistreringRequest(
     val oppvarming: OppvarmingKode,
     val kildemateriale: KildematerialeKode,
     val gyldighetsaar: Int? = null,
-    val opphoersaar: Int? = null
+    val opphoersaar: Int? = null,
 )
 
-fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering {
-    return EtasjeBruksarealRegistrering(
+fun EtasjeBruksarealRegistreringRequest.toEtasjeBruksarealRegistrering(): EtasjeBruksarealRegistrering =
+    EtasjeBruksarealRegistrering(
         bruksareal = this.bruksareal,
-        etasjebetegnelse = Etasjebetegnelse.of(
-            etasjenummer = Etasjenummer.of(this.etasjebetegnelse.etasjenummer),
-            etasjeplanKode = EtasjeplanKode.of(this.etasjebetegnelse.etasjeplanKode),
-        ),
+        etasjebetegnelse =
+            Etasjebetegnelse.of(
+                etasjenummer = Etasjenummer.of(this.etasjebetegnelse.etasjenummer),
+                etasjeplanKode = EtasjeplanKode.of(this.etasjebetegnelse.etasjeplanKode),
+            ),
     )
-}
 
-fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering {
-    return BruksenhetRegistrering(
+fun EgenregistreringRequest.toBruksenhetRegistrering(): BruksenhetRegistrering =
+    BruksenhetRegistrering(
         bruksenhetBubbleId = BruksenhetBubbleId(bruksenhetId),
-        bruksarealRegistrering = bruksarealRegistrering?.let { bruksarealRegistrering ->
-            BruksarealRegistrering(
-                totaltBruksareal = bruksarealRegistrering.totaltBruksareal,
-                etasjeRegistreringer = bruksarealRegistrering.etasjeRegistreringer?.map {
-                    it.toEtasjeBruksarealRegistrering()
-                },
-                kildemateriale = bruksarealRegistrering.kildemateriale,
-            )
-        },
-        byggeaarRegistrering = byggeaarRegistrering?.let {
-            ByggeaarRegistrering(
-                byggeaar = it.byggeaar,
-                kildemateriale = it.kildemateriale,
-            )
-        },
-        vannforsyningRegistrering = vannforsyningRegistrering?.let {
-            VannforsyningRegistrering(
-                vannforsyning = it.vannforsyning,
-                kildemateriale = it.kildemateriale,
-                gyldighetsaar = it.gyldighetsaar,
-                opphoersaar = it.opphoersaar,
-            )
-        },
-        avlopRegistrering = avlopRegistrering?.let {
-            AvlopRegistrering(
-                avlop = it.avlop,
-                kildemateriale = it.kildemateriale,
-                gyldighetsaar = it.gyldighetsaar,
-                opphoersaar = it.opphoersaar,
-            )
-        },
-        energikildeRegistrering = energikildeRegistrering?.map {
-            EnergikildeRegistrering(
-                energikilde = it.energikilde,
-                kildemateriale = it.kildemateriale,
-                gyldighetsaar = it.gyldighetsaar,
-                opphoersaar = it.opphoersaar,
-            )
-        },
-        oppvarmingRegistrering = oppvarmingRegistrering?.map {
-            OppvarmingRegistrering(
-                oppvarming = it.oppvarming,
-                kildemateriale = it.kildemateriale,
-                gyldighetsaar = it.gyldighetsaar,
-                opphoersaar = it.opphoersaar,
-            )
-        },
+        bruksarealRegistrering =
+            bruksarealRegistrering?.let { bruksarealRegistrering ->
+                BruksarealRegistrering(
+                    totaltBruksareal = bruksarealRegistrering.totaltBruksareal,
+                    etasjeRegistreringer =
+                        bruksarealRegistrering.etasjeRegistreringer?.map {
+                            it.toEtasjeBruksarealRegistrering()
+                        },
+                    kildemateriale = bruksarealRegistrering.kildemateriale,
+                )
+            },
+        byggeaarRegistrering =
+            byggeaarRegistrering?.let {
+                ByggeaarRegistrering(
+                    byggeaar = it.byggeaar,
+                    kildemateriale = it.kildemateriale,
+                )
+            },
+        vannforsyningRegistrering =
+            vannforsyningRegistrering?.let {
+                VannforsyningRegistrering(
+                    vannforsyning = it.vannforsyning,
+                    kildemateriale = it.kildemateriale,
+                    gyldighetsaar = it.gyldighetsaar,
+                    opphoersaar = it.opphoersaar,
+                )
+            },
+        avlopRegistrering =
+            avlopRegistrering?.let {
+                AvlopRegistrering(
+                    avlop = it.avlop,
+                    kildemateriale = it.kildemateriale,
+                    gyldighetsaar = it.gyldighetsaar,
+                    opphoersaar = it.opphoersaar,
+                )
+            },
+        energikildeRegistrering =
+            energikildeRegistrering?.map {
+                EnergikildeRegistrering(
+                    energikilde = it.energikilde,
+                    kildemateriale = it.kildemateriale,
+                    gyldighetsaar = it.gyldighetsaar,
+                    opphoersaar = it.opphoersaar,
+                )
+            },
+        oppvarmingRegistrering =
+            oppvarmingRegistrering?.map {
+                OppvarmingRegistrering(
+                    oppvarming = it.oppvarming,
+                    kildemateriale = it.kildemateriale,
+                    gyldighetsaar = it.gyldighetsaar,
+                    opphoersaar = it.opphoersaar,
+                )
+            },
     )
-}
 
-fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering = Egenregistrering(
-    id = EgenregistreringId(UUID.randomUUID()),
-    eier = Foedselsnummer(eier),
-    registreringstidspunkt = Instant.now(),
-    prosess = ProsessKode.Egenregistrering,
-    bruksenhetRegistrering = this.toBruksenhetRegistrering(),
-)
+fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
+    Egenregistrering(
+        id = EgenregistreringId(UUID.randomUUID()),
+        eier = Foedselsnummer(eier),
+        registreringstidspunkt = Instant.now(),
+        prosess = ProsessKode.Egenregistrering,
+        bruksenhetRegistrering = this.toBruksenhetRegistrering(),
+    )

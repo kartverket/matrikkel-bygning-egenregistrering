@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   packages: write
+  pull-requests: write
 
 env:
   registry: ghcr.io
@@ -23,12 +24,18 @@ jobs:
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v4
+
       - name: Setup Java
         uses: ./.github/actions/setup-java
+
+      - name: Lint
+        uses: ./.github/actions/lint
+
       - name: Run build and integration tests
         run: ./gradlew build integrationTest
         env:
           KV_PACKAGES_PAT: ${{ secrets.KV_PACKAGES_PAT }}
+
       - name: Build and push docker
         id: docker
         if: github.event_name == 'push' && github.ref_name == 'main'

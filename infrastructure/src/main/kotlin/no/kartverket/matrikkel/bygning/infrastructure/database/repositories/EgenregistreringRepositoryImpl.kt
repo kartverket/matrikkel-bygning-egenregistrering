@@ -14,13 +14,17 @@ class EgenregistreringRepositoryImpl : EgenregistreringRepository {
     private val objectMapper =
         jacksonObjectMapper().registerModule(JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-    override fun saveEgenregistrering(egenregistrering: Egenregistrering, tx: TransactionalSession) {
+    override fun saveEgenregistrering(
+        egenregistrering: Egenregistrering,
+        tx: TransactionalSession,
+    ) {
         @Language("PostgreSQL")
-        val sql = """
-           INSERT INTO bygning.egenregistrering
-           (id, registreringstidspunkt, eier, registrering)
-           VALUES (:id, :registreringstidspunkt, :eier, :registrering)
-        """.trimIndent()
+        val sql =
+            """
+            INSERT INTO bygning.egenregistrering
+            (id, registreringstidspunkt, eier, registrering)
+            VALUES (:id, :registreringstidspunkt, :eier, :registrering)
+            """.trimIndent()
 
         tx.run(
             queryOf(
@@ -29,10 +33,11 @@ class EgenregistreringRepositoryImpl : EgenregistreringRepository {
                     "id" to egenregistrering.id.value,
                     "registreringstidspunkt" to egenregistrering.registreringstidspunkt,
                     "eier" to egenregistrering.eier.value,
-                    "registrering" to PGobject().apply {
-                        this.type = "jsonb"
-                        this.value = objectMapper.writeValueAsString(egenregistrering.bruksenhetRegistrering)
-                    },
+                    "registrering" to
+                        PGobject().apply {
+                            this.type = "jsonb"
+                            this.value = objectMapper.writeValueAsString(egenregistrering.bruksenhetRegistrering)
+                        },
                 ),
             ).asUpdate,
         )

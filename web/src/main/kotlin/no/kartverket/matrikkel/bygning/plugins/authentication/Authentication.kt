@@ -1,15 +1,23 @@
 package no.kartverket.matrikkel.bygning.plugins.authentication
 
-
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import io.ktor.http.auth.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
-import io.ktor.server.config.*
+import io.ktor.http.auth.HttpAuthHeader
+import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.AuthenticationConfig
+import io.ktor.server.auth.BearerTokenCredential
+import io.ktor.server.auth.UserIdPrincipal
+import io.ktor.server.auth.bearer
+import io.ktor.server.auth.jwt.JWTAuthenticationProvider
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.auth.parseAuthorizationHeader
+import io.ktor.server.config.ApplicationConfig
 import no.kartverket.matrikkel.bygning.config.Env
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.auth.AuthService
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.auth.Matrikkelrolle
@@ -46,13 +54,17 @@ data class JWTAuthenticationConfig(
     val audience: String? = null,
 ) {
     val jwkProvider: JwkProvider
-        get() = JwkProviderBuilder(URI(jwksUri).toURL())
-            .cached(10, 24, TimeUnit.HOURS)
-            .rateLimited(10, 1, TimeUnit.MINUTES)
-            .build()
+        get() =
+            JwkProviderBuilder(URI(jwksUri).toURL())
+                .cached(10, 24, TimeUnit.HOURS)
+                .rateLimited(10, 1, TimeUnit.MINUTES)
+                .build()
 }
 
-fun Application.configureAuthentication(config: ApplicationConfig, matrikkelAuth: AuthService) {
+fun Application.configureAuthentication(
+    config: ApplicationConfig,
+    matrikkelAuth: AuthService,
+) {
     install(Authentication) {
         jwtMaskinporten(config)
         jwtIDPorten(config)
@@ -66,11 +78,12 @@ private fun AuthenticationConfig.jwtMaskinporten(config: ApplicationConfig) {
         mockJwt(MASKINPORTEN_PROVIDER_NAME)
     } else {
         jwt(MASKINPORTEN_PROVIDER_NAME) {
-            val authConfig = JWTAuthenticationConfig(
-                jwksUri = config.property("$name.jwksUri").getString(),
-                issuer = config.property("$name.issuer").getString(),
-                scopes = config.property("$name.scopes").getString(),
-            )
+            val authConfig =
+                JWTAuthenticationConfig(
+                    jwksUri = config.property("$name.jwksUri").getString(),
+                    issuer = config.property("$name.issuer").getString(),
+                    scopes = config.property("$name.scopes").getString(),
+                )
 
             verifier(authConfig.jwkProvider, authConfig.issuer) {
                 acceptLeeway(3)
@@ -86,20 +99,23 @@ private fun AuthenticationConfig.jwtIDPorten(config: ApplicationConfig) {
     if (Env.isLocal() && isProviderDisabled(config, IDPORTEN_PROVIDER_NAME)) {
         mockJwt(IDPORTEN_PROVIDER_NAME) {
             jwtCreator {
-                val token = JWT.create()
-                    .withClaim("pid", "66860475309")
-                    .sign(Algorithm.none())
+                val token =
+                    JWT
+                        .create()
+                        .withClaim("pid", "66860475309")
+                        .sign(Algorithm.none())
 
                 JWT.decode(token)
             }
         }
     } else {
         jwt(IDPORTEN_PROVIDER_NAME) {
-            val authConfig = JWTAuthenticationConfig(
-                jwksUri = config.property("$name.jwksUri").getString(),
-                issuer = config.property("$name.issuer").getString(),
-                scopes = null,
-            )
+            val authConfig =
+                JWTAuthenticationConfig(
+                    jwksUri = config.property("$name.jwksUri").getString(),
+                    issuer = config.property("$name.issuer").getString(),
+                    scopes = null,
+                )
 
             verifier(authConfig.jwkProvider, authConfig.issuer) {
                 acceptLeeway(3)
@@ -115,11 +131,12 @@ private fun AuthenticationConfig.jwtEntraIdArkivariskHistorikk(config: Applicati
         mockJwt(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME)
     } else {
         jwt(ENTRA_ID_ARKIVARISK_HISTORIKK_NAME) {
-            val authConfig = JWTAuthenticationConfig(
-                jwksUri = config.property("entra.jwksUri").getString(),
-                issuer = config.property("entra.issuer").getString(),
-                audience = config.property("entra.audience").getString(),
-            )
+            val authConfig =
+                JWTAuthenticationConfig(
+                    jwksUri = config.property("entra.jwksUri").getString(),
+                    issuer = config.property("entra.issuer").getString(),
+                    audience = config.property("entra.audience").getString(),
+                )
 
             verifier(authConfig.jwkProvider, authConfig.issuer) {
                 acceptLeeway(3)
@@ -132,10 +149,15 @@ private fun AuthenticationConfig.jwtEntraIdArkivariskHistorikk(config: Applicati
     }
 }
 
-private fun isProviderDisabled(config: ApplicationConfig, name: String): Boolean =
-    config.property("${name}.disabled").getString().toBoolean()
+private fun isProviderDisabled(
+    config: ApplicationConfig,
+    name: String,
+): Boolean = config.property("$name.disabled").getString().toBoolean()
 
-private fun AuthenticationConfig.configureMatrikkelAuth(config: ApplicationConfig, authService: AuthService) {
+private fun AuthenticationConfig.configureMatrikkelAuth(
+    config: ApplicationConfig,
+    authService: AuthService,
+) {
     if (Env.isLocal() && isProviderDisabled(config, "matrikkel.oidc")) {
         // Må registrere authenticators med disse navnene, men uten noe å sjekke mot, så avslår de alt.
         val authenticate: suspend ApplicationCall.(BearerTokenCredential) -> Any? = { _ -> null }
@@ -149,11 +171,12 @@ private fun AuthenticationConfig.configureMatrikkelAuth(config: ApplicationConfi
             authenticate(authenticate)
         }
     } else {
-        val authConfig = JWTAuthenticationConfig(
-            jwksUri = config.property("matrikkel.oidc.jwksUri").getString(),
-            issuer = config.property("matrikkel.oidc.issuer").getString(),
-            audience = config.property("matrikkel.oidc.audience").getString(),
-        )
+        val authConfig =
+            JWTAuthenticationConfig(
+                jwksUri = config.property("matrikkel.oidc.jwksUri").getString(),
+                issuer = config.property("matrikkel.oidc.issuer").getString(),
+                audience = config.property("matrikkel.oidc.audience").getString(),
+            )
 
         jwt(MATRIKKEL_AUTH_BERETTIGET_INTERESSE) {
             realm = "Bygning berettiget interesse"
@@ -173,7 +196,7 @@ private fun AuthenticationConfig.configureMatrikkelAuth(config: ApplicationConfi
 private fun JWTAuthenticationProvider.Config.configureMatrikkelAuth(
     authConfig: JWTAuthenticationConfig,
     authService: AuthService,
-    rolle: Matrikkelrolle
+    rolle: Matrikkelrolle,
 ) {
     verifier(authConfig.jwkProvider, authConfig.issuer) {
         acceptLeeway(3)
@@ -184,7 +207,8 @@ private fun JWTAuthenticationProvider.Config.configureMatrikkelAuth(
         // Siden vi har kommet hit, så vet vi at Authorization-header er på forventet format.
         val authHeader = request.parseAuthorizationHeader() as HttpAuthHeader.Single
         val token = authHeader.blob
-        authService.harMatrikkeltilgang(token, rolle)
+        authService
+            .harMatrikkeltilgang(token, rolle)
             ?.let { UserIdPrincipal(it) }
     }
 }

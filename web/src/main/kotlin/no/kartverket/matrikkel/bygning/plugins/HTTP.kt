@@ -1,16 +1,17 @@
 package no.kartverket.matrikkel.bygning.plugins
 
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.callid.*
-import io.ktor.server.plugins.calllogging.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.routing.*
-import io.ktor.server.request.*
-import kotlinx.serialization.ExperimentalSerializationApi
+import io.ktor.http.HttpHeaders
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.callid.CallId
+import io.ktor.server.plugins.callid.callIdMdc
+import io.ktor.server.plugins.calllogging.CallLogging
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.request.path
 import kotlinx.serialization.json.Json
-import java.util.*
+import java.util.UUID
 
 fun Application.configureHTTP() {
     install(ContentNegotiation) {

@@ -14,6 +14,7 @@ import java.net.URI
 
 sealed interface MatrikkelApiFactory {
     fun createBygningClient(): BygningClient
+
     fun createAuthService(): AuthService
 
     companion object {
@@ -34,17 +35,19 @@ sealed interface MatrikkelApiFactory {
      * feil på noen elegant måte.
      */
     private data object StubbedMatrikkelApiFactory : MatrikkelApiFactory {
-        override fun createBygningClient(): BygningClient {
-            return LocalBygningClient()
-        }
+        override fun createBygningClient(): BygningClient = LocalBygningClient()
 
         override fun createAuthService(): AuthService {
             return object : AuthService {
                 private val objectMapper = ObjectMapper()
 
-                override suspend fun harMatrikkeltilgang(token: String, rolle: Matrikkelrolle): String? {
+                override suspend fun harMatrikkeltilgang(
+                    token: String,
+                    rolle: Matrikkelrolle,
+                ): String? {
                     // Tokenet skal allerede ha blitt verifisert, så kjører quick & dirty her uten å trekke inn ekstra avhengigheter.
-                    return token.split('.')
+                    return token
+                        .split('.')
                         .drop(1)
                         .firstOrNull()
                         ?.let {
@@ -62,22 +65,22 @@ sealed interface MatrikkelApiFactory {
         }
     }
 
-    private class RealMatrikkelApiFactory(private val config: MatrikkelApiConfig) : MatrikkelApiFactory {
-        private val api = MatrikkelApi(
-            URI(config.baseUrl),
-        )
+    private class RealMatrikkelApiFactory(
+        private val config: MatrikkelApiConfig,
+    ) : MatrikkelApiFactory {
+        private val api =
+            MatrikkelApi(
+                URI(config.baseUrl),
+            )
 
-        override fun createBygningClient(): BygningClient {
-            return MatrikkelBygningClient(
+        override fun createBygningClient(): BygningClient =
+            MatrikkelBygningClient(
                 api.withAuth(
                     config.username,
                     config.password,
                 ),
             )
-        }
 
-        override fun createAuthService(): AuthService {
-            return MatrikkelAuthService(api)
-        }
+        override fun createAuthService(): AuthService = MatrikkelAuthService(api)
     }
 }

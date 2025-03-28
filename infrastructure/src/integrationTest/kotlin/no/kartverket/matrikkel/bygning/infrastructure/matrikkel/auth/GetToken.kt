@@ -18,14 +18,15 @@ fun main() {
 
     val httpClient = HttpClient.newHttpClient()
 
-    val request = HttpRequest.newBuilder(url.resolve("token"))
-        .POST(
-            HttpRequest.BodyPublishers.ofString(
-                "grant_type=password&username=$username&password=$password&client_id=$clientId&client_secret=$clientSecret",
-            ),
-        )
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .build()
+    val request =
+        HttpRequest
+            .newBuilder(url.resolve("token"))
+            .POST(
+                HttpRequest.BodyPublishers.ofString(
+                    "grant_type=password&username=$username&password=$password&client_id=$clientId&client_secret=$clientSecret",
+                ),
+            ).header("Content-Type", "application/x-www-form-urlencoded")
+            .build()
     val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
     println(response.body())
 }
