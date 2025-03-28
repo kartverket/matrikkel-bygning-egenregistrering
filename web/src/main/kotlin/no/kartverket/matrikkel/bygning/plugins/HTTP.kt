@@ -17,7 +17,7 @@ fun Application.configureHTTP() {
             Json {
                 encodeDefaults = true
                 explicitNulls = false
-            },
+            }
         )
         removeIgnoredType<String>()
     }

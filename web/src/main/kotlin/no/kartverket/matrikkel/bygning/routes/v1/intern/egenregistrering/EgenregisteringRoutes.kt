@@ -12,8 +12,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
+import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
 import no.kartverket.matrikkel.bygning.routes.getFnr
 import no.kartverket.matrikkel.bygning.routes.v1.common.ErrorResponse
@@ -74,6 +76,88 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
         }
     }
 }
+
+fun Route.egenregistrering2Routing(egenregistreringService: EgenregistreringService) {
+    authenticate(IDPORTEN_PROVIDER_NAME) {
+        post(
+            {
+                summary = "Egenregistrering på bruksenhet"
+                description = "Legg til en egenregistrering på en bruksenhet"
+                securitySchemeNames = listOf(IDPORTEN_PROVIDER_NAME)
+                request {
+                    body<EgenregistreringRequest2> {
+                        required = true
+                        example("Bruksenhet #1 vannforsyning") {
+                            description = "Bruksenhet med id = 1"
+                            value = egenregistreringExample2
+                        }
+                        example("Bruksenhet #1 energikilde") {
+                            description = "Bruksenhet med id = 1"
+                            value = egenregistreringExample3
+                        }
+                    }
+                }
+                response {
+                    code(HttpStatusCode.Created) {
+                        description = "Egenregistrering ble registrert"
+                    }
+                    code(HttpStatusCode.BadRequest) {
+                        body<ErrorResponse.ValidationError>()
+                        description = "Validering av egenregistreringsdata har gått feil"
+                    }
+                    code(HttpStatusCode.InternalServerError) {
+                        body<ErrorResponse.InternalServerError>()
+                        description = "Noe gikk galt på server"
+                    }
+                    code(HttpStatusCode.Unauthorized) {
+                        description = "Manglende eller ugyldig token"
+                    }
+                }
+
+            },
+        ) {
+            val fnr = call.getFnr()
+            // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
+            val egenregistreringRequest = call.receive<EgenregistreringRequest2>()
+
+            val (status, body) = runCatching { egenregistreringRequest.toEgenregistrering2(eier = fnr) }
+                .mapError(::exceptionToDomainError)
+                .andThen { egenregistreringService.addEgenregistrering(it) }
+                .mapBoth(
+                    success = { HttpStatusCode.Created to null },
+                    failure = ::domainErrorToResponse,
+                )
+
+            if (body == null) {
+                call.respond(status)
+            } else {
+                call.respond(status, body)
+            }
+        }
+    }
+}
+
+private val egenregistreringExample2 = EgenregistreringRequest2(
+    bruksenhetId = 1L,
+    feltRegistrering = FeltRegistreringRequest.VannforsyningFeltRegistreringRequest(
+        vannforsyning = VannforsyningKode.AnnenPrivatInnlagtVann,
+        kildemateriale = KildematerialeKode.Selvrapportert,
+        gyldighetsaar = 1976
+    )
+)
+
+private val egenregistreringExample3 = EgenregistreringRequest2(
+    bruksenhetId = 1L,
+    feltRegistrering = FeltRegistreringRequest.EnergikildeFeltRegistreringRequest.Energikilder(
+        energikilder = listOf(
+            FeltRegistreringRequest.EnergikildeFeltRegistreringRequest.EnergikildeFeltDataRequest(
+                energikilde = EnergikildeKode.Biobrensel,
+                kildemateriale = KildematerialeKode.Selvrapportert,
+                gyldighetsaar = 2002
+            )
+        )
+    ))
+
 
 private val egenregistreringExample = EgenregistreringRequest(
     bruksenhetId = 1L,

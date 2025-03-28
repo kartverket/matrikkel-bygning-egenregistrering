@@ -53,21 +53,19 @@ fun Application.configureOpenAPI() {
 private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, version: String) {
     spec(name) {
         schemas {
-            generator = SchemaGenerator.kotlinx {
-                overwrite(SchemaGenerator.TypeOverwrites.Instant())
+            generator = SchemaGenerator.reflection {
+                customGenerator(SchemaGenerator.TypeOverwrites.Instant())
                 explicitNullTypes = false
                 referencePath = RefType.SIMPLE
+                //Genererer dokumentasjon med discriminator type hvis request/response-objekter har klassehierarkier
+                discriminatorProperty = "type"
             }
-//            generator = SchemaGenerator.reflection {
-//                customGenerator(SchemaGenerator.TypeOverwrites.Instant())
-//                explicitNullTypes = false
-//                referencePath = RefType.SIMPLE
-//                 Genererer dokumentasjon med discriminator type hvis request/response-objekter har klassehierarkier
-//                discriminatorProperty = "type"
-//            }
         }
         examples {
             // Benytter kotlinx for serialisering av eksempler. Gjør blant annet at eksempler blir korrekt vist med discriminator type
+            exampleEncoder = ExampleEncoder.kotlinx()
+        }
+        examples {
             exampleEncoder = ExampleEncoder.kotlinx()
         }
         postBuild = { openApi, _ -> openApi.externalDocs = null } // Ellers peker den på et sted hvor det ikke ligger noe
@@ -78,10 +76,10 @@ private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, 
         tags {
             tagGenerator = { url ->
                 listOf(
-                    when (url.getOrNull(1)) {
-                        "hendelser" -> url.getOrNull(1)?.replaceFirstChar(Char::titlecase)
-                        else -> url.getOrNull(2)?.replaceFirstChar(Char::titlecase)
-                    }
+                        when (url.getOrNull(1)) {
+                            "hendelser" -> url.getOrNull(1)?.replaceFirstChar(Char::titlecase)
+                            else -> url.getOrNull(2)?.replaceFirstChar(Char::titlecase)
+                        },
                 )
             }
         }

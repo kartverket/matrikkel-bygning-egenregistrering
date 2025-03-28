@@ -23,12 +23,9 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.serializers.InstantSerializer
-import no.kartverket.matrikkel.bygning.serializers.MultikildeInternResponseSerializer
 import java.time.Instant
 
-@OptIn(ExperimentalSerializationApi::class)
-@Serializable(with = MultikildeInternResponseSerializer::class)
-@KeepGeneratedSerializer
+@Serializable
 data class MultikildeInternResponse<T : Any>(
     val autoritativ: T? = null, val egenregistrert: T? = null
 )

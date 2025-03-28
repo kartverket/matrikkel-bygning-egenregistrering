@@ -10,6 +10,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
+import java.time.Year
 
 sealed interface HasKildemateriale {
     val kildemateriale: KildematerialeKode
@@ -18,6 +19,13 @@ sealed interface HasKildemateriale {
 interface HasGyldighetPeriode {
     val gyldighetsaar: Int?
     val opphoersaar: Int?
+}
+
+interface HasGyldighetPeriode2<T> {
+    val gyldighetsaar: Year?
+    val opphoersaar: Year?
+
+    fun withGyldighet(gyldighetsaar: Year?, opphoersaar: Year?) : T
 }
 
 data class ByggeaarRegistrering(
@@ -103,3 +111,52 @@ data class Egenregistrering(
     val prosess: ProsessKode,
     val bruksenhetRegistrering: BruksenhetRegistrering,
 )
+
+data class Egenregistrering2(
+    val id: EgenregistreringId,
+    val eier: Foedselsnummer,
+    val registreringstidspunkt: Instant,
+    val prosess: ProsessKode,
+    val bruksenhetId: BruksenhetBubbleId,
+    val feltRegistrering: FeltRegistrering,
+)
+
+sealed class FeltRegistrering {
+    data class ByggeaarFeltRegistrering(val byggeaar: Int, override val kildemateriale: KildematerialeKode) : HasKildemateriale,
+        FeltRegistrering()
+
+    sealed class BruksarealFeltRegistrering(val byggeaar: Int, override val kildemateriale: KildematerialeKode) : HasKildemateriale,
+        FeltRegistrering() {
+        data class TotaltBruksArealFeltRegistrering(
+            val totaltBruksareal: Double,
+            override val kildemateriale: KildematerialeKode
+        ) :
+            HasKildemateriale, FeltRegistrering()
+
+        data class TotaltOgEtasjeBruksArealFeltRegistrering(
+            val totaltBruksareal: Double,
+            val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>,
+            override val kildemateriale: KildematerialeKode
+        ) : HasKildemateriale, FeltRegistrering()
+    }
+
+    data class VannforsyningFeltRegistrering(
+        val vannforsyning: VannforsyningKode,
+        override val kildemateriale: KildematerialeKode,
+        override val gyldighetsaar: Int,
+        override val opphoersaar: Int? = null,
+    ) : HasKildemateriale, HasGyldighetPeriode, FeltRegistrering()
+
+    data class AvlopFeltRegistrering(
+        val avlop: AvlopKode,
+        override val kildemateriale: KildematerialeKode,
+        override val gyldighetsaar: Int?,
+        override val opphoersaar: Int?
+    ) : HasKildemateriale, HasGyldighetPeriode, FeltRegistrering()
+
+    sealed class EnergikildeFeltRegistrering : FeltRegistrering() {
+        data class HarIkke(val kildemateriale: KildematerialeKode) : EnergikildeFeltRegistrering()
+        data class Data(val data: List<EnergikildeDataRegistrering>) : EnergikildeFeltRegistrering()
+    }
+}
+

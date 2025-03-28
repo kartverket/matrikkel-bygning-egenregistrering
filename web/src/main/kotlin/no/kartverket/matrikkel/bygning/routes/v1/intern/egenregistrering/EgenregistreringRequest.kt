@@ -10,11 +10,13 @@ import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
 import no.kartverket.matrikkel.bygning.application.models.ByggeaarRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
+import no.kartverket.matrikkel.bygning.application.models.Egenregistrering2
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeDataRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EnergikildeRegistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
+import no.kartverket.matrikkel.bygning.application.models.FeltRegistrering
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingDataRegistrering
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
@@ -41,6 +43,47 @@ data class EgenregistreringRequest(
     val oppvarmingRegistrering: OppvarmingRegistreringRequest?,
     val energikildeRegistrering: EnergikildeRegistreringRequest?,
 )
+
+@Serializable
+data class EgenregistreringRequest2(
+    val bruksenhetId: Long,
+    val feltRegistrering: FeltRegistreringRequest
+)
+
+@Serializable
+sealed class FeltRegistreringRequest {
+
+    @Serializable
+    @SerialName("vannforsyning")
+    @Name("vannforsyning")
+    data class VannforsyningFeltRegistreringRequest(
+        val vannforsyning: VannforsyningKode,
+        val kildemateriale: KildematerialeKode,
+        val gyldighetsaar: Int,
+    ) : FeltRegistreringRequest()
+
+    @Serializable
+    sealed class EnergikildeFeltRegistreringRequest : FeltRegistreringRequest() {
+        @Serializable
+        @SerialName("harIkkeEnergikilder")
+        @Name("harIkkeEnergikilder")
+        data class HarIkke(val kildemateriale: KildematerialeKode) : EnergikildeFeltRegistreringRequest()
+
+        @Serializable
+        @SerialName("energikilder")
+        @Name("energikilder")
+        data class Energikilder(val energikilder: List<EnergikildeFeltDataRequest>) : EnergikildeFeltRegistreringRequest()
+
+        @Serializable
+        data class EnergikildeFeltDataRequest(
+            val energikilde: EnergikildeKode,
+            val kildemateriale: KildematerialeKode,
+            val gyldighetsaar: Int,
+        )
+
+    }
+}
+
 
 @Serializable
 data class ByggeaarRegistreringRequest(
@@ -216,4 +259,30 @@ fun EgenregistreringRequest.toEgenregistrering(eier: String): Egenregistrering =
     registreringstidspunkt = Instant.now(),
     prosess = ProsessKode.Egenregistrering,
     bruksenhetRegistrering = this.toBruksenhetRegistrering(),
+)
+
+fun EgenregistreringRequest2.toEgenregistrering2(eier: String) = Egenregistrering2(
+    id = EgenregistreringId(UUID.randomUUID()),
+    eier = Foedselsnummer(eier),
+    registreringstidspunkt = Instant.now(),
+    prosess = ProsessKode.Egenregistrering,
+    bruksenhetId = BruksenhetBubbleId(bruksenhetId),
+    feltRegistrering = when (val felt = this.feltRegistrering) {
+        is FeltRegistreringRequest.VannforsyningFeltRegistreringRequest -> FeltRegistrering.VannforsyningFeltRegistrering(
+            vannforsyning = felt.vannforsyning,
+            kildemateriale = felt.kildemateriale,
+            gyldighetsaar = felt.gyldighetsaar,
+        )
+        is FeltRegistreringRequest.EnergikildeFeltRegistreringRequest.Energikilder -> FeltRegistrering.EnergikildeFeltRegistrering.Data(
+            data = felt.energikilder.map { EnergikildeDataRegistrering(
+                energikilde = it.energikilde,
+                kildemateriale = it.kildemateriale,
+                gyldighetsaar = it.gyldighetsaar,
+                opphoersaar = null
+            ) }
+        )
+        is FeltRegistreringRequest.EnergikildeFeltRegistreringRequest.HarIkke -> FeltRegistrering.EnergikildeFeltRegistrering.HarIkke(
+            kildemateriale = felt.kildemateriale,
+        )
+    }
 )

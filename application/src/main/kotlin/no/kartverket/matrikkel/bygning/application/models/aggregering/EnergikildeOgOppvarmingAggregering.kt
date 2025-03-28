@@ -45,7 +45,7 @@ internal fun oppdaterOppvarming(
         .plus(newOppvarmingToAdd)
 }
 
-private fun OppvarmingDataRegistrering.toOppvarming(metadata: RegisterMetadata): Oppvarming {
+fun OppvarmingDataRegistrering.toOppvarming(metadata: RegisterMetadata): Oppvarming {
     return Oppvarming(
         data = this.oppvarming,
         metadata = metadata
@@ -56,7 +56,7 @@ private fun OppvarmingDataRegistrering.toOppvarming(metadata: RegisterMetadata):
     )
 }
 
-private fun EnergikildeDataRegistrering.toEnergikilde(metadata: RegisterMetadata): Energikilde {
+fun EnergikildeDataRegistrering.toEnergikilde(metadata: RegisterMetadata): Energikilde {
     return Energikilde(
         data = this.energikilde,
         metadata = metadata
