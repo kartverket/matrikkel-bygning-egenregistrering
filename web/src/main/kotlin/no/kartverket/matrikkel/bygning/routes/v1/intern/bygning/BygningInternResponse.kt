@@ -1,5 +1,7 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern.bygning
 
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KeepGeneratedSerializer
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Bygning
@@ -21,9 +23,12 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import no.kartverket.matrikkel.bygning.serializers.InstantSerializer
+import no.kartverket.matrikkel.bygning.serializers.MultikildeInternResponseSerializer
 import java.time.Instant
 
-@Serializable
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable(with = MultikildeInternResponseSerializer::class)
+@KeepGeneratedSerializer
 data class MultikildeInternResponse<T : Any>(
     val autoritativ: T? = null, val egenregistrert: T? = null
 )

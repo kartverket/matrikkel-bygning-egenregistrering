@@ -53,13 +53,18 @@ fun Application.configureOpenAPI() {
 private fun OpenApiPluginConfig.installOpenApiSpec(name: String, title: String, version: String) {
     spec(name) {
         schemas {
-            generator = SchemaGenerator.reflection {
-                customGenerator(SchemaGenerator.TypeOverwrites.Instant())
+            generator = SchemaGenerator.kotlinx {
+                overwrite(SchemaGenerator.TypeOverwrites.Instant())
                 explicitNullTypes = false
                 referencePath = RefType.SIMPLE
-                // Genererer dokumentasjon med discriminator type hvis request/response-objekter har klassehierarkier
-                discriminatorProperty = "type"
             }
+//            generator = SchemaGenerator.reflection {
+//                customGenerator(SchemaGenerator.TypeOverwrites.Instant())
+//                explicitNullTypes = false
+//                referencePath = RefType.SIMPLE
+//                 Genererer dokumentasjon med discriminator type hvis request/response-objekter har klassehierarkier
+//                discriminatorProperty = "type"
+//            }
         }
         examples {
             // Benytter kotlinx for serialisering av eksempler. Gjør blant annet at eksempler blir korrekt vist med discriminator type

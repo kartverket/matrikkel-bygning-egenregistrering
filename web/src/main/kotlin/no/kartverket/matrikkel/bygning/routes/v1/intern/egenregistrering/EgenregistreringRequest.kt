@@ -1,8 +1,10 @@
 package no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering
 
 import io.github.smiley4.schemakenerator.core.annotations.Name
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
@@ -103,17 +105,17 @@ data class EnergikildeDataRequest(
     val opphoersaar: Int? = null
 )
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
+@JsonClassDiscriminator("type")
 sealed class OppvarmingRegistreringRequest {
 
     @Serializable
     @SerialName("harIkke")
-    @Name("harIkke")
     data class HarIkke(val kildemateriale: KildematerialeKode) : OppvarmingRegistreringRequest()
 
     @Serializable
     @SerialName("data")
-    @Name("data")
     data class Data(val data: List<OppvarmingDataRequest>) : OppvarmingRegistreringRequest()
 }
 
