@@ -7,6 +7,7 @@ import no.kartverket.matrikkel.bygning.application.bygning.BygningRepository
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelsePayload.BruksenhetOppdatertPayload
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseRepository
+import no.kartverket.matrikkel.bygning.application.models.AvinstalleringKommando
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering2
@@ -22,12 +23,16 @@ import no.kartverket.matrikkel.bygning.application.models.FeltRegistrering.Energ
 import no.kartverket.matrikkel.bygning.application.models.FeltRegistrering.VannforsyningFeltRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Gyldighetsperiode
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
+import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.aggregering.applyEgenregistrering
 import no.kartverket.matrikkel.bygning.application.models.aggregering.toEnergikilde
 import no.kartverket.matrikkel.bygning.application.models.aggregering.withGyldighetsperiode
 import no.kartverket.matrikkel.bygning.application.models.aggregering.withKildemateriale
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
+import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.transaction.Transactional
+import java.time.Instant
+import java.time.Year
 
 class EgenregistreringService(
     private val bygningService: BygningService,
@@ -53,6 +58,11 @@ class EgenregistreringService(
                     registreringstidspunkt = egenregistrering.registreringstidspunkt,
                     tx = tx,
                 )
+
+                hendelseRepository.saveHendelse(
+                    payload = createEgenregistreringHendelsePayloads(egenregistrering),
+                    tx = tx,
+                )
             }
         }
     }
@@ -67,15 +77,70 @@ class EgenregistreringService(
         return bygningService.getBruksenhetByBubbleId(
             bruksenhetBubbleId = egenregistrering.bruksenhetId.value,
         ).map { bruksenhet ->
+            val feltRegistrering = egenregistrering.feltRegistrering
+
+            // Hvis ugyldig kommando for nåværende aggregat-tilstand -> returner feil
+            if (!bruksenhet.kanHaandtereRegistrering(feltRegistrering)) {
+                throw IllegalArgumentException("Kan ikke håndtere kommando")
+            }
+
+            // Alt bra, lagre og oppdater aggregat
             transactional.withTransaction { tx ->
+                egenregistreringRepository.saveEgenregistrering(egenregistrering, tx)
                 bygningRepository.saveBruksenhet(
                     bruksenhet = createBruksenhetSnapshotOfLatestEgenregistrering(bruksenhet, egenregistrering),
                     registreringstidspunkt = egenregistrering.registreringstidspunkt,
                     tx = tx,
                 )
+
+                // generer hendelse
             }
         }
     }
+
+    fun avinstaller(avinstalleringKommando: AvinstalleringKommando) {
+        bygningService.getBruksenhetByBubbleId(
+            bruksenhetBubbleId = avinstalleringKommando.bruksenhetId.value,
+        ).map { bruksenhet ->
+            // Valider at kommandoen er gyldig
+
+
+            val oppdatertBruksenhet = when (avinstalleringKommando) {
+                is AvinstalleringKommando.AvinstallerVannforsyning -> {
+                    bruksenhet.copy(
+                        vannforsyning = bruksenhet.vannforsyning.withEgenregistrert(
+                            Felt.Vannforsyning(
+                                data = bruksenhet.vannforsyning.egenregistrert!!.data!!,
+                                metadata = RegisterMetadata(
+                                    registrertAv = RegistreringAktoer.Foedselsnummer("66860475309"),
+                                    registreringstidspunkt = Instant.now(),
+                                    prosess = ProsessKode.Egenregistrering,
+                                    kildemateriale = bruksenhet.vannforsyning.egenregistrert!!.metadata!!.kildemateriale,
+                                    gyldighetsperiode = Gyldighetsperiode.of(
+                                        gyldighetsaar = bruksenhet.vannforsyning.egenregistrert!!.metadata!!.gyldighetsperiode.gyldighetsaar,
+                                        opphoersaar = Year.of(
+                                            avinstalleringKommando.opphoersaar,
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    )
+                }
+            }
+            transactional.withTransaction { tx ->
+                //egenregistreringRepository.saveEgenregistrering(egenregistrering, tx)
+                bygningRepository.saveBruksenhet(
+                    bruksenhet = oppdatertBruksenhet,
+                    registreringstidspunkt = Instant.now(),
+                    tx = tx,
+                )
+
+                // generer hendelse
+            }
+        }
+    }
+
 
     private fun createBruksenhetSnapshotOfLatestEgenregistrering(
         eksisterendeBruksenhet: Bruksenhet,
@@ -116,9 +181,6 @@ class EgenregistreringService(
         felt: VannforsyningFeltRegistrering,
         metadata: RegisterMetadata
     ): Bruksenhet {
-        if (this.vannforsyning.egenregistrert != null) {
-            throw IllegalStateException("Vannforsyning already registered")
-        }
         return this.copy(
             vannforsyning = this.vannforsyning.withEgenregistrert(
                 Felt.Vannforsyning(
@@ -197,4 +259,14 @@ class EgenregistreringService(
             registreringstidspunkt = egenregistrering.registreringstidspunkt,
         )
     }
+}
+
+private fun Bruksenhet.kanHaandtereRegistrering(feltRegistrering: FeltRegistrering) = when (feltRegistrering) {
+    is VannforsyningFeltRegistrering -> this.vannforsyning.egenregistrert == null
+    is AvlopFeltRegistrering -> TODO()
+    is ByggeaarFeltRegistrering -> TODO()
+    is EnergikildeFeltRegistrering.Data -> TODO()
+    is EnergikildeFeltRegistrering.HarIkke -> TODO()
+    is FeltRegistrering.BruksarealFeltRegistrering.TotaltBruksArealFeltRegistrering -> TODO()
+    is FeltRegistrering.BruksarealFeltRegistrering.TotaltOgEtasjeBruksArealFeltRegistrering -> TODO()
 }

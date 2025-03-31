@@ -5,6 +5,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import no.kartverket.matrikkel.bygning.application.models.AvinstalleringKommando
 import no.kartverket.matrikkel.bygning.application.models.AvlopRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.BruksenhetRegistrering
@@ -84,6 +85,19 @@ sealed class FeltRegistreringRequest {
     }
 }
 
+@Serializable
+sealed class AvinstallerRequest {
+    abstract val bruksenhetId: Long
+
+    @Serializable
+    @SerialName("vannforsyning")
+    @Name("vannforsyning")
+    data class AvinstallerVannforsyningRequest(
+        override val bruksenhetId: Long,
+        val vannforsyning: VannforsyningKode,
+        val opphoersaar: Int
+    ) : AvinstallerRequest()
+}
 
 @Serializable
 data class ByggeaarRegistreringRequest(
@@ -125,6 +139,15 @@ data class AvlopRegistreringRequest(
     val gyldighetsaar: Int? = null,
     val opphoersaar: Int? = null
 )
+
+
+fun AvinstallerRequest.toAvinstallering() = when(this) {
+    is AvinstallerRequest.AvinstallerVannforsyningRequest -> AvinstalleringKommando.AvinstallerVannforsyning(
+        bruksenhetId = BruksenhetBubbleId(this.bruksenhetId),
+        vannforsyning = this.vannforsyning,
+        opphoersaar = this.opphoersaar,
+    )
+}
 
 @Serializable
 sealed class EnergikildeRegistreringRequest {

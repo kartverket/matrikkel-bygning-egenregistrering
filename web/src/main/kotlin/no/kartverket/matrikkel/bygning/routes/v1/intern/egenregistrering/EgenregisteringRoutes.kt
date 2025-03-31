@@ -134,6 +134,13 @@ fun Route.egenregistrering2Routing(egenregistreringService: EgenregistreringServ
                 call.respond(status, body)
             }
         }
+        put("/avinstaller") {
+            val avinstallerRequest = call.receive<AvinstallerRequest>()
+
+            egenregistreringService.avinstaller(avinstallerRequest.toAvinstallering())
+
+            call.respond(HttpStatusCode.OK)
+        }
     }
 }
 
@@ -142,8 +149,8 @@ private val egenregistreringExample2 = EgenregistreringRequest2(
     feltRegistrering = FeltRegistreringRequest.VannforsyningFeltRegistreringRequest(
         vannforsyning = VannforsyningKode.AnnenPrivatInnlagtVann,
         kildemateriale = KildematerialeKode.Selvrapportert,
-        gyldighetsaar = 1976
-    )
+        gyldighetsaar = 1976,
+    ),
 )
 
 private val egenregistreringExample3 = EgenregistreringRequest2(
@@ -153,10 +160,11 @@ private val egenregistreringExample3 = EgenregistreringRequest2(
             FeltRegistreringRequest.EnergikildeFeltRegistreringRequest.EnergikildeFeltDataRequest(
                 energikilde = EnergikildeKode.Biobrensel,
                 kildemateriale = KildematerialeKode.Selvrapportert,
-                gyldighetsaar = 2002
-            )
-        )
-    ))
+                gyldighetsaar = 2002,
+            ),
+        ),
+    ),
+)
 
 
 private val egenregistreringExample = EgenregistreringRequest(
