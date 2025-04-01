@@ -22,7 +22,7 @@ jobs:
         env:
           KV_PACKAGES_PAT: ${{ secrets.KV_PACKAGES_PAT }}
       - name: Dependency review
-        uses: actions/dependency-review-action@v4.5.0
+        uses: actions/dependency-review-action@v4.6.0
         if: github.event_name == 'pull_request'
         with:
           comment-summary-in-pr: true
