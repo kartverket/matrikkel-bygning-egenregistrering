@@ -8,10 +8,14 @@ import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class RegistrertEierService(
     private val registrertEierClient: RegistrertEierClient,
 ) {
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
+
     fun erUltimatEier(
         matrikkelenhetBubbleId: MatrikkelenhetBubbleId,
         eier: RegistreringAktoer.Foedselsnummer,
@@ -22,7 +26,11 @@ class RegistrertEierService(
                 if (eierforhold.ultimatEier) {
                     Ok(Unit)
                 } else {
-                    Err(ValidationError("Eier ${eier.value} er ikke ultimat eier av matrikkelenhet ${matrikkelenhetBubbleId.value}"))
+                    // TODO: fjern fnr fra logglinje
+                    log.warn(
+                        "Eier ${eier.value} er ikke ultimat eier av matrikkelenhet ${matrikkelenhetBubbleId.value}",
+                    )
+                    Err(ValidationError("Eier kan ikke registrere på bruksenheten"))
                 }
             }
 }

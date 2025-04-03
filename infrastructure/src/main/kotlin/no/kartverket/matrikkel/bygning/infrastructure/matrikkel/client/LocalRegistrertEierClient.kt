@@ -6,10 +6,14 @@ import no.kartverket.matrikkel.bygning.application.bygning.RegistrertEierClient
 import no.kartverket.matrikkel.bygning.application.models.MatrikkelenhetEier
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.error.MatrikkelenhetNotFound
+import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class LocalRegistrertEierClient : RegistrertEierClient {
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
+
     private val matrikkelenhetEiere: List<MatrikkelenhetEier> =
         listOf(
             MatrikkelenhetEier(
@@ -26,8 +30,12 @@ class LocalRegistrertEierClient : RegistrertEierClient {
         matrikkelenhetEiere
             .find { it.matrikkelenhetBubbleId == matrikkelenhetBubbleId && it.eier == eier }
             .toResultOr {
-                MatrikkelenhetNotFound(
-                    message = "Fant ikke eierforhold mellom matrikkelenhet ${matrikkelenhetBubbleId.value} og eier ${eier.value}",
+                // TODO: fjern fnr fra logglinje
+                log.warn(
+                    "Fant ikke eierforhold mellom matrikkelenhet ${matrikkelenhetBubbleId.value} og eier ${eier.value}",
+                )
+                ValidationError(
+                    message = "Fant ikke eierforhold",
                 )
             }
 }

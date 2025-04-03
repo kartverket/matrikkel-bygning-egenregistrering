@@ -9,6 +9,9 @@ plugins {
 }
 
 dependencies {
+    // Logging
+    implementation(libs.logback.classic)
+
     // Error handling
     api(libs.kotlin.result)
 
