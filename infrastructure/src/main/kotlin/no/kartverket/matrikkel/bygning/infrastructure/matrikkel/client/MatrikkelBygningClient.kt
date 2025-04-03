@@ -23,6 +23,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApi
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenhet
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.getBruksenheter
@@ -128,6 +129,7 @@ class MatrikkelBygningClient(
                             Bruksenhet(
                                 id = BruksenhetId(it.uuid.uuid),
                                 bruksenhetBubbleId = BruksenhetBubbleId(it.id.value),
+                                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(it.id.value),
                                 totaltBruksareal =
                                     Multikilde(
                                         autoritativ =
@@ -185,6 +187,7 @@ class MatrikkelBygningClient(
                 Bruksenhet(
                     id = BruksenhetId(bruksenhet.uuid.uuid),
                     bruksenhetBubbleId = BruksenhetBubbleId(bruksenhetId.value),
+                    matrikkelenhetBubbleId = MatrikkelenhetBubbleId(bruksenhetId.value),
                 ),
             )
         } catch (exception: ServiceException) {

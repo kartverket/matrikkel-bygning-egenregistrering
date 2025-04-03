@@ -11,6 +11,10 @@ data class BruksenhetNotFound(
     val message: String,
 ) : DomainError
 
+data class MatrikkelenhetNotFound(
+    val message: String,
+) : DomainError
+
 data class ValidationError(
     val message: String,
 ) : DomainError

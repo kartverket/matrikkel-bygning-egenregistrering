@@ -11,6 +11,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -37,6 +38,7 @@ data class Bygning(
 data class Bruksenhet(
     val id: BruksenhetId,
     val bruksenhetBubbleId: BruksenhetBubbleId,
+    val matrikkelenhetBubbleId: MatrikkelenhetBubbleId,
     val etasjer: Multikilde<BruksenhetEtasjer> = Multikilde(),
     val byggeaar: Multikilde<Byggeaar> = Multikilde(),
     val totaltBruksareal: Multikilde<Bruksareal> = Multikilde(),

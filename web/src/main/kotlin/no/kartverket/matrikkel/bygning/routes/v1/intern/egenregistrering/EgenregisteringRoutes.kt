@@ -55,6 +55,7 @@ fun Route.egenregistreringRouting(egenregistreringService: EgenregistreringServi
             },
         ) {
             val fnr = call.getFnr()
+            println("fnr: $fnr")
             // Kan også wrappes i en runCatching. Enten her eller ved å lage en custom receive-metode.
             val egenregistreringRequest = call.receive<EgenregistreringRequest>()
 

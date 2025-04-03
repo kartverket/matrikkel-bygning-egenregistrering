@@ -5,6 +5,7 @@ import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.map
 import no.kartverket.matrikkel.bygning.application.bygning.BygningRepository
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
+import no.kartverket.matrikkel.bygning.application.bygning.RegistrertEierService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelsePayload.BruksenhetOppdatertPayload
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseRepository
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
@@ -15,6 +16,7 @@ import no.kartverket.matrikkel.bygning.application.transaction.Transactional
 
 class EgenregistreringService(
     private val bygningService: BygningService,
+    private val registrertEierService: RegistrertEierService,
     private val egenregistreringRepository: EgenregistreringRepository,
     private val hendelseRepository: HendelseRepository,
     private val bygningRepository: BygningRepository,
@@ -26,6 +28,8 @@ class EgenregistreringService(
                 bruksenhetBubbleId = egenregistrering.bruksenhetRegistrering.bruksenhetBubbleId.value,
             ).andThen { bruksenhet ->
                 EgenregistreringValidator.validateEgenregistrering(egenregistrering).map { bruksenhet }
+            }.andThen { bruksenhet ->
+                registrertEierService.erUltimatEier(bruksenhet.matrikkelenhetBubbleId, eier = egenregistrering.eier).map { bruksenhet }
             }.map { bruksenhet ->
                 transactional.withTransaction { tx ->
                     egenregistreringRepository.saveEgenregistrering(

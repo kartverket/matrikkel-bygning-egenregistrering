@@ -16,6 +16,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
 import java.time.Instant
 
 class LocalBygningClient : BygningClient {
@@ -24,18 +25,22 @@ class LocalBygningClient : BygningClient {
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0000-000000000001"),
                 bruksenhetBubbleId = BruksenhetBubbleId(1L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(1L),
             ),
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
                 bruksenhetBubbleId = BruksenhetBubbleId(2L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(2L),
             ),
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0000-000000000003"),
                 bruksenhetBubbleId = BruksenhetBubbleId(3L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(3L),
             ),
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0000-000000000004"),
                 bruksenhetBubbleId = BruksenhetBubbleId(4L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(3L),
             ),
         )
 

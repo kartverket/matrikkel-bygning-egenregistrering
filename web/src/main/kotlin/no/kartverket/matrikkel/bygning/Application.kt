@@ -10,6 +10,7 @@ import io.ktor.server.routing.routing
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
+import no.kartverket.matrikkel.bygning.application.bygning.RegistrertEierService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
@@ -24,6 +25,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygn
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiFactory
+import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client.LocalRegistrertEierClient
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
 import no.kartverket.matrikkel.bygning.plugins.authentication.configureAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
@@ -97,11 +99,15 @@ fun Application.mainModule() {
             hendelseRepository = hendelseRepository,
         )
 
+    val registrertEierClient = LocalRegistrertEierClient()
+    val registrertEierService = RegistrertEierService(registrertEierClient = registrertEierClient)
+
     configureAuthentication(config, matrikkelAuth)
 
     val egenregistreringService =
         EgenregistreringService(
             bygningService = bygningService,
+            registrertEierService = registrertEierService,
             egenregistreringRepository = egenregistreringRepository,
             transactional = TransactionalSupport(dataSource),
             hendelseRepository = hendelseRepository,
