@@ -55,7 +55,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val token = mockOAuthServer.issueIDPortenJWT()
 
             val response =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest.gyldigRequest(),
@@ -73,7 +73,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val token = mockOAuthServer.issueIDPortenJWT()
 
             val response =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest.gyldigRequest(),
@@ -167,7 +167,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val token = mockOAuthServer.issueIDPortenJWT()
 
             val response =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest.gyldigRequest(),
@@ -220,7 +220,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val token = mockOAuthServer.issueIDPortenJWT()
 
             val egenregistrering1 =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest.gyldigRequest(),
@@ -230,7 +230,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             assertThat(egenregistrering1.status).isEqualTo(HttpStatusCode.Created)
 
             val egenregistrering2 =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest(
@@ -291,7 +291,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val token = mockOAuthServer.issueIDPortenJWT()
 
             val response =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest.gyldigRequest(),
@@ -332,7 +332,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val token = mockOAuthServer.issueIDPortenJWT()
 
             val response =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest.ugyldigRequestKunBruksarealPerEtasje(),
@@ -355,7 +355,7 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
 
             val response =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest.gyldigRequest(),

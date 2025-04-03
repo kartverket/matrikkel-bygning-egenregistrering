@@ -18,3 +18,7 @@ data class ValidationError(
 data class MultipleValidationError(
     val errors: List<ValidationError>,
 ) : DomainError
+
+data class Konflikt(
+    val message: String,
+) : DomainError

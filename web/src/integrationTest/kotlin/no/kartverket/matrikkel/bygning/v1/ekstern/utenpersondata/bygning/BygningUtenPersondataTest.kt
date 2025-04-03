@@ -88,7 +88,7 @@ class BygningUtenPersondataTest : TestApplicationWithDb() {
             val idportenToken = mockOAuthServer.issueIDPortenJWT()
 
             val response =
-                client.post("/v1/intern/egenregistreringer") {
+                client.post("/v1/intern/gammel/egenregistreringer") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         EgenregistreringRequest.gyldigRequest().copy(

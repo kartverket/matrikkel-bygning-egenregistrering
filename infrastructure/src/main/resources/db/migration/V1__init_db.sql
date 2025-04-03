@@ -3,8 +3,11 @@ create schema if not exists bygning;
 CREATE TABLE egenregistrering
 (
     id                     UUID PRIMARY KEY,
+    bruksenhet_bubble_id   BIGINT                   NOT NULL,
     registreringstidspunkt TIMESTAMP WITH TIME ZONE NOT NULL,
     eier                   VARCHAR(32)              NOT NULL,
+    type_registrering      VARCHAR(32)              NOT NULL,
+    felt_type              VARCHAR(32)              NOT NULL,
     registrering           JSONB                    NOT NULL
 );
 

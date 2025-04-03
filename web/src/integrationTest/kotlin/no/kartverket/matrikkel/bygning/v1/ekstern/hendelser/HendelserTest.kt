@@ -33,7 +33,7 @@ class HendelserTest : TestApplicationWithDb() {
 
             val idportenJWT = mockOAuthServer.issueIDPortenJWT()
 
-            client.post("/v1/intern/egenregistreringer") {
+            client.post("/v1/intern/gammel/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.Companion.gyldigRequest(),
@@ -41,7 +41,7 @@ class HendelserTest : TestApplicationWithDb() {
                 bearerAuth(idportenJWT.serialize())
             }
 
-            client.post("/v1/intern/egenregistreringer") {
+            client.post("/v1/intern/gammel/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.Companion.gyldigRequest(2L),
