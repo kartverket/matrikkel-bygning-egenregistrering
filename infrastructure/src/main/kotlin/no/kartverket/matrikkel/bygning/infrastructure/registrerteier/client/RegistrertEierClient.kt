@@ -20,10 +20,11 @@ import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 // import io.ktor.http.ContentType
 // import io.ktor.http.contentType
-// import kotlinx.serialization.Serializable
 
 class DefaultRegistrertEierClient : RegistrertEierClient {
     private val client =
@@ -33,7 +34,8 @@ class DefaultRegistrertEierClient : RegistrertEierClient {
             }
         }
 
-    private val registrertEierBaseUrl = "localhost:8090"
+    private val registrertEierBaseUrl = "http://localhost:8090"
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     override fun finnEierforhold(
         matrikkelenhetId: MatrikkelenhetBubbleId,
@@ -44,10 +46,11 @@ class DefaultRegistrertEierClient : RegistrertEierClient {
                 client
                     .post("$registrertEierBaseUrl/v1/finnEierforhold") {
                         contentType(ContentType.Application.Json)
-                        setBody(EierMatrikkelenhetRequest(fnr = fnr.value, matrikkelenhetId = matrikkelenhetId.value))
+                        setBody(EierMatrikkelenhetRequest(fnr = "03327291172", matrikkelenhetId = 1002))
                     }.body<EierMatrikkelenhetResponse>()
             }
-
+        log.info("HALLO")
+        log.info(res.toString())
         if (res.eierforholdinfo == null) {
             return Err(ValidationError("Fant ikke eierforhold"))
         }
@@ -55,16 +58,6 @@ class DefaultRegistrertEierClient : RegistrertEierClient {
         return Ok(MatrikkelenhetEier(res.eierforholdinfo.ultimatEier, MatrikkelenhetBubbleId(matrikkelenhetId.value), fnr))
     }
 }
-
-@Serializable
-data class EideMatrikkelenheterRequest(
-    val fnr: String,
-)
-
-@Serializable
-data class EideMatrikkelenheterResponse(
-    val matrikkelenhetIds: Set<Long>,
-)
 
 @Serializable
 data class EierMatrikkelenhetRequest(
