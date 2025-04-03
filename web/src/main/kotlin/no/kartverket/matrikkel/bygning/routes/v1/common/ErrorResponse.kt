@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.error.MatrikkelenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.MultipleValidationError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import org.slf4j.MDC
@@ -23,7 +22,6 @@ fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorRespons
     when (error) {
         is BygningNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
         is BruksenhetNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
-        is MatrikkelenhetNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
         is ValidationError -> HttpStatusCode.BadRequest to ErrorResponse.BadRequestError(description = error.message)
         is MultipleValidationError ->
             HttpStatusCode.BadRequest to
