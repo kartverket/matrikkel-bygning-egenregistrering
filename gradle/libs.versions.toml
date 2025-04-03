@@ -35,6 +35,9 @@ ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages
 ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref = "ktorVersion" }
 ktor-server-auth-jwt = { group = "io.ktor", name = "ktor-server-auth-jwt", version.ref = "ktorVersion" }
 
+ktor-client-core-jvm = { group = "io.ktor", name = "ktor-client-core-jvm", version.ref = "ktorVersion" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktorVersion" }
+
 ktor-serialization-kotlinx = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktorVersion" }
 ktor-client-content-negotation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorVersion" }
 

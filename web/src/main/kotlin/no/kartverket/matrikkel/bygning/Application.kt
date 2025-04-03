@@ -25,7 +25,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.bygn
 import no.kartverket.matrikkel.bygning.infrastructure.database.runFlywayMigrations
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConfig
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiFactory
-import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client.LocalRegistrertEierClient
+import no.kartverket.matrikkel.bygning.infrastructure.registrerteier.client.DefaultRegistrertEierClient
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
 import no.kartverket.matrikkel.bygning.plugins.authentication.configureAuthentication
 import no.kartverket.matrikkel.bygning.plugins.configureHTTP
@@ -99,7 +99,9 @@ fun Application.mainModule() {
             hendelseRepository = hendelseRepository,
         )
 
-    val registrertEierClient = LocalRegistrertEierClient()
+//    TODO: fikse smooth transition basert på miljø
+//    val registrertEierClient = LocalRegistrertEierClient()
+    val registrertEierClient = DefaultRegistrertEierClient()
     val registrertEierService = RegistrertEierService(registrertEierClient = registrertEierClient)
 
     configureAuthentication(config, matrikkelAuth)

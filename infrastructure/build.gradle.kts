@@ -23,6 +23,11 @@ dependencies {
         // Ekskluderer joda-time da vi ikke benytter dette i sql mappingen vår
         exclude(group = "joda-time")
     }
+    implementation(libs.ktor.client.content.negotation)
+    implementation(libs.ktor.serialization.kotlinx)
+
+    implementation(libs.ktor.client.core.jvm)
+    implementation(libs.ktor.client.okhttp)
 
     // Serialization
     implementation(libs.fasterxml.jackson.kotlin)
