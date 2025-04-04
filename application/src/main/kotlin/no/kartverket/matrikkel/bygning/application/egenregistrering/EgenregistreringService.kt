@@ -5,13 +5,13 @@ import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.map
 import no.kartverket.matrikkel.bygning.application.bygning.BygningRepository
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
-import no.kartverket.matrikkel.bygning.application.bygning.RegistrertEierService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelsePayload.BruksenhetOppdatertPayload
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseRepository
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
 import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.applyEgenregistrering
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
+import no.kartverket.matrikkel.bygning.application.registrerteier.RegistrertEierService
 import no.kartverket.matrikkel.bygning.application.transaction.Transactional
 
 class EgenregistreringService(

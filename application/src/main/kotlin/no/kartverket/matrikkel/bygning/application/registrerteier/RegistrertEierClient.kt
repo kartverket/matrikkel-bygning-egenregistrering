@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.application.bygning
+package no.kartverket.matrikkel.bygning.application.registrerteier
 
 import com.github.michaelbull.result.Result
 import no.kartverket.matrikkel.bygning.application.models.MatrikkelenhetEier

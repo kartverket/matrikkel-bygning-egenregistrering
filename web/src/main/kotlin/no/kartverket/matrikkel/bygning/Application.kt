@@ -10,10 +10,10 @@ import io.ktor.server.routing.routing
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
-import no.kartverket.matrikkel.bygning.application.bygning.RegistrertEierService
 import no.kartverket.matrikkel.bygning.application.egenregistrering.EgenregistreringService
 import no.kartverket.matrikkel.bygning.application.health.HealthService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
+import no.kartverket.matrikkel.bygning.application.registrerteier.RegistrertEierService
 import no.kartverket.matrikkel.bygning.config.loadConfiguration
 import no.kartverket.matrikkel.bygning.infrastructure.database.DatabaseConfig
 import no.kartverket.matrikkel.bygning.infrastructure.database.TransactionalSupport

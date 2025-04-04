@@ -2,12 +2,12 @@ package no.kartverket.matrikkel.bygning.infrastructure.matrikkel.client
 
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.toResultOr
-import no.kartverket.matrikkel.bygning.application.bygning.RegistrertEierClient
 import no.kartverket.matrikkel.bygning.application.models.MatrikkelenhetEier
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.registrerteier.RegistrertEierClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

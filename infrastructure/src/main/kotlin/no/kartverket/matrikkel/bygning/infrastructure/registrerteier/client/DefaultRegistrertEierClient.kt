@@ -12,18 +12,14 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Serializable
-import no.kartverket.matrikkel.bygning.application.bygning.RegistrertEierClient
 import no.kartverket.matrikkel.bygning.application.models.MatrikkelenhetEier
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
+import no.kartverket.matrikkel.bygning.application.registrerteier.RegistrertEierClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-// import io.ktor.http.ContentType
-// import io.ktor.http.contentType
 
 class DefaultRegistrertEierClient : RegistrertEierClient {
     private val client =
@@ -46,7 +42,7 @@ class DefaultRegistrertEierClient : RegistrertEierClient {
                 client
                     .post("$registrertEierBaseUrl/v1/finnEierforhold") {
                         contentType(ContentType.Application.Json)
-                        setBody(EierMatrikkelenhetRequest(fnr = fnr.value, matrikkelenhetId = matrikkelenhetId.value))
+                        setBody(RegistrertEierRequest(fnr = fnr.value, matrikkelenhetId = matrikkelenhetId.value))
                     }.body<EierMatrikkelenhetResponse>()
             }
         log.info(res.eierforholdinfo.toString())
@@ -57,27 +53,3 @@ class DefaultRegistrertEierClient : RegistrertEierClient {
         return Ok(MatrikkelenhetEier(res.eierforholdinfo.ultimatEier, MatrikkelenhetBubbleId(matrikkelenhetId.value), fnr))
     }
 }
-
-@Serializable
-data class EierMatrikkelenhetRequest(
-    val fnr: String,
-    val matrikkelenhetId: Long,
-)
-
-@Serializable
-data class EierMatrikkelenhetResponse(
-    val eierforholdinfo: EierforholdinfoResponse? = null,
-)
-
-@Serializable
-data class EierforholdinfoResponse(
-    val eierforholdkode: String,
-    val andel: BroekResponse? = null,
-    val ultimatEier: Boolean,
-)
-
-@Serializable
-data class BroekResponse(
-    val teller: Long,
-    val nevner: Long,
-)

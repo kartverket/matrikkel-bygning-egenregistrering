@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.application.bygning
+package no.kartverket.matrikkel.bygning.application.registrerteier
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
