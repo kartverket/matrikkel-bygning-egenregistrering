@@ -15,6 +15,7 @@ import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationCons
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_VIRKSOMHET_UTVIDET
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_VIRKSOMHET_UTVIDET_UTEN_PII
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_BEGRENSET
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_HENDELSER
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET_UTEN_PII
 
@@ -38,12 +39,7 @@ fun Application.configureOpenAPI() {
             title = "API for hendelseslogg for egenregistrerte bygningsdata",
             version = "0.1",
         ) {
-            // TODO Security Scheme for hendelser
-//            securityScheme(MASKINPORTEN_PROVIDER_NAME) {
-//                type = AuthType.HTTP
-//                scheme = AuthScheme.BEARER
-//                bearerFormat = "jwt"
-//            }
+            jwtSecurityScheme(VIRKSOMHET_HENDELSER.maskinportenAuthSchemeName)
         }
         installOpenApiSpec(
             name = VIRKSOMHET_BEGRENSET.openApiSpecId,

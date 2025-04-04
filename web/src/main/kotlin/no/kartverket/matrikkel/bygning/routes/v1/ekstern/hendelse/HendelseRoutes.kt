@@ -17,7 +17,7 @@ object HendelseRoutingConstants {
     const val ANTALL_QUERY_PARAM_MAX: Long = 1000
 }
 
-fun Route.virksomhetHendelserRouting(hendelseService: HendelseService) {
+fun Route.hendelserRouting(hendelseService: HendelseService) {
     get(
         {
             summary = "Henter hendelser som har skjedd"

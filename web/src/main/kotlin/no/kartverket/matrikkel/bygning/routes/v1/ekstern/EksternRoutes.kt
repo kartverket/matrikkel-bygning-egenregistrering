@@ -11,7 +11,7 @@ import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationCons
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET_UTEN_PII
 import no.kartverket.matrikkel.bygning.plugins.authentication.EksternRouteConfig
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.virksomhetHendelserRouting
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.hendelserRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetbegrenset.virksomhetBegrensetRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.virksomhetUtvidetRouting
 import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidetutenpii.virksomhetUtvidetUtenPIIRouting
@@ -34,7 +34,7 @@ fun Route.eksternRouting(
         }
 
         eksternApiRoute(VIRKSOMHET_HENDELSER) {
-            virksomhetHendelserRouting(hendelseService)
+            hendelserRouting(hendelseService)
         }
     }
 }

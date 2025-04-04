@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 
 class MatrikkelAuthTest {
     @Nested
-    inner class BerettigetInteresse : TestApplicationWithDb() {
+    inner class VirksomhetBegrenset : TestApplicationWithDb() {
         @Test
         fun utenToken() =
             testApplication {
@@ -53,7 +53,7 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-BerettigetInteresse",
+                        subject = "stubbed-test-user-VirksomhetBegrenset",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
@@ -66,7 +66,7 @@ class MatrikkelAuthTest {
     }
 
     @Nested
-    inner class UtenPersondata : TestApplicationWithDb() {
+    inner class VirksomhetUtvidetUtenPII : TestApplicationWithDb() {
         @Test
         fun utenToken() =
             testApplication {
@@ -84,7 +84,7 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-BerettigetInteresse",
+                        subject = "stubbed-test-user-VirksomhetBegrenset",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
@@ -103,7 +103,7 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-InnsynUtenPersondata",
+                        subject = "stubbed-test-user-VirksomhetUtvidetUtenPII",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
@@ -116,7 +116,7 @@ class MatrikkelAuthTest {
     }
 
     @Nested
-    inner class MedPersondata : TestApplicationWithDb() {
+    inner class VirksomhetUtvidet : TestApplicationWithDb() {
         @Test
         fun utenToken() =
             testApplication {
@@ -134,7 +134,7 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-InnsynUtenPersondata",
+                        subject = "stubbed-test-user-VirksomhetUtvidetUtenPII",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
@@ -153,7 +153,7 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-InnsynMedPersondata",
+                        subject = "stubbed-test-user-VirksomhetUtvidet",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 

@@ -4,7 +4,7 @@ enum class Matrikkelrolle(
     /** Må eksplisitt liste alle roller, også de som arver fra andre roller i matrikkelen. */
     val akseptableRolleIds: Set<Long>,
 ) {
-    BerettigetInteresse(
+    VirksomhetBegrenset(
         hashSetOf(
             0L, // Kommunalt innsyn uten fnr
             1L, // Kommunalt innsyn med fnr
@@ -16,7 +16,7 @@ enum class Matrikkelrolle(
             32L, // Berettiget interesse
         ),
     ),
-    InnsynUtenPersondata(
+    VirksomhetUtvidetUtenPII(
         hashSetOf(
             0L, // Kommunalt innsyn uten fnr
             1L, // Kommunalt innsyn med fnr
@@ -27,7 +27,7 @@ enum class Matrikkelrolle(
             3L, // Matrikkelfører
         ),
     ),
-    InnsynMedPersondata(
+    VirksomhetUtvidet(
         hashSetOf(
             1L, // Kommunalt innsyn med fnr
             13L, // Innsyn med fnr

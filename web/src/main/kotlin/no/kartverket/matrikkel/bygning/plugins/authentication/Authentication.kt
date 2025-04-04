@@ -68,8 +68,6 @@ object AuthenticationConstants {
             scope = "kartverk:eiendomsregisteret:bygning.virksomhet.utvidet",
         )
 
-    // TODO Vet ikke om jeg er enig med meg selv når det kommer til hendelser
-    // Burde det egentlig være kun hendelser uten virksomhet? Noe å tenke på her.
     val VIRKSOMHET_HENDELSER =
         EksternRouteConfig(
             maskinportenAuthSchemeName = "maskinporten_virksomhet_hendelser",
@@ -96,7 +94,7 @@ object ApplicationRoles {
 data class JWTAuthenticationConfig(
     val jwksUri: String,
     val issuer: String,
-    val scopes: String? = null,
+    val scope: String? = null,
     val audience: String? = null,
 ) {
     val jwkProvider: JwkProvider
@@ -134,12 +132,12 @@ private fun AuthenticationConfig.jwtMaskinporten(
                 JWTAuthenticationConfig(
                     jwksUri = config.property("maskinporten.jwksUri").getString(),
                     issuer = config.property("maskinporten.issuer").getString(),
-                    scopes = eksternRouteConfig.scope,
+                    scope = eksternRouteConfig.scope,
                 )
 
             verifier(authConfig.jwkProvider, authConfig.issuer) {
                 acceptLeeway(3)
-                withClaim("scope", authConfig.scopes)
+                withClaim("scope", authConfig.scope)
             }
 
             validate { credentials -> JWTPrincipal(credentials.payload) }
@@ -166,7 +164,7 @@ private fun AuthenticationConfig.jwtIDPorten(config: ApplicationConfig) {
                 JWTAuthenticationConfig(
                     jwksUri = config.property("$name.jwksUri").getString(),
                     issuer = config.property("$name.issuer").getString(),
-                    scopes = null,
+                    scope = null,
                 )
 
             verifier(authConfig.jwkProvider, authConfig.issuer) {
@@ -232,15 +230,15 @@ private fun AuthenticationConfig.configureMatrikkelAuth(
 
         jwt(VIRKSOMHET_BEGRENSET.matrikkelAuthSchemeName) {
             realm = "Bygning virksomhet begrenset"
-            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.BerettigetInteresse)
+            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.VirksomhetBegrenset)
         }
         jwt(VIRKSOMHET_UTVIDET_UTEN_PII.matrikkelAuthSchemeName) {
             realm = "Bygning virksomhet utvidet uten personidentifiserende informasjon"
-            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.InnsynUtenPersondata)
+            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.VirksomhetUtvidetUtenPII)
         }
         jwt(VIRKSOMHET_UTVIDET.matrikkelAuthSchemeName) {
             realm = "Bygning virksomhet utvidet"
-            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.InnsynMedPersondata)
+            configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.VirksomhetUtvidet)
         }
     }
 }
