@@ -6,7 +6,6 @@ import com.github.michaelbull.result.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -41,16 +40,16 @@ class DefaultRegistrertEierClient : RegistrertEierClient {
         matrikkelenhetId: MatrikkelenhetBubbleId,
         fnr: RegistreringAktoer.Foedselsnummer,
     ): Result<MatrikkelenhetEier, DomainError> {
+        log.info("Finn eierforhold for matrikkelenhetId: ${matrikkelenhetId.value} og fnr: ${fnr.value}")
         val res =
             runBlocking {
                 client
                     .post("$registrertEierBaseUrl/v1/finnEierforhold") {
                         contentType(ContentType.Application.Json)
-                        setBody(EierMatrikkelenhetRequest(fnr = "03327291172", matrikkelenhetId = 1002))
+                        setBody(EierMatrikkelenhetRequest(fnr = fnr.value, matrikkelenhetId = matrikkelenhetId.value))
                     }.body<EierMatrikkelenhetResponse>()
             }
-        log.info("HALLO")
-        log.info(res.toString())
+        log.info(res.eierforholdinfo.toString())
         if (res.eierforholdinfo == null) {
             return Err(ValidationError("Fant ikke eierforhold"))
         }

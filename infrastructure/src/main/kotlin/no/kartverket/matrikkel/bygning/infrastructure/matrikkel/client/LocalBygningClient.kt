@@ -25,22 +25,22 @@ class LocalBygningClient : BygningClient {
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0000-000000000001"),
                 bruksenhetBubbleId = BruksenhetBubbleId(1L),
-                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(1L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(1001),
             ),
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0000-000000000002"),
                 bruksenhetBubbleId = BruksenhetBubbleId(2L),
-                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(2L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(1002),
             ),
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0000-000000000003"),
                 bruksenhetBubbleId = BruksenhetBubbleId(3L),
-                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(3L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(1003),
             ),
             Bruksenhet(
                 id = BruksenhetId("00000000-0000-0000-0000-000000000004"),
                 bruksenhetBubbleId = BruksenhetBubbleId(4L),
-                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(3L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(1004),
             ),
         )
 
