@@ -26,12 +26,12 @@ class MockOAuth2ServerExtensions {
                     ),
             )
 
-        fun MockOAuth2Server.issueIDPortenJWT() =
+        fun MockOAuth2Server.issueIDPortenJWT(pid: String = DEFAULT_PID) =
             issueToken(
                 issuerId = DEFAULT_ISSUER,
                 claims =
                     mapOf(
-                        "pid" to DEFAULT_PID,
+                        "pid" to pid,
                     ),
             )
 

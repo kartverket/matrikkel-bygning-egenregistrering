@@ -365,6 +365,25 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
             assertThat(response.status).isEqualTo(HttpStatusCode.Unauthorized)
         }
 
+    @Test
+    fun `gitt at en eier ikke er ultimat eier av en matrikkelenhet, skal egenregistreringen returnere 403 forbidden`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+            val token = mockOAuthServer.issueIDPortenJWT("43886301317")
+
+            val response =
+                client.post("/v1/intern/egenregistreringer") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        EgenregistreringRequest.gyldigRequest(),
+                    )
+                    bearerAuth(token.serialize())
+                }
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.Forbidden)
+        }
+//    TODO: Test for eierforhold
+
     private fun Assert<List<BruksenhetInternResponse>>.withBruksenhetId(bruksenhetId: Long) =
         transform(appendName("[bruksenhetId=$bruksenhetId]")) { it.find { br -> br.bruksenhetId == bruksenhetId }!! }
 }
