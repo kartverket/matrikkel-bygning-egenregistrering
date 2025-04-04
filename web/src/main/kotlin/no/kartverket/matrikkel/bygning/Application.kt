@@ -26,6 +26,7 @@ import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiConf
 import no.kartverket.matrikkel.bygning.infrastructure.matrikkel.MatrikkelApiFactory
 import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_BEGRENSET
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_HENDELSER
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET_UTEN_PII
 import no.kartverket.matrikkel.bygning.plugins.authentication.configureAuthentication
@@ -137,7 +138,7 @@ fun Application.mainModule() {
                     "Virksomhet Begrenset" to "/${VIRKSOMHET_BEGRENSET.openApiSpecId}/api.json",
                     "Virksomhet Utvidet Uten PII" to "/${VIRKSOMHET_UTVIDET_UTEN_PII.openApiSpecId}/api.json",
                     "Virksomhet Utvidet" to "/${VIRKSOMHET_UTVIDET.openApiSpecId}/api.json",
-//                    "Hendelseslogg" to "/${OpenApiSpecIds.HENDELSER}/api.json",
+                    "Hendelseslogg" to "/${VIRKSOMHET_HENDELSER}/api.json",
                 ),
             )
         }
