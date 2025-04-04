@@ -11,6 +11,7 @@ import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningBubbleId
 import no.kartverket.matrikkel.bygning.application.models.ids.BygningId
+import no.kartverket.matrikkel.bygning.application.models.ids.EgenregistreringId
 import no.kartverket.matrikkel.bygning.application.models.kodelister.AvlopKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.EnergikildeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
@@ -60,7 +61,7 @@ data class Gyldighetsperiode private constructor(
     companion object {
         fun of(
             gyldighetsaar: Year?,
-            opphoersaar: Year?,
+            opphoersaar: Year? = null,
         ): Gyldighetsperiode {
             if (gyldighetsaar != null && opphoersaar != null) {
                 require(gyldighetsaar <= opphoersaar) {
@@ -82,6 +83,15 @@ data class Gyldighetsperiode private constructor(
                 opphoersaar = opphoersaar?.let { Year.of(it) },
             )
     }
+
+    fun withOpphoersaar(opphoersaar: Year): Gyldighetsperiode {
+        require(erGyldigOpphoersaar(opphoersaar)) { "Ugyldig opphoersaar: $opphoersaar" }
+        return this.copy(
+            opphoersaar = opphoersaar,
+        )
+    }
+
+    fun erGyldigOpphoersaar(opphoersaar: Year) = opphoersaar == gyldighetsaar || opphoersaar >= gyldighetsaar
 }
 
 data class RegisterMetadata(
@@ -90,7 +100,17 @@ data class RegisterMetadata(
     val kildemateriale: KildematerialeKode? = null,
     val prosess: ProsessKode?,
     val gyldighetsperiode: Gyldighetsperiode = Gyldighetsperiode.of(),
-)
+    val egenregistreringId: EgenregistreringId? = null,
+) {
+    fun withOpphoersaaar(opphoersaar: Year) =
+        this.copy(
+            gyldighetsperiode = this.gyldighetsperiode.withOpphoersaar(opphoersaar),
+        )
+
+    fun withKildemateriale(kildemateriale: KildematerialeKode): RegisterMetadata = copy(kildemateriale = kildemateriale)
+
+    fun withGyldighetsperiode(gyldighetsperiode: Gyldighetsperiode): RegisterMetadata = copy(gyldighetsperiode = gyldighetsperiode)
+}
 
 sealed interface Felt<T> {
     val data: T
@@ -104,7 +124,12 @@ sealed interface Felt<T> {
     data class Vannforsyning(
         override val data: VannforsyningKode,
         override val metadata: RegisterMetadata,
-    ) : Felt<VannforsyningKode>
+    ) : Felt<VannforsyningKode> {
+        fun withOpphoersaar(opphoersaar: Year): Vannforsyning =
+            copy(
+                metadata = metadata.withOpphoersaaar(opphoersaar),
+            )
+    }
 
     data class Bruksareal(
         override val data: Double,
@@ -119,7 +144,12 @@ sealed interface Felt<T> {
     data class Avlop(
         override val data: AvlopKode,
         override val metadata: RegisterMetadata,
-    ) : Felt<AvlopKode>
+    ) : Felt<AvlopKode> {
+        fun withOpphoersaar(opphoersaar: Year): Avlop =
+            copy(
+                metadata = metadata.withOpphoersaaar(opphoersaar),
+            )
+    }
 
     data class Energikilde(
         override val data: EnergikildeKode,

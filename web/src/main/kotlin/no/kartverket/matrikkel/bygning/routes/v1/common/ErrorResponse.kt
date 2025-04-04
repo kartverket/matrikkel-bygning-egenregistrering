@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
+import no.kartverket.matrikkel.bygning.application.models.error.Konflikt
 import no.kartverket.matrikkel.bygning.application.models.error.MultipleValidationError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import org.slf4j.MDC
@@ -22,6 +23,7 @@ fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorRespons
     when (error) {
         is BygningNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
         is BruksenhetNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
+        is Konflikt -> HttpStatusCode.Conflict to ErrorResponse.ConflictError(description = error.message)
         is ValidationError -> HttpStatusCode.BadRequest to ErrorResponse.BadRequestError(description = error.message)
         is MultipleValidationError ->
             HttpStatusCode.BadRequest to
@@ -82,6 +84,17 @@ sealed interface ErrorResponse {
         override val status: Int = HttpStatusCode.NotFound.value,
         override val title: String = "Ikke funnet",
         override val description: String = "Ressursen du etterspurte kunne ikke bli funnet",
+        override val correlationId: String = resolveCallID(),
+        override val details: List<String> = emptyList(),
+    ) : ErrorResponse {
+        constructor(vararg details: String) : this(details = details.toList())
+    }
+
+    @Serializable
+    class ConflictError(
+        override val status: Int = HttpStatusCode.Conflict.value,
+        override val title: String = "Konflikt",
+        override val description: String = "Ressursen du prøver å oppdatere er ikke i en gyldig tilstand",
         override val correlationId: String = resolveCallID(),
         override val details: List<String> = emptyList(),
     ) : ErrorResponse {

@@ -10,6 +10,7 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.ProsessKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 import java.time.Instant
+import java.time.Year
 
 sealed interface HasKildemateriale {
     val kildemateriale: KildematerialeKode
@@ -18,6 +19,10 @@ sealed interface HasKildemateriale {
 interface HasGyldighetPeriode {
     val gyldighetsaar: Int?
     val opphoersaar: Int?
+}
+
+interface HasGyldighetsaar {
+    val gyldighetsaar: Year
 }
 
 data class ByggeaarRegistrering(
@@ -95,3 +100,168 @@ data class Egenregistrering(
     val prosess: ProsessKode,
     val bruksenhetRegistrering: BruksenhetRegistrering,
 )
+
+sealed interface EgenregistreringBase {
+    val id: EgenregistreringId
+    val eier: Foedselsnummer
+    val registreringstidspunkt: Instant
+    val prosess: ProsessKode
+    val bruksenhetId: BruksenhetBubbleId
+    val type: FeltRegistreringType
+}
+
+data class RegistrerEgenregistrering(
+    override val id: EgenregistreringId,
+    override val eier: Foedselsnummer,
+    override val bruksenhetId: BruksenhetBubbleId,
+    val feltRegistrering: FeltRegistrering,
+) : EgenregistreringBase {
+    override val registreringstidspunkt: Instant = Instant.now()
+    override val prosess = ProsessKode.Egenregistrering
+    override val type = FeltRegistreringType.LEGG_TIL
+}
+
+data class KorrigerEgenregistrering(
+    override val id: EgenregistreringId,
+    override val eier: Foedselsnummer,
+    override val bruksenhetId: BruksenhetBubbleId,
+    val feltRegistrering: FeltRegistrering,
+) : EgenregistreringBase {
+    override val registreringstidspunkt: Instant = Instant.now()
+    override val prosess = ProsessKode.Egenregistrering
+    override val type = FeltRegistreringType.KORRIGER
+}
+
+data class AvsluttEgenregistrering(
+    override val id: EgenregistreringId,
+    override val eier: Foedselsnummer,
+    override val bruksenhetId: BruksenhetBubbleId,
+    val feltRegistrering: AvsluttFeltRegistrering,
+) : EgenregistreringBase {
+    override val registreringstidspunkt: Instant = Instant.now()
+    override val prosess = ProsessKode.Egenregistrering
+    override val type = FeltRegistreringType.AVSLUTT
+}
+
+sealed class FeltRegistrering {
+    data class ByggeaarFeltRegistrering(
+        val byggeaar: Int,
+        override val kildemateriale: KildematerialeKode,
+    ) : FeltRegistrering(),
+        HasKildemateriale
+
+    sealed class BruksarealFeltRegistrering {
+        data class TotaltBruksarealFeltRegistrering(
+            val totaltBruksareal: Double,
+            override val kildemateriale: KildematerialeKode,
+        ) : FeltRegistrering(),
+            HasKildemateriale
+
+        data class TotaltOgEtasjeBruksarealFeltRegistrering private constructor(
+            val totaltBruksareal: Double,
+            val etasjeRegistreringer: List<EtasjeBruksarealRegistrering>,
+            override val kildemateriale: KildematerialeKode,
+        ) : FeltRegistrering(),
+            HasKildemateriale {
+            companion object {
+                fun of(
+                    totaltBruksareal: Double,
+                    etasjeRegistreringer: List<EtasjeBruksarealRegistrering>,
+                    kildemateriale: KildematerialeKode,
+                ): TotaltOgEtasjeBruksarealFeltRegistrering {
+                    if (etasjeRegistreringer.sumOf { it.bruksareal } != totaltBruksareal) {
+                        throw IllegalArgumentException("Totalt BRA stemmer ikke overens med totalen av BRA per etasje")
+                    }
+                    return TotaltOgEtasjeBruksarealFeltRegistrering(totaltBruksareal, etasjeRegistreringer, kildemateriale)
+                }
+            }
+        }
+    }
+
+    data class VannforsyningFeltRegistrering(
+        val vannforsyning: VannforsyningKode,
+        override val kildemateriale: KildematerialeKode,
+        override val gyldighetsaar: Year,
+    ) : FeltRegistrering(),
+        HasKildemateriale,
+        HasGyldighetsaar
+
+    data class AvlopFeltRegistrering(
+        val avlop: AvlopKode,
+        override val kildemateriale: KildematerialeKode,
+        override val gyldighetsaar: Year,
+    ) : FeltRegistrering(),
+        HasKildemateriale,
+        HasGyldighetsaar
+
+    sealed class EnergikildeFeltRegistrering {
+        data class HarIkke(
+            val kildemateriale: KildematerialeKode,
+        ) : FeltRegistrering()
+
+        data class Energikilder private constructor(
+            val energikilder: List<EnergikildeDataRegistrering>,
+        ) : FeltRegistrering() {
+            companion object {
+                fun of(energikilder: List<EnergikildeDataRegistrering>): Energikilder {
+                    if (energikilder.groupBy { it.energikilde }.any { it.value.size > 1 }) {
+                        throw IllegalArgumentException("Energikilder inneholder dupliserte kodeverdier")
+                    }
+                    return Energikilder(energikilder)
+                }
+            }
+        }
+    }
+
+    // TODO: Må støtte HarIkke
+    sealed class OppvarmingFeltRegistrering {
+        data class HarIkke(
+            val kildemateriale: KildematerialeKode,
+        ) : FeltRegistrering()
+
+        data class Oppvarming private constructor(
+            val oppvarming: List<OppvarmingDataRegistrering>,
+        ) : FeltRegistrering() {
+            companion object {
+                fun of(oppvarming: List<OppvarmingDataRegistrering>): Oppvarming {
+                    if (oppvarming.groupBy { it.oppvarming }.any { it.value.size > 1 }) {
+                        throw IllegalArgumentException("Oppvarming inneholder dupliserte kodeverdier")
+                    }
+                    return Oppvarming(oppvarming)
+                }
+            }
+        }
+    }
+}
+
+data class EnergikildeDataRegistrering(
+    val energikilde: EnergikildeKode,
+    override val kildemateriale: KildematerialeKode,
+    override val gyldighetsaar: Year,
+) : HasKildemateriale,
+    HasGyldighetsaar
+
+data class OppvarmingDataRegistrering(
+    val oppvarming: OppvarmingKode,
+    override val kildemateriale: KildematerialeKode,
+    override val gyldighetsaar: Year,
+) : HasKildemateriale,
+    HasGyldighetsaar
+
+enum class FeltRegistreringType {
+    LEGG_TIL,
+    KORRIGER,
+    AVSLUTT,
+}
+
+sealed class AvsluttFeltRegistrering {
+    data class AvsluttVannforsyning(
+        val vannforsyning: VannforsyningKode,
+        val opphoersaar: Year,
+    ) : AvsluttFeltRegistrering()
+
+    data class AvsluttAvlop(
+        val avlop: AvlopKode,
+        val opphoersaar: Year,
+    ) : AvsluttFeltRegistrering()
+}

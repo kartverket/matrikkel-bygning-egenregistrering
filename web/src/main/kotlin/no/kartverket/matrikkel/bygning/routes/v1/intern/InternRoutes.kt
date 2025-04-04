@@ -10,6 +10,7 @@ import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationCons
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.arkivRouting
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.bruksenhetRouting
 import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.bygningRouting
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.egenregistreringGammelRouting
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.egenregistreringRouting
 import no.kartverket.matrikkel.bygning.routes.v1.kodeliste.kodelisteRouting
 
@@ -25,6 +26,9 @@ fun Route.internRouting(
     ) {
         route("kodelister") {
             kodelisteRouting()
+        }
+        route("/gammel/egenregistreringer") {
+            egenregistreringGammelRouting(egenregistreringService)
         }
         route("egenregistreringer") {
             egenregistreringRouting(egenregistreringService)

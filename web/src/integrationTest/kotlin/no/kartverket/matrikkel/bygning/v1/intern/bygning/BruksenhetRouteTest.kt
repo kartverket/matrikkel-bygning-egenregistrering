@@ -86,7 +86,7 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
             val token = mockOAuthServer.issueIDPortenJWT()
 
-            client.post("/v1/intern/egenregistreringer") {
+            client.post("/v1/intern/gammel/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.gyldigRequest(2L),
@@ -137,7 +137,7 @@ class BruksenhetRouteTest : TestApplicationWithDb() {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
             val token = mockOAuthServer.issueIDPortenJWT()
 
-            client.post("/v1/intern/egenregistreringer") {
+            client.post("/v1/intern/gammel/egenregistreringer") {
                 contentType(ContentType.Application.Json)
                 setBody(
                     EgenregistreringRequest.gyldigRequest(2L),
