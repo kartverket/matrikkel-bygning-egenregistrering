@@ -15,13 +15,15 @@ import kotlinx.coroutines.runBlocking
 import no.kartverket.matrikkel.bygning.application.models.MatrikkelenhetEier
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
+import no.kartverket.matrikkel.bygning.application.models.error.FantIkkeEierForhold
 import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.registrerteier.RegistrertEierClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class DefaultRegistrertEierClient : RegistrertEierClient {
+class DefaultRegistrertEierClient(
+    private val baseUrl: String,
+) : RegistrertEierClient {
     private val client =
         HttpClient {
             install(ContentNegotiation) {
@@ -29,7 +31,6 @@ class DefaultRegistrertEierClient : RegistrertEierClient {
             }
         }
 
-    private val registrertEierBaseUrl = "http://localhost:8090"
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     override fun finnEierforhold(
@@ -40,14 +41,14 @@ class DefaultRegistrertEierClient : RegistrertEierClient {
         val res =
             runBlocking {
                 client
-                    .post("$registrertEierBaseUrl/v1/finnEierforhold") {
+                    .post("$baseUrl/v1/finnEierforhold") {
                         contentType(ContentType.Application.Json)
                         setBody(RegistrertEierRequest(fnr = fnr.value, matrikkelenhetId = matrikkelenhetId.value))
                     }.body<EierMatrikkelenhetResponse>()
             }
         log.info(res.eierforholdinfo.toString())
         if (res.eierforholdinfo == null) {
-            return Err(ValidationError("Fant ikke eierforhold"))
+            return Err(FantIkkeEierForhold("Fant ikke eierforhold"))
         }
 
         return Ok(MatrikkelenhetEier(res.eierforholdinfo.ultimatEier, MatrikkelenhetBubbleId(matrikkelenhetId.value), fnr))

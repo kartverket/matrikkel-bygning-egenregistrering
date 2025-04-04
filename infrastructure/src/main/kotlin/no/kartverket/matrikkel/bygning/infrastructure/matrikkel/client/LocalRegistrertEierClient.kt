@@ -5,7 +5,7 @@ import com.github.michaelbull.result.toResultOr
 import no.kartverket.matrikkel.bygning.application.models.MatrikkelenhetEier
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
-import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
+import no.kartverket.matrikkel.bygning.application.models.error.FantIkkeEierForhold
 import no.kartverket.matrikkel.bygning.application.models.ids.MatrikkelenhetBubbleId
 import no.kartverket.matrikkel.bygning.application.registrerteier.RegistrertEierClient
 import org.slf4j.Logger
@@ -34,7 +34,7 @@ class LocalRegistrertEierClient : RegistrertEierClient {
                 log.warn(
                     "Fant ikke eierforhold mellom matrikkelenhet ${matrikkelenhetBubbleId.value} og eier ${eier.value}",
                 )
-                ValidationError(
+                FantIkkeEierForhold(
                     message = "Fant ikke eierforhold",
                 )
             }

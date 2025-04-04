@@ -11,6 +11,14 @@ data class BruksenhetNotFound(
     val message: String,
 ) : DomainError
 
+data class IkkeUltimatEier(
+    val message: String,
+) : DomainError
+
+data class FantIkkeEierForhold(
+    val message: String,
+) : DomainError
+
 data class ValidationError(
     val message: String,
 ) : DomainError

@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.error.BruksenhetNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.BygningNotFound
 import no.kartverket.matrikkel.bygning.application.models.error.DomainError
+import no.kartverket.matrikkel.bygning.application.models.error.FantIkkeEierForhold
+import no.kartverket.matrikkel.bygning.application.models.error.IkkeUltimatEier
 import no.kartverket.matrikkel.bygning.application.models.error.MultipleValidationError
 import no.kartverket.matrikkel.bygning.application.models.error.ValidationError
 import org.slf4j.MDC
@@ -23,6 +25,8 @@ fun domainErrorToResponse(error: DomainError): Pair<HttpStatusCode, ErrorRespons
         is BygningNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
         is BruksenhetNotFound -> HttpStatusCode.NotFound to ErrorResponse.NotFoundError(description = error.message)
         is ValidationError -> HttpStatusCode.BadRequest to ErrorResponse.BadRequestError(description = error.message)
+        is IkkeUltimatEier -> HttpStatusCode.Forbidden to ErrorResponse.ForbiddenError(description = error.message)
+        is FantIkkeEierForhold -> HttpStatusCode.Forbidden to ErrorResponse.ForbiddenError(description = error.message)
         is MultipleValidationError ->
             HttpStatusCode.BadRequest to
                 ErrorResponse.ValidationError(
@@ -60,6 +64,18 @@ sealed interface ErrorResponse {
         override val description: String =
             "Requesten din inneholdt én eller flere felter som ikke var formatert riktig." +
                 "Se listen over feil for flere detaljer",
+        override val correlationId: String = resolveCallID(),
+        override val details: List<String> = emptyList(),
+    ) : ErrorResponse {
+        constructor(vararg details: String) : this(details = details.toList())
+    }
+
+    @Serializable
+    class ForbiddenError(
+        override val status: Int = HttpStatusCode.Forbidden.value,
+        override val title: String = "Ingen tilgang",
+        override val description: String =
+            "Du har ikke tilgang til å gjøre denne forespørselen",
         override val correlationId: String = resolveCallID(),
         override val details: List<String> = emptyList(),
     ) : ErrorResponse {
