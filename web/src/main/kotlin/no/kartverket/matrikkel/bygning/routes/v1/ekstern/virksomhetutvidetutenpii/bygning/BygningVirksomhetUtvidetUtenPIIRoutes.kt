@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.bygning
+package no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidetutenpii.bygning
 
 import com.github.michaelbull.result.mapBoth
 import io.github.smiley4.ktoropenapi.get
@@ -10,7 +10,7 @@ import io.ktor.server.util.getOrFail
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 
-fun Route.bygningBerettigetInteresseRouting(bygningService: BygningService) {
+fun Route.bygningVirksomhetUtvidetUtenPIIRouting(bygningService: BygningService) {
     route("{bygningId}") {
         get(
             {
@@ -23,7 +23,7 @@ fun Route.bygningBerettigetInteresseRouting(bygningService: BygningService) {
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BygningBerettigetInteresseResponse> {
+                        body<BygningVirksomhetUtvidetUtenPIIResponse> {
                             description = "Bygningen med tilhørende bruksenheter"
                         }
                         description = "Bygningen finnes og ble hentet"
@@ -38,7 +38,7 @@ fun Route.bygningBerettigetInteresseRouting(bygningService: BygningService) {
 
             val (status, body) =
                 bygningService.getBygningByBubbleId(bygningId).mapBoth(
-                    success = { HttpStatusCode.OK to it.toBygningBerettigetInteresseResponse() },
+                    success = { HttpStatusCode.OK to it.toBygningVirksomhetUtvidetUtenPIIResponse() },
                     failure = ::domainErrorToResponse,
                 )
 
@@ -47,7 +47,7 @@ fun Route.bygningBerettigetInteresseRouting(bygningService: BygningService) {
     }
 }
 
-fun Route.bruksenhetBerettigetInteresseRouting(bygningService: BygningService) {
+fun Route.bruksenhetVirksomhetUtvidetUtenPIIRouting(bygningService: BygningService) {
     route("{bruksenhetId}") {
         get(
             {
@@ -60,7 +60,7 @@ fun Route.bruksenhetBerettigetInteresseRouting(bygningService: BygningService) {
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BruksenhetBerettigetInteresseResponse> {
+                        body<BruksenhetVirksomhetUtvidetUtenPIIResponse> {
                             description = "Bruksenheten"
                         }
                         description = "Bruksenheten finnes og ble hentet"
@@ -75,7 +75,7 @@ fun Route.bruksenhetBerettigetInteresseRouting(bygningService: BygningService) {
 
             val (status, body) =
                 bygningService.getBruksenhetByBubbleId(bruksenhetId).mapBoth(
-                    success = { HttpStatusCode.OK to it.toBruksenhetBerettigetInteresseResponse() },
+                    success = { HttpStatusCode.OK to it.toBruksenhetVirksomhetUtvidetUtenPIIResponse() },
                     failure = ::domainErrorToResponse,
                 )
 

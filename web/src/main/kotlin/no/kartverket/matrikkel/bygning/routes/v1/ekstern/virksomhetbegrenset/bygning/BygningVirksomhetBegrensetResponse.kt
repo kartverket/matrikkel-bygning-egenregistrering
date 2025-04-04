@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.bygning
+package no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetbegrenset.bygning
 
 import kotlinx.serialization.Serializable
 import no.kartverket.matrikkel.bygning.application.models.Bruksenhet
@@ -9,18 +9,18 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingK
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
 
 @Serializable
-data class BygningBerettigetInteresseResponse(
+data class BygningVirksomhetBegrensetResponse(
     val bygningId: Long,
     val bygningsnummer: Long,
-    val bruksenheter: List<BruksenhetBerettigetInteresseResponse>,
+    val bruksenheter: List<BruksenhetVirksomhetBegrensetResponse>,
 )
 
 @Serializable
-data class BruksenhetBerettigetInteresseResponse(
+data class BruksenhetVirksomhetBegrensetResponse(
     val bruksenhetId: Long,
     val byggeaar: Int?,
     val totaltBruksareal: Double?,
-    val etasjer: List<BruksenhetEtasjeBerettigetInteresseResponse>?,
+    val etasjer: List<BruksenhetEtasjeVirksomhetBegrensetResponse>?,
     val vannforsyning: VannforsyningKode?,
     val avlop: AvlopKode?,
     val energikilder: List<EnergikildeKode>?,
@@ -28,37 +28,37 @@ data class BruksenhetBerettigetInteresseResponse(
 )
 
 @Serializable
-data class BruksenhetEtasjeBerettigetInteresseResponse(
-    val etasjeBetegnelse: EtasjeBetegnelseBerettigetInteresseResponse,
+data class BruksenhetEtasjeVirksomhetBegrensetResponse(
+    val etasjeBetegnelse: EtasjeBetegnelseVirksomhetBegrensetResponse,
     val bruksareal: Double,
 ) {
     @Serializable
-    data class EtasjeBetegnelseBerettigetInteresseResponse(
+    data class EtasjeBetegnelseVirksomhetBegrensetResponse(
         val etasjeplanKode: String,
         val etasjenummer: Int,
     )
 }
 
-fun Bygning.toBygningBerettigetInteresseResponse(): BygningBerettigetInteresseResponse =
-    BygningBerettigetInteresseResponse(
+fun Bygning.toBygningVirksomhetBegrensetResponse(): BygningVirksomhetBegrensetResponse =
+    BygningVirksomhetBegrensetResponse(
         bygningId = bygningBubbleId.value,
         bygningsnummer = bygningsnummer,
         bruksenheter =
             bruksenheter.map {
-                it.toBruksenhetBerettigetInteresseResponse()
+                it.toBruksenhetVirksomhetBegrensetResponse()
             },
     )
 
-fun Bruksenhet.toBruksenhetBerettigetInteresseResponse(): BruksenhetBerettigetInteresseResponse =
-    BruksenhetBerettigetInteresseResponse(
+fun Bruksenhet.toBruksenhetVirksomhetBegrensetResponse(): BruksenhetVirksomhetBegrensetResponse =
+    BruksenhetVirksomhetBegrensetResponse(
         bruksenhetId = this.bruksenhetBubbleId.value,
         byggeaar = this.byggeaar.egenregistrert?.data,
         totaltBruksareal = this.totaltBruksareal.egenregistrert?.data,
         etasjer =
             this.etasjer.egenregistrert?.data?.map {
-                BruksenhetEtasjeBerettigetInteresseResponse(
+                BruksenhetEtasjeVirksomhetBegrensetResponse(
                     etasjeBetegnelse =
-                        BruksenhetEtasjeBerettigetInteresseResponse.EtasjeBetegnelseBerettigetInteresseResponse(
+                        BruksenhetEtasjeVirksomhetBegrensetResponse.EtasjeBetegnelseVirksomhetBegrensetResponse(
                             etasjeplanKode = it.etasjebetegnelse.etasjeplanKode.toString(),
                             etasjenummer = it.etasjebetegnelse.etasjenummer.loepenummer,
                         ),

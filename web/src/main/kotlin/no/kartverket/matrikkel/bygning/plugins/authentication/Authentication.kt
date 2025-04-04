@@ -25,22 +25,68 @@ import no.kartverket.matrikkel.bygning.plugins.authentication.ApplicationRoles.A
 import no.kartverket.matrikkel.bygning.plugins.authentication.ApplicationRoles.BYGNING_ARKIVARISK_HISTORIKK
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.ENTRA_ID_ARKIVARISK_HISTORIKK_NAME
 import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.IDPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_BERETTIGET_INTERESSE
-import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_MED_PERSONDATA
-import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_UTEN_PERSONDATA
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_BEGRENSET
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_HENDELSER
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET_UTEN_PII
 import no.kartverket.matrikkel.bygning.plugins.authentication.mock.mockJwt
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
 object AuthenticationConstants {
     const val IDPORTEN_PROVIDER_NAME = "idporten"
-    const val MASKINPORTEN_PROVIDER_NAME = "maskinporten"
     const val ENTRA_ID_ARKIVARISK_HISTORIKK_NAME = "entra_arkivarisk_historikk"
-    const val MATRIKKEL_AUTH_BERETTIGET_INTERESSE = "matrikkel_auth_berettiget_interesse"
-    const val MATRIKKEL_AUTH_UTEN_PERSONDATA = "matrikkel_auth_uten_persondata"
-    const val MATRIKKEL_AUTH_MED_PERSONDATA = "matrikkel_auth_med_persondata"
+
+    const val MATRIKKEL_AUTH_VIRKSOMHET_BEGRENSET = "matrikkel_auth_virksomhet_begrenset"
+    const val MATRIKKEL_AUTH_VIRKSOMHET_UTVIDET_UTEN_PII = "matrikkel_auth_virksomhet_utvidet_uten_pii"
+    const val MATRIKKEL_AUTH_VIRKSOMHET_UTVIDET = "matrikkel_auth_virksomhet_utvidet"
+
+    val VIRKSOMHET_BEGRENSET =
+        EksternRouteConfig(
+            maskinportenAuthSchemeName = "maskinporten_virksomhet_begrenset",
+            matrikkelAuthSchemeName = MATRIKKEL_AUTH_VIRKSOMHET_BEGRENSET,
+            openApiSpecId = "virksomhet_begrenset",
+            path = "virksomhet_begrenset",
+            scope = "kartverk:eiendomsregisteret:bygning.virksomhet.begrenset",
+        )
+
+    val VIRKSOMHET_UTVIDET_UTEN_PII =
+        EksternRouteConfig(
+            maskinportenAuthSchemeName = "maskinporten_virksomhet_utvidet_uten_pii",
+            matrikkelAuthSchemeName = MATRIKKEL_AUTH_VIRKSOMHET_UTVIDET_UTEN_PII,
+            openApiSpecId = "virksomhet_utvidet_uten_pii",
+            path = "virksomhet_utvidet_uten_pii",
+            scope = "kartverk:eiendomsregisteret:bygning.virksomhet.utvidet.utenpii",
+        )
+
+    val VIRKSOMHET_UTVIDET =
+        EksternRouteConfig(
+            maskinportenAuthSchemeName = "maskinporten_virksomhet_utvidet",
+            matrikkelAuthSchemeName = MATRIKKEL_AUTH_VIRKSOMHET_UTVIDET,
+            openApiSpecId = "virksomhet_utvidet",
+            path = "virksomhet_utvidet",
+            scope = "kartverk:eiendomsregisteret:bygning.virksomhet.utvidet",
+        )
+
+    // TODO Vet ikke om jeg er enig med meg selv når det kommer til hendelser
+    // Burde det egentlig være kun hendelser uten virksomhet? Noe å tenke på her.
+    val VIRKSOMHET_HENDELSER =
+        EksternRouteConfig(
+            maskinportenAuthSchemeName = "maskinporten_virksomhet_hendelser",
+            matrikkelAuthSchemeName = null,
+            openApiSpecId = "virksomhet_hendelser",
+            path = "virksomhet_hendelser",
+            scope = "kartverk:eiendomsregisteret:bygning.virksomhet.hendelser",
+        )
 }
+
+data class EksternRouteConfig(
+    val maskinportenAuthSchemeName: String,
+    val matrikkelAuthSchemeName: String?,
+    val openApiSpecId: String,
+    val path: String,
+    val scope: String,
+)
 
 object ApplicationRoles {
     const val ACCESS_AS_APPLICATION = "access_as_application"
@@ -66,23 +112,29 @@ fun Application.configureAuthentication(
     matrikkelAuth: AuthService,
 ) {
     install(Authentication) {
-        jwtMaskinporten(config)
+        jwtMaskinporten(config, VIRKSOMHET_BEGRENSET)
+        jwtMaskinporten(config, VIRKSOMHET_UTVIDET_UTEN_PII)
+        jwtMaskinporten(config, VIRKSOMHET_UTVIDET)
+        jwtMaskinporten(config, VIRKSOMHET_HENDELSER)
         jwtIDPorten(config)
         jwtEntraIdArkivariskHistorikk(config)
         configureMatrikkelAuth(config, matrikkelAuth)
     }
 }
 
-private fun AuthenticationConfig.jwtMaskinporten(config: ApplicationConfig) {
-    if (Env.isLocal() && isProviderDisabled(config, MASKINPORTEN_PROVIDER_NAME)) {
-        mockJwt(MASKINPORTEN_PROVIDER_NAME)
+private fun AuthenticationConfig.jwtMaskinporten(
+    config: ApplicationConfig,
+    eksternRouteConfig: EksternRouteConfig,
+) {
+    if (Env.isLocal() && isProviderDisabled(config, "maskinporten")) {
+        mockJwt(eksternRouteConfig.maskinportenAuthSchemeName)
     } else {
-        jwt(MASKINPORTEN_PROVIDER_NAME) {
+        jwt(eksternRouteConfig.maskinportenAuthSchemeName) {
             val authConfig =
                 JWTAuthenticationConfig(
-                    jwksUri = config.property("$name.jwksUri").getString(),
-                    issuer = config.property("$name.issuer").getString(),
-                    scopes = config.property("$name.scopes").getString(),
+                    jwksUri = config.property("maskinporten.jwksUri").getString(),
+                    issuer = config.property("maskinporten.issuer").getString(),
+                    scopes = eksternRouteConfig.scope,
                 )
 
             verifier(authConfig.jwkProvider, authConfig.issuer) {
@@ -161,13 +213,13 @@ private fun AuthenticationConfig.configureMatrikkelAuth(
     if (Env.isLocal() && isProviderDisabled(config, "matrikkel.oidc")) {
         // Må registrere authenticators med disse navnene, men uten noe å sjekke mot, så avslår de alt.
         val authenticate: suspend ApplicationCall.(BearerTokenCredential) -> Any? = { _ -> null }
-        bearer(MATRIKKEL_AUTH_BERETTIGET_INTERESSE) {
+        bearer(VIRKSOMHET_BEGRENSET.matrikkelAuthSchemeName) {
             authenticate(authenticate)
         }
-        bearer(MATRIKKEL_AUTH_UTEN_PERSONDATA) {
+        bearer(VIRKSOMHET_UTVIDET_UTEN_PII.matrikkelAuthSchemeName) {
             authenticate(authenticate)
         }
-        bearer(MATRIKKEL_AUTH_MED_PERSONDATA) {
+        bearer(VIRKSOMHET_UTVIDET.matrikkelAuthSchemeName) {
             authenticate(authenticate)
         }
     } else {
@@ -178,16 +230,16 @@ private fun AuthenticationConfig.configureMatrikkelAuth(
                 audience = config.property("matrikkel.oidc.audience").getString(),
             )
 
-        jwt(MATRIKKEL_AUTH_BERETTIGET_INTERESSE) {
-            realm = "Bygning berettiget interesse"
+        jwt(VIRKSOMHET_BEGRENSET.matrikkelAuthSchemeName) {
+            realm = "Bygning virksomhet begrenset"
             configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.BerettigetInteresse)
         }
-        jwt(MATRIKKEL_AUTH_UTEN_PERSONDATA) {
-            realm = "Bygning uten personidentifikasjon"
+        jwt(VIRKSOMHET_UTVIDET_UTEN_PII.matrikkelAuthSchemeName) {
+            realm = "Bygning virksomhet utvidet uten personidentifiserende informasjon"
             configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.InnsynUtenPersondata)
         }
-        jwt(MATRIKKEL_AUTH_MED_PERSONDATA) {
-            realm = "Bygning med personidentifikasjon"
+        jwt(VIRKSOMHET_UTVIDET.matrikkelAuthSchemeName) {
+            realm = "Bygning virksomhet utvidet"
             configureMatrikkelAuth(authConfig, authService, Matrikkelrolle.InnsynMedPersondata)
         }
     }

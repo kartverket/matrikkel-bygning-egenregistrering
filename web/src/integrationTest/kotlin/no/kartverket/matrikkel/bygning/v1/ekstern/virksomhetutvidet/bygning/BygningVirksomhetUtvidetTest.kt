@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.v1.ekstern.utenpersondata.bygning
+package no.kartverket.matrikkel.bygning.v1.ekstern.virksomhetutvidet.bygning
 
 import assertk.all
 import assertk.assertThat
@@ -18,17 +18,17 @@ import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import no.kartverket.matrikkel.bygning.TestApplicationWithDb
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.BruksenhetUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.BygningUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.AvlopKodeUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.BruksarealUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.BruksenhetEtasjerUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.BruksenhetEtasjerUtenPersondataResponse.BruksenhetEtasjeUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.BruksenhetEtasjerUtenPersondataResponse.EtasjeBetegnelseUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.EnergikildeUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.OppvarmingUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.FeltUtenPersondataResponse.VannforsyningKodeUtenPersondataResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning.RegisterMetadataUtenPersondataResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.BruksenhetVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.BygningVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.AvlopKodeVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.BruksarealVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.BruksenhetEtasjerVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.BruksenhetEtasjerVirksomhetUtvidetResponse.BruksenhetEtasjeVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.BruksenhetEtasjerVirksomhetUtvidetResponse.EtasjeBetegnelseVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.EnergikildeVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.OppvarmingVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.VannforsyningKodeVirksomhetUtvidetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.RegisterMetadataVirksomhetUtvidetResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EtasjeBetegnelseRequest
@@ -38,22 +38,22 @@ import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Comp
 import no.kartverket.matrikkel.bygning.v1.common.gyldigRequest
 import org.junit.jupiter.api.Test
 
-class BygningUtenPersondataTest : TestApplicationWithDb() {
+class BygningVirksomhetUtvidetTest : TestApplicationWithDb() {
     @Test
     fun `gitt en gyldig token med riktig scope skal tilgang gis`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
-            val token = mockOAuthServer.issueMaskinportenJWT()
+            val token = mockOAuthServer.issueMaskinportenJWT("kartverk:eiendomsregisteret:bygning.virksomhet.utvidet")
 
             val response =
-                client.get("/v1/utenpersondata/bygninger/1") {
+                client.get("/v1/virksomhet_utvidet/bygninger/1") {
                     bearerAuth(token.serialize())
                 }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-            assertThat(response.body<BygningUtenPersondataResponse>()).all {
-                prop(BygningUtenPersondataResponse::bygningId).isEqualTo(1L)
-                prop(BygningUtenPersondataResponse::bruksenheter).hasSize(2)
+            assertThat(response.body<BygningVirksomhetUtvidetResponse>()).all {
+                prop(BygningVirksomhetUtvidetResponse::bygningId).isEqualTo(1L)
+                prop(BygningVirksomhetUtvidetResponse::bruksenheter).hasSize(2)
             }
         }
 
@@ -64,7 +64,7 @@ class BygningUtenPersondataTest : TestApplicationWithDb() {
             val token = mockOAuthServer.issueMaskinportenJWT("feil:scope")
 
             val response =
-                client.get("/v1/utenpersondata/bygninger/1") {
+                client.get("/v1/virksomhet_utvidet/bygninger/1") {
                     bearerAuth(token.serialize())
                 }
 
@@ -76,7 +76,7 @@ class BygningUtenPersondataTest : TestApplicationWithDb() {
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-            val response = client.get("/v1/utenpersondata/bygninger/1")
+            val response = client.get("/v1/virksomhet_utvidet/bygninger/1")
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Unauthorized)
         }
@@ -123,62 +123,62 @@ class BygningUtenPersondataTest : TestApplicationWithDb() {
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Created)
 
-            val maskinportenToken = mockOAuthServer.issueMaskinportenJWT()
+            val maskinportenToken = mockOAuthServer.issueMaskinportenJWT("kartverk:eiendomsregisteret:bygning.virksomhet.utvidet")
             val bygningResponse =
-                client.get("/v1/utenpersondata/bruksenheter/1") {
+                client.get("/v1/virksomhet_utvidet/bruksenheter/1") {
                     bearerAuth(maskinportenToken.serialize())
                 }
 
             assertThat(bygningResponse.status).isEqualTo(HttpStatusCode.OK)
-            assertThat(bygningResponse.body<BruksenhetUtenPersondataResponse>()).all {
-                prop(BruksenhetUtenPersondataResponse::bruksenhetId).isEqualTo(1L)
-                prop(BruksenhetUtenPersondataResponse::etasjer).isNotNull().all {
-                    prop(BruksenhetEtasjerUtenPersondataResponse::data).all {
+            assertThat(bygningResponse.body<BruksenhetVirksomhetUtvidetResponse>()).all {
+                prop(BruksenhetVirksomhetUtvidetResponse::bruksenhetId).isEqualTo(1L)
+                prop(BruksenhetVirksomhetUtvidetResponse::etasjer).isNotNull().all {
+                    prop(BruksenhetEtasjerVirksomhetUtvidetResponse::data).all {
                         index(0).all {
-                            prop(BruksenhetEtasjeUtenPersondataResponse::bruksareal).isEqualTo(30.0)
-                            prop(BruksenhetEtasjeUtenPersondataResponse::etasjeBetegnelse).all {
-                                prop(EtasjeBetegnelseUtenPersondataResponse::etasjeplanKode).isEqualTo("H")
-                                prop(EtasjeBetegnelseUtenPersondataResponse::etasjenummer).isEqualTo(1)
+                            prop(BruksenhetEtasjeVirksomhetUtvidetResponse::bruksareal).isEqualTo(30.0)
+                            prop(BruksenhetEtasjeVirksomhetUtvidetResponse::etasjeBetegnelse).all {
+                                prop(EtasjeBetegnelseVirksomhetUtvidetResponse::etasjeplanKode).isEqualTo("H")
+                                prop(EtasjeBetegnelseVirksomhetUtvidetResponse::etasjenummer).isEqualTo(1)
                             }
                         }
                         index(1).all {
-                            prop(BruksenhetEtasjeUtenPersondataResponse::bruksareal).isEqualTo(10.0)
-                            prop(BruksenhetEtasjeUtenPersondataResponse::etasjeBetegnelse).all {
-                                prop(EtasjeBetegnelseUtenPersondataResponse::etasjeplanKode).isEqualTo("L")
-                                prop(EtasjeBetegnelseUtenPersondataResponse::etasjenummer).isEqualTo(1)
+                            prop(BruksenhetEtasjeVirksomhetUtvidetResponse::bruksareal).isEqualTo(10.0)
+                            prop(BruksenhetEtasjeVirksomhetUtvidetResponse::etasjeBetegnelse).all {
+                                prop(EtasjeBetegnelseVirksomhetUtvidetResponse::etasjeplanKode).isEqualTo("L")
+                                prop(EtasjeBetegnelseVirksomhetUtvidetResponse::etasjenummer).isEqualTo(1)
                             }
                         }
                     }
-                    prop(BruksenhetEtasjerUtenPersondataResponse::metadata).all {
-                        prop(RegisterMetadataUtenPersondataResponse::kildemateriale).isEqualTo(KildematerialeKode.Salgsoppgave)
+                    prop(BruksenhetEtasjerVirksomhetUtvidetResponse::metadata).all {
+                        prop(RegisterMetadataVirksomhetUtvidetResponse::registrertAv).isEqualTo("66860475309")
                     }
                 }
-                prop(BruksenhetUtenPersondataResponse::totaltBruksareal).isNotNull().all {
-                    prop(BruksarealUtenPersondataResponse::metadata).all {
-                        prop(RegisterMetadataUtenPersondataResponse::kildemateriale).isEqualTo(KildematerialeKode.Salgsoppgave)
+                prop(BruksenhetVirksomhetUtvidetResponse::totaltBruksareal).isNotNull().all {
+                    prop(BruksarealVirksomhetUtvidetResponse::metadata).all {
+                        prop(RegisterMetadataVirksomhetUtvidetResponse::registrertAv).isEqualTo("66860475309")
                     }
                 }
-                prop(BruksenhetUtenPersondataResponse::vannforsyning).isNotNull().all {
-                    prop(VannforsyningKodeUtenPersondataResponse::metadata).all {
-                        prop(RegisterMetadataUtenPersondataResponse::kildemateriale).isEqualTo(KildematerialeKode.Salgsoppgave)
+                prop(BruksenhetVirksomhetUtvidetResponse::vannforsyning).isNotNull().all {
+                    prop(VannforsyningKodeVirksomhetUtvidetResponse::metadata).all {
+                        prop(RegisterMetadataVirksomhetUtvidetResponse::registrertAv).isEqualTo("66860475309")
                     }
                 }
-                prop(BruksenhetUtenPersondataResponse::avlop).isNotNull().all {
-                    prop(AvlopKodeUtenPersondataResponse::metadata).all {
-                        prop(RegisterMetadataUtenPersondataResponse::kildemateriale).isEqualTo(KildematerialeKode.Selvrapportert)
+                prop(BruksenhetVirksomhetUtvidetResponse::avlop).isNotNull().all {
+                    prop(AvlopKodeVirksomhetUtvidetResponse::metadata).all {
+                        prop(RegisterMetadataVirksomhetUtvidetResponse::registrertAv).isEqualTo("66860475309")
                     }
                 }
-                prop(BruksenhetUtenPersondataResponse::energikilder).isNotNull().all {
+                prop(BruksenhetVirksomhetUtvidetResponse::energikilder).isNotNull().all {
                     index(0).isNotNull().all {
-                        prop(EnergikildeUtenPersondataResponse::metadata).all {
-                            prop(RegisterMetadataUtenPersondataResponse::kildemateriale).isEqualTo(KildematerialeKode.Selvrapportert)
+                        prop(EnergikildeVirksomhetUtvidetResponse::metadata).all {
+                            prop(RegisterMetadataVirksomhetUtvidetResponse::registrertAv).isEqualTo("66860475309")
                         }
                     }
                 }
-                prop(BruksenhetUtenPersondataResponse::oppvarming).isNotNull().all {
+                prop(BruksenhetVirksomhetUtvidetResponse::oppvarming).isNotNull().all {
                     index(0).isNotNull().all {
-                        prop(OppvarmingUtenPersondataResponse::metadata).all {
-                            prop(RegisterMetadataUtenPersondataResponse::kildemateriale).isEqualTo(KildematerialeKode.Selvrapportert)
+                        prop(OppvarmingVirksomhetUtvidetResponse::metadata).all {
+                            prop(RegisterMetadataVirksomhetUtvidetResponse::registrertAv).isEqualTo("66860475309")
                         }
                     }
                 }

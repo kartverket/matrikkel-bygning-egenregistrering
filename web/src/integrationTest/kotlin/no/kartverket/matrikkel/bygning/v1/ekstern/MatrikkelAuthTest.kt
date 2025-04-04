@@ -22,7 +22,7 @@ class MatrikkelAuthTest {
             testApplication {
                 val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-                val response = client.request("/v1/berettigetinteresse/bruksenheter/1")
+                val response = client.request("/v1/virksomhet_begrenset/bruksenheter/1")
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
             }
 
@@ -39,7 +39,7 @@ class MatrikkelAuthTest {
                     )
 
                 val response =
-                    client.request("/v1/berettigetinteresse/bruksenheter/1") {
+                    client.request("/v1/virksomhet_begrenset/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
@@ -58,7 +58,7 @@ class MatrikkelAuthTest {
                     )
 
                 val response =
-                    client.request("/v1/berettigetinteresse/bruksenheter/1") {
+                    client.request("/v1/virksomhet_begrenset/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.OK)
@@ -72,7 +72,7 @@ class MatrikkelAuthTest {
             testApplication {
                 val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-                val response = client.request("/v1/utenpersondata/bruksenheter/1")
+                val response = client.request("/v1/virksomhet_utvidet_uten_pii/bruksenheter/1")
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
             }
 
@@ -89,7 +89,7 @@ class MatrikkelAuthTest {
                     )
 
                 val response =
-                    client.request("/v1/utenpersondata/bruksenheter/1") {
+                    client.request("/v1/virksomhet_utvidet_uten_pii/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
@@ -108,7 +108,7 @@ class MatrikkelAuthTest {
                     )
 
                 val response =
-                    client.request("/v1/utenpersondata/bruksenheter/1") {
+                    client.request("/v1/virksomhet_utvidet_uten_pii/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.OK)
@@ -122,7 +122,7 @@ class MatrikkelAuthTest {
             testApplication {
                 val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-                val response = client.request("/v1/medpersondata/bruksenheter/1")
+                val response = client.request("/v1/virksomhet_utvidet/bruksenheter/1")
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
             }
 
@@ -139,7 +139,7 @@ class MatrikkelAuthTest {
                     )
 
                 val response =
-                    client.request("/v1/medpersondata/bruksenheter/1") {
+                    client.request("/v1/virksomhet_utvidet/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
@@ -158,7 +158,7 @@ class MatrikkelAuthTest {
                     )
 
                 val response =
-                    client.request("/v1/medpersondata/bruksenheter/1") {
+                    client.request("/v1/virksomhet_utvidet/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.OK)

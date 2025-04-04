@@ -49,9 +49,9 @@ class HendelserTest : TestApplicationWithDb() {
                 bearerAuth(idportenJWT.serialize())
             }
 
-            val maskinportenJWT = mockOAuthServer.issueMaskinportenJWT()
+            val maskinportenJWT = mockOAuthServer.issueMaskinportenJWT("kartverk:eiendomsregisteret:bygning.virksomhet.hendelser")
             val result =
-                client.get("/v1/hendelser") {
+                client.get("/v1/virksomhet_hendelser") {
                     url {
                         parameters.append("antall", "10")
                     }

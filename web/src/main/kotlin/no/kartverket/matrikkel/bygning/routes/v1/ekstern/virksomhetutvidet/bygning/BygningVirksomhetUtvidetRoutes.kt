@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning
+package no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning
 
 import com.github.michaelbull.result.mapBoth
 import io.github.smiley4.ktoropenapi.get
@@ -10,7 +10,7 @@ import io.ktor.server.util.getOrFail
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 
-fun Route.bygningMedPersondataRouting(bygningService: BygningService) {
+fun Route.bygningVirksomhetUtvidetRouting(bygningService: BygningService) {
     route("{bygningId}") {
         get(
             {
@@ -23,7 +23,7 @@ fun Route.bygningMedPersondataRouting(bygningService: BygningService) {
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BygningMedPersondataResponse> {
+                        body<BygningVirksomhetUtvidetResponse> {
                             description = "Bygningen med tilhørende bruksenheter"
                         }
                         description = "Bygningen finnes og ble hentet"
@@ -38,7 +38,7 @@ fun Route.bygningMedPersondataRouting(bygningService: BygningService) {
 
             val (status, body) =
                 bygningService.getBygningByBubbleId(bygningId).mapBoth(
-                    success = { HttpStatusCode.OK to it.toBygningMedPersondataResponse() },
+                    success = { HttpStatusCode.OK to it.toBygningVirksomhetUtvidetResponse() },
                     failure = ::domainErrorToResponse,
                 )
 
@@ -47,7 +47,7 @@ fun Route.bygningMedPersondataRouting(bygningService: BygningService) {
     }
 }
 
-fun Route.bruksenhetMedPersondataRouting(bygningService: BygningService) {
+fun Route.bruksenhetVirksomhetUtvidetRouting(bygningService: BygningService) {
     route("{bruksenhetId}") {
         get(
             {
@@ -60,7 +60,7 @@ fun Route.bruksenhetMedPersondataRouting(bygningService: BygningService) {
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BruksenhetMedPersondataResponse> {
+                        body<BruksenhetVirksomhetUtvidetResponse> {
                             description = "Bruksenheten"
                         }
                         description = "Bruksenheten finnes og ble hentet"
@@ -75,7 +75,7 @@ fun Route.bruksenhetMedPersondataRouting(bygningService: BygningService) {
 
             val (status, body) =
                 bygningService.getBruksenhetByBubbleId(bruksenhetId).mapBoth(
-                    success = { HttpStatusCode.OK to it.toBruksenhetMedPersondataResponse() },
+                    success = { HttpStatusCode.OK to it.toBruksenhetVirksomhetUtvidetResponse() },
                     failure = ::domainErrorToResponse,
                 )
 

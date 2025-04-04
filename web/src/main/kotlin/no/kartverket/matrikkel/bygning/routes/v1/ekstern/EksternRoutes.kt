@@ -6,53 +6,48 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.Route
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelseService
-import no.kartverket.matrikkel.bygning.plugins.OpenApiSpecIds
-import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MASKINPORTEN_PROVIDER_NAME
-import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_BERETTIGET_INTERESSE
-import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_MED_PERSONDATA
-import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.MATRIKKEL_AUTH_UTEN_PERSONDATA
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.berettigetInteresseRouting
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.hendelseRouting
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygningMedPersondataRouting
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.utenPersondataRouting
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_BEGRENSET
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_HENDELSER
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET
+import no.kartverket.matrikkel.bygning.plugins.authentication.AuthenticationConstants.VIRKSOMHET_UTVIDET_UTEN_PII
+import no.kartverket.matrikkel.bygning.plugins.authentication.EksternRouteConfig
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.hendelse.virksomhetHendelserRouting
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetbegrenset.virksomhetBegrensetRouting
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.virksomhetUtvidetRouting
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidetutenpii.virksomhetUtvidetUtenPIIRouting
 
 fun Route.eksternRouting(
     bygningService: BygningService,
     hendelseService: HendelseService,
 ) {
     route("/") {
-        eksternApiRoute(
-            "berettigetinteresse",
-            OpenApiSpecIds.BERETTIGET_INTERESSE,
-            MATRIKKEL_AUTH_BERETTIGET_INTERESSE,
-        ) {
-            berettigetInteresseRouting(bygningService)
+        eksternApiRoute(VIRKSOMHET_BEGRENSET) {
+            virksomhetBegrensetRouting(bygningService)
         }
 
-        eksternApiRoute("utenpersondata", OpenApiSpecIds.UTEN_PERSONDATA, MATRIKKEL_AUTH_UTEN_PERSONDATA) {
-            utenPersondataRouting(bygningService)
+        eksternApiRoute(VIRKSOMHET_UTVIDET_UTEN_PII) {
+            virksomhetUtvidetUtenPIIRouting(bygningService)
         }
 
-        eksternApiRoute("medpersondata", OpenApiSpecIds.MED_PERSONDATA, MATRIKKEL_AUTH_MED_PERSONDATA) {
-            bygningMedPersondataRouting(bygningService)
+        eksternApiRoute(VIRKSOMHET_UTVIDET) {
+            virksomhetUtvidetRouting(bygningService)
         }
 
-        eksternApiRoute("hendelser", OpenApiSpecIds.HENDELSER) {
-            hendelseRouting(hendelseService)
+        eksternApiRoute(VIRKSOMHET_HENDELSER) {
+            virksomhetHendelserRouting(hendelseService)
         }
     }
 }
 
 private fun Route.eksternApiRoute(
-    path: String,
-    openApiSpecId: String,
-    matrikkelAuthSchemeName: String? = null,
+    eksternRouteConfig: EksternRouteConfig,
     build: Route.() -> Unit,
 ) = route(
-    path,
+    eksternRouteConfig.path,
     {
-        specName = openApiSpecId
-        securitySchemeNames = listOfNotNull(MASKINPORTEN_PROVIDER_NAME, matrikkelAuthSchemeName)
+        specName = eksternRouteConfig.openApiSpecId
+        securitySchemeNames =
+            listOfNotNull(eksternRouteConfig.maskinportenAuthSchemeName, eksternRouteConfig.matrikkelAuthSchemeName)
         response {
             code(HttpStatusCode.Unauthorized) {
                 description = "Manglende eller ugyldig token"
@@ -60,9 +55,13 @@ private fun Route.eksternApiRoute(
         }
     },
 ) {
-    if (matrikkelAuthSchemeName != null) {
-        authenticate(MASKINPORTEN_PROVIDER_NAME, matrikkelAuthSchemeName, build = build)
+    if (eksternRouteConfig.matrikkelAuthSchemeName != null) {
+        authenticate(
+            eksternRouteConfig.maskinportenAuthSchemeName,
+            eksternRouteConfig.matrikkelAuthSchemeName,
+            build = build,
+        )
     } else {
-        authenticate(MASKINPORTEN_PROVIDER_NAME, build = build)
+        authenticate(eksternRouteConfig.maskinportenAuthSchemeName, build = build)
     }
 }

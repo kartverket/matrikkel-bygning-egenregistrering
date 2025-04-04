@@ -79,7 +79,6 @@ abstract class TestApplicationWithDb {
                         "matrikkel.oidc.disabled" to "false",
                         "maskinporten.issuer" to mockOAuthServer.issuerUrl(DEFAULT_ISSUER).toString(),
                         "maskinporten.jwksUri" to mockOAuthServer.jwksUrl(DEFAULT_ISSUER).toString(),
-                        "maskinporten.scopes" to "kartverk:riktig:scope",
                         "maskinporten.disabled" to "false",
                         "idporten.issuer" to mockOAuthServer.issuerUrl(DEFAULT_ISSUER).toString(),
                         "idporten.jwksUri" to mockOAuthServer.jwksUrl(DEFAULT_ISSUER).toString(),
