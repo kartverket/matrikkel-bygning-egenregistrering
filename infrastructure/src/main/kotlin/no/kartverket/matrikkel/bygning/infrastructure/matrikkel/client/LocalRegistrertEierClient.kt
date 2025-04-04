@@ -18,7 +18,7 @@ class LocalRegistrertEierClient : RegistrertEierClient {
         listOf(
             MatrikkelenhetEier(
                 ultimatEier = true,
-                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(1L),
+                matrikkelenhetBubbleId = MatrikkelenhetBubbleId(1001),
                 eier = RegistreringAktoer.Foedselsnummer("66860475309"),
             ),
         )
