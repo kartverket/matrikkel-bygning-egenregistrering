@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning
+package no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
@@ -7,11 +7,11 @@ import assertk.assertions.prop
 import no.kartverket.matrikkel.bygning.application.models.Felt
 import no.kartverket.matrikkel.bygning.application.models.RegisterMetadata
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.medpersondata.bygning.FeltMedPersondataResponse.ByggeaarMedPersondataResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetutvidet.bygning.FeltVirksomhetUtvidetResponse.ByggeaarVirksomhetUtvidetResponse
 import java.time.Instant
 import kotlin.test.Test
 
-class FeltMedPersondataResponseTest {
+class FeltVirksomhetUtvidetResponseTest {
     @Test
     fun `mapping av felt med foedselsnummer`() {
         val byggeaar =
@@ -25,11 +25,11 @@ class FeltMedPersondataResponseTest {
                 ),
             )
 
-        val responseObject = toFeltMedPersondataResponse(byggeaar, ::ByggeaarMedPersondataResponse)
+        val responseObject = toFeltVirksomhetUtvidetResponse(byggeaar, ::ByggeaarVirksomhetUtvidetResponse)
         assertThat(responseObject)
             .isNotNull()
-            .prop(FeltMedPersondataResponse<*>::metadata)
-            .prop(RegisterMetadataMedPersondataResponse::registrertAv)
+            .prop(FeltVirksomhetUtvidetResponse<*>::metadata)
+            .prop(RegisterMetadataVirksomhetUtvidetResponse::registrertAv)
             .isEqualTo("21904798557")
     }
 
@@ -46,11 +46,11 @@ class FeltMedPersondataResponseTest {
                 ),
             )
 
-        val responseObject = toFeltMedPersondataResponse(byggeaar, ::ByggeaarMedPersondataResponse)
+        val responseObject = toFeltVirksomhetUtvidetResponse(byggeaar, ::ByggeaarVirksomhetUtvidetResponse)
         assertThat(responseObject)
             .isNotNull()
-            .prop(FeltMedPersondataResponse<*>::metadata)
-            .prop(RegisterMetadataMedPersondataResponse::registrertAv)
+            .prop(FeltVirksomhetUtvidetResponse<*>::metadata)
+            .prop(RegisterMetadataVirksomhetUtvidetResponse::registrertAv)
             .isEqualTo("Kongen")
     }
 }

@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test
 
 class MatrikkelAuthTest {
     @Nested
-    inner class BerettigetInteresse : TestApplicationWithDb() {
+    inner class VirksomhetBegrenset : TestApplicationWithDb() {
         @Test
         fun utenToken() =
             testApplication {
                 val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-                val response = client.request("/v1/berettigetinteresse/bruksenheter/1")
+                val response = client.request("/v1/virksomhet_begrenset/bruksenheter/1")
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
             }
 
@@ -39,7 +39,7 @@ class MatrikkelAuthTest {
                     )
 
                 val response =
-                    client.request("/v1/berettigetinteresse/bruksenheter/1") {
+                    client.request("/v1/virksomhet_begrenset/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
@@ -53,12 +53,12 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-BerettigetInteresse",
+                        subject = "stubbed-test-user-VirksomhetBegrenset",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
                 val response =
-                    client.request("/v1/berettigetinteresse/bruksenheter/1") {
+                    client.request("/v1/virksomhet_begrenset/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.OK)
@@ -66,13 +66,13 @@ class MatrikkelAuthTest {
     }
 
     @Nested
-    inner class UtenPersondata : TestApplicationWithDb() {
+    inner class VirksomhetUtvidetUtenPII : TestApplicationWithDb() {
         @Test
         fun utenToken() =
             testApplication {
                 val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-                val response = client.request("/v1/utenpersondata/bruksenheter/1")
+                val response = client.request("/v1/virksomhet_utvidet_uten_pii/bruksenheter/1")
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
             }
 
@@ -84,12 +84,12 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-BerettigetInteresse",
+                        subject = "stubbed-test-user-VirksomhetBegrenset",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
                 val response =
-                    client.request("/v1/utenpersondata/bruksenheter/1") {
+                    client.request("/v1/virksomhet_utvidet_uten_pii/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
@@ -103,12 +103,12 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-InnsynUtenPersondata",
+                        subject = "stubbed-test-user-VirksomhetUtvidetUtenPII",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
                 val response =
-                    client.request("/v1/utenpersondata/bruksenheter/1") {
+                    client.request("/v1/virksomhet_utvidet_uten_pii/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.OK)
@@ -116,13 +116,13 @@ class MatrikkelAuthTest {
     }
 
     @Nested
-    inner class MedPersondata : TestApplicationWithDb() {
+    inner class VirksomhetUtvidet : TestApplicationWithDb() {
         @Test
         fun utenToken() =
             testApplication {
                 val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-                val response = client.request("/v1/medpersondata/bruksenheter/1")
+                val response = client.request("/v1/virksomhet_utvidet/bruksenheter/1")
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
             }
 
@@ -134,12 +134,12 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-InnsynUtenPersondata",
+                        subject = "stubbed-test-user-VirksomhetUtvidetUtenPII",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
                 val response =
-                    client.request("/v1/medpersondata/bruksenheter/1") {
+                    client.request("/v1/virksomhet_utvidet/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.Unauthorized)
@@ -153,12 +153,12 @@ class MatrikkelAuthTest {
                 val token =
                     mockOAuthServer.issueToken(
                         issuerId = MATRIKKEL_ISSUER,
-                        subject = "stubbed-test-user-InnsynMedPersondata",
+                        subject = "stubbed-test-user-VirksomhetUtvidet",
                         audience = MATRIKKEL_AUDIENCE,
                     )
 
                 val response =
-                    client.request("/v1/medpersondata/bruksenheter/1") {
+                    client.request("/v1/virksomhet_utvidet/bruksenheter/1") {
                         bearerAuth(token.serialize())
                     }
                 assertThat(response).prop(HttpResponse::status).isEqualTo(HttpStatusCode.OK)

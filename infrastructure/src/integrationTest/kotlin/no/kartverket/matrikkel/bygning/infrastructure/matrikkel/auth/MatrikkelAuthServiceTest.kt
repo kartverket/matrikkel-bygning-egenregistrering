@@ -30,7 +30,7 @@ class MatrikkelAuthServiceTest {
 
             val matrikkelAuthService = MatrikkelAuthService(MatrikkelApi(URI.create(wireMock.baseUrl())))
 
-            assertThat(matrikkelAuthService.harMatrikkeltilgang("random", Matrikkelrolle.InnsynMedPersondata)).isNull()
+            assertThat(matrikkelAuthService.harMatrikkeltilgang("random", Matrikkelrolle.VirksomhetUtvidet)).isNull()
         }
 
     @Test
@@ -89,7 +89,7 @@ class MatrikkelAuthServiceTest {
             assertThat(
                 matrikkelAuthService.harMatrikkeltilgang(
                     "random",
-                    Matrikkelrolle.InnsynMedPersondata,
+                    Matrikkelrolle.VirksomhetUtvidet,
                 ),
             ).isEqualTo("testbruker")
 
@@ -161,11 +161,11 @@ class MatrikkelAuthServiceTest {
 
             val matrikkelAuthService = MatrikkelAuthService(MatrikkelApi(URI.create(wireMock.baseUrl())))
 
-            assertThat(matrikkelAuthService.harMatrikkeltilgang("random", Matrikkelrolle.InnsynMedPersondata)).isNull()
+            assertThat(matrikkelAuthService.harMatrikkeltilgang("random", Matrikkelrolle.VirksomhetUtvidet)).isNull()
             assertThat(
                 matrikkelAuthService.harMatrikkeltilgang(
                     "random",
-                    Matrikkelrolle.BerettigetInteresse,
+                    Matrikkelrolle.VirksomhetBegrenset,
                 ),
             ).isEqualTo("testbruker")
 

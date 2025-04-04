@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.v1.ekstern.berettigetinteresse.bygning
+package no.kartverket.matrikkel.bygning.v1.ekstern.virksomhetbegrenset.bygning
 
 import assertk.all
 import assertk.assertThat
@@ -22,10 +22,10 @@ import no.kartverket.matrikkel.bygning.application.models.kodelister.Energikilde
 import no.kartverket.matrikkel.bygning.application.models.kodelister.KildematerialeKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.OppvarmingKode
 import no.kartverket.matrikkel.bygning.application.models.kodelister.VannforsyningKode
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.bygning.BruksenhetBerettigetInteresseResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.bygning.BruksenhetEtasjeBerettigetInteresseResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.bygning.BruksenhetEtasjeBerettigetInteresseResponse.EtasjeBetegnelseBerettigetInteresseResponse
-import no.kartverket.matrikkel.bygning.routes.v1.ekstern.berettigetinteresse.bygning.BygningBerettigetInteresseResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetbegrenset.bygning.BruksenhetEtasjeVirksomhetBegrensetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetbegrenset.bygning.BruksenhetEtasjeVirksomhetBegrensetResponse.EtasjeBetegnelseVirksomhetBegrensetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetbegrenset.bygning.BruksenhetVirksomhetBegrensetResponse
+import no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetbegrenset.bygning.BygningVirksomhetBegrensetResponse
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EtasjeBetegnelseRequest
@@ -35,22 +35,22 @@ import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Comp
 import no.kartverket.matrikkel.bygning.v1.common.gyldigRequest
 import org.junit.jupiter.api.Test
 
-class BygningBerettigetInteresseTest : TestApplicationWithDb() {
+class BygningVirksomhetBegrensetTest : TestApplicationWithDb() {
     @Test
     fun `gitt en gyldig token med riktig scope skal tilgang gis`() =
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
-            val token = mockOAuthServer.issueMaskinportenJWT()
+            val token = mockOAuthServer.issueMaskinportenJWT("kartverk:eiendomsregisteret:bygning.virksomhet.begrenset")
 
             val response =
-                client.get("/v1/berettigetinteresse/bygninger/1") {
+                client.get("/v1/virksomhet_begrenset/bygninger/1") {
                     bearerAuth(token.serialize())
                 }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.OK)
-            assertThat(response.body<BygningBerettigetInteresseResponse>()).all {
-                prop(BygningBerettigetInteresseResponse::bygningId).isEqualTo(1L)
-                prop(BygningBerettigetInteresseResponse::bruksenheter).hasSize(2)
+            assertThat(response.body<BygningVirksomhetBegrensetResponse>()).all {
+                prop(BygningVirksomhetBegrensetResponse::bygningId).isEqualTo(1L)
+                prop(BygningVirksomhetBegrensetResponse::bruksenheter).hasSize(2)
             }
         }
 
@@ -61,7 +61,7 @@ class BygningBerettigetInteresseTest : TestApplicationWithDb() {
             val token = mockOAuthServer.issueMaskinportenJWT("feil:scope")
 
             val response =
-                client.get("/v1/berettigetinteresse/bygninger/1") {
+                client.get("/v1/virksomhet_begrenset/bygninger/1") {
                     bearerAuth(token.serialize())
                 }
 
@@ -73,7 +73,7 @@ class BygningBerettigetInteresseTest : TestApplicationWithDb() {
         testApplication {
             val client = mainModuleWithDatabaseEnvironmentAndClient()
 
-            val response = client.get("/v1/berettigetinteresse/bygninger/1")
+            val response = client.get("/v1/virksomhet_begrenset/bygninger/1")
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Unauthorized)
         }
@@ -120,38 +120,39 @@ class BygningBerettigetInteresseTest : TestApplicationWithDb() {
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Created)
 
-            val maskinportenToken = mockOAuthServer.issueMaskinportenJWT()
+            val maskinportenToken =
+                mockOAuthServer.issueMaskinportenJWT("kartverk:eiendomsregisteret:bygning.virksomhet.begrenset")
             val bygningResponse =
-                client.get("/v1/berettigetinteresse/bruksenheter/1") {
+                client.get("/v1/virksomhet_begrenset/bruksenheter/1") {
                     bearerAuth(maskinportenToken.serialize())
                 }
 
             assertThat(bygningResponse.status).isEqualTo(HttpStatusCode.OK)
-            assertThat(bygningResponse.body<BruksenhetBerettigetInteresseResponse>()).all {
-                prop(BruksenhetBerettigetInteresseResponse::bruksenhetId).isEqualTo(1L)
-                prop(BruksenhetBerettigetInteresseResponse::etasjer).isNotNull().all {
+            assertThat(bygningResponse.body<BruksenhetVirksomhetBegrensetResponse>()).all {
+                prop(BruksenhetVirksomhetBegrensetResponse::bruksenhetId).isEqualTo(1L)
+                prop(BruksenhetVirksomhetBegrensetResponse::etasjer).isNotNull().all {
                     index(0).all {
-                        prop(BruksenhetEtasjeBerettigetInteresseResponse::bruksareal).isEqualTo(30.0)
-                        prop(BruksenhetEtasjeBerettigetInteresseResponse::etasjeBetegnelse).all {
-                            prop(EtasjeBetegnelseBerettigetInteresseResponse::etasjeplanKode).isEqualTo("H")
-                            prop(EtasjeBetegnelseBerettigetInteresseResponse::etasjenummer).isEqualTo(1)
+                        prop(BruksenhetEtasjeVirksomhetBegrensetResponse::bruksareal).isEqualTo(30.0)
+                        prop(BruksenhetEtasjeVirksomhetBegrensetResponse::etasjeBetegnelse).all {
+                            prop(EtasjeBetegnelseVirksomhetBegrensetResponse::etasjeplanKode).isEqualTo("H")
+                            prop(EtasjeBetegnelseVirksomhetBegrensetResponse::etasjenummer).isEqualTo(1)
                         }
                     }
                     index(1).all {
-                        prop(BruksenhetEtasjeBerettigetInteresseResponse::bruksareal).isEqualTo(10.0)
-                        prop(BruksenhetEtasjeBerettigetInteresseResponse::etasjeBetegnelse).all {
-                            prop(EtasjeBetegnelseBerettigetInteresseResponse::etasjeplanKode).isEqualTo("L")
-                            prop(EtasjeBetegnelseBerettigetInteresseResponse::etasjenummer).isEqualTo(1)
+                        prop(BruksenhetEtasjeVirksomhetBegrensetResponse::bruksareal).isEqualTo(10.0)
+                        prop(BruksenhetEtasjeVirksomhetBegrensetResponse::etasjeBetegnelse).all {
+                            prop(EtasjeBetegnelseVirksomhetBegrensetResponse::etasjeplanKode).isEqualTo("L")
+                            prop(EtasjeBetegnelseVirksomhetBegrensetResponse::etasjenummer).isEqualTo(1)
                         }
                     }
                 }
-                prop(BruksenhetBerettigetInteresseResponse::totaltBruksareal).isEqualTo(40.0)
-                prop(BruksenhetBerettigetInteresseResponse::avlop).isEqualTo(AvlopKode.OffentligKloakk)
-                prop(BruksenhetBerettigetInteresseResponse::vannforsyning).isEqualTo(VannforsyningKode.OffentligVannverk)
-                prop(BruksenhetBerettigetInteresseResponse::energikilder).isNotNull().all {
+                prop(BruksenhetVirksomhetBegrensetResponse::totaltBruksareal).isEqualTo(40.0)
+                prop(BruksenhetVirksomhetBegrensetResponse::avlop).isEqualTo(AvlopKode.OffentligKloakk)
+                prop(BruksenhetVirksomhetBegrensetResponse::vannforsyning).isEqualTo(VannforsyningKode.OffentligVannverk)
+                prop(BruksenhetVirksomhetBegrensetResponse::energikilder).isNotNull().all {
                     index(0).isEqualTo(EnergikildeKode.Elektrisitet)
                 }
-                prop(BruksenhetBerettigetInteresseResponse::oppvarming).isNotNull().all {
+                prop(BruksenhetVirksomhetBegrensetResponse::oppvarming).isNotNull().all {
                     index(0).isEqualTo(OppvarmingKode.Elektrisk)
                 }
             }

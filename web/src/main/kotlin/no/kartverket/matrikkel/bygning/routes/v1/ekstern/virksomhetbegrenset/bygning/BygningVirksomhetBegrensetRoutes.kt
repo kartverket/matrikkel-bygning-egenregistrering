@@ -1,4 +1,4 @@
-package no.kartverket.matrikkel.bygning.routes.v1.ekstern.utenpersondata.bygning
+package no.kartverket.matrikkel.bygning.routes.v1.ekstern.virksomhetbegrenset.bygning
 
 import com.github.michaelbull.result.mapBoth
 import io.github.smiley4.ktoropenapi.get
@@ -10,7 +10,7 @@ import io.ktor.server.util.getOrFail
 import no.kartverket.matrikkel.bygning.application.bygning.BygningService
 import no.kartverket.matrikkel.bygning.routes.v1.common.domainErrorToResponse
 
-fun Route.bygningUtenPersondataRouting(bygningService: BygningService) {
+fun Route.bygningVirksomhetBegrensetRouting(bygningService: BygningService) {
     route("{bygningId}") {
         get(
             {
@@ -23,7 +23,7 @@ fun Route.bygningUtenPersondataRouting(bygningService: BygningService) {
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BygningUtenPersondataResponse> {
+                        body<BygningVirksomhetBegrensetResponse> {
                             description = "Bygningen med tilhørende bruksenheter"
                         }
                         description = "Bygningen finnes og ble hentet"
@@ -38,7 +38,7 @@ fun Route.bygningUtenPersondataRouting(bygningService: BygningService) {
 
             val (status, body) =
                 bygningService.getBygningByBubbleId(bygningId).mapBoth(
-                    success = { HttpStatusCode.OK to it.toBygningUtenPersondataResponse() },
+                    success = { HttpStatusCode.OK to it.toBygningVirksomhetBegrensetResponse() },
                     failure = ::domainErrorToResponse,
                 )
 
@@ -47,7 +47,7 @@ fun Route.bygningUtenPersondataRouting(bygningService: BygningService) {
     }
 }
 
-fun Route.bruksenhetUtenPersondataRouting(bygningService: BygningService) {
+fun Route.bruksenhetVirksomhetBegrensetRouting(bygningService: BygningService) {
     route("{bruksenhetId}") {
         get(
             {
@@ -60,7 +60,7 @@ fun Route.bruksenhetUtenPersondataRouting(bygningService: BygningService) {
                 }
                 response {
                     code(HttpStatusCode.OK) {
-                        body<BruksenhetUtenPersondataResponse> {
+                        body<BruksenhetVirksomhetBegrensetResponse> {
                             description = "Bruksenheten"
                         }
                         description = "Bruksenheten finnes og ble hentet"
@@ -75,7 +75,7 @@ fun Route.bruksenhetUtenPersondataRouting(bygningService: BygningService) {
 
             val (status, body) =
                 bygningService.getBruksenhetByBubbleId(bruksenhetId).mapBoth(
-                    success = { HttpStatusCode.OK to it.toBruksenhetUtenPersondataResponse() },
+                    success = { HttpStatusCode.OK to it.toBruksenhetVirksomhetBegrensetResponse() },
                     failure = ::domainErrorToResponse,
                 )
 
