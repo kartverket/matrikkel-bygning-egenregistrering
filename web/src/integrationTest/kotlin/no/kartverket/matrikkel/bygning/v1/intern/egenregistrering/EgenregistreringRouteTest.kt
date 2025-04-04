@@ -39,6 +39,8 @@ import no.kartverket.matrikkel.bygning.routes.v1.intern.bygning.VannforsyningKod
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.BruksarealRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.ByggeaarRegistreringRequest
 import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EgenregistreringRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikildeDataRequest
+import no.kartverket.matrikkel.bygning.routes.v1.intern.egenregistrering.EnergikildeRegistreringRequest
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.DEFAULT_PID
 import no.kartverket.matrikkel.bygning.v1.common.MockOAuth2ServerExtensions.Companion.issueIDPortenJWT
 import no.kartverket.matrikkel.bygning.v1.common.gyldigRequest
@@ -363,6 +365,41 @@ class EgenregistreringRouteTest : TestApplicationWithDb() {
                 }
 
             assertThat(response.status).isEqualTo(HttpStatusCode.Unauthorized)
+        }
+
+    @Test
+    fun `energikilde har ikke skal ikke være mulig å registrere sammen med andre kilder`() =
+        testApplication {
+            val client = mainModuleWithDatabaseEnvironmentAndClient()
+            val token = mockOAuthServer.issueIDPortenJWT()
+
+            val response =
+                client.post("/v1/intern/egenregistreringer") {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(token.serialize())
+                    setBody(
+                        EgenregistreringRequest
+                            .gyldigRequest()
+                            .copy(
+                                energikildeRegistrering =
+                                    EnergikildeRegistreringRequest.Data(
+                                        data =
+                                            listOf(
+                                                EnergikildeDataRequest(
+                                                    energikilde = EnergikildeKode.HarIkke,
+                                                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                                                ),
+                                                EnergikildeDataRequest(
+                                                    energikilde = EnergikildeKode.Biobrensel,
+                                                    kildemateriale = KildematerialeKode.Salgsoppgave,
+                                                ),
+                                            ),
+                                    ),
+                            ),
+                    )
+                }
+
+            assertThat(response.status).isEqualTo(HttpStatusCode.BadRequest)
         }
 
     private fun Assert<List<BruksenhetInternResponse>>.withBruksenhetId(bruksenhetId: Long) =

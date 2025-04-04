@@ -10,6 +10,7 @@ import no.kartverket.matrikkel.bygning.application.models.Egenregistrering
 import no.kartverket.matrikkel.bygning.application.models.EtasjeBruksarealRegistrering
 import no.kartverket.matrikkel.bygning.application.models.Etasjebetegnelse
 import no.kartverket.matrikkel.bygning.application.models.Etasjenummer
+import no.kartverket.matrikkel.bygning.application.models.OppvarmingDataRegistrering
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
 import no.kartverket.matrikkel.bygning.application.models.RegistreringAktoer.Foedselsnummer
 import no.kartverket.matrikkel.bygning.application.models.ids.BruksenhetBubbleId
@@ -91,19 +92,22 @@ class EgenregistreringValidatorTest {
                 bruksenhetRegistrering =
                     baseEgenregistrering.bruksenhetRegistrering.copy(
                         oppvarmingRegistrering =
-                            listOf(
-                                OppvarmingRegistrering(
-                                    oppvarming = OppvarmingKode.Elektrisk,
-                                    kildemateriale = KildematerialeKode.Selvrapportert,
-                                    gyldighetsaar = 2024,
-                                    opphoersaar = 2024,
-                                ),
-                                OppvarmingRegistrering(
-                                    oppvarming = OppvarmingKode.Elektrisk,
-                                    kildemateriale = KildematerialeKode.Selvrapportert,
-                                    gyldighetsaar = 2025,
-                                    opphoersaar = 2026,
-                                ),
+                            OppvarmingRegistrering.Data(
+                                data =
+                                    listOf(
+                                        OppvarmingDataRegistrering(
+                                            oppvarming = OppvarmingKode.Elektrisk,
+                                            kildemateriale = KildematerialeKode.Selvrapportert,
+                                            gyldighetsaar = 2024,
+                                            opphoersaar = 2024,
+                                        ),
+                                        OppvarmingDataRegistrering(
+                                            oppvarming = OppvarmingKode.Elektrisk,
+                                            kildemateriale = KildematerialeKode.Selvrapportert,
+                                            gyldighetsaar = 2025,
+                                            opphoersaar = 2026,
+                                        ),
+                                    ),
                             ),
                     ),
             )

@@ -10,7 +10,6 @@ import no.kartverket.matrikkel.bygning.application.hendelser.BygningHendelseType
 import no.kartverket.matrikkel.bygning.application.hendelser.Hendelse
 import no.kartverket.matrikkel.bygning.application.hendelser.HendelsePayload
 import no.kartverket.matrikkel.bygning.infrastructure.database.repositories.HendelseRepositoryImpl
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -47,15 +46,5 @@ class HendelseRepositoryTest : TestWithDb() {
             }
         }
         assertThat(lagredeHendelser).size().isEqualTo(2)
-    }
-
-    @BeforeEach
-    fun clearBruksenheter() {
-        dataSource.connection.use { connection ->
-            connection.createStatement().use { statement ->
-                @Suppress("SqlWithoutWhere")
-                statement.execute("DELETE FROM bygning.hendelse")
-            }
-        }
     }
 }

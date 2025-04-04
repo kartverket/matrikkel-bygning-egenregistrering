@@ -43,6 +43,7 @@ enum class EnergikildeKode(
     OljeParafin("Olje eller parafin", "Energikildekode for olje eller parafin"),
     Solenergi("Solenergi", "Energikildekode for solenergi"),
     Varmepumpe("Varmepumpe", "Energikildekode for varmepumpe"),
+    HarIkke("Har ikke", "Har ingen energikilde. Kan ikke kombineres med andre koder."),
 }
 
 enum class OppvarmingKode(
@@ -52,6 +53,7 @@ enum class OppvarmingKode(
     Elektrisk("Elektrisk", "Elektrisk oppvarming"),
     Sentralvarme("Sentralvarme", "Sentralvarme"),
     AnnenOppvarming("Annen oppvarming", "Annen oppvarming"),
+    HarIkke("Har ikke", "Har ikke oppvarming. Kan ikke kombineres med andre koder."),
 }
 
 enum class KildematerialeKode(

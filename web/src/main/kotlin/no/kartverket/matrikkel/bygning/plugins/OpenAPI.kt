@@ -3,6 +3,7 @@ package no.kartverket.matrikkel.bygning.plugins
 import io.github.smiley4.ktoropenapi.OpenApi
 import io.github.smiley4.ktoropenapi.config.AuthScheme
 import io.github.smiley4.ktoropenapi.config.AuthType
+import io.github.smiley4.ktoropenapi.config.ExampleEncoder
 import io.github.smiley4.ktoropenapi.config.OpenApiPluginConfig
 import io.github.smiley4.ktoropenapi.config.SchemaGenerator
 import io.github.smiley4.ktoropenapi.config.SecurityConfig
@@ -127,7 +128,13 @@ private fun OpenApiPluginConfig.installOpenApiSpec(
                     customGenerator(SchemaGenerator.TypeOverwrites.Instant())
                     explicitNullTypes = false
                     referencePath = RefType.SIMPLE
+                    // Genererer dokumentasjon med discriminator type hvis request/response-objekter har klassehierarkier
+                    discriminatorProperty = "type"
                 }
+        }
+        examples {
+            // Benytter kotlinx for serialisering av eksempler. Gjør blant annet at eksempler blir korrekt vist med discriminator type
+            exampleEncoder = ExampleEncoder.kotlinx()
         }
         postBuild =
             { openApi, _ -> openApi.externalDocs = null } // Ellers peker den på et sted hvor det ikke ligger noe

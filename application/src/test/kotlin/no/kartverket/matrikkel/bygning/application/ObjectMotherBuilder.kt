@@ -15,7 +15,9 @@ import no.kartverket.matrikkel.bygning.application.models.Felt.Bruksareal
 import no.kartverket.matrikkel.bygning.application.models.Felt.BruksenhetEtasjer
 import no.kartverket.matrikkel.bygning.application.models.Felt.Byggeaar
 import no.kartverket.matrikkel.bygning.application.models.Felt.Energikilde
+import no.kartverket.matrikkel.bygning.application.models.Felt.EnergikildeOpplysning
 import no.kartverket.matrikkel.bygning.application.models.Felt.Oppvarming
+import no.kartverket.matrikkel.bygning.application.models.Felt.OppvarmingOpplysning
 import no.kartverket.matrikkel.bygning.application.models.Felt.Vannforsyning
 import no.kartverket.matrikkel.bygning.application.models.Multikilde
 import no.kartverket.matrikkel.bygning.application.models.OppvarmingRegistrering
@@ -46,8 +48,8 @@ class Builder {
     private var byggeaarRegistrering: ByggeaarRegistrering? = null
     private var vannforsyningRegistrering: VannforsyningRegistrering? = null
     private var avlopRegistrering: AvlopRegistrering? = null
-    private var energikildeRegistrering: List<EnergikildeRegistrering>? = null
-    private var oppvarmingRegistrering: List<OppvarmingRegistrering>? = null
+    private var energikildeRegistrering: EnergikildeRegistrering? = null
+    private var oppvarmingRegistrering: OppvarmingRegistrering? = null
 
     fun withBruksenhetBubbleId(id: BruksenhetBubbleId) =
         apply {
@@ -84,12 +86,12 @@ class Builder {
             avlopRegistrering = avlop
         }
 
-    fun withEnergikilderRegistreringer(energikilder: List<EnergikildeRegistrering>) =
+    fun withEnergikilderRegistreringer(energikilder: EnergikildeRegistrering) =
         apply {
             energikildeRegistrering = energikilder
         }
 
-    fun withOppvarmingRegistreringer(oppvarming: List<OppvarmingRegistrering>) =
+    fun withOppvarmingRegistreringer(oppvarming: OppvarmingRegistrering) =
         apply {
             oppvarmingRegistrering = oppvarming
         }
@@ -115,8 +117,8 @@ object BruksenhetMother {
         private var etasjer: Multikilde<BruksenhetEtasjer> = Multikilde()
         private var byggeaar: Multikilde<Byggeaar> = Multikilde()
         private var totaltBruksareal: Multikilde<Bruksareal> = Multikilde()
-        private var energikilder: Multikilde<List<Energikilde>> = Multikilde()
-        private var oppvarming: Multikilde<List<Oppvarming>> = Multikilde()
+        private var energikilder: Multikilde<EnergikildeOpplysning> = Multikilde()
+        private var oppvarming: Multikilde<OppvarmingOpplysning> = Multikilde()
         private var vannforsyning: Multikilde<Vannforsyning> = Multikilde()
         private var avlop: Multikilde<Avlop> = Multikilde()
 
@@ -132,14 +134,14 @@ object BruksenhetMother {
 
         fun withEtasjer(etasjer: BruksenhetEtasjer) =
             apply {
-                this.etasjer = Multikilde(autoritativ = etasjer)
+                this.etasjer = Multikilde(egenregistrert = etasjer)
             }
 
         fun withByggeaar(byggeaar: Byggeaar) =
             apply {
                 this.byggeaar =
                     Multikilde(
-                        autoritativ = byggeaar,
+                        egenregistrert = byggeaar,
                     )
             }
 
@@ -147,23 +149,23 @@ object BruksenhetMother {
             apply {
                 this.totaltBruksareal =
                     Multikilde(
-                        autoritativ = bruksareal,
+                        egenregistrert = bruksareal,
                     )
             }
 
-        fun withEnergikilder(energikilder: List<Energikilde>) =
+        fun withEnergikilder(energikilder: EnergikildeOpplysning) =
             apply {
                 this.energikilder =
                     Multikilde(
-                        autoritativ = energikilder,
+                        egenregistrert = energikilder,
                     )
             }
 
-        fun withOppvarming(oppvarming: List<Oppvarming>) =
+        fun withOppvarming(oppvarming: OppvarmingOpplysning) =
             apply {
                 this.oppvarming =
                     Multikilde(
-                        autoritativ = oppvarming,
+                        egenregistrert = oppvarming,
                     )
             }
 
